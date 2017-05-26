@@ -8,18 +8,28 @@ namespace Destiny.Server
 {
     public abstract class ServerBase
     {
+        private string mLabel;
         private Acceptor mAcceptor;
         private List<MapleClient> mClients;
         private PacketProcessor mProcessor;
 
+        public short Port
+        {
+            get
+            {
+                return mAcceptor.Port;
+            }
+        }
+
         protected ServerBase(string label, short port)
         {
+            mLabel = label;
             mAcceptor = new Acceptor(port);
             mAcceptor.OnClientAccepted = this.OnClientAccepted;
 
             mClients = new List<MapleClient>();
 
-            mProcessor = new PacketProcessor(label);
+            mProcessor = new PacketProcessor(mLabel);
 
             this.RegisterHandlers();
         }
@@ -39,18 +49,18 @@ namespace Destiny.Server
 
             client.SendRaw(LoginPacket.Handshake());
 
-            Logger.Write(LogLevel.Connection, "Accepted client {0}.", client.Host);
+            Logger.Write(LogLevel.Connection, "[0] Accepted client {1}.", mLabel, client.Host);
         }
 
-        public virtual void Run()
+        public virtual void Start()
         {
             mAcceptor.Start();
         }
 
-        public void Shutdown()
+        public virtual void Stop()
         {
             mAcceptor.Stop();
-            mClients.ForEach(m => m.Close());
+            mClients.ForEach(c => c.Close());
         }
     }
 }

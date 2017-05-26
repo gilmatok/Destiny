@@ -1,4 +1,6 @@
-﻿namespace Destiny.Server
+﻿using Destiny.Utility;
+
+namespace Destiny.Server
 {
     public sealed class MasterServer
     {
@@ -14,16 +16,19 @@
 
         public bool IsAlive { get; private set; }
 
+        public Database Database { get; private set; }
         public LoginServer Login { get; private set; }
         public WorldServer[] Worlds { get; private set; }
 
+        // TODO: Get values from config.
         public MasterServer()
         {
-            // TODO: Get values from config.
+            this.Database = new Database("mongodb://127.0.0.1:27017", "Destiny");
+
             int worlds = 1;
             byte channels = 2;
 
-            this.Login = new LoginServer(8484); // TODO: Get port from config.
+            this.Login = new LoginServer(8484);
             this.Worlds = new WorldServer[worlds];
 
             short port = 8485;
@@ -36,15 +41,15 @@
             }
         }
 
-        public void Run()
+        public void Start()
         {
             // TODO: Load data.
 
-            this.Login.Run();
+            this.Login.Start();
 
             foreach (WorldServer world in this.Worlds)
             {
-                world.Run();
+                world.Start();
             }
 
             this.IsAlive = true;
@@ -52,13 +57,13 @@
             Logger.Write(LogLevel.Success, "MasterServer started.");
         }
 
-        public void Shutdown()
+        public void Stop()
         {
-            this.Login.Shutdown();
+            this.Login.Stop();
 
             foreach (WorldServer world in this.Worlds)
             {
-                world.Shutdown();
+                world.Stop();
             }
 
             this.IsAlive = false;

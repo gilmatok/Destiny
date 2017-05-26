@@ -25,20 +25,24 @@ namespace Destiny.Server
             mMigrationRequests = new List<MigrationData>();
         }
 
-        public void Run()
+        public void Start()
         {
             foreach (ChannelServer channel in this.Channels)
             {
-                channel.Run();
+                channel.Start();
             }
+
+            Logger.Write(LogLevel.Info, "WorldServer {0} started with {1} channels.", Constants.WorldNames[this.ID], this.Channels.Length);
         }
 
-        public void Shutdown()
+        public void Stop()
         {
             foreach (ChannelServer channel in this.Channels)
             {
-                channel.Shutdown();
+                channel.Stop();
             }
+
+            Logger.Write(LogLevel.Info, "WorldServer {0} stopped.", Constants.WorldNames[this.ID]);
         }
 
         public void AddMigrationRequest(string host, int accountID, int characterID)

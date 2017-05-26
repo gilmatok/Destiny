@@ -11,7 +11,7 @@ namespace Destiny
 
             try
             {
-                MasterServer.Instance.Run();
+                MasterServer.Instance.Start();
             }
             catch (Exception ex)
             {
