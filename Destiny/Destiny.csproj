@@ -81,6 +81,7 @@
     <Compile Include="Core\IO\OutPacket.cs" />
     <Compile Include="Application.cs" />
     <Compile Include="Core\Network\PacketProcessor.cs" />
+    <Compile Include="Packet\HelpPacket.cs" />
     <Compile Include="Packet\LoginPacket.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Security\AesCryptograph.cs" />

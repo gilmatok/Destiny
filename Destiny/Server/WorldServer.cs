@@ -11,6 +11,14 @@ namespace Destiny.Server
 
         private List<MigrationData> mMigrationRequests;
 
+        public WorldStatus Status
+        {
+            get
+            {
+                return WorldStatus.Normal; // NOTE: Unless someone wants to impose a maximum registered users, this is useless.
+            }
+        }
+
         public WorldServer(byte id, short port, int channels)
         {
             this.ID = id;

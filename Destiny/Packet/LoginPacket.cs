@@ -2,6 +2,7 @@
 using Destiny.Game;
 using Destiny.Network;
 using Destiny.Server;
+using System.Collections.Generic;
 
 namespace Destiny.Packet
 {
@@ -94,6 +95,61 @@ namespace Destiny.Packet
             using (OutPacket oPacket = new OutPacket(SendOpcode.WorldInformation))
             {
                 oPacket.WriteByte(byte.MaxValue);
+
+                return oPacket.ToArray();
+            }
+        }
+
+        public static byte[] CheckUserLimitResult(WorldStatus status)
+        {
+            using (OutPacket oPacket = new OutPacket(SendOpcode.CheckUserLimitResult))
+            {
+                oPacket.WriteShort((short)status);
+
+                return oPacket.ToArray();
+            }
+        }
+
+        public static byte[] SelectWorldResult(List<Character> characters)
+        {
+            using (OutPacket oPacket = new OutPacket(SendOpcode.SelectWorldResult))
+            {
+                oPacket
+                    .WriteBool(false)
+                    .WriteByte((byte)characters.Count);
+
+                foreach (Character character in characters)
+                {
+                    HelpPacket.AddCharacterEntry(oPacket, character);
+                }
+
+                oPacket
+                    .WriteByte(2)
+                    .WriteInt(3);
+
+                return oPacket.ToArray();
+            }
+        }
+
+        public static byte[] CheckDuplicatedIDResult(string name, bool taken)
+        {
+            using (OutPacket oPacket = new OutPacket(SendOpcode.CheckDuplicatedIDResult))
+            {
+                oPacket
+                    .WriteString(name)
+                    .WriteBool(taken);
+
+                return oPacket.ToArray();
+            }
+        }
+
+        public static byte[] CreateNewCharacterResult(bool error, Character character)
+        {
+            using (OutPacket oPacket = new OutPacket(SendOpcode.CreateNewCharacterResult))
+            {
+                oPacket.WriteBool(error);
+
+                HelpPacket.AddCharacterEntry(oPacket, character);
 
                 return oPacket.ToArray();
             }
