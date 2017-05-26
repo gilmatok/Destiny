@@ -63,6 +63,7 @@
     <Compile Include="Core\IO\BufferPool.cs" />
     <Compile Include="Core\Network\Session.cs" />
     <Compile Include="Core\IO\InPacket.cs" />
+    <Compile Include="Handler\LoginHandler.cs" />
     <Compile Include="Network\MapleClient.cs" />
     <Compile Include="Network\Opcodes.cs" />
     <Compile Include="Core\IO\OutPacket.cs" />
@@ -81,9 +82,7 @@
     <Compile Include="Server\WorldServer.cs" />
     <Compile Include="Utility\Logger.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Handler\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>

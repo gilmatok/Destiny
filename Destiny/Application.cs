@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Destiny.Server;
+using System;
 
 namespace Destiny
 {
@@ -8,12 +9,25 @@ namespace Destiny
         {
             Logger.Entitle("Destiny");
 
-
-
-            while (true)
+            try
             {
+                MasterServer.Instance.Run();
+            }
+            catch (Exception ex)
+            {
+                Logger.Exception(ex);
+            }
+
+            while (MasterServer.Instance.IsAlive)
+            {
+                // TODO: Implement a CLI of some sort.
+
                 Console.Read();
             }
+
+            Logger.Write(LogLevel.Info, "Press any key to quit.");
+
+            Console.Read();
         }
     }
 }

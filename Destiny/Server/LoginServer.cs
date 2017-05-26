@@ -1,12 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Destiny.Handler;
+using Destiny.Network;
 
 namespace Destiny.Server
 {
-    class LoginServer
+    public sealed class LoginServer : ServerBase
     {
+        public LoginServer(short port) : base("Login", port) { }
+
+        protected override void RegisterHandlers()
+        {
+            this.RegisterHandler(RecvOpcode.LoginPassword, LoginHandler.HandleLoginPassword);
+        }
     }
 }

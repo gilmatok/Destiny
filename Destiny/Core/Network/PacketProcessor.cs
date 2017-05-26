@@ -34,7 +34,7 @@ namespace Destiny.Network
             mHandlers = new PacketHandler[0xFFFF + 1];
         }
 
-        public void AppendHandler(short operationCode, PacketHandler handler)
+        public void Add(short operationCode, PacketHandler handler)
         {
             mHandlers[operationCode] = handler;
             mCount++;

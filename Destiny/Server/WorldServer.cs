@@ -1,12 +1,79 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Destiny.Server
 {
-    class WorldServer
+    public sealed class WorldServer
     {
+        public byte ID { get; private set; }
+        public ChannelServer[] Channels { get; private set; }
+
+        private List<MigrationData> mMigrationRequests;
+
+        public WorldServer(byte id, short port, int channels)
+        {
+            this.ID = id;
+            this.Channels = new ChannelServer[channels];
+
+            for (int i = 0; i < channels; i++)
+            {
+                this.Channels[i] = new ChannelServer((byte)i, id, port);
+
+                port++;
+            }
+
+            mMigrationRequests = new List<MigrationData>();
+        }
+
+        public void Run()
+        {
+            foreach (ChannelServer channel in this.Channels)
+            {
+                channel.Run();
+            }
+        }
+
+        public void Shutdown()
+        {
+            foreach (ChannelServer channel in this.Channels)
+            {
+                channel.Shutdown();
+            }
+        }
+
+        public void AddMigrationRequest(string host, int accountID, int characterID)
+        {
+            lock (mMigrationRequests)
+            {
+                mMigrationRequests.Add(new MigrationData(host, accountID, characterID));
+            }
+        }
+
+        public int EligableMigration(string host, int characterID)
+        {
+            lock (mMigrationRequests)
+            {
+                for (int i = mMigrationRequests.Count; i-- > 0;)
+                {
+                    MigrationData itr = mMigrationRequests[i];
+
+                    if ((DateTime.Now - itr.Expiry).Seconds > 30)
+                    {
+                        mMigrationRequests.Remove(itr);
+
+                        continue;
+                    }
+
+                    if (itr.Host == host && itr.CharacterID == characterID)
+                    {
+                        mMigrationRequests.Remove(itr);
+
+                        return itr.AccountID;
+                    }
+                }
+            }
+
+            return 0;
+        }
     }
 }

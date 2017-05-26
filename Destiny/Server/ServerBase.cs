@@ -25,6 +25,11 @@ namespace Destiny.Server
         }
 
         protected abstract void RegisterHandlers();
+        
+        protected void RegisterHandler(RecvOpcode operationCode, PacketHandler handler)
+        {
+            mProcessor.Add((short)operationCode, handler);
+        }
 
         private void OnClientAccepted(Socket socket)
         {
