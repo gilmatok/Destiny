@@ -17,6 +17,7 @@ namespace Destiny.Server
         protected override void RegisterHandlers()
         {
             this.RegisterHandler(RecvOpcode.LoginPassword, LoginHandler.HandleLoginPassword);
+            this.RegisterHandler(RecvOpcode.WorldList, LoginHandler.HandleWorldList);
         }
     }
 }

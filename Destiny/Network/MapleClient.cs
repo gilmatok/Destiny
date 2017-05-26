@@ -14,7 +14,9 @@ namespace Destiny.Network
     {
         private PacketProcessor mProcessor;
         private Func<MapleClient, bool> mDeathAction;
-
+        
+        public string LastUsername { get; set; }
+        public string LastPassword { get; set; }
         public Account Account { get; set; }
         public Character Character { get; set; }
 

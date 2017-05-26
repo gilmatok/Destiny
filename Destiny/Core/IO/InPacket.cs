@@ -133,5 +133,17 @@ namespace Destiny.Core.IO
             Buffer.BlockCopy(mBuffer, 0, final, 0, mBuffer.Length);
             return final;
         }
+
+        public override string ToString()
+        {
+            string ret = "";
+
+            foreach (byte b in this.ToArray())
+            {
+                ret += string.Format("{0:X2} ", b);
+            }
+
+            return ret;
+        }
     }
 }

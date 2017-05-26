@@ -46,7 +46,7 @@ namespace Destiny.Core.Network
 
         private void BeginRead()
         {
-            if (this.IsConnected)
+            if (!this.IsConnected)
             {
                 return;
             }

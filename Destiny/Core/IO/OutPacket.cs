@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Destiny.Network;
+using System;
 using System.IO;
 
 namespace Destiny.Core.IO
@@ -40,6 +41,8 @@ namespace Destiny.Core.IO
 
             this.WriteShort(operationCode);
         }
+
+        public OutPacket(SendOpcode operationCode) : this((short)operationCode) { }
 
         private void Append(long value, int count)
         {

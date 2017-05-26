@@ -6,6 +6,7 @@ namespace Destiny.Server
     public sealed class WorldServer
     {
         public byte ID { get; private set; }
+        public string Name { get; private set; }
         public ChannelServer[] Channels { get; private set; }
 
         private List<MigrationData> mMigrationRequests;
@@ -13,6 +14,7 @@ namespace Destiny.Server
         public WorldServer(byte id, short port, int channels)
         {
             this.ID = id;
+            this.Name = Constants.WorldNames[id];
             this.Channels = new ChannelServer[channels];
 
             for (int i = 0; i < channels; i++)
@@ -32,7 +34,7 @@ namespace Destiny.Server
                 channel.Start();
             }
 
-            Logger.Write(LogLevel.Info, "WorldServer {0} started with {1} channels.", Constants.WorldNames[this.ID], this.Channels.Length);
+            Logger.Write(LogLevel.Info, "WorldServer {0} started with {1} channels.", this.Name, this.Channels.Length);
         }
 
         public void Stop()
@@ -42,7 +44,7 @@ namespace Destiny.Server
                 channel.Stop();
             }
 
-            Logger.Write(LogLevel.Info, "WorldServer {0} stopped.", Constants.WorldNames[this.ID]);
+            Logger.Write(LogLevel.Info, "WorldServer {0} stopped.", this.Name);
         }
 
         public void AddMigrationRequest(string host, int accountID, int characterID)

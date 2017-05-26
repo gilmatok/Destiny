@@ -49,7 +49,7 @@ namespace Destiny.Server
 
             client.SendRaw(LoginPacket.Handshake());
 
-            Logger.Write(LogLevel.Connection, "[0] Accepted client {1}.", mLabel, client.Host);
+            Logger.Write(LogLevel.Connection, "[{0}] Accepted client {1}.", mLabel, client.Host);
         }
 
         public virtual void Start()
