@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Destiny.Game
+﻿namespace Destiny.Game
 {
-    class Account
+    public sealed class Account
     {
+        public void Save()
+        {
+
+        }
     }
 }

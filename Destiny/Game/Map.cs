@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Destiny.Game
+﻿namespace Destiny.Game
 {
-    class Map
+    public sealed class Map
     {
+        public int MapleID { get; private set; }
+        public int ReturnMap { get; private set; }
+        public int ForcedReturn { get; private set; }
     }
 }

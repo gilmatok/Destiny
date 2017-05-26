@@ -22,6 +22,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -46,6 +47,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Constants.cs" />
     <Compile Include="Game\Account.cs" />
     <Compile Include="Game\Character.cs" />
     <Compile Include="Game\Drop.cs" />
@@ -54,16 +56,33 @@
     <Compile Include="Game\Map.cs" />
     <Compile Include="Game\Mob.cs" />
     <Compile Include="Game\Npc.cs" />
+    <Compile Include="Game\Pet.cs" />
     <Compile Include="Game\Portal.cs" />
     <Compile Include="Game\Reactor.cs" />
-    <Compile Include="Network\Client.cs" />
-    <Compile Include="Network\InPacket.cs" />
-    <Compile Include="Network\OutPacket.cs" />
+    <Compile Include="Core\Network\Acceptor.cs" />
+    <Compile Include="Core\IO\BufferPool.cs" />
+    <Compile Include="Core\Network\Session.cs" />
+    <Compile Include="Core\IO\InPacket.cs" />
+    <Compile Include="Network\MapleClient.cs" />
+    <Compile Include="Network\Opcodes.cs" />
+    <Compile Include="Core\IO\OutPacket.cs" />
     <Compile Include="Application.cs" />
+    <Compile Include="Core\Network\PacketProcessor.cs" />
+    <Compile Include="Packet\LoginPacket.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Security\AesCryptograph.cs" />
+    <Compile Include="Security\MapleCryptograph.cs" />
+    <Compile Include="Security\ShandaCryptograph.cs" />
+    <Compile Include="Server\ChannelServer.cs" />
+    <Compile Include="Server\LoginServer.cs" />
+    <Compile Include="Server\MasterServer.cs" />
+    <Compile Include="Server\MigrationData.cs" />
+    <Compile Include="Server\ServerBase.cs" />
+    <Compile Include="Server\WorldServer.cs" />
+    <Compile Include="Utility\Logger.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Utility\" />
+    <Folder Include="Handler\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

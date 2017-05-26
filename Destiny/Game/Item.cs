@@ -1,4 +1,4 @@
-﻿using Destiny.Network;
+﻿using Destiny.Core.IO;
 using System;
 
 namespace Destiny.Game

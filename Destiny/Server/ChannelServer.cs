@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Destiny.Network
+namespace Destiny.Server
 {
-    class InPacket
+    class ChannelServer
     {
     }
 }
