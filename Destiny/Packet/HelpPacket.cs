@@ -48,7 +48,7 @@ namespace Destiny.Packet
 
             SortedDictionary<byte, Doublet<int, int>> equipment = new SortedDictionary<byte, Doublet<int, int>>();
 
-            using (DatabaseQuery equipmentQuery = Database.Query("SELECT `slot`, `maple_id` FROM `items` WHERE `character_id` = @character_id AND `inventory` = 0 AND `slot` < 0", new MySqlParameter("@character_id", query.GetInt("character_id"))))
+            using (DatabaseQuery equipmentQuery = Database.Query("SELECT `slot`, `item_identifier` FROM `items` WHERE `character_id` = @character_id AND `inventory` = 0 AND `slot` < 0", new MySqlParameter("@character_id", query.GetInt("character_id"))))
             {
                 while (equipmentQuery.NextRow())
                 {
@@ -63,17 +63,17 @@ namespace Destiny.Packet
 
                     if (pair == null)
                     {
-                        pair = new Doublet<int, int>(equipmentQuery.GetInt("maple_id"), 0);
+                        pair = new Doublet<int, int>(equipmentQuery.GetInt("item_identifier"), 0);
                         equipment.Add((byte)slot, pair);
                     }
                     else if (equipmentQuery.GetShort("slot") < -100)
                     {
                         pair.Second = pair.First;
-                        pair.First = equipmentQuery.GetInt("maple_id");
+                        pair.First = equipmentQuery.GetInt("item_identifier");
                     }
                     else
                     {
-                        pair.Second = (int)equipmentQuery["maple_id"];
+                        pair.Second = (int)equipmentQuery["item_identifier"];
                     }
                 }
             }
@@ -185,7 +185,7 @@ namespace Destiny.Packet
             // NOTE: Teleport rock locations.
             for (int i = 0; i < 15; i++)
             {
-                oPacket.WriteInt(999999999);
+                oPacket.WriteInt(Map.INVALID_MAP_ID);
             }
 
             oPacket

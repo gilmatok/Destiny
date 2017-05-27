@@ -9,12 +9,9 @@ namespace Destiny.Server
     {
         public Dictionary<int, Npc> Npcs { get; private set; }
         public Dictionary<int, Reactor> Reactors { get; private set; }
-
-        public DataProvider()
-        {
-            this.Npcs = new Dictionary<int, Npc>();
-            this.Reactors = new Dictionary<int, Reactor>();
-        }
+        public Dictionary<int, Mob> Mobs { get; private set; }
+        public Dictionary<int, Item> Items { get; private set; }
+        public Dictionary<int, Map> Maps { get; private set; }
 
         public void Load()
         {
@@ -119,11 +116,13 @@ namespace Destiny.Server
         {
             int count = reader.ReadInt32();
 
+            this.Npcs = new Dictionary<int, Npc>(count);
+
             while (count-- > 0)
             {
                 Npc npc = new Npc(reader);
 
-                this.Npcs.Add(npc.MapleID, npc);
+                this.Npcs.Add(npc.Identifier, npc);
             }
         }
 
@@ -131,11 +130,13 @@ namespace Destiny.Server
         {
             int count = reader.ReadInt32();
 
+            this.Reactors = new Dictionary<int, Reactor>(count);
+
             while (count-- > 0)
             {
                 Reactor reactor = new Reactor(reader);
 
-                this.Reactors.Add(reactor.MapleID, reactor);
+                this.Reactors.Add(reactor.Identifier, reactor);
             }
         }
 
@@ -143,9 +144,13 @@ namespace Destiny.Server
         {
             int count = reader.ReadInt32();
 
+            this.Mobs = new Dictionary<int, Mob>(count);
+
             while (count-- > 0)
             {
+                Mob mob = new Mob(reader);
 
+                this.Mobs.Add(mob.Identifier, mob);
             }
         }
 
@@ -155,7 +160,48 @@ namespace Destiny.Server
 
             while (count-- > 0)
             {
+                reader.ReadUInt16();
+                reader.ReadUInt16();
+                reader.ReadByte();
+                reader.ReadByte();
+                reader.ReadByte();
+                reader.ReadUInt16();
+                reader.ReadByte();
+                reader.ReadInt32();
+                reader.ReadUInt16();
 
+                int jobsCount = reader.ReadInt32();
+
+                while (jobsCount-- > 0)
+                {
+                    reader.ReadUInt16();
+                }
+
+                int requirementsCount = reader.ReadInt32();
+
+                while (requirementsCount-- > 0)
+                {
+                    reader.ReadByte();
+                    reader.ReadByte();
+                    reader.ReadInt32();
+                    reader.ReadInt32();
+                }
+
+                int rewardsCount = reader.ReadInt32();
+
+                while (rewardsCount-- > 0)
+                {
+                    reader.ReadByte();
+                    reader.ReadByte();
+                    reader.ReadByte();
+                    reader.ReadInt32();
+                    reader.ReadInt32();
+                    reader.ReadByte();
+                    reader.ReadByte();
+                    reader.ReadUInt16();
+                    reader.ReadInt16();
+                    reader.ReadInt32();
+                }
             }
         }
 
@@ -163,9 +209,13 @@ namespace Destiny.Server
         {
             int count = reader.ReadInt32();
 
+            this.Items = new Dictionary<int, Item>(count);
+
             while (count-- > 0)
             {
+                Item item = new Item(reader);
 
+                this.Items.Add(item.Identifier, item);
             }
         }
 
@@ -173,9 +223,13 @@ namespace Destiny.Server
         {
             int count = reader.ReadInt32();
 
+            this.Maps = new Dictionary<int, Map>(count);
+
             while (count-- > 0)
             {
+                Map map = new Map(reader);
 
+                this.Maps.Add(map.Identifier, map);
             }
         }
     }

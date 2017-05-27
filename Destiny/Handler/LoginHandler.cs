@@ -114,25 +114,25 @@ namespace Destiny.Handler
 
             // TODO: Validate the default equipment statistics. I'm pretty sure some of them are untradable.
 
-            Database.Execute("INSERT INTO `items` (character_id, inventory, slot, maple_id, weapon_defense) " +
-                             "VALUES (@character_id, 0, -5, @maple_id, 3)",
+            Database.Execute("INSERT INTO `items` (character_id, inventory, slot, item_identifier, weapon_defense) " +
+                             "VALUES (@character_id, 0, -5, @item_identifier, 3)",
                              new MySqlParameter("character_id", id),
-                             new MySqlParameter("maple_id", topID));
+                             new MySqlParameter("item_identifier", topID));
 
-            Database.Execute("INSERT INTO `items` (character_id, inventory, slot, maple_id, weapon_defense) " +
-                             "VALUES (@character_id, 0, -6, @maple_id, 2)",
+            Database.Execute("INSERT INTO `items` (character_id, inventory, slot, item_identifier, weapon_defense) " +
+                             "VALUES (@character_id, 0, -6, @item_identifier, 2)",
                              new MySqlParameter("character_id", id),
-                             new MySqlParameter("maple_id", bottomID));
+                             new MySqlParameter("item_identifier", bottomID));
 
-            Database.Execute("INSERT INTO `items` (character_id, inventory, slot, maple_id, slots, weapon_defense) " +
-                             "VALUES (@character_id, 0, -7, @maple_id, 5, 3)",
+            Database.Execute("INSERT INTO `items` (character_id, inventory, slot, item_identifier, slots, weapon_defense) " +
+                             "VALUES (@character_id, 0, -7, @item_identifier, 5, 3)",
                              new MySqlParameter("character_id", id),
-                             new MySqlParameter("maple_id", shoesID));
+                             new MySqlParameter("item_identifier", shoesID));
 
-            Database.Execute("INSERT INTO `items` (character_id, inventory, slot, maple_id, slots, weapon_attack) " +
-                             "VALUES (@character_id, 0, -11, @maple_id, 7, 17)",
+            Database.Execute("INSERT INTO `items` (character_id, inventory, slot, item_identifier, slots, weapon_attack) " +
+                             "VALUES (@character_id, 0, -11, @item_identifier, 7, 17)",
                              new MySqlParameter("character_id", id),
-                             new MySqlParameter("maple_id", weaponID));
+                             new MySqlParameter("item_identifier", weaponID));
 
             // TODO: Add beginner's guide (based on job).
 

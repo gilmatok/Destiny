@@ -4,13 +4,13 @@ namespace Destiny.Game
 {
     public sealed class Npc
     {
-        public int MapleID { get; private set; }
+        public int Identifier { get; private set; }
         public NpcFlags Flags { get; private set; }
         public ushort StorageCost { get; private set; }
         
         public Npc(BinaryReader reader)
         {
-            this.MapleID = reader.ReadInt32();
+            this.Identifier = reader.ReadInt32();
             this.Flags = (NpcFlags)reader.ReadByte();
             this.StorageCost = reader.ReadUInt16();
 

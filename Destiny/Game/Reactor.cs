@@ -51,7 +51,7 @@ namespace Destiny.Game
 
     public sealed class Reactor
     {
-        public int MapleID { get; private set; }
+        public int Identifier { get; private set; }
         public ReactorFlags Flags { get; private set; }
         public int LinkID { get; private set; }
         public List<ReactorState> States { get; private set; }
@@ -59,7 +59,7 @@ namespace Destiny.Game
 
         public Reactor(BinaryReader reader)
         {
-            this.MapleID = reader.ReadInt32();
+            this.Identifier = reader.ReadInt32();
             this.Flags = (ReactorFlags)reader.ReadByte();
             this.LinkID = reader.ReadInt32();
 
