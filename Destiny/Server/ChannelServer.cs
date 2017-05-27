@@ -7,12 +7,14 @@ namespace Destiny.Server
     {
         public byte ID { get; private set; }
         public byte WorldID { get; private set; }
+        public MapFactory Maps { get; private set; }
 
         public ChannelServer(byte id, byte worldID, short port) 
             : base("Channel", port)
         {
             this.ID = id;
             this.WorldID = worldID;
+            this.Maps = new MapFactory(this.WorldID, this.ID);
         }
 
         protected override void ClientAdded(MapleClient client)
@@ -23,7 +25,7 @@ namespace Destiny.Server
 
         protected override void RegisterHandlers()
         {
-            this.RegisterHandler(RecvOpcode.MigrateIn, ServerHandler.HandleMigrateIn);
+            this.RegisterHandler(RecvOpcode.MigrateIn, ServerHandler.HandleMigrateChannel);
         }
     }
 }

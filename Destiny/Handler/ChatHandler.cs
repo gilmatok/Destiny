@@ -1,6 +1,5 @@
 ﻿using Destiny.Core.IO;
 using Destiny.Network;
-using Destiny.Packet;
 
 namespace Destiny.Handler
 {

@@ -13,7 +13,7 @@ namespace Destiny.Utility
         {
             if (path == null)
             {
-                path = "Config.xml";
+                path = "Destiny.xml";
             }
 
             using (XmlReader reader = XmlReader.Create(path))

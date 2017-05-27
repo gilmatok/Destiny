@@ -1,0 +1,29 @@
+﻿<Config>
+  <Binary>Data.bin</Binary>
+  
+  <Database>
+    <Host>localhost</Host>
+    <Schema>destiny</Schema>
+    <Username>root</Username>
+    <Password>root</Password>
+  </Database>
+
+  <Login>
+    <Port>8484</Port>
+    <AutoRegister>true</AutoRegister>
+    <RequestPin>false</RequestPin>
+    <RequestPic>false</RequestPic>
+  </Login>
+
+  <Worlds>
+    <CWorld>
+      <ID>0</ID>
+      <Name>Scania</Name>
+      <Port>8485</Port>
+      <Channels>2</Channels>
+      <Flag>New</Flag>
+      <EventMessage>Welcome to Scania!</EventMessage>
+      <TickerMessage>Welcome to Destiny!</TickerMessage>
+    </CWorld>
+  </Worlds>
+</Config>
