@@ -2,7 +2,8 @@
 using Destiny.Game;
 using Destiny.Network;
 using Destiny.Server;
-using System.Collections.Generic;
+using Destiny.Utility;
+using MySql.Data.MySqlClient;
 
 namespace Destiny.Packet
 {
@@ -110,22 +111,30 @@ namespace Destiny.Packet
             }
         }
 
-        public static byte[] SelectWorldResult(List<Character> characters)
+        public static byte[] SelectWorldResult(int accountID, byte worldID)
         {
+            byte characterCount = (byte)(long)Database.Scalar("SELECT COUNT(*) FROM `characters` WHERE `account_id` = @account_id", new MySqlParameter("@account_id", accountID));
+
             using (OutPacket oPacket = new OutPacket(SendOpcode.SelectWorldResult))
             {
                 oPacket
                     .WriteBool(false)
-                    .WriteByte((byte)characters.Count);
+                    .WriteByte(characterCount);
 
-                foreach (Character character in characters)
+                if (characterCount > 0)
                 {
-                    HelpPacket.AddCharacterEntry(oPacket, character);
+                    using (DatabaseQuery query = Database.Query("SELECT * FROM `characters` WHERE `account_id` = @account_id AND `world_id` = @world_id", new MySqlParameter("@account_id", accountID), new MySqlParameter("world_id", worldID)))
+                    {
+                        while (query.NextRow())
+                        {
+                            HelpPacket.AddCharacterEntry(oPacket, query);
+                        }
+                    }
                 }
 
                 oPacket
                     .WriteByte(2)
-                    .WriteInt(3);
+                    .WriteInt(3); // TODO: Account specific character creation slots. For now, use default 3.
 
                 return oPacket.ToArray();
             }
@@ -143,13 +152,13 @@ namespace Destiny.Packet
             }
         }
 
-        public static byte[] CreateNewCharacterResult(bool error, Character character)
+        public static byte[] CreateNewCharacterResult(bool error, DatabaseQuery query)
         {
             using (OutPacket oPacket = new OutPacket(SendOpcode.CreateNewCharacterResult))
             {
                 oPacket.WriteBool(error);
 
-                HelpPacket.AddCharacterEntry(oPacket, character);
+                HelpPacket.AddCharacterEntry(oPacket, query);
 
                 return oPacket.ToArray();
             }

@@ -6,6 +6,7 @@ using Destiny.Security;
 using Destiny.Server;
 using Destiny.Utility;
 using MySql.Data.MySqlClient;
+using System.Collections.Generic;
 
 namespace Destiny.Handler
 {
@@ -21,7 +22,7 @@ namespace Destiny.Handler
 
             using (DatabaseQuery query = Database.Query("SELECT * FROM `accounts` WHERE `username` = @username", new MySqlParameter("username", username)))
             {
-                if (!query.Read())
+                if (!query.NextRow())
                 {
                     if (MasterServer.Instance.Login.AutoRegister && username == client.LastUsername && password == client.LastPassword)
                     {
@@ -75,13 +76,13 @@ namespace Destiny.Handler
             client.World = iPacket.ReadByte();
             client.Channel = iPacket.ReadByte();
 
-            //client.Send(LoginPacket.SelectWorldResult(characters));
+            client.Send(LoginPacket.SelectWorldResult(client.Account.ID, client.World));
         }
 
         public static void HandleCheckCharacterName(MapleClient client, InPacket iPacket)
         {
             string name = iPacket.ReadString();
-            bool unusable = (long)Database.Scalar("SELECT COUNT(*) FROM `character`s WHERE `name` = @name", new MySqlParameter("name", name)) != 0;
+            bool unusable = (long)Database.Scalar("SELECT COUNT(*) FROM `characters` WHERE `name` = @name", new MySqlParameter("name", name)) != 0;
 
             client.Send(LoginPacket.CheckDuplicatedIDResult(name, unusable));
         }
@@ -99,6 +100,47 @@ namespace Destiny.Handler
             int shoesID = iPacket.ReadInt();
             int weaponID = iPacket.ReadInt();
             Gender gender = (Gender)iPacket.ReadByte();
+
+            // TODO: Validate name, beauty and equipment.
+
+            int id = Database.InsertAndReturnIdentifier("INSERT INTO `characters` (account_id, world_id, name, gender, skin, face, hair) " +
+                                                        "VALUES (@account_id, @world_id, @name, @gender, @skin, @face, @hair)",
+                                                        new MySqlParameter("account_id", client.Account.ID),
+                                                        new MySqlParameter("world_id", client.World),
+                                                        new MySqlParameter("name", name),
+                                                        new MySqlParameter("gender", gender),
+                                                        new MySqlParameter("skin", skin),
+                                                        new MySqlParameter("face", face),
+                                                        new MySqlParameter("hair", hair));
+
+            Database.Execute("INSERT INTO `items` (character_id, inventory, slot, maple_id, weapon_defense) " +
+                             "VALUES (@character_id, 0, -5, @maple_id, 3)",
+                             new MySqlParameter("character_id", id),
+                             new MySqlParameter("maple_id", topID));
+
+            Database.Execute("INSERT INTO `items` (character_id, inventory, slot, maple_id, weapon_defense) " +
+                             "VALUES (@character_id, 0, -6, @maple_id, 2)",
+                             new MySqlParameter("character_id", id),
+                             new MySqlParameter("maple_id", bottomID));
+
+            Database.Execute("INSERT INTO `items` (character_id, inventory, slot, maple_id, slots, weapon_defense) " +
+                             "VALUES (@character_id, 0, -7, @maple_id, 5, 3)",
+                             new MySqlParameter("character_id", id),
+                             new MySqlParameter("maple_id", shoesID));
+
+            Database.Execute("INSERT INTO `items` (character_id, inventory, slot, maple_id, weapon_attack) " +
+                             "VALUES (@character_id, 0, -11, @maple_id, 17)",
+                             new MySqlParameter("character_id", id),
+                             new MySqlParameter("maple_id", weaponID));
+
+            // TODO: Add beginner's guide (based on job).
+
+            using (DatabaseQuery query = Database.Query("SELECT * FROM characters WHERE `character_id` = @character_id", new MySqlParameter("character_id", id)))
+            {
+                query.NextRow();
+
+                client.Send(LoginPacket.CreateNewCharacterResult(false, query));
+            }
         }
     }
 }

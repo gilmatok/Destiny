@@ -53,13 +53,13 @@
     <Compile Include="Constants.cs" />
     <Compile Include="Game\Account.cs" />
     <Compile Include="Game\Character.cs" />
+    <Compile Include="Game\CharacterItems.cs" />
     <Compile Include="Game\Drop.cs" />
     <Compile Include="Game\Equip.cs" />
     <Compile Include="Game\Item.cs" />
     <Compile Include="Game\Map.cs" />
     <Compile Include="Game\Mob.cs" />
     <Compile Include="Game\Npc.cs" />
-    <Compile Include="Game\Pet.cs" />
     <Compile Include="Game\Portal.cs" />
     <Compile Include="Game\Reactor.cs" />
     <Compile Include="Core\Network\Acceptor.cs" />
@@ -88,6 +88,8 @@
     <Compile Include="Server\WorldServer.cs" />
     <Compile Include="Utility\Config.cs" />
     <Compile Include="Utility\Database.cs" />
+    <Compile Include="Utility\Doublet.cs" />
+    <Compile Include="Utility\Extensions.cs" />
     <Compile Include="Utility\Logger.cs" />
   </ItemGroup>
   <ItemGroup>

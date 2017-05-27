@@ -10,7 +10,7 @@ namespace Destiny.Server
         public bool RequestPin { get; private set; }
         public bool RequestPic { get; private set; }
 
-        public LoginServer(CLogin config) 
+        public LoginServer(CLogin config)
             : base("Login", config.Port)
         {
             this.AutoRegister = config.AutoRegister;
@@ -29,10 +29,11 @@ namespace Destiny.Server
         {
             this.RegisterHandler(RecvOpcode.LoginPassword, LoginHandler.HandleLoginPassword);
             this.RegisterHandler(RecvOpcode.WorldList, LoginHandler.HandleWorldList);
+            this.RegisterHandler(RecvOpcode.WorldRelist, LoginHandler.HandleWorldList);
             this.RegisterHandler(RecvOpcode.CheckUserLimit, LoginHandler.HandleCheckUserLimit);
             this.RegisterHandler(RecvOpcode.WorldSelect, LoginHandler.HandleSelectWorld);
             this.RegisterHandler(RecvOpcode.CharacterNameCheck, LoginHandler.HandleCheckCharacterName);
             this.RegisterHandler(RecvOpcode.CharacterCreate, LoginHandler.HandleCreateCharacter);
-   }
+        }
     }
 }

@@ -4,45 +4,6 @@ using System;
 // CREDITS: Chronicle
 namespace Destiny.Utility
 {
-    // NOTE: This class is temporary.
-    public static class DatabaseExtensions
-    {
-        public static bool GetBool(this DatabaseQuery query, string field)
-        {
-            return DatabaseExtensions.GetByte(query, field) == 1 ? true : false;
-        }
-
-        public static byte GetByte(this DatabaseQuery query, string field)
-        {
-            return query[field] == DBNull.Value ? (byte)0 : (byte)query[field];
-        }
-
-        public static short GetShort(this DatabaseQuery query, string field)
-        {
-            return query[field] == DBNull.Value ? (short)0 : (short)query[field];
-        }
-
-        public static int GetInt(this DatabaseQuery query, string field)
-        {
-            return query[field] == DBNull.Value ? 0 : (int)query[field];
-        }
-
-        public static long GetLong(this DatabaseQuery query, string field)
-        {
-            return query[field] == DBNull.Value ? 0 : (long)query[field];
-        }
-
-        public static string GetString(this DatabaseQuery query, string field)
-        {
-            return query[field] == DBNull.Value ? string.Empty : (string)query[field];
-        }
-
-        public static DateTime GetDateTime(this DatabaseQuery query, string field)
-        {
-            return query[field] == DBNull.Value ? DateTime.MinValue : (DateTime)query[field];
-        }
-    }
-
     public sealed class DatabaseQuery : IDisposable
     {
         private MySqlConnection mConnection;
@@ -62,7 +23,7 @@ namespace Destiny.Utility
             mReader = reader;
         }
 
-        public bool Read()
+        public bool NextRow()
         {
             return mReader.Read();
         }
@@ -141,7 +102,7 @@ namespace Destiny.Utility
                 command.ExecuteNonQuery();
                 command.CommandText = "SELECT LAST_INSERT_ID()";
                 command.Parameters.Clear();
-                return (int)(long)command.ExecuteScalar();
+                return (int)(ulong)command.ExecuteScalar();
             }
         }
     }
