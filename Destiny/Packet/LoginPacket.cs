@@ -44,7 +44,7 @@ namespace Destiny.Packet
                     .WriteInt()
                     .WriteByte()
                     .WriteByte()
-                    .WriteInt(account.AccountId)
+                    .WriteInt(account.ID)
                     .WriteByte()
                     .WriteBool()
                     .WriteByte()
@@ -131,13 +131,13 @@ namespace Destiny.Packet
             }
         }
 
-        public static byte[] CheckDuplicatedIDResult(string name, bool taken)
+        public static byte[] CheckDuplicatedIDResult(string name, bool unusable)
         {
             using (OutPacket oPacket = new OutPacket(SendOpcode.CheckDuplicatedIDResult))
             {
                 oPacket
                     .WriteString(name)
-                    .WriteBool(taken);
+                    .WriteBool(unusable);
 
                 return oPacket.ToArray();
             }

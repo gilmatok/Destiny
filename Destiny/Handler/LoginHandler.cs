@@ -2,7 +2,10 @@
 using Destiny.Game;
 using Destiny.Network;
 using Destiny.Packet;
+using Destiny.Security;
 using Destiny.Server;
+using Destiny.Utility;
+using MySql.Data.MySqlClient;
 
 namespace Destiny.Handler
 {
@@ -14,34 +17,28 @@ namespace Destiny.Handler
             string username = iPacket.ReadString();
             string password = iPacket.ReadString();
 
-            Account account = MasterServer.Instance.Database.GetAccount(username);
+            Account account;
 
-            if (account == null)
+            using (DatabaseQuery query = Database.Query("SELECT * FROM `accounts` WHERE `username` = @username", new MySqlParameter("username", username)))
             {
-                // TODO: Check if login configuration allows auto registering. For now, enable it.
-                if (true && username == client.LastUsername && password == client.LastPassword)
+                if (!query.Read())
                 {
-                    account = new Account
+                    if (MasterServer.Instance.Login.AutoRegister && username == client.LastUsername && password == client.LastPassword)
                     {
-                        Username = username,
-                        Password = password
-                    };
+                        // TODO: Auto register.
+                    }
+                    else
+                    {
+                        client.Send(LoginPacket.LoginError(LoginResult.NotRegistered));
+                    }
 
-                    MasterServer.Instance.Database.AddAccount(account);
-
-                    client.Account = account;
-
-                    client.Send(LoginPacket.LoginSuccess(account));
+                    return;
                 }
-                else
-                {
-                    client.Send(LoginPacket.LoginError(LoginResult.NotRegistered));
 
-                    client.LastUsername = username;
-                    client.LastPassword = password;
-                }
+                account = new Account(query);
             }
-            else if (password != account.Password)
+
+            if (SHACryptograph.Encrypt(SHAMode.SHA512, password + account.PasswordSalt) != account.Password)
             {
                 client.Send(LoginPacket.LoginError(LoginResult.IncorrectPassword));
             }
@@ -78,17 +75,15 @@ namespace Destiny.Handler
             client.World = iPacket.ReadByte();
             client.Channel = iPacket.ReadByte();
 
-            var characters = MasterServer.Instance.Database.GetCharacters(client.Account.AccountId, client.World);
-
-            client.Send(LoginPacket.SelectWorldResult(characters));
+            //client.Send(LoginPacket.SelectWorldResult(characters));
         }
 
         public static void HandleCheckCharacterName(MapleClient client, InPacket iPacket)
         {
             string name = iPacket.ReadString();
-            bool taken = MasterServer.Instance.Database.CharacterNameTaken(name);
+            bool unusable = (long)Database.Scalar("SELECT COUNT(*) FROM `character`s WHERE `name` = @name", new MySqlParameter("name", name)) != 0;
 
-            client.Send(LoginPacket.CheckDuplicatedIDResult(name, taken));
+            client.Send(LoginPacket.CheckDuplicatedIDResult(name, unusable));
         }
 
         public static void HandleCreateCharacter(MapleClient client, InPacket iPacket)
@@ -98,41 +93,12 @@ namespace Destiny.Handler
             int face = iPacket.ReadInt();
             int hair = iPacket.ReadInt();
             int hairColor = iPacket.ReadInt();
-            byte skin = (byte) iPacket.ReadInt();
+            byte skin = (byte)iPacket.ReadInt();
             int topID = iPacket.ReadInt();
             int bottomID = iPacket.ReadInt();
             int shoesID = iPacket.ReadInt();
             int weaponID = iPacket.ReadInt();
             Gender gender = (Gender)iPacket.ReadByte();
-
-            Character character = new Character
-            {
-                AccountId = client.Account.AccountId,
-                WorldId = client.World,
-                Name = name,
-                Gender = gender,
-                Skin = skin,
-                Face = face,
-                Hair = hair + hairColor,
-                Level = 1,
-                Job = Job.Beginner,
-                Strength = 12,
-                Dexterity = 5,
-                Intelligence = 4,
-                Luck = 4,
-                Health = 50,
-                MaxHealth = 50,
-                Mana = 5,
-                MaxMana = 5,
-                AbilityPoints = 0,
-                SkillPoints = 0,
-                Experience = 0,
-                Fame = 0
-            };
-
-            MasterServer.Instance.Database.AddCharacter(character);
-
-            client.Send(LoginPacket.CreateNewCharacterResult(false, character));
         }
     }
 }

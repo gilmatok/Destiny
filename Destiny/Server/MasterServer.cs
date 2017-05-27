@@ -20,24 +20,16 @@ namespace Destiny.Server
         public LoginServer Login { get; private set; }
         public WorldServer[] Worlds { get; private set; }
 
-        // TODO: Get values from config.
         public MasterServer()
         {
-            this.Database = new Database("mongodb://127.0.0.1:27017", "Destiny");
+            this.Login = new LoginServer(Config.Instance.Login);
+            this.Worlds = new WorldServer[Config.Instance.Worlds.Count];
 
-            int worlds = 1;
-            byte channels = 2;
+            int i = 0;
 
-            this.Login = new LoginServer(8484);
-            this.Worlds = new WorldServer[worlds];
-
-            short port = 8485;
-
-            for (int i = 0; i < worlds; i++)
+            foreach (CWorld config in Config.Instance.Worlds)
             {
-                this.Worlds[i] = new WorldServer((byte)i, port, channels);
-
-                port += channels;
+                this.Worlds[i++] = new WorldServer(config);
             }
         }
 

@@ -18,7 +18,7 @@ namespace Destiny.Packet
         public static void AddCharacterStatistics(OutPacket oPacket, Character character)
         {
             oPacket
-                .WriteInt(character.CharacterId)
+                .WriteInt(character.ID)
                 .WriteStringFixed(character.Name, 13)
                 .WriteByte((byte)character.Gender)
                 .WriteByte(character.Skin)

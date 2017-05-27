@@ -1,11 +1,22 @@
 ﻿using Destiny.Handler;
 using Destiny.Network;
+using Destiny.Utility;
 
 namespace Destiny.Server
 {
     public sealed class LoginServer : ServerBase
     {
-        public LoginServer(short port) : base("Login", port) { }
+        public bool AutoRegister { get; private set; }
+        public bool RequestPin { get; private set; }
+        public bool RequestPic { get; private set; }
+
+        public LoginServer(CLogin config) 
+            : base("Login", config.Port)
+        {
+            this.AutoRegister = config.AutoRegister;
+            this.RequestPin = config.RequestPin;
+            this.RequestPic = config.RequestPic;
+        }
 
         public override void Start()
         {

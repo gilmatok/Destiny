@@ -1,16 +1,23 @@
 ﻿using Destiny.Server;
+using Destiny.Utility;
 using System;
 
 namespace Destiny
 {
-    internal class Application
+    internal static class Destiny
     {
+        public static Random Random = new Random();
+
         private static void Main(string[] args)
         {
             Logger.Entitle("Destiny");
 
             try
             {
+                Config.Load();
+
+                Database.Initialize();
+
                 MasterServer.Instance.Start();
             }
             catch (Exception ex)

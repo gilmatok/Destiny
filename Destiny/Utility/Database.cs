@@ -1,106 +1,148 @@
-﻿using Destiny.Game;
-using MongoDB.Bson;
-using MongoDB.Driver;
-using System.Collections.Generic;
+﻿using MySql.Data.MySqlClient;
+using System;
 
+// CREDITS: Chronicle
 namespace Destiny.Utility
 {
+    // NOTE: This class is temporary.
+    public static class DatabaseExtensions
+    {
+        public static bool GetBool(this DatabaseQuery query, string field)
+        {
+            return DatabaseExtensions.GetByte(query, field) == 1 ? true : false;
+        }
+
+        public static byte GetByte(this DatabaseQuery query, string field)
+        {
+            return query[field] == DBNull.Value ? (byte)0 : (byte)query[field];
+        }
+
+        public static short GetShort(this DatabaseQuery query, string field)
+        {
+            return query[field] == DBNull.Value ? (short)0 : (short)query[field];
+        }
+
+        public static int GetInt(this DatabaseQuery query, string field)
+        {
+            return query[field] == DBNull.Value ? 0 : (int)query[field];
+        }
+
+        public static long GetLong(this DatabaseQuery query, string field)
+        {
+            return query[field] == DBNull.Value ? 0 : (long)query[field];
+        }
+
+        public static string GetString(this DatabaseQuery query, string field)
+        {
+            return query[field] == DBNull.Value ? string.Empty : (string)query[field];
+        }
+
+        public static DateTime GetDateTime(this DatabaseQuery query, string field)
+        {
+            return query[field] == DBNull.Value ? DateTime.MinValue : (DateTime)query[field];
+        }
+    }
+
+    public sealed class DatabaseQuery : IDisposable
+    {
+        private MySqlConnection mConnection;
+        private MySqlDataReader mReader;
+
+        public object this[string field]
+        {
+            get
+            {
+                return mReader[field];
+            }
+        }
+
+        public DatabaseQuery(MySqlConnection connection, MySqlDataReader reader)
+        {
+            mConnection = connection;
+            mReader = reader;
+        }
+
+        public bool Read()
+        {
+            return mReader.Read();
+        }
+
+        public void Dispose()
+        {
+            mReader.Close();
+            mConnection.Close();
+        }
+    }
+
     public sealed class Database
     {
-        private readonly IMongoClient mClient;
-        private readonly IMongoDatabase mDatabase;
+        private static string sConnectionString;
 
-        public Database(string connectionString, string databaseName)
+        public static void Initialize()
         {
-            mClient = new MongoClient(connectionString);
-            mDatabase = mClient.GetDatabase(databaseName);
-        }
+            sConnectionString = string.Format("Server={0}; Database={1}; Username={2}; Password={3}; Pooling=true; Min Pool Size=4; Max Pool Size=32",
+                               Config.Instance.Database.Host,
+                               Config.Instance.Database.Schema,
+                               Config.Instance.Database.Username,
+                               Config.Instance.Database.Password);
 
-        public Account GetAccount(string username)
-        {
-            var collection = mDatabase.GetCollection<Account>("accounts");
-            var filter = new BsonDocument("Username", username);
-
-            return collection.Find(filter).FirstOrDefault();
-        }
-
-        public void AddAccount(Account account)
-        {
-            var collection = mDatabase.GetCollection<Account>("accounts");
-
-            account.AccountId = this.GetAccountID();
-
-            collection.InsertOne(account);
-        }
-
-        public Character GetCharacter(int id)
-        {
-            var collection = mDatabase.GetCollection<Character>("characters");
-            var filter = new BsonDocument("CharacterId", id);
-
-            return collection.Find(filter).FirstOrDefault();
-        }
-
-        public List<Character> GetCharacters(int accountId, byte worldId)
-        {
-            var collection = mDatabase.GetCollection<Character>("characters");
-            var elements = new List<BsonElement>(new BsonElement[] { new BsonElement("AccountId", accountId), new BsonElement("WorldId", worldId) });
-            var filter = new BsonDocument(elements);
-
-            return collection.Find(filter).ToList();
-        }
-
-        public bool CharacterNameTaken(string name)
-        {
-            var collection = mDatabase.GetCollection<Character>("characters");
-            var filter = new BsonDocument("Name", name);
-
-            return collection.Find(filter).Any();
-        }
-
-        public void AddCharacter(Character character)
-        {
-            var collection = mDatabase.GetCollection<Character>("characters");
-
-            character.CharacterId = this.GetCharacterID();
-
-            collection.InsertOne(character);
-        }
-
-        private int GetAccountID()
-        {
-            var collection = mDatabase.GetCollection<Account>("accounts");
-            var filter = new BsonDocument();
-
-            int id = 1;
-
-            foreach (var account in collection.Find(filter).ToList())
+            using (MySqlConnection connection = new MySqlConnection(sConnectionString))
             {
-                if (account.AccountId > id)
-                {
-                    id = account.AccountId;
-                }
-            }
+                connection.Open();
 
-            return id + 1;
+                Logger.Write(LogLevel.Info, "Able to connect to database '{0}'.", Config.Instance.Database.Schema);
+
+                connection.Close();
+            }
         }
 
-        private int GetCharacterID()
+        public static DatabaseQuery Query(string query, params MySqlParameter[] args)
         {
-            var collection = mDatabase.GetCollection<Character>("characters");
-            var filter = new BsonDocument();
+            MySqlConnection connection = new MySqlConnection(sConnectionString);
+            connection.Open();
+            MySqlCommand command = connection.CreateCommand();
+            command.CommandText = query;
+            Array.ForEach(args, p => command.Parameters.Add(p));
+            return new DatabaseQuery(connection, command.ExecuteReader());
+        }
 
-            int id = 1;
-
-            foreach (var character in collection.Find(filter).ToList())
+        public static void Execute(string query, params MySqlParameter[] args)
+        {
+            using (MySqlConnection connection = new MySqlConnection(sConnectionString))
             {
-                if (character.CharacterId > id)
-                {
-                    id = character.CharacterId;
-                }
+                connection.Open();
+                MySqlCommand command = connection.CreateCommand();
+                command.CommandText = query;
+                Array.ForEach(args, p => command.Parameters.Add(p));
+                command.ExecuteNonQuery();
             }
+        }
 
-            return id + 1;
+        public static object Scalar(string query, params MySqlParameter[] args)
+        {
+            using (MySqlConnection connection = new MySqlConnection(sConnectionString))
+            {
+                connection.Open();
+                MySqlCommand command = connection.CreateCommand();
+                command.CommandText = query;
+                Array.ForEach(args, p => command.Parameters.Add(p));
+                return command.ExecuteScalar();
+            }
+        }
+
+        public static int InsertAndReturnIdentifier(string query, params MySqlParameter[] args)
+        {
+            using (MySqlConnection connection = new MySqlConnection(sConnectionString))
+            {
+                connection.Open();
+                MySqlCommand command = connection.CreateCommand();
+                command.CommandText = query;
+                Array.ForEach(args, p => command.Parameters.Add(p));
+                command.ExecuteNonQuery();
+                command.CommandText = "SELECT LAST_INSERT_ID()";
+                command.Parameters.Clear();
+                return (int)(long)command.ExecuteScalar();
+            }
         }
     }
 }

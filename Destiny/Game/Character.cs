@@ -1,12 +1,8 @@
-﻿using MongoDB.Bson;
-
-namespace Destiny.Game
+﻿namespace Destiny.Game
 {
     public sealed class Character
     {
-        public ObjectId _id;
-
-        public int CharacterId { get; set; }
+        public int ID { get; set; }
         public int AccountId { get; set; }
         public byte WorldId { get; set; }
         public string Name { get; set; }

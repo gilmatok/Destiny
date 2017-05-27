@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Destiny.Utility;
+using System;
 using System.Collections.Generic;
 
 namespace Destiny.Server
@@ -8,6 +9,9 @@ namespace Destiny.Server
         public byte ID { get; private set; }
         public string Name { get; private set; }
         public ChannelServer[] Channels { get; private set; }
+        public WorldFlag Flag { get; private set; }
+        public string EventMessage { get; private set; }
+        public string TickerMessage { get; private set; }
 
         private List<MigrationData> mMigrationRequests;
 
@@ -19,18 +23,24 @@ namespace Destiny.Server
             }
         }
 
-        public WorldServer(byte id, short port, int channels)
+        public WorldServer(CWorld config)
         {
-            this.ID = id;
-            this.Name = Constants.WorldNames[id];
-            this.Channels = new ChannelServer[channels];
+            this.ID = config.ID;
+            this.Name = config.Name;
+            this.Channels = new ChannelServer[config.Channels];
 
-            for (int i = 0; i < channels; i++)
+            short port = config.Port;
+
+            for (byte id = 0; id < config.Channels; id++)
             {
-                this.Channels[i] = new ChannelServer((byte)i, id, port);
+                this.Channels[id] = new ChannelServer(id, this.ID, port);
 
                 port++;
             }
+
+            this.Flag = config.Flag;
+            this.EventMessage = config.EventMessage;
+            this.TickerMessage = config.TickerMessage;
 
             mMigrationRequests = new List<MigrationData>();
         }
