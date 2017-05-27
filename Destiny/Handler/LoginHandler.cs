@@ -70,7 +70,7 @@ namespace Destiny.Handler
         }
 
 
-        public static void HandleSelectWorld(MapleClient client, InPacket iPacket)
+        public static void HandleWorldSELECT(MapleClient client, InPacket iPacket)
         {
             iPacket.Skip(1);
             client.World = iPacket.ReadByte();
@@ -79,7 +79,7 @@ namespace Destiny.Handler
             client.Send(LoginPacket.SelectWorldResult(client.Account.ID, client.World));
         }
 
-        public static void HandleCheckCharacterName(MapleClient client, InPacket iPacket)
+        public static void HandleCharacterNameCheck(MapleClient client, InPacket iPacket)
         {
             string name = iPacket.ReadString();
             bool unusable = (long)Database.Scalar("SELECT COUNT(*) FROM `characters` WHERE `name` = @name", new MySqlParameter("name", name)) != 0;
@@ -87,7 +87,7 @@ namespace Destiny.Handler
             client.Send(LoginPacket.CheckDuplicatedIDResult(name, unusable));
         }
 
-        public static void HandleCreateCharacter(MapleClient client, InPacket iPacket)
+        public static void HandleCharacterCreation(MapleClient client, InPacket iPacket)
         {
             string name = iPacket.ReadString();
             int jobType = iPacket.ReadInt();
@@ -141,6 +141,16 @@ namespace Destiny.Handler
 
                 client.Send(LoginPacket.CreateNewCharacterResult(false, query));
             }
+        }
+
+        public static void HandleCharacterSelection(MapleClient client, InPacket iPacket)
+        {
+            int characterID = iPacket.ReadInt();
+            string macAddresses = iPacket.ReadString(); // TODO: Do something with these.
+
+            MasterServer.Instance.Worlds[client.World].AddMigrationRequest(client.Host, client.Account.ID, characterID);
+
+            client.Send(LoginPacket.SelectCharacterResult(MasterServer.Instance.Worlds[client.World].Channels[client.Channel].Port, characterID));
         }
     }
 }

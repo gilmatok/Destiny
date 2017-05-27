@@ -158,5 +158,43 @@ namespace Destiny.Packet
                 .WriteInt()
                 .WriteZero(12);
         }
+
+        public static void AddCharacterData(OutPacket oPacket, Character character, long flag = long.MaxValue)
+        {
+            oPacket
+                .WriteLong(flag)
+                .WriteByte(); // NOTE: Unknown.
+
+            HelpPacket.AddCharacterStatistics(oPacket, character);
+
+            oPacket
+                .WriteByte(20) // NOTE: Max buddylist size.
+                .WriteBool(false) // NOTE: Blessing of Fairy.
+                .WriteInt(); // NOTE: Mesos.
+
+            character.Items.Encode(oPacket);
+            character.Skills.Encode(oPacket);
+            character.Quests.Encode(oPacket);
+
+            oPacket
+                .WriteShort() // NOTE: Mini games record.
+                .WriteShort() // NOTE: Rings (1).
+                .WriteShort() // NOTE: Rings (2). 
+                .WriteShort(); // NOTE: Rings (3).
+
+            // NOTE: Teleport rock locations.
+            for (int i = 0; i < 15; i++)
+            {
+                oPacket.WriteInt(999999999);
+            }
+
+            oPacket
+                .WriteInt() // NOTE: Monster book cover ID.
+                .WriteByte() // NOTE: Unknown.
+                .WriteShort() // NOTE: Monster book cards count.
+                .WriteShort() // NOTE: New year cards.
+                .WriteShort() // NOTE: Area information.
+                .WriteShort(); // NOTE: Unknown.
+        }
     }
 }

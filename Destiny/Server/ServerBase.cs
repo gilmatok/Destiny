@@ -41,11 +41,19 @@ namespace Destiny.Server
             mProcessor.Add((short)operationCode, handler);
         }
 
+        // TODO: This is a bit hackish, consider refactoring.
+        protected virtual void ClientAdded(MapleClient client)
+        {
+
+        }
+
         private void OnClientAccepted(Socket socket)
         {
             MapleClient client = new MapleClient(socket, mProcessor, mClients.Remove);
 
             mClients.Add(client);
+
+            this.ClientAdded(client);
 
             client.SendRaw(LoginPacket.Handshake());
 

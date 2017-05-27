@@ -32,6 +32,8 @@ namespace Destiny.Game
         public short Fame { get; set; }
 
         public CharacterItems Items { get; private set; }
+        public CharacterSkills Skills { get; private set; }
+        public CharacterQuests Quests { get; private set; }
 
         public Character(MapleClient client, DatabaseQuery query)
         {
@@ -46,7 +48,7 @@ namespace Destiny.Game
             this.Face = query.GetInt("face");
             this.Hair = query.GetInt("hair");
             this.Level = query.GetByte("level");
-            this.Job = (Job)query.GetByte("job");
+            this.Job = (Job)query.GetShort("job");
             this.Strength = query.GetShort("strength");
             this.Dexterity = query.GetShort("dexterity");
             this.Intelligence = query.GetShort("intelligence");
@@ -56,13 +58,23 @@ namespace Destiny.Game
             this.Mana = query.GetShort("mana");
             this.MaxMana = query.GetShort("max_mana");
             this.AbilityPoints = query.GetShort("ability_points");
-            this.SkillPoints= query.GetShort("skill_points");
+            this.SkillPoints = query.GetShort("skill_points");
             this.Experience = query.GetInt("experience");
             this.Fame = query.GetShort("fame");
 
             using (DatabaseQuery itemQuery = Database.Query("SELECT * FROM `items` WHERE `character_id` = @character_id", new MySqlParameter("character_id", this.ID)))
             {
                 this.Items = new CharacterItems(this, itemQuery);
+            }
+
+            using (DatabaseQuery skillQuery = null)
+            {
+                this.Skills = new CharacterSkills(this, skillQuery);
+            }
+
+            using (DatabaseQuery questQuery = null)
+            {
+                this.Quests = new CharacterQuests(this, questQuery);
             }
         }
 

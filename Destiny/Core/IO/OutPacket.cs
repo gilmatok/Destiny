@@ -130,7 +130,7 @@ namespace Destiny.Core.IO
 
         public OutPacket WriteDateTime(DateTime value)
         {
-            return this;
+            return this.WriteLong(value.ToFileTimeUtc());
         }
 
         public OutPacket WriteZero(int count)

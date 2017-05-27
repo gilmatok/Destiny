@@ -28,7 +28,7 @@ namespace Destiny.Game
             {
                 byte inventory = query.GetByte("inventory");
 
-                if (inventory == 1)
+                if (inventory == 0)
                 {
                     Item equip = new Equip(query);
 
@@ -57,7 +57,23 @@ namespace Destiny.Game
 
         public void Encode(OutPacket oPacket)
         {
+            oPacket
+                .WriteByte(24)
+                .WriteByte(24)
+                .WriteByte(24)
+                .WriteByte(24)
+                .WriteByte(48)
+                .WriteLong();
 
+            oPacket.WriteShort();
+            oPacket.WriteShort();
+            oPacket.WriteShort();
+            oPacket.WriteShort();
+
+            oPacket.WriteByte();
+            oPacket.WriteByte();
+            oPacket.WriteByte();
+            oPacket.WriteByte();
         }
     }
 }

@@ -1,4 +1,7 @@
-﻿namespace Destiny.Server
+﻿using Destiny.Handler;
+using Destiny.Network;
+
+namespace Destiny.Server
 {
     public sealed class ChannelServer : ServerBase
     {
@@ -12,9 +15,15 @@
             this.WorldID = worldID;
         }
 
+        protected override void ClientAdded(MapleClient client)
+        {
+            client.World = this.WorldID;
+            client.Channel = this.ID;
+        }
+
         protected override void RegisterHandlers()
         {
-
+            this.RegisterHandler(RecvOpcode.MigrateIn, ServerHandler.HandleMigrateIn);
         }
     }
 }

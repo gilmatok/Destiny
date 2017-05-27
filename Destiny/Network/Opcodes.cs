@@ -17,7 +17,7 @@
         CharacterSelectFromViewAll = 0x0E,
         EnterExitViewAll = 0x0F,
         CharacterSelect = 0x13,
-        PlayerLoggedIn = 0x14,
+        MigrateIn = 0x14,
         CharacterNameCheck = 0x15,
         CharacterCreate = 0x16,
         CreateCygnus = 0x17,

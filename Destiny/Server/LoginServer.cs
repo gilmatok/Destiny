@@ -31,9 +31,10 @@ namespace Destiny.Server
             this.RegisterHandler(RecvOpcode.WorldList, LoginHandler.HandleWorldList);
             this.RegisterHandler(RecvOpcode.WorldRelist, LoginHandler.HandleWorldList);
             this.RegisterHandler(RecvOpcode.CheckUserLimit, LoginHandler.HandleCheckUserLimit);
-            this.RegisterHandler(RecvOpcode.WorldSelect, LoginHandler.HandleSelectWorld);
-            this.RegisterHandler(RecvOpcode.CharacterNameCheck, LoginHandler.HandleCheckCharacterName);
-            this.RegisterHandler(RecvOpcode.CharacterCreate, LoginHandler.HandleCreateCharacter);
+            this.RegisterHandler(RecvOpcode.WorldSelect, LoginHandler.HandleWorldSELECT);
+            this.RegisterHandler(RecvOpcode.CharacterNameCheck, LoginHandler.HandleCharacterNameCheck);
+            this.RegisterHandler(RecvOpcode.CharacterCreate, LoginHandler.HandleCharacterCreation);
+            this.RegisterHandler(RecvOpcode.CharacterSelect, LoginHandler.HandleCharacterSelection);
         }
     }
 }

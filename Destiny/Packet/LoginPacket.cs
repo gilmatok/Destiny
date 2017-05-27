@@ -163,5 +163,22 @@ namespace Destiny.Packet
                 return oPacket.ToArray();
             }
         }
+
+        public static byte[] SelectCharacterResult(short port, int characterID)
+        {
+            using (OutPacket oPacket = new OutPacket(SendOpcode.SelectCharacterResult))
+            {
+                oPacket
+                    .WriteByte()
+                    .WriteByte()
+                    .WriteBytes(127, 0, 0, 1)
+                    .WriteShort(port)
+                    .WriteInt(characterID)
+                    .WriteInt()
+                    .WriteByte();
+
+                return oPacket.ToArray();
+            }
+        }
     }
 }
