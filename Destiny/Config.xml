@@ -1,9 +1,11 @@
 ﻿<Config>
+  <Binary>Data.bin</Binary>
+  
   <Database>
     <Host>localhost</Host>
     <Schema>destiny</Schema>
     <Username>root</Username>
-    <Password></Password>
+    <Password>root</Password>
   </Database>
 
   <Login>

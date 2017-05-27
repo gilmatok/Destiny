@@ -24,6 +24,7 @@ namespace Destiny.Utility
             Logger.Write(LogLevel.Info, "Configuration file '{0}' loaded.", Path.GetFileName(path));
         }
 
+        public string Binary { get; set; }
         public CDatabase Database { get; set; }
         public CLogin Login { get; set; }
         public List<CWorld> Worlds { get; set; }

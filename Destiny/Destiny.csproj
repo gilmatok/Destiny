@@ -68,6 +68,7 @@
     <Compile Include="Core\IO\BufferPool.cs" />
     <Compile Include="Core\Network\Session.cs" />
     <Compile Include="Core\IO\InPacket.cs" />
+    <Compile Include="Handler\ChatHandler.cs" />
     <Compile Include="Handler\LoginHandler.cs" />
     <Compile Include="Handler\ServerHandler.cs" />
     <Compile Include="Network\MapleClient.cs" />
@@ -75,6 +76,7 @@
     <Compile Include="Core\IO\OutPacket.cs" />
     <Compile Include="Destiny.cs" />
     <Compile Include="Core\Network\PacketProcessor.cs" />
+    <Compile Include="Packet\ChatPacket.cs" />
     <Compile Include="Packet\HelpPacket.cs" />
     <Compile Include="Packet\LoginPacket.cs" />
     <Compile Include="Packet\MapPacket.cs" />
@@ -85,6 +87,7 @@
     <Compile Include="Security\SHACryptograph.cs" />
     <Compile Include="Security\ShandaCryptograph.cs" />
     <Compile Include="Server\ChannelServer.cs" />
+    <Compile Include="Server\DataProvider.cs" />
     <Compile Include="Server\LoginServer.cs" />
     <Compile Include="Server\MasterServer.cs" />
     <Compile Include="Server\MigrationData.cs" />
@@ -100,6 +103,11 @@
     <Content Include="Config.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Data.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

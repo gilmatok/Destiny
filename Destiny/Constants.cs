@@ -1,4 +1,6 @@
-﻿namespace Destiny
+﻿using System;
+
+namespace Destiny
 {
     public static class Constants
     {
@@ -147,5 +149,40 @@
         Setup,
         Etcetera,
         Cash
+    }
+
+    [Flags]
+    public enum NpcFlags : byte
+    {
+        None = 0 << 0,
+        MapleTV = 1 << 0,
+        IsGuildRank = 1 << 1
+    }
+
+    [Flags]
+    public enum ReactorFlags
+    {
+        None = 0 << 0,
+        ActivateByTouch = 1 << 0,
+        RemoveInFieldSet = 1 << 1
+    }
+
+    public enum ReactorStateType : byte
+    {
+        None = 0,
+        PlainAdvanceState = 1,
+        HitFromLeft = 2,
+        HitFromRight = 3,
+        HitBySkill = 4,
+        NoClue = 5,
+        NoClue2 = 6,
+        HitByItem = 7
+    }
+
+    [Flags]
+    public enum ReactorDropFlags
+    {
+        None = 0 << 0,
+        IsMesos = 1 << 0
     }
 }
