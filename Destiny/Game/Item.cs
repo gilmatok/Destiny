@@ -11,6 +11,14 @@ namespace Destiny.Game
         public short Quantity { get; private set; }
         public DateTime Expiration { get; private set; }
 
+        public ItemType Type
+        {
+            get
+            {
+                return (ItemType)(this.MapleID / 1000000);
+            }
+        }
+
         public Item(DatabaseQuery query)
         {
             this.MapleID = query.GetInt("maple_id");
@@ -22,15 +30,13 @@ namespace Destiny.Game
         public virtual void Encode(OutPacket oPacket)
         {
             oPacket
+                .WriteByte(2)
                 .WriteInt(this.MapleID)
-                .WriteBool(false); // TODO: If SN is not -1.
-
-            if (false) // TODO: If SN is not -1.
-            {
-                // TODO: Write SN.
-            }
-
-            oPacket.WriteDateTime(this.Expiration);
+                .WriteBool(false)
+                .WriteLong() // TODO: Expiration.
+                .WriteShort(this.Quantity)
+                .WriteString(string.Empty) // NOTE: Creator.
+                .WriteShort(); // NOTE: Flags.
         }
     }
 }

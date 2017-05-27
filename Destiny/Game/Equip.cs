@@ -23,7 +23,7 @@ namespace Destiny.Game
         public short Speed { get; private set; }
         public short Jump { get; private set; }
 
-        public Equip(DatabaseQuery query) 
+        public Equip(DatabaseQuery query)
             : base(query)
         {
             this.Slots = query.GetByte("slots");
@@ -47,7 +47,38 @@ namespace Destiny.Game
 
         public override void Encode(OutPacket oPacket)
         {
-            base.Encode(oPacket);
+            oPacket
+                .WriteByte(1)
+                .WriteInt(this.MapleID)
+                .WriteBool(false)
+                .WriteLong() // TODO: Expiration.
+                .WriteByte(this.Slots)
+                .WriteByte(this.Scrolls)
+                .WriteShort(this.Strength)
+                .WriteShort(this.Dexterity)
+                .WriteShort(this.Intelligence)
+                .WriteShort(this.Luck)
+                .WriteShort(this.Health)
+                .WriteShort(this.Mana)
+                .WriteShort(this.WeaponAttack)
+                .WriteShort(this.MagicAttack)
+                .WriteShort(this.WeaponDefense)
+                .WriteShort(this.MagicDefense)
+                .WriteShort(this.Accuracy)
+                .WriteShort(this.Avoidability)
+                .WriteShort(this.Hands)
+                .WriteShort(this.Speed)
+                .WriteShort(this.Jump)
+                .WriteString(string.Empty) // NOTE: Creator.
+                .WriteShort() // NOTE: Flags.
+                .WriteByte()
+                .WriteByte()
+                .WriteShort()
+                .WriteShort()
+                .WriteInt()
+                .WriteLong()
+                .WriteLong()
+                .WriteInt(-1);
         }
     }
 }

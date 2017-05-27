@@ -130,4 +130,22 @@
         ThunderBreaker2 = 1510,
         ThunderBreaker3 = 1511
     }
+
+    public enum ItemType : byte
+    {
+        Equipment = 1,
+        Usable,
+        Setup,
+        Etcetera,
+        Cash
+    }
+
+    public enum InventoryType : byte
+    {
+        Equipment,
+        Usable,
+        Setup,
+        Etcetera,
+        Cash
+    }
 }
