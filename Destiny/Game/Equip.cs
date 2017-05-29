@@ -49,7 +49,7 @@ namespace Destiny.Game
         {
             oPacket
                 .WriteByte(1)
-                .WriteInt(this.Identifier)
+                .WriteInt(this.MapleID)
                 .WriteBool(false)
                 .WriteLong() // TODO: Expiration.
                 .WriteByte(this.Slots)

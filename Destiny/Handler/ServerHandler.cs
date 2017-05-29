@@ -37,6 +37,10 @@ namespace Destiny.Handler
             }
 
             client.Send(MapPacket.SetField(client.Character, true));
+
+            client.Character.Map.Characters.Add(client.Character);
+
+            client.Character.IsInitialized = true;
         }
 
         public static void HandleMigrateCashShop(MapleClient client, InPacket iPacket)
@@ -64,6 +68,8 @@ namespace Destiny.Handler
 
                 client.Character = new Character(client, query);
             }
+
+            // TODO: Cash Shop packets and whatnot.
         }
     }
 }

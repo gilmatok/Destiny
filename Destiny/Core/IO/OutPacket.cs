@@ -1,4 +1,5 @@
-﻿using Destiny.Network;
+﻿using Destiny.Game;
+using Destiny.Network;
 using System;
 using System.IO;
 
@@ -133,6 +134,14 @@ namespace Destiny.Core.IO
             return this.WriteLong(value.ToFileTimeUtc());
         }
 
+        public OutPacket WritePoint(Point value)
+        {
+            this.WriteShort(value.X);
+            this.WriteShort(value.Y);
+
+            return this;
+        }
+
         public OutPacket WriteZero(int count)
         {
             for (int i = 0; i < count; i++)
@@ -153,6 +162,11 @@ namespace Destiny.Core.IO
             mStream.Dispose();
 
             mStream = null;
+        }
+
+        internal void WriteInt(object mapleID)
+        {
+            throw new NotImplementedException();
         }
     }
 }

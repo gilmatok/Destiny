@@ -1,5 +1,6 @@
 ﻿using Destiny.Core.IO;
 using Destiny.Utility;
+using System;
 
 // TODO: Consider refactoring this entire class. Things seem to get a little hacky.
 namespace Destiny.Game
@@ -12,24 +13,22 @@ namespace Destiny.Game
         private Item[] mCashEquipped;
         private Item[][] mItems;
 
-        public CharacterItems(Character parent, DatabaseQuery query)
+        public CharacterItems(Character parent, byte[] slots, DatabaseQuery query)
         {
             this.Parent = parent;
 
-            mEquipped = new Item[100];
-            mCashEquipped = new Item[100];
-            mItems = new Item[5][];
+            mEquipped = new Item[(byte)EquipmentSlot.Count];
+            mCashEquipped = new Item[(byte)EquipmentSlot.Count];
+            mItems = new Item[slots.Length][];
 
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < slots.Length; i++)
             {
-                mItems[i] = new Item[24];
+                mItems[i] = new Item[slots[i]];
             }
 
             while (query.NextRow())
             {
-                byte inventory = query.GetByte("inventory");
-
-                if (inventory == 0)
+                if (query.GetByte("inventory") == 0)
                 {
                     Item equip = new Equip(query);
 
@@ -46,25 +45,23 @@ namespace Destiny.Game
                     }
                     else
                     {
-                        mItems[0][equip.Slot] = equip;
+                        mItems[(byte)InventoryType.Equipment][equip.Slot] = equip;
                     }
                 }
                 else
                 {
                     Item item = new Item(query);
+
+                    mItems[query.GetByte("inventory")][item.Slot] = item;
                 }
             }
         }
 
         public void Encode(OutPacket oPacket)
         {
-            oPacket
-                .WriteByte(24)
-                .WriteByte(24)
-                .WriteByte(24)
-                .WriteByte(24)
-                .WriteByte(48)
-                .WriteLong();
+            Array.ForEach(mItems, m => oPacket.WriteByte((byte)m.Length));
+
+            oPacket.WriteLong();
 
             for (short i = 0; i < mEquipped.Length; i++)
             {
@@ -138,6 +135,44 @@ namespace Destiny.Game
                 }
             }
             oPacket.WriteByte();
+        }
+
+        public void EncodeEquipment(OutPacket oPacket)
+        {
+            for (byte i = 0; i < (byte)EquipmentSlot.Count; i++)
+            {
+                if (mEquipped[i] == null && mCashEquipped[i] == null)
+                {
+                    continue;
+                }
+
+                if (i == (byte)EquipmentSlot.Weapon && mEquipped[i] != null)
+                {
+                    oPacket.WriteInt(mEquipped[i].MapleID);
+                }
+                else if (mCashEquipped[i] != null)
+                {
+                    oPacket.WriteInt(mCashEquipped[i].MapleID);
+                }
+                else if (mEquipped[i] != null)
+                {
+                    oPacket.WriteInt(mEquipped[i].MapleID);
+                }
+            }
+            oPacket.WriteByte(byte.MaxValue);
+
+            for (byte i = 0; i < (byte)EquipmentSlot.Count; i++)
+            {
+                if (i == (byte)EquipmentSlot.Weapon || mEquipped[i] == null || mCashEquipped[i] == null)
+                {
+                    continue;
+                }
+
+                oPacket.WriteInt(mEquipped[i].MapleID);
+            }
+            oPacket.WriteByte(byte.MaxValue);
+
+            oPacket.WriteInt(mCashEquipped[(byte)EquipmentSlot.Weapon] == null ? 0 : mCashEquipped[(byte)EquipmentSlot.Weapon].MapleID);
         }
     }
 }

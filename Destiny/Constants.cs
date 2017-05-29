@@ -133,6 +133,31 @@ namespace Destiny
         ThunderBreaker3 = 1511
     }
 
+    [Flags]
+    public enum StatisticType : int
+    {
+        Skin = 0x1,
+        Face = 0x2,
+        Hair = 0x4,
+        Level = 0x10,
+        Job = 0x20,
+        Strength = 0x40,
+        Dexterity = 0x80,
+        Intelligence = 0x100,
+        Luck = 0x200,
+        Health = 0x400,
+        MaxHealth = 0x800,
+        Mana = 0x1000,
+        MaxMana = 0x2000,
+        AbilityPoints = 0x4000,
+        SkillPoints = 0x8000,
+        Experience = 0x10000,
+        Fame = 0x20000,
+        Mesos = 0x40000,
+        Pet = 0x180000,
+        GachaponExperience = 0x200000
+    }
+
     public enum ItemType : byte
     {
         Equipment = 1,
@@ -148,7 +173,32 @@ namespace Destiny
         Usable,
         Setup,
         Etcetera,
-        Cash
+        Cash,
+        Count
+    }
+
+    public enum EquipmentSlot : byte
+    {
+        Helm = 1,
+        Face = 2,
+        Eye = 3,
+        Earring = 4,
+        Top = 5,
+        Bottom = 6,
+        Shoe = 7,
+        Glove = 8,
+        Cape = 9,
+        Shield = 10,
+        Weapon = 11,
+        FirstRelationshipRing = 12,
+        LabelRing = 13,
+        SecondRelationshipRing = 14,
+        QuoteRing = 15,
+        Pendant = 17,
+        Mount = 18,
+        Saddle = 19,
+
+        Count = 100
     }
 
     public enum ItemKind : byte

@@ -24,15 +24,15 @@ namespace Destiny.Packet
                         oPacket.WriteInt(Destiny.Random.Next());
                     }
 
-                    HelpPacket.AddCharacterData(oPacket, character);
+                    character.Encode(oPacket);
                 }
                 else
                 {
                     oPacket
                         .WriteByte()
-                        .WriteInt() // NOTE: Map ID.
-                        .WriteByte() // NOTE: Map spawn.
-                        .WriteShort(character.Health)
+                        .WriteInt(character.Map.MapleID)
+                        .WriteByte(character.SpawnPoint)
+                        .WriteShort(character.Stats.Health)
                         .WriteBool(false); // NOTE: Follow.
                 }
 

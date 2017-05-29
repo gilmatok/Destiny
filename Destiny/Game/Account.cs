@@ -1,14 +1,13 @@
 ﻿using Destiny.Utility;
-using System;
 
 namespace Destiny.Game
 {
     public sealed class Account
     {
-        public int ID { get; set; }
-        public string Username { get; set; }
-        public string Password { get; set; }
-        public string Salt { get; set; }
+        public int ID { get; private set; }
+        public string Username { get; private set; }
+        public string Password { get; private set; }
+        public string Salt { get; private set; }
 
         public Account(DatabaseQuery query)
         {

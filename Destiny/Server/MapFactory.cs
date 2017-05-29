@@ -1,4 +1,5 @@
-﻿using Destiny.Game;
+﻿using Destiny.Data;
+using Destiny.Game;
 using Destiny.Utility;
 using System.Collections.Generic;
 
@@ -21,17 +22,21 @@ namespace Destiny.Server
             mActiveMaps = new Dictionary<int, Map>();
         }
 
-        public Map this[int identifier]
+        public Map this[int mapleID]
         {
             get
             {
-                Map map = mActiveMaps.GetOrDefault(identifier, null);
+                Map map = mActiveMaps.GetOrDefault(mapleID, null);
 
                 if (map == null)
                 {
-                    map = new Map(identifier);
+                    map = new Map(mapleID);
 
-                    mActiveMaps.Add(identifier, map);
+                    MapData data = MasterServer.Instance.Data.Maps[mapleID];
+
+                    data.NPCs.ForEach(n => map.Npcs.Add(new Npc(n)));
+
+                    mActiveMaps.Add(mapleID, map);
                 }
 
                 return map;

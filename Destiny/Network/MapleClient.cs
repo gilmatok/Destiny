@@ -1,9 +1,5 @@
 ﻿using Destiny.Core.Network;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Net.Sockets;
 using Destiny.Game;
 using Destiny.Core.IO;
@@ -12,16 +8,17 @@ namespace Destiny.Network
 {
     public sealed class MapleClient : Session
     {
-        private PacketProcessor mProcessor;
-        private Func<MapleClient, bool> mDeathAction;
-        
-        public string LastUsername { get; set; }
-        public string LastPassword { get; set; }
         public Account Account { get; set; }
         public Character Character { get; set; }
 
+        public string LastUsername { get; set; }
+        public string LastPassword { get; set; }
+
         public byte World { get; set; }
         public byte Channel { get; set; }
+
+        private PacketProcessor mProcessor;
+        private Func<MapleClient, bool> mDeathAction;
 
         public MapleClient(Socket socket, PacketProcessor processor, Func<MapleClient, bool> deathAction)
             : base(socket)
@@ -32,13 +29,9 @@ namespace Destiny.Network
 
         protected override void Terminate()
         {
-            if (this.Account != null)
+            if (this.Account != null && this.Character != null)
             {
                 this.Account.Save();
-            }
-
-            if (this.Character != null)
-            {
                 this.Character.Save();
             }
 

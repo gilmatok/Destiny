@@ -1,4 +1,4 @@
-﻿namespace Destiny.Security
+﻿namespace Destiny.Core.Security
 {
     public sealed class ShandaCryptograph
     {

@@ -1,5 +1,5 @@
 ﻿using Destiny.Core.IO;
-using Destiny.Security;
+using Destiny.Core.Security;
 using System;
 using System.Net;
 using System.Net.Sockets;

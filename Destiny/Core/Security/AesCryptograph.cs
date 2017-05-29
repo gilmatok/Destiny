@@ -1,6 +1,6 @@
 ﻿using System.Security.Cryptography;
 
-namespace Destiny.Security
+namespace Destiny.Core.Security
 {
     public sealed class AESEncryption
     {

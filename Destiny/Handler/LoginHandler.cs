@@ -1,8 +1,8 @@
 ﻿using Destiny.Core.IO;
+using Destiny.Core.Security;
 using Destiny.Game;
 using Destiny.Network;
 using Destiny.Packet;
-using Destiny.Security;
 using Destiny.Server;
 using Destiny.Utility;
 using MySql.Data.MySqlClient;

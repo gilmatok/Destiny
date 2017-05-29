@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Destiny.Security
+namespace Destiny.Core.Security
 {
     public enum TransformDirection : byte
     {

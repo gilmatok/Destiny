@@ -137,10 +137,10 @@ namespace Destiny.Data
             }
         }
 
-        public sealed class MapNPCData
+        public sealed class MapNpcData
         {
             [Flags]
-            public enum EMapNPCFlags : byte
+            public enum EMapNpcFlags : byte
             {
                 None = 0 << 0,
                 Faces_Left = 1 << 0,
@@ -148,9 +148,9 @@ namespace Destiny.Data
             }
 
 
-            public int NPCIdentifier { get; set; }
-            public EMapNPCFlags Flags { get; set; }
-            public ushort Foothold { get; set; }
+            public int Identifier { get; set; }
+            public EMapNpcFlags Flags { get; set; }
+            public short Foothold { get; set; }
             public short X { get; set; }
             public short Y { get; set; }
             public short MinClickX { get; set; }
@@ -158,7 +158,7 @@ namespace Destiny.Data
 
             public void Save(BinaryWriter pWriter)
             {
-                pWriter.Write(NPCIdentifier);
+                pWriter.Write(Identifier);
                 pWriter.Write((byte)Flags);
                 pWriter.Write(Foothold);
                 pWriter.Write(X);
@@ -169,9 +169,9 @@ namespace Destiny.Data
 
             public void Load(BinaryReader pReader)
             {
-                NPCIdentifier = pReader.ReadInt32();
-                Flags = (EMapNPCFlags)pReader.ReadByte();
-                Foothold = pReader.ReadUInt16();
+                Identifier = pReader.ReadInt32();
+                Flags = (EMapNpcFlags)pReader.ReadByte();
+                Foothold = pReader.ReadInt16();
                 X = pReader.ReadInt16();
                 Y = pReader.ReadInt16();
                 MinClickX = pReader.ReadInt16();
@@ -364,7 +364,7 @@ namespace Destiny.Data
         public float MobRate { get; set; }
         public int LinkIdentifier { get; set; }
         public List<MapFootholdData> Footholds { get; set; }
-        public List<MapNPCData> NPCs { get; set; }
+        public List<MapNpcData> NPCs { get; set; }
         public List<MapReactorData> Reactors { get; set; }
         public List<MapMobData> Mobs { get; set; }
         public List<MapPortalData> Portals { get; set; }
@@ -447,10 +447,10 @@ namespace Destiny.Data
             }
 
             int npcsCount = pReader.ReadInt32();
-            NPCs = new List<MapNPCData>(npcsCount);
+            NPCs = new List<MapNpcData>(npcsCount);
             while (npcsCount-- > 0)
             {
-                MapNPCData npc = new MapNPCData();
+                MapNpcData npc = new MapNpcData();
                 npc.Load(pReader);
                 NPCs.Add(npc);
             }

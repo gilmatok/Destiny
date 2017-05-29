@@ -3,7 +3,7 @@ using System.Security.Cryptography;
 using System.Text;
 
 // CREDITS: Loki
-namespace Destiny.Security
+namespace Destiny.Core.Security
 {
     public static class HashGenerator
     {
