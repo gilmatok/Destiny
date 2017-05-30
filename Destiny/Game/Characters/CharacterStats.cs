@@ -2,7 +2,7 @@
 using Destiny.Packet;
 using Destiny.Utility;
 
-namespace Destiny.Game
+namespace Destiny.Game.Characters
 {
     public sealed class CharacterStats
     {

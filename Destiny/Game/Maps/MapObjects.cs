@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Destiny.Game.Characters;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
 namespace Destiny.Game.Maps

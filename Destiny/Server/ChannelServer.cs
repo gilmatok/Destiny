@@ -1,4 +1,4 @@
-﻿using Destiny.Game;
+﻿using Destiny.Game.Characters;
 using Destiny.Handler;
 using Destiny.Network;
 

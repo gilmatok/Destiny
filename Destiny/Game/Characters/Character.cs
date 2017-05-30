@@ -6,7 +6,7 @@ using Destiny.Core.IO;
 using Destiny.Game.Maps;
 using Destiny.Packet;
 
-namespace Destiny.Game
+namespace Destiny.Game.Characters
 {
     public sealed class Character : MapObject
     {
@@ -23,6 +23,8 @@ namespace Destiny.Game
         public CharacterItems Items { get; private set; }
         public CharacterSkills Skills { get; private set; }
         public CharacterQuests Quests { get; private set; }
+        public ControlledMobs ControlledMobs { get; private set; }
+        public ControlledNpcs ControlledNpcs { get; private set; }
 
         public bool IsGm
         {
@@ -75,6 +77,9 @@ namespace Destiny.Game
             {
                 this.Quests = new CharacterQuests(this, questQuery);
             }
+
+            this.ControlledMobs = new ControlledMobs(this);
+            this.ControlledNpcs = new ControlledNpcs(this);
         }
 
         public void Save()

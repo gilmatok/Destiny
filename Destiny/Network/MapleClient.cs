@@ -3,6 +3,7 @@ using System;
 using System.Net.Sockets;
 using Destiny.Game;
 using Destiny.Core.IO;
+using Destiny.Game.Characters;
 
 namespace Destiny.Network
 {
@@ -40,6 +41,13 @@ namespace Destiny.Network
 
         protected override void Dispatch(InPacket iPacket)
         {
+            if (iPacket.OperationCode < 0)
+            {
+                Logger.Write(LogLevel.Warning, "[{0}] Negative header from {1}.", mProcessor.Label, this.Host);
+
+                return;
+            }
+
             PacketHandler handler = mProcessor[iPacket.OperationCode];
 
             if (handler != null)

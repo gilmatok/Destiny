@@ -8,8 +8,23 @@ namespace Destiny.Packet
     {
         public static byte[] MobEnterField(Mob mob)
         {
-            using (OutPacket oPacket = new OutPacket(SendOpcode.MobEnterField))
+            return MobPacket.MobInternalPacket(mob, false);
+        }
+
+        public static byte[] MobControlRequest(Mob mob)
+        {
+            return MobPacket.MobInternalPacket(mob, true);
+        }
+
+        private static byte[] MobInternalPacket(Mob mob, bool requestControl)
+        {
+            using (OutPacket oPacket = new OutPacket(requestControl ? SendOpcode.MobChangeController : SendOpcode.MobEnterField))
             {
+                if (requestControl)
+                {
+                    oPacket.WriteByte(1); // TODO: 2 if mob is provoked (aggro).
+                }
+
                 oPacket
                     .WriteInt(mob.ObjectID)
                     .WriteByte(5) // TODO: 1 if mob is being controlled.
@@ -24,6 +39,18 @@ namespace Destiny.Packet
                     .WriteShort(-2) // NOTE: Spawn effect (-2 - new, -1 - existing).
                     .WriteByte(byte.MaxValue) // NOTE: Carnival team.
                     .WriteInt(); // NOTE: Unknown.
+
+                return oPacket.ToArray();
+            }
+        }
+
+        public static byte[] MobControlCancel(int objectID)
+        {
+            using (OutPacket oPacket = new OutPacket(SendOpcode.MobChangeController))
+            {
+                oPacket
+                    .WriteBool()
+                    .WriteInt(objectID);
 
                 return oPacket.ToArray();
             }

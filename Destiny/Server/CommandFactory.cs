@@ -1,4 +1,4 @@
-﻿using Destiny.Game;
+﻿using Destiny.Game.Characters;
 using System;
 using System.Collections.ObjectModel;
 using System.Reflection;

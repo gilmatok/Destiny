@@ -9,7 +9,7 @@ namespace Destiny.Core.Network
     public abstract class Session
     {
         public string Host { get; private set; }
-        public bool IsConnected { get; private set; }
+        public bool IsAlive { get; private set; }
 
         private readonly Socket mSocket;
 
@@ -39,14 +39,14 @@ namespace Destiny.Core.Network
 
             mLocker = new object();
 
-            this.IsConnected = true;
+            this.IsAlive = true;
 
             this.BeginRead();
         }
 
         private void BeginRead()
         {
-            if (!this.IsConnected)
+            if (!this.IsAlive)
             {
                 return;
             }
@@ -63,7 +63,7 @@ namespace Destiny.Core.Network
 
         private void ReadCallback(IAsyncResult asyncResult)
         {
-            if (!this.IsConnected)
+            if (!this.IsAlive)
             {
                 return;
             }
@@ -137,7 +137,7 @@ namespace Destiny.Core.Network
 
         public void Send(params byte[][] buffers)
         {
-            if (!this.IsConnected)
+            if (!this.IsAlive)
             {
                 return;
             }
@@ -174,7 +174,7 @@ namespace Destiny.Core.Network
 
         public void SendRaw(byte[] buffer)
         {
-            if (!this.IsConnected)
+            if (!this.IsAlive)
             {
                 return;
             }
@@ -199,12 +199,12 @@ namespace Destiny.Core.Network
 
         public void Close()
         {
-            if (!this.IsConnected)
+            if (!this.IsAlive)
             {
                 return;
             }
 
-            this.IsConnected = false;
+            this.IsAlive = false;
 
             mSocket.Shutdown(SocketShutdown.Both);
             mSocket.Close();

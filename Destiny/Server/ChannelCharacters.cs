@@ -1,5 +1,5 @@
 ﻿using Destiny.Core.Collections;
-using Destiny.Game;
+using Destiny.Game.Characters;
 using Destiny.Game.Maps;
 using System.Collections.Generic;
 

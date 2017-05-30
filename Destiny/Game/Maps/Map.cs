@@ -1,4 +1,5 @@
-﻿using Destiny.Server;
+﻿using Destiny.Game.Characters;
+using Destiny.Server;
 using System;
 using System.IO;
 

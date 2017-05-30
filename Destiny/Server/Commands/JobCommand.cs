@@ -1,4 +1,4 @@
-﻿using Destiny.Game;
+﻿using Destiny.Game.Characters;
 using System;
 
 namespace Destiny.Server.Commands

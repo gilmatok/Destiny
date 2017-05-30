@@ -3,7 +3,7 @@ using Destiny.Utility;
 using System;
 
 // TODO: Consider refactoring this entire class. Things seem to get a little hacky.
-namespace Destiny.Game
+namespace Destiny.Game.Characters
 {
     public sealed class CharacterItems
     {

@@ -1,7 +1,7 @@
 ﻿using Destiny.Core.IO;
 using Destiny.Utility;
 
-namespace Destiny.Game
+namespace Destiny.Game.Characters
 {
     public sealed class CharacterSkills
     {

@@ -1,7 +1,7 @@
 ﻿using Destiny.Core.IO;
-using Destiny.Game;
 using Destiny.Network;
 using System;
+using Destiny.Game.Characters;
 
 namespace Destiny.Packet
 {

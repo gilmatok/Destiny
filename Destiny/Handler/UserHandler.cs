@@ -8,22 +8,22 @@ namespace Destiny.Handler
 {
     public static class UserHandler
     {
-        public static void OnTransferFieldRequest(MapleClient client, InPacket inPacket)
+        public static void OnTransferFieldRequest(MapleClient client, InPacket iPacket)
         {
-            byte portals = inPacket.ReadByte();
+            byte portals = iPacket.ReadByte();
 
             if (portals != client.Character.Portals)
             {
                 return;
             }
 
-            int destinationID = inPacket.ReadInt();
+            int destinationID = iPacket.ReadInt();
 
             switch (destinationID)
             {
                 case -1:
                     {
-                        string label = inPacket.ReadString();
+                        string label = iPacket.ReadString();
                         Portal portal = client.Character.Map.Portals[label];
 
                         if (portal == null)

@@ -59,6 +59,8 @@
     <Compile Include="Game\Characters\CharacterQuests.cs" />
     <Compile Include="Game\Characters\CharacterSkills.cs" />
     <Compile Include="Game\Characters\CharacterStats.cs" />
+    <Compile Include="Game\Characters\ControlledMobs.cs" />
+    <Compile Include="Game\Characters\ControlledNpcs.cs" />
     <Compile Include="Game\Maps\Drop.cs" />
     <Compile Include="Game\Equip.cs" />
     <Compile Include="Game\Maps\MapMobs.cs" />
@@ -82,6 +84,7 @@
     <Compile Include="Core\Network\Session.cs" />
     <Compile Include="Core\IO\InPacket.cs" />
     <Compile Include="Game\Rectangle.cs" />
+    <Compile Include="Handler\MobHandler.cs" />
     <Compile Include="Handler\UserHandler.cs" />
     <Compile Include="Handler\LoginHandler.cs" />
     <Compile Include="Handler\ServerHandler.cs" />

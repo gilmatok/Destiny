@@ -1,4 +1,5 @@
-﻿using Destiny.Packet;
+﻿using Destiny.Game.Characters;
+using Destiny.Packet;
 
 namespace Destiny.Game.Maps
 {
@@ -8,22 +9,71 @@ namespace Destiny.Game.Maps
 
         protected override void InsertItem(int index, Character item)
         {
+            // TODO: Broadcast characters enter field packet to character.
+
             base.InsertItem(index, item);
 
-            foreach (Npc npc in this.Map.Npcs)
+            lock (this.Map.Mobs)
             {
-                item.Client.Send(NpcPacket.NpcEnterField(npc));
+                foreach (Mob mob in this.Map.Mobs)
+                {
+                    item.Client.Send(MobPacket.MobEnterField(mob));
+                }
             }
 
-            foreach (Mob mob in this.Map.Mobs)
+            lock (this.Map.Npcs)
             {
-                item.Client.Send(MobPacket.MobEnterField(mob));
+                foreach (Npc npc in this.Map.Npcs)
+                {
+                    item.Client.Send(NpcPacket.NpcEnterField(npc));
+                }
             }
+
+            lock (this.Map.Mobs)
+            {
+                foreach (Mob mob in this.Map.Mobs)
+                {
+                    mob.AssignController();
+                }
+            }
+
+            lock (this.Map.Npcs)
+            {
+                foreach (Npc npc in this.Map.Npcs)
+                {
+                    npc.AssignController();
+                }
+            }
+
+            // TODO: Broadcast character enter field packet to map.
         }
 
         protected override void RemoveItem(int index)
         {
+            Character item = base.Items[index];
+
+            item.ControlledMobs.Clear();
+            item.ControlledNpcs.Clear();
+
             base.RemoveItem(index);
+
+            lock (this.Map.Mobs)
+            {
+                foreach (Mob mob in this.Map.Mobs)
+                {
+                    mob.AssignController();
+                }
+            }
+
+            lock (this.Map.Npcs)
+            {
+                foreach (Npc npc in this.Map.Npcs)
+                {
+                    npc.AssignController();
+                }
+            }
+
+            // TODO: Broadcast character leave field packet to map.
         }
     }
 }
