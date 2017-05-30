@@ -52,6 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Constants.cs" />
+    <Compile Include="Core\Collections\EnumerationHelper.cs" />
     <Compile Include="Game\Account.cs" />
     <Compile Include="Game\Characters\Character.cs" />
     <Compile Include="Game\Characters\CharacterItems.cs" />
@@ -101,9 +102,16 @@
     <Compile Include="Core\Security\MapleCryptograph.cs" />
     <Compile Include="Core\Security\SHACryptograph.cs" />
     <Compile Include="Core\Security\ShandaCryptograph.cs" />
+    <Compile Include="Server\ChannelCharacters.cs" />
     <Compile Include="Server\ChannelServer.cs" />
     <Compile Include="Server\CommandFactory.cs" />
-    <Compile Include="Server\Commands\TestCommand.cs" />
+    <Compile Include="Server\Commands\ItemCommand.cs" />
+    <Compile Include="Server\Commands\JobCommand.cs" />
+    <Compile Include="Server\Commands\LevelCommand.cs" />
+    <Compile Include="Server\Commands\MapCommand.cs" />
+    <Compile Include="Server\Commands\MesosCommand.cs" />
+    <Compile Include="Server\Commands\NoticeCommand.cs" />
+    <Compile Include="Server\Commands\TickerCommand.cs" />
     <Compile Include="Server\DataProvider.cs" />
     <Compile Include="Server\LoginServer.cs" />
     <Compile Include="Server\MapFactory.cs" />

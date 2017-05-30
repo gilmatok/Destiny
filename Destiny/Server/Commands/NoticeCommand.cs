@@ -2,13 +2,13 @@
 
 namespace Destiny.Server.Commands
 {
-    public sealed class TestCommand : Command
+    public sealed class NoticeCommand : Command
     {
         public override string Name
         {
             get
             {
-                return "test";
+                return "notice";
             }
         }
 
@@ -16,7 +16,7 @@ namespace Destiny.Server.Commands
         {
             get
             {
-                return string.Empty;
+                return "message";
             }
         }
 
@@ -24,21 +24,19 @@ namespace Destiny.Server.Commands
         {
             get
             {
-                return GmLevel.Intern;
+                return GmLevel.SuperGm;
             }
         }
 
         public override void Execute(Character caller, string[] args)
         {
-            if (args.Length != 0)
+            if (args.Length < 1)
             {
                 this.ShowSyntax(caller);
             }
             else
             {
-                caller.Notify("Hey, the command works!");
-
-                caller.Stats.Level++;
+                MasterServer.Instance.Worlds[caller.Client.World].Notify(this.CombineArgs(args), NoticeType.Notice);
             }
         }
     }

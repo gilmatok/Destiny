@@ -99,5 +99,13 @@ namespace Destiny.Server
 
             return 0;
         }
+
+        public void Notify(string message, NoticeType type)
+        {
+            foreach (ChannelServer channel in this.Channels)
+            {
+                channel.Notify(message, type);
+            }
+        }
     }
 }
