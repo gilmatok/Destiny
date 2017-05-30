@@ -4,6 +4,7 @@ using Destiny.Utility;
 using MySql.Data.MySqlClient;
 using Destiny.Core.IO;
 using Destiny.Game.Maps;
+using Destiny.Packet;
 
 namespace Destiny.Game
 {
@@ -26,7 +27,7 @@ namespace Destiny.Game
         {
             get
             {
-                return true; // TODO: Get from account.
+                return this.Client.Account.GmLevel >= GmLevel.Intern;
             }
         }
 
@@ -78,6 +79,11 @@ namespace Destiny.Game
         public void Save()
         {
 
+        }
+
+        public void Notify(string message, NoticeType type = NoticeType.Pink)
+        {
+            this.Client.Send(UserPacket.BrodcastMsg(message, type));
         }
 
         public void Encode(OutPacket oPacket, long flag = long.MaxValue)

@@ -39,7 +39,7 @@
         MagicAttack = 0x2E,
         EnergyOrbAttack = 0x2F,
         TakeDamage = 0x30,
-        GeneralChat = 0x31,
+        UserChat = 0x31,
         CloseChalkboard = 0x32,
         FaceExpression = 0x33,
         UseItemEffect = 0x34,

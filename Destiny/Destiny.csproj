@@ -81,7 +81,7 @@
     <Compile Include="Core\Network\Session.cs" />
     <Compile Include="Core\IO\InPacket.cs" />
     <Compile Include="Game\Rectangle.cs" />
-    <Compile Include="Handler\ChatHandler.cs" />
+    <Compile Include="Handler\UserHandler.cs" />
     <Compile Include="Handler\LoginHandler.cs" />
     <Compile Include="Handler\ServerHandler.cs" />
     <Compile Include="Network\MapleClient.cs" />
@@ -89,12 +89,11 @@
     <Compile Include="Core\IO\OutPacket.cs" />
     <Compile Include="Destiny.cs" />
     <Compile Include="Core\Network\PacketProcessor.cs" />
-    <Compile Include="Packet\ChatPacket.cs" />
+    <Compile Include="Packet\UserPacket.cs" />
     <Compile Include="Packet\HelpPacket.cs" />
     <Compile Include="Packet\LoginPacket.cs" />
     <Compile Include="Packet\MapPacket.cs" />
     <Compile Include="Packet\NpcPacket.cs" />
-    <Compile Include="Packet\PlayerPacket.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Core\Security\AesCryptograph.cs" />
     <Compile Include="Core\Security\HashGenerator.cs" />
@@ -102,6 +101,8 @@
     <Compile Include="Core\Security\SHACryptograph.cs" />
     <Compile Include="Core\Security\ShandaCryptograph.cs" />
     <Compile Include="Server\ChannelServer.cs" />
+    <Compile Include="Server\CommandFactory.cs" />
+    <Compile Include="Server\Commands\TestCommand.cs" />
     <Compile Include="Server\DataProvider.cs" />
     <Compile Include="Server\LoginServer.cs" />
     <Compile Include="Server\MapFactory.cs" />
@@ -120,5 +121,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

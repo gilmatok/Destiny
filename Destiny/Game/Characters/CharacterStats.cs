@@ -397,7 +397,7 @@ namespace Destiny.Game
 
         public void Update(params StatisticType[] statistics)
         {
-            this.Parent.Client.Send(PlayerPacket.StatChanged(this.Parent, statistics));
+            this.Parent.Client.Send(UserPacket.StatChanged(this.Parent, statistics));
         }
 
         public void Encode(OutPacket oPacket)

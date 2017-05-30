@@ -26,6 +26,7 @@ namespace Destiny.Server
         protected override void RegisterHandlers()
         {
             this.RegisterHandler(RecvOpcode.MigrateIn, ServerHandler.HandleMigrateChannel);
+            this.RegisterHandler(RecvOpcode.UserChat, UserHandler.HandleUserChat);
         }
     }
 }

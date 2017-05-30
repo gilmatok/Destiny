@@ -5,7 +5,7 @@ using System;
 
 namespace Destiny.Packet
 {
-    public static class PlayerPacket
+    public static class UserPacket
     {
         public static byte[] StatChanged(Character character, params StatisticType[] statistics)
         {
@@ -86,7 +86,7 @@ namespace Destiny.Packet
 
                         case StatisticType.SkillPoints:
                             oPacket.WriteShort(character.Stats.SkillPoints);
-                        break;
+                            break;
 
                         case StatisticType.Experience:
                             oPacket.WriteInt(character.Stats.Experience);
@@ -101,6 +101,37 @@ namespace Destiny.Packet
                             break;
                     }
                 }
+
+                return oPacket.ToArray();
+            }
+        }
+
+        public static byte[] BrodcastMsg(string message, NoticeType type)
+        {
+            using (OutPacket oPacket = new OutPacket(SendOpcode.BroadcastMsg))
+            {
+                oPacket.WriteByte((byte)type);
+
+                if (type == NoticeType.Ticker)
+                {
+                    oPacket.WriteBool(!string.IsNullOrEmpty(message));
+                }
+
+                oPacket.WriteString(message);
+
+                return oPacket.ToArray();
+            }
+        }
+
+        public static byte[] UserChat(int characterID, bool isGm, string text, bool shout)
+        {
+            using (OutPacket oPacket = new OutPacket(SendOpcode.UserChat))
+            {
+                oPacket
+                    .WriteInt(characterID)
+                    .WriteBool(isGm)
+                    .WriteString(text)
+                    .WriteBool(shout);
 
                 return oPacket.ToArray();
             }

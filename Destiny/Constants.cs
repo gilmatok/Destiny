@@ -8,6 +8,8 @@ namespace Destiny
         public const string Patch = "1";
         public const byte Locale = 8;
 
+        public const char CommandIndiciator = '!';
+
         public static readonly byte[] RIV = new byte[] { 0x52, 0x61, 0x6A, 0x61 };
         public static readonly byte[] SIV = new byte[] { 0x6E, 0x52, 0x30, 0x58 };
     }
@@ -50,6 +52,14 @@ namespace Destiny
         Full
     }
 
+    public enum GmLevel : byte
+    {
+        Intern,
+        Gm,
+        SuperGm,
+        Administrator
+    }
+
     public enum Gender : byte
     {
         Male,
@@ -57,7 +67,17 @@ namespace Destiny
         Both
     }
 
-     public enum Job : short
+    public enum NoticeType : byte
+    {
+        Notice,
+        Popup,
+        Background,
+        Ticker = 4,
+        Pink,
+        Blue
+    }
+
+    public enum Job : short
     {
         Beginner,
 

@@ -1,4 +1,5 @@
-﻿using Destiny.Server;
+﻿using Destiny.Core.IO;
+using Destiny.Server;
 using System;
 using System.IO;
 
@@ -14,7 +15,7 @@ namespace Destiny.Game.Maps
         public MapMobs Mobs { get; private set; }
         public MapNpcs Npcs { get; private set; }
         public MapPortals Portals { get; private set; }
-        
+
         public Map CachedReference
         {
             get
@@ -45,6 +46,14 @@ namespace Destiny.Game.Maps
             this.Mobs = this.CachedReference.Mobs;
             this.Npcs = this.CachedReference.Npcs;
             this.Portals = this.CachedReference.Portals;
+        }
+
+        public void Broadcast(byte[] buffer)
+        {
+            foreach (Character character in this.Characters)
+            {
+                character.Client.Send(buffer);
+            }
         }
 
         // TODO: Refactor this.

@@ -40,6 +40,8 @@ namespace Destiny.Handler
 
             client.Character.Map.Characters.Add(client.Character);
 
+            client.Character.Notify(MasterServer.Instance.Worlds[client.World].TickerMessage, NoticeType.Ticker);
+
             client.Character.IsInitialized = true;
         }
 

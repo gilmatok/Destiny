@@ -17,12 +17,14 @@ namespace Destiny.Server
         public bool IsAlive { get; private set; }
 
         public DataProvider Data { get; private set; }
+        public CommandFactory Commands { get; private set; }
         public LoginServer Login { get; private set; }
         public WorldServer[] Worlds { get; private set; }
 
         public MasterServer()
         {
             this.Data = new DataProvider();
+            this.Commands = new CommandFactory();
             this.Login = new LoginServer(Config.Instance.Login);
             this.Worlds = new WorldServer[Config.Instance.Worlds.Count];
 
@@ -37,6 +39,8 @@ namespace Destiny.Server
         public void Start()
         {
             this.Data.Load();
+
+            this.Commands.Load();
 
             this.Login.Start();
 
