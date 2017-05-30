@@ -19,6 +19,9 @@ Clone the Git repoistory to a local folder on your machine.
 ...
 6. **Build the Destiny solution provided with Visual Studio 2015**
 ...
+7. **Run WZ2BIN [MapleStory directory] [Data directory]**
+WZ2BIN will convert MapleStory WZ files to custom data binary files that Destiny uses.
+8. **Run Destiny**
 
 The server should be running at this point.
 
