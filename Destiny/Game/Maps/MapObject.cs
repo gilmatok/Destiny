@@ -1,4 +1,4 @@
-﻿namespace Destiny.Game
+﻿namespace Destiny.Game.Maps
 {
     public abstract class MapObject : Moveable
     {

@@ -3,6 +3,7 @@ using Destiny.Server;
 using Destiny.Utility;
 using MySql.Data.MySqlClient;
 using Destiny.Core.IO;
+using Destiny.Game.Maps;
 
 namespace Destiny.Game
 {
@@ -105,7 +106,7 @@ namespace Destiny.Game
             // NOTE: Teleport rock locations.
             for (int i = 0; i < 15; i++)
             {
-                oPacket.WriteInt(Map.INVALID_MAP_ID);
+                oPacket.WriteInt(999999999);
             }
 
             oPacket

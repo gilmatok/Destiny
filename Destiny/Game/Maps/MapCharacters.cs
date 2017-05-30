@@ -1,6 +1,6 @@
 ﻿using Destiny.Packet;
 
-namespace Destiny.Game
+namespace Destiny.Game.Maps
 {
     public sealed class MapCharacters : MapObjects<Character>
     {

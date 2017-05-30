@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
-namespace Destiny.Game
+namespace Destiny.Game.Maps
 {
     public abstract class MapObjects<T> : KeyedCollection<int, T> where T : MapObject
     {
@@ -32,7 +32,7 @@ namespace Destiny.Game
         {
             item.Map = this.Map;
 
-            if (!(item is Character))
+            if (!(item is Character)  && !(item is Portal))
             {
                 item.ObjectID = this.Map.AssignObjectID(item.Type);
             }
@@ -46,7 +46,7 @@ namespace Destiny.Game
 
             item.Map = null;
 
-            if (!(item is Character))
+            if (!(item is Character) && !(item is Portal))
             {
                 item.ObjectID = -1;
             }

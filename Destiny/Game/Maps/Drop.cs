@@ -1,12 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Destiny.Game
+﻿namespace Destiny.Game.Maps
 {
-    class Drop
+    public sealed class Drop : MapObject
     {
+        public override MapObjectType Type
+        {
+            get
+            {
+                return MapObjectType.Drop;
+            }
+        }
     }
 }

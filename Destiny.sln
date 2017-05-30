@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.26403.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Destiny", "Destiny\Destiny.csproj", "{05D44ABA-F962-49BD-9CB2-E4F72B3C474F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WZ2BIN", "WZ2BIN\WZ2BIN.csproj", "{7E964845-B793-41C4-91C8-87F2533AE795}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{05D44ABA-F962-49BD-9CB2-E4F72B3C474F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{05D44ABA-F962-49BD-9CB2-E4F72B3C474F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{05D44ABA-F962-49BD-9CB2-E4F72B3C474F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7E964845-B793-41C4-91C8-87F2533AE795}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7E964845-B793-41C4-91C8-87F2533AE795}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7E964845-B793-41C4-91C8-87F2533AE795}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7E964845-B793-41C4-91C8-87F2533AE795}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,21 +1,53 @@
-﻿using System;
+﻿using Destiny.Server;
+using System;
+using System.IO;
 
-namespace Destiny.Game
+namespace Destiny.Game.Maps
 {
     public sealed class Map
     {
-        public const int INVALID_MAP_ID = 999999999;
-
         public int MapleID { get; private set; }
-        public MapCharacters Characters { get; private set; }
-        public MapNpcs Npcs { get; private set; }
+        public int ReturnMapID { get; private set; }
+        public int ForcedReturnMapID { get; private set; }
 
-        public Map(int identifier)
+        public MapCharacters Characters { get; private set; }
+        public MapMobs Mobs { get; private set; }
+        public MapNpcs Npcs { get; private set; }
+        public MapPortals Portals { get; private set; }
+        
+        public Map CachedReference
         {
-            this.MapleID = identifier;
-            this.Characters = new MapCharacters(this);
-            this.Npcs = new MapNpcs(this);
+            get
+            {
+                return MasterServer.Instance.Data.Maps[this.MapleID];
+            }
         }
+
+        public Map(BinaryReader reader)
+        {
+            this.MapleID = reader.ReadInt32();
+            this.ReturnMapID = reader.ReadInt32();
+            this.ForcedReturnMapID = reader.ReadInt32();
+
+            this.Characters = new MapCharacters(this);
+            this.Mobs = new MapMobs(this);
+            this.Npcs = new MapNpcs(this);
+            this.Portals = new MapPortals(this);
+        }
+
+        public Map(int mapleID)
+        {
+            this.MapleID = mapleID;
+            this.ReturnMapID = this.CachedReference.ReturnMapID;
+            this.ForcedReturnMapID = this.CachedReference.ForcedReturnMapID;
+
+            this.Characters = this.CachedReference.Characters;
+            this.Mobs = this.CachedReference.Mobs;
+            this.Npcs = this.CachedReference.Npcs;
+            this.Portals = this.CachedReference.Portals;
+        }
+
+        // TODO: Refactor this.
 
         private int mNpcObjectIDs = 0;
         private int mMobObjectIDs = 0;

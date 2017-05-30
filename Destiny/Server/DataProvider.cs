@@ -1,151 +1,93 @@
-﻿using Destiny.Data;
+﻿using Destiny.Game;
+using Destiny.Game.Maps;
 using Destiny.Utility;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 
 namespace Destiny.Server
 {
     public sealed class DataProvider
     {
-        public Dictionary<byte, Dictionary<byte, AbilityData>> Abilities { get; private set; }
-        public Dictionary<int, Dictionary<byte, SkillData>> Skills { get; private set; }
-        public Dictionary<int, NpcData> Npcs { get; private set; }
-        public Dictionary<int, ReactorData> Reactors { get; private set; }
-        public Dictionary<int, MobData> Mobs { get; private set; }
-        public Dictionary<int, QuestData> Quests { get; private set; }
-        public Dictionary<int, ItemData> Items { get; private set; }
-        public Dictionary<int, MapData> Maps { get; private set; }
+        public SortedDictionary<int, Item> Items { get; private set; }
+        public SortedDictionary<int, Equip> Equips { get; private set; }
+        public SortedDictionary<int, Map> Maps { get; private set; }
 
         public DataProvider()
         {
-            this.Abilities = new Dictionary<byte, Dictionary<byte, AbilityData>>();
-            this.Skills = new Dictionary<int, Dictionary<byte, SkillData>>();
-            this.Npcs = new Dictionary<int, NpcData>();
-            this.Reactors = new Dictionary<int, ReactorData>();
-            this.Mobs = new Dictionary<int, MobData>();
-            this.Quests = new Dictionary<int, QuestData>();
-            this.Items = new Dictionary<int, ItemData>();
-            this.Maps = new Dictionary<int, MapData>();
+            this.Items = new SortedDictionary<int, Item>();
+            this.Equips = new SortedDictionary<int, Equip>();
+            this.Maps = new SortedDictionary<int, Map>();
         }
 
         public void Load()
         {
-            Logger.Initializer("Loading Data", () =>
+            Stopwatch sw = new Stopwatch();
+
+            sw.Start();
+
+            this.LoadItems();
+            this.LoadEquips();
+            this.LoadMaps();
+
+            sw.Stop();
+
+            Logger.Write(LogLevel.Info, "Loaded data in {0}ms.", sw.ElapsedMilliseconds);
+        }
+
+        private void LoadItems()
+        {
+            using (FileStream stream = File.Open(Path.Combine(Config.Instance.Binary, "Items.bin"), FileMode.Open, FileAccess.Read))
             {
-                int count;
-
-                using (FileStream stream = File.Open(Config.Instance.Binary, FileMode.Open, FileAccess.Read))
+                using (BinaryReader reader = new BinaryReader(stream))
                 {
-                    using (BinaryReader reader = new BinaryReader(stream))
+                    while (reader.BaseStream.Position < reader.BaseStream.Length)
                     {
-                        count = reader.ReadInt32();
+                        Item item = new Item(reader);
 
-                        while (count-- > 0)
-                        {
-                            AbilityData ability = new AbilityData();
-
-                            ability.Load(reader);
-
-                            Dictionary<byte, AbilityData> levels = this.Abilities.GetOrDefault(ability.Identifier, null);
-
-                            if (levels == null)
-                            {
-                                levels = new Dictionary<byte, AbilityData>();
-
-                                this.Abilities.Add(ability.Identifier, levels);
-                            }
-
-                            levels.Add(ability.Level, ability);
-                        }
-
-                        count = reader.ReadInt32();
-
-                        while (count-- > 0)
-                        {
-                            SkillData skill = new SkillData();
-
-                            skill.Load(reader);
-
-                            Dictionary<byte, SkillData> levels = this.Skills.GetOrDefault(skill.Identifier, null);
-
-                            if (levels == null)
-                            {
-                                levels = new Dictionary<byte, SkillData>();
-
-                                this.Skills.Add(skill.Identifier, levels);
-                            }
-
-                            levels.Add(skill.Level, skill);
-                        }
-
-                        count = reader.ReadInt32();
-
-                        while (count-- > 0)
-                        {
-                            NpcData npc = new NpcData();
-
-                            npc.Load(reader);
-
-                            this.Npcs.Add(npc.Identifier, npc);
-                        }
-
-                        count = reader.ReadInt32();
-
-                        while (count-- > 0)
-                        {
-                            ReactorData reactor = new ReactorData();
-
-                            reactor.Load(reader);
-
-                            this.Reactors.Add(reactor.Identifier, reactor);
-                        }
-
-                        count = reader.ReadInt32();
-
-                        while (count-- > 0)
-                        {
-                            MobData mob = new MobData();
-
-                            mob.Load(reader);
-
-                            this.Mobs.Add(mob.Identifier, mob);
-                        }
-
-                        count = reader.ReadInt32();
-
-                        while (count-- > 0)
-                        {
-                            QuestData quest = new QuestData();
-
-                            quest.Load(reader);
-
-                            this.Quests.Add(quest.Identifier, quest);
-                        }
-
-                        count = reader.ReadInt32();
-
-                        while (count-- > 0)
-                        {
-                            ItemData item = new ItemData();
-
-                            item.Load(reader);
-
-                            this.Items.Add(item.Identifier, item);
-                        }
-
-                        count = reader.ReadInt32();
-
-                        while (count-- > 0)
-                        {
-                            MapData map = new MapData();
-
-                            map.Load(reader);
-
-                            this.Maps.Add(map.Identifier, map);
-                        }
+                        this.Items.Add(item.MapleID, item);
                     }
                 }
-            });
+            }
+        }
+
+        private void LoadEquips()
+        {
+            using (FileStream stream = File.Open(Path.Combine(Config.Instance.Binary, "Equips.bin"), FileMode.Open, FileAccess.Read))
+            {
+                using (BinaryReader reader = new BinaryReader(stream))
+                {
+                    while (reader.BaseStream.Position < reader.BaseStream.Length)
+                    {
+                        Equip equip = new Equip(reader);
+
+                        this.Equips.Add(equip.MapleID, equip);
+                    }
+                }
+            }
+        }
+
+        private void LoadMaps()
+        {
+            using (FileStream stream = File.Open(Path.Combine(Config.Instance.Binary, "Maps.bin"), FileMode.Open, FileAccess.Read))
+            {
+                using (BinaryReader reader = new BinaryReader(stream))
+                {
+                    while (reader.BaseStream.Position < reader.BaseStream.Length)
+                    {
+                        Map map = new Map(reader);
+
+                        int portalsCount = reader.ReadInt32();
+
+                        while (portalsCount-- > 0)
+                        {
+                            map.Portals.Add(new Portal(reader));
+                        }
+
+                        this.Maps.Add(map.MapleID, map);
+                    }
+                }
+            }
         }
     }
 }

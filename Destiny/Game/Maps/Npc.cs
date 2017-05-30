@@ -1,13 +1,14 @@
-﻿using Destiny.Data;
+﻿using Destiny.Server;
 
-namespace Destiny.Game
+namespace Destiny.Game.Maps
 {
     public sealed class Npc : MapObject
     {
         public int MapleID { get; private set; }
+        public short MinimumClickX { get; private set; }
+        public short MaximumClickX { get; private set; }
         public bool Flip { get; private set; }
-        public short MinClickPos { get; private set; }
-        public short MaxClickPos { get; private set; }
+        public int StorageCost { get; private set; }
 
         public override MapObjectType Type
         {
@@ -17,19 +18,22 @@ namespace Destiny.Game
             }
         }
 
-        public Npc(int identifier)
-        {
-            this.MapleID = identifier;
-        }
+        //public Npc(int mapleID)
+        //{
+        //    NpcData data = MasterServer.Instance.Data.Npcs[mapleID];
 
-        public Npc(MapData.MapNpcData spawn)
-            : this(spawn.Identifier)
-        {
-            this.Flip = (spawn.Flags & MapData.MapNpcData.EMapNpcFlags.FacesLeft) != 0;
-            this.Foothold = spawn.Foothold;
-            this.Position = new Point(spawn.X, spawn.Y);
-            this.MinClickPos = spawn.MinClickX;
-            this.MaxClickPos = spawn.MaxClickX;
-        }
+        //    this.MapleID = mapleID;
+        //    this.StorageCost = data.StorageCost;
+        //}
+
+        //public Npc(MapData.MapNpcData data)
+        //    : this(data.Identifier)
+        //{
+        //    this.Foothold = data.Foothold;
+        //    this.Position = new Point(data.X, data.Y);
+        //    this.MinimumClickX = data.MinClickX;
+        //    this.MaximumClickX = data.MaxClickX;
+        //    this.Flip = (data.Flags & MapData.MapNpcData.EMapNpcFlags.FacesLeft) != 0;
+        //}
     }
 }

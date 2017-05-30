@@ -1,6 +1,6 @@
 ﻿<Config>
-  <Binary>Data.bin</Binary>
-  
+  <Binary>Data</Binary>
+
   <Database>
     <Host>localhost</Host>
     <Schema>destiny</Schema>

@@ -15,7 +15,7 @@ namespace Destiny.Server
         }
 
         public bool IsAlive { get; private set; }
-        
+
         public DataProvider Data { get; private set; }
         public LoginServer Login { get; private set; }
         public WorldServer[] Worlds { get; private set; }

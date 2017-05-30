@@ -10,7 +10,6 @@ namespace Destiny
         Warning,
         Info,
         Connection,
-        DataLoad,
         Success,
     }
 
@@ -69,25 +68,6 @@ namespace Destiny
 
             //Keep outside to prevent a deadlock.
             Write(LogLevel.Error, "An exception was logged{0}{1}", Environment.NewLine, exception);
-        }
-
-        public static void Initializer(string message, Action function)
-        {
-            int startTime = Environment.TickCount;
-            Console.Write(message);
-            Console.Write("... ");
-
-            function();
-
-            Console.Write(Environment.TickCount - startTime);
-            Console.Write("ms");
-
-            Console.SetCursorPosition(Console.WindowWidth - 7, Console.CursorTop);
-            Console.Write("[");
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.Write("DONE");
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.WriteLine("]");
         }
     }
 }

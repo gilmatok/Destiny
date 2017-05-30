@@ -1,4 +1,4 @@
-﻿namespace Destiny.Game
+﻿namespace Destiny.Game.Maps
 {
     public sealed class MapNpcs : MapObjects<Npc>
     {

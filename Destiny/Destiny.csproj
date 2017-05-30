@@ -52,14 +52,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Constants.cs" />
-    <Compile Include="Data\AbilityData.cs" />
-    <Compile Include="Data\ItemData.cs" />
-    <Compile Include="Data\MapData.cs" />
-    <Compile Include="Data\MobData.cs" />
-    <Compile Include="Data\NpcData.cs" />
-    <Compile Include="Data\QuestData.cs" />
-    <Compile Include="Data\ReactorData.cs" />
-    <Compile Include="Data\SkillData.cs" />
     <Compile Include="Game\Account.cs" />
     <Compile Include="Game\Characters\Character.cs" />
     <Compile Include="Game\Characters\CharacterItems.cs" />
@@ -68,9 +60,12 @@
     <Compile Include="Game\Characters\CharacterStats.cs" />
     <Compile Include="Game\Maps\Drop.cs" />
     <Compile Include="Game\Equip.cs" />
+    <Compile Include="Game\Maps\MapMobs.cs" />
     <Compile Include="Game\Maps\MapObject.cs" />
     <Compile Include="Game\Maps\MapObjects.cs" />
     <Compile Include="Game\Maps\MapObjectType.cs" />
+    <Compile Include="Game\Maps\MapPortals.cs" />
+    <Compile Include="Game\Maps\MapReactors.cs" />
     <Compile Include="Game\Moveable.cs" />
     <Compile Include="Game\Item.cs" />
     <Compile Include="Game\Maps\Map.cs" />
@@ -124,11 +119,6 @@
     <Content Include="Destiny.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Data.bin">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -1,5 +1,5 @@
 ﻿using Destiny.Core.IO;
-using Destiny.Game;
+using Destiny.Game.Maps;
 using Destiny.Network;
 
 namespace Destiny.Packet
@@ -16,8 +16,8 @@ namespace Destiny.Packet
                     .WritePoint(npc.Position)
                     .WriteBool(!npc.Flip)
                     .WriteShort(npc.Foothold)
-                    .WriteShort(npc.MinClickPos)
-                    .WriteShort(npc.MaxClickPos)
+                    .WriteShort(npc.MinimumClickX)
+                    .WriteShort(npc.MaximumClickX)
                     .WriteBool(true); // TODO: bHide.
 
                 return oPacket.ToArray();

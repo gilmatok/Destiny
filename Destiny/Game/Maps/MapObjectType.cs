@@ -1,11 +1,15 @@
-﻿namespace Destiny.Game
+﻿namespace Destiny.Game.Maps
 {
     public enum MapObjectType
     {
-        Npc,
+        Character,
+        Drop,
         Mob,
+        Npc,
         Reactor,
         Portal,
-        Character
+        Shop,
+        HiredMerchant,
+        Omok
     }
 }

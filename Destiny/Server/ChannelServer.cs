@@ -9,7 +9,7 @@ namespace Destiny.Server
         public byte WorldID { get; private set; }
         public MapFactory Maps { get; private set; }
 
-        public ChannelServer(byte id, byte worldID, short port) 
+        public ChannelServer(byte id, byte worldID, short port)
             : base("Channel", port)
         {
             this.ID = id;

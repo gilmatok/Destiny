@@ -1,4 +1,6 @@
-﻿namespace Destiny.Game
+﻿using Destiny.Server;
+
+namespace Destiny.Game.Maps
 {
     public sealed class Mob : MapObject
     {
@@ -11,5 +13,10 @@
         }
 
         public int MapleID { get; private set; }
+
+        public Mob(int mapleID)
+        {
+            this.MapleID = mapleID;
+        }
     }
 }
