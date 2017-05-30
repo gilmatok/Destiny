@@ -28,7 +28,7 @@
         StrangeData = 0x1C,
         Relog = 0x1C,
         LoginUnknown = 0x22,
-        ChangeMap = 0x26,
+        TransferFieldRequest = 0x26,
         ChangeChannel = 0x27,
         EnterCashShop = 0x28,
         MovePlayer = 0x29,

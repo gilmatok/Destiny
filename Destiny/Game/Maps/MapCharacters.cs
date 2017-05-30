@@ -14,6 +14,11 @@ namespace Destiny.Game.Maps
             {
                 item.Client.Send(NpcPacket.NpcEnterField(npc));
             }
+
+            foreach (Mob mob in this.Map.Mobs)
+            {
+                item.Client.Send(MobPacket.MobEnterField(mob));
+            }
         }
 
         protected override void RemoveItem(int index)

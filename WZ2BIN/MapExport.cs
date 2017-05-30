@@ -33,12 +33,37 @@ namespace WZ2BIN
                                     foreach (var portalNode in node["portal"])
                                     {
                                         writer.Write(byte.Parse(portalNode.Name));
-                                        writer.Write(portalNode.GetString("name"));
+                                        writer.Write(portalNode.GetString("pn"));
                                         writer.Write(portalNode.GetInt("tm"));
                                         writer.Write(portalNode.GetString("tn"));
                                         writer.Write(portalNode.GetString("script"));
                                         writer.Write(portalNode.GetShort("x"));
                                         writer.Write(portalNode.GetShort("y"));
+                                    }
+                                }
+                                else
+                                {
+                                    writer.Write(0);
+                                }
+
+                                if (node.HasChild("life"))
+                                {
+                                    writer.Write(node["life"].ChildCount);
+
+                                    foreach (var lifeNode in node["life"])
+                                    {
+                                        string type = lifeNode.GetString("type");
+
+                                        writer.Write(type);
+                                        writer.Write(lifeNode.GetInt("id"));
+                                        writer.Write(lifeNode.GetShort("x"));
+                                        writer.Write(lifeNode.GetShort("cy"));
+                                        writer.Write(lifeNode.GetShort("fh"));
+                                        writer.Write(lifeNode.GetByte("f"));
+                                        writer.Write(lifeNode.GetShort("rx0"));
+                                        writer.Write(lifeNode.GetShort("rx1"));
+                                        writer.Write(lifeNode.GetByte("hide"));
+                                        writer.Write(lifeNode.GetInt("mobTime"));
                                     }
                                 }
                                 else

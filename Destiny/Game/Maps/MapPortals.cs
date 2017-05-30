@@ -4,6 +4,22 @@
     {
         public MapPortals(Map map) : base(map) { }
 
+        public Portal this[string label]
+        {
+            get
+            {
+                foreach (Portal portal in this)
+                {
+                    if (portal.Label == label)
+                    {
+                        return portal;
+                    }
+                }
+
+                return null;
+            }
+        }
+
         protected override int GetKeyForItem(Portal item)
         {
             return item.ID;

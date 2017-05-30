@@ -16,6 +16,7 @@ namespace Destiny.Game
         public int AccountID { get; set; }
         public string Name { get; set; }
         public byte SpawnPoint { get; set; }
+        public byte Portals { get; set; }
         public bool IsInitialized { get; set; }
 
         public CharacterStats Stats { get; private set; }
@@ -84,6 +85,19 @@ namespace Destiny.Game
         public void Notify(string message, NoticeType type = NoticeType.Pink)
         {
             this.Client.Send(UserPacket.BrodcastMsg(message, type));
+        }
+
+        public void ChangeMap(int mapID, byte portalID = 0)
+        {
+            this.SpawnPoint = portalID;
+
+            this.Map.Characters.Remove(this);
+
+            this.Map = MasterServer.Instance.Worlds[this.Client.World].Channels[this.Client.Channel].Maps[mapID];
+
+            this.Client.Send(MapPacket.SetField(this, false));
+
+            this.Map.Characters.Add(this);
         }
 
         public void Encode(OutPacket oPacket, long flag = long.MaxValue)

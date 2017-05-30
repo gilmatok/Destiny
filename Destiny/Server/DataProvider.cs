@@ -84,6 +84,22 @@ namespace Destiny.Server
                             map.Portals.Add(new Portal(reader));
                         }
 
+                        int lifeCount = reader.ReadInt32();
+
+                        while (lifeCount-- > 0)
+                        {
+                            string type = reader.ReadString();
+
+                            if (type == "n")
+                            {
+                                map.Npcs.Add(new Npc(reader));
+                            }
+                            else
+                            {
+                                map.Mobs.Add(new Mob(reader));
+                            }
+                        }
+
                         this.Maps.Add(map.MapleID, map);
                     }
                 }

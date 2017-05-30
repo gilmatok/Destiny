@@ -10,7 +10,7 @@ namespace Destiny.Handler
 {
     public static class ServerHandler
     {
-        public static void HandleMigrateChannel(MapleClient client, InPacket iPacket)
+        public static void OnMigrateIn(MapleClient client, InPacket iPacket)
         {
             int accountID;
             int characterID = iPacket.ReadInt();

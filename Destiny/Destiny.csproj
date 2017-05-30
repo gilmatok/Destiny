@@ -89,6 +89,7 @@
     <Compile Include="Core\IO\OutPacket.cs" />
     <Compile Include="Destiny.cs" />
     <Compile Include="Core\Network\PacketProcessor.cs" />
+    <Compile Include="Packet\MobPacket.cs" />
     <Compile Include="Packet\UserPacket.cs" />
     <Compile Include="Packet\HelpPacket.cs" />
     <Compile Include="Packet\LoginPacket.cs" />

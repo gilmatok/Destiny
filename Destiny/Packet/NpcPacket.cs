@@ -18,7 +18,7 @@ namespace Destiny.Packet
                     .WriteShort(npc.Foothold)
                     .WriteShort(npc.MinimumClickX)
                     .WriteShort(npc.MaximumClickX)
-                    .WriteBool(true); // TODO: bHide.
+                    .WriteBool(!npc.Hide);
 
                 return oPacket.ToArray();
             }

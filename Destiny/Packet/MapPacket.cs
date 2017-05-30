@@ -13,7 +13,7 @@ namespace Destiny.Packet
             {
                 oPacket
                     .WriteInt(character.Client.Channel)
-                    .WriteByte() // NOTE: Portal count.
+                    .WriteByte(++character.Portals)
                     .WriteBool(initial)
                     .WriteShort(); // NOTE: Floating messages at top corner.
 
