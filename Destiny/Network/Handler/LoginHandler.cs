@@ -154,7 +154,7 @@ namespace Destiny.Network.Handler
 
         private static void MigrateClient(MapleClient client, int characterID)
         {
-            MasterServer.Instance.Worlds[client.World].Migrations.Add(client.Host, client.Account.ID, characterID);
+            MasterServer.Instance.Worlds[client.World].Channels[client.Channel].Migrations.Add(client.Host, client.Account.ID, characterID);
 
             client.Send(LoginPacket.SelectCharacterResult(MasterServer.Instance.Worlds[client.World].Channels[client.Channel].Port, characterID));
         }

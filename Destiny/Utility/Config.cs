@@ -28,6 +28,7 @@ namespace Destiny.Utility
         public CDatabase Database { get; set; }
         public CLogin Login { get; set; }
         public List<CWorld> Worlds { get; set; }
+        public CShop Shop { get; set; }
     }
 
     public class CDatabase
@@ -55,5 +56,10 @@ namespace Destiny.Utility
         public WorldFlag Flag { get; set; }
         public string EventMessage { get; set; }
         public string TickerMessage { get; set; }
+    }
+
+    public class CShop
+    {
+        public short Port { get; set; }
     }
 }

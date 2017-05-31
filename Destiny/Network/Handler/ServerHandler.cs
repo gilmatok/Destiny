@@ -1,7 +1,6 @@
 ﻿using Destiny.Core.IO;
 using Destiny.Game;
 using Destiny.Game.Characters;
-using Destiny.Network;
 using Destiny.Network.Packet;
 using Destiny.Server;
 using Destiny.Utility;
@@ -11,12 +10,12 @@ namespace Destiny.Network.Handler
 {
     public static class ServerHandler
     {
-        public static void OnMigrateIn(MapleClient client, InPacket iPacket)
+        public static void HandleMigrateChannel(MapleClient client, InPacket iPacket)
         {
             int accountID;
             int characterID = iPacket.ReadInt();
 
-            if ((accountID = MasterServer.Instance.Worlds[client.World].Migrations.Validate(client.Host, characterID)) == -1)
+            if ((accountID = MasterServer.Instance.Worlds[client.World].Channels[client.Channel].Migrations.Validate(client.Host, characterID)) == -1)
             {
                 client.Close();
 
@@ -41,9 +40,9 @@ namespace Destiny.Network.Handler
 
             client.Character.Map.Characters.Add(client.Character);
 
-            client.Character.Notify(MasterServer.Instance.Worlds[client.World].TickerMessage, NoticeType.Ticker);
-
             client.Character.IsInitialized = true;
+
+            client.Character.Notify(MasterServer.Instance.Worlds[client.World].TickerMessage, NoticeType.Ticker);
         }
 
         public static void HandleMigrateCashShop(MapleClient client, InPacket iPacket)
@@ -51,7 +50,7 @@ namespace Destiny.Network.Handler
             int accountID;
             int characterID = iPacket.ReadInt();
 
-            if ((accountID = MasterServer.Instance.Worlds[client.World].Migrations.Validate(client.Host, characterID)) == -1)
+            if ((accountID = MasterServer.Instance.Shop.Migrations.Validate(client.Host, characterID)) == -1)
             {
                 client.Close();
 
@@ -72,7 +71,37 @@ namespace Destiny.Network.Handler
                 client.Character = new Character(client, query);
             }
 
-            // TODO: Cash Shop packets and whatnot.
+            client.Send(ShopPacket.SetCashShop(client.Character));
+
+            client.Character.IsInitialized = true;
+        }
+
+        public static void HandleChangeChannel(MapleClient client, InPacket iPacket)
+        {
+            byte id = iPacket.ReadByte();
+
+            MasterServer.Instance.Worlds[client.World].Channels[id].Migrations.Add(client.Host, client.Account.ID, client.Character.ID);
+
+            client.Send(ServerPacket.MigrateCommand(true, MasterServer.Instance.Worlds[client.World].Channels[id].Port));
+        }
+
+        public static void HandleCashShop(MapleClient client, InPacket iPacket)
+        {
+            MasterServer.Instance.Shop.Migrations.Add(client.Host, client.Account.ID, client.Character.ID);
+
+            client.Send(ServerPacket.MigrateCommand(true, MasterServer.Instance.Shop.Port));
+        }
+
+        public static void HandleMTS(MapleClient client, InPacket iPacket)
+        {
+            if (client.Character.Map.MapleID == 910000000)
+            {
+                client.Character.ChangeMap(100000000);
+            }
+            else
+            {
+                client.Character.ChangeMap(910000000);
+            }
         }
     }
 }

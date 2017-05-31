@@ -10,7 +10,6 @@ namespace Destiny.Server
         public WorldFlag Flag { get; private set; }
         public string EventMessage { get; private set; }
         public string TickerMessage { get; private set; }
-        public MigrationRegistery Migrations { get; private set; }
 
         public WorldStatus Status
         {
@@ -38,7 +37,6 @@ namespace Destiny.Server
             this.Flag = config.Flag;
             this.EventMessage = config.EventMessage;
             this.TickerMessage = config.TickerMessage;
-            this.Migrations = new MigrationRegistery();
         }
 
         public void Start()

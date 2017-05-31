@@ -26,4 +26,8 @@
       <TickerMessage>Welcome to Destiny!</TickerMessage>
     </CWorld>
   </Worlds>
+
+  <Shop>
+    <Port>9000</Port>
+  </Shop>
 </Config>

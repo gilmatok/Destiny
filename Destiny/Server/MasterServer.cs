@@ -21,6 +21,7 @@ namespace Destiny.Server
         public CommandFactory Commands { get; private set; }
         public LoginServer Login { get; private set; }
         public WorldServer[] Worlds { get; private set; }
+        public ShopServer Shop { get; private set; }
 
         public MasterServer()
         {
@@ -28,6 +29,7 @@ namespace Destiny.Server
             this.Commands = new CommandFactory();
             this.Login = new LoginServer(Config.Instance.Login);
             this.Worlds = new WorldServer[Config.Instance.Worlds.Count];
+            this.Shop = new ShopServer(Config.Instance.Shop);
 
             int i = 0;
 
@@ -53,6 +55,8 @@ namespace Destiny.Server
                 world.Start();
             }
 
+            this.Shop.Start();
+
             this.IsAlive = true;
 
             sw.Stop();
@@ -68,6 +72,8 @@ namespace Destiny.Server
             {
                 world.Stop();
             }
+
+            this.Shop.Stop();
 
             this.IsAlive = false;
 

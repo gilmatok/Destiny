@@ -13,7 +13,6 @@ namespace Destiny.Game.Characters
         public MapleClient Client { get; private set; }
 
         public int ID { get; set; }
-        public int AccountID { get; set; }
         public string Name { get; set; }
         public byte SpawnPoint { get; set; }
         public byte Stance { get; set; }
@@ -52,17 +51,15 @@ namespace Destiny.Game.Characters
             }
         }
 
-        public Character(MapleClient client, DatabaseQuery query)
+        public Character(MapleClient client, DatabaseQuery query, bool cashShop = false)
              : base()
         {
             this.Client = client;
 
             this.ID = query.GetInt("character_id");
-            this.AccountID = query.GetInt("account_id");
             this.Name = query.GetString("name");
             this.Map = MasterServer.Instance.Worlds[this.Client.World].Channels[this.Client.Channel].Maps[query.GetInt("map")];
             this.SpawnPoint = query.GetByte("map_spawn");
-
             this.Stats = new CharacterStats(this, query);
 
             using (DatabaseQuery itemQuery = Database.Query("SELECT * FROM `items` WHERE `character_id` = @character_id", new MySqlParameter("character_id", this.ID)))

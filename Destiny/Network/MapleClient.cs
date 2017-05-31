@@ -30,10 +30,11 @@ namespace Destiny.Network
 
         protected override void Terminate()
         {
-            if (this.Account != null && this.Character != null)
+            if (this.Character != null)
             {
-                this.Account.Save();
                 this.Character.Save();
+
+                this.Character.Map.Characters.Remove(this.Character);
             }
 
             mDeathAction(this);

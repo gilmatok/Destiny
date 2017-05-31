@@ -93,6 +93,7 @@
     <Compile Include="Core\IO\InPacket.cs" />
     <Compile Include="Game\Rectangle.cs" />
     <Compile Include="Network\Handler\MobHandler.cs" />
+    <Compile Include="Network\Handler\ShopHandler.cs" />
     <Compile Include="Network\Handler\UserHandler.cs" />
     <Compile Include="Network\Handler\LoginHandler.cs" />
     <Compile Include="Network\Handler\ServerHandler.cs" />
@@ -103,6 +104,8 @@
     <Compile Include="Core\Network\PacketProcessor.cs" />
     <Compile Include="Network\Packet\CommonPacket.cs" />
     <Compile Include="Network\Packet\MobPacket.cs" />
+    <Compile Include="Network\Packet\ServerPacket.cs" />
+    <Compile Include="Network\Packet\ShopPacket.cs" />
     <Compile Include="Network\Packet\UserPacket.cs" />
     <Compile Include="Network\Packet\HelpPacket.cs" />
     <Compile Include="Network\Packet\LoginPacket.cs" />
@@ -128,6 +131,7 @@
     <Compile Include="Server\MapFactory.cs" />
     <Compile Include="Server\MasterServer.cs" />
     <Compile Include="Server\MigrationRegistery.cs" />
+    <Compile Include="Server\ShopServer.cs" />
     <Compile Include="Server\WorldServer.cs" />
     <Compile Include="Utility\Config.cs" />
     <Compile Include="Utility\Database.cs" />
@@ -141,6 +145,8 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Game\Interaction\" />
+    <Folder Include="Game\Shops\" />
     <Folder Include="Game\Social\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -1,6 +1,5 @@
 ﻿using Destiny.Core.IO;
 using Destiny.Game.Maps;
-using Destiny.Network;
 using Destiny.Network.Packet;
 using Destiny.Server;
 

@@ -43,6 +43,7 @@ namespace Destiny.Server
         public byte ID { get; private set; }
         public byte WorldID { get; private set; }
         public short Port { get; private set; }
+        public MigrationRegistery Migrations { get; private set; }
         public MapFactory Maps { get; private set; }
         public ChannelCharacters Characters { get; private set; }
 
@@ -55,10 +56,11 @@ namespace Destiny.Server
             this.ID = id;
             this.WorldID = worldID;
             this.Port = port;
+            this.Migrations = new MigrationRegistery();
             this.Maps = new MapFactory(this.WorldID, this.ID);
             this.Characters = new ChannelCharacters(this.WorldID, this.ID);
 
-            mAcceptor = new Acceptor(port);
+            mAcceptor = new Acceptor(this.Port);
             mAcceptor.OnClientAccepted = this.OnClientAccepted;
 
             mClients = new List<MapleClient>();
@@ -85,8 +87,11 @@ namespace Destiny.Server
         {
             mProcessor = new PacketProcessor("Channel");
 
-            mProcessor.Add(RecvOps.MigrateIn, ServerHandler.OnMigrateIn);
+            mProcessor.Add(RecvOps.MigrateIn, ServerHandler.HandleMigrateChannel);
             mProcessor.Add(RecvOps.TransferFieldRequest, UserHandler.OnTransferFieldRequest);
+            mProcessor.Add(RecvOps.ChangeChannel, ServerHandler.HandleChangeChannel);
+            mProcessor.Add(RecvOps.EnterCashShop, ServerHandler.HandleCashShop);
+            mProcessor.Add(RecvOps.EnterMts, ServerHandler.HandleMTS);
             mProcessor.Add(RecvOps.UserChat, UserHandler.OnChat);
             mProcessor.Add(RecvOps.UserMove, UserHandler.OnMove);
             mProcessor.Add(RecvOps.MobMove, MobHandler.OnMobMove);
