@@ -54,6 +54,15 @@
     <Compile Include="Constants.cs" />
     <Compile Include="Core\Collections\EnumerationHelper.cs" />
     <Compile Include="Core\IO\PacketBase.cs" />
+    <Compile Include="Enums\Gender.cs" />
+    <Compile Include="Enums\GmLevel.cs" />
+    <Compile Include="Enums\InventoryType.cs" />
+    <Compile Include="Enums\Job.cs" />
+    <Compile Include="Enums\LoginResult.cs" />
+    <Compile Include="Enums\NoticeType.cs" />
+    <Compile Include="Enums\StatisticType.cs" />
+    <Compile Include="Enums\WorldFlag.cs" />
+    <Compile Include="Enums\WorldStatus.cs" />
     <Compile Include="Game\Account.cs" />
     <Compile Include="Game\Characters\Character.cs" />
     <Compile Include="Game\Characters\CharacterItems.cs" />
@@ -71,6 +80,7 @@
     <Compile Include="Game\Data\ReactorData.cs" />
     <Compile Include="Game\Data\SkillData.cs" />
     <Compile Include="Game\IMoveable.cs" />
+    <Compile Include="Game\InventoryFullException.cs" />
     <Compile Include="Game\Maps\Drop.cs" />
     <Compile Include="Game\Equip.cs" />
     <Compile Include="Game\Maps\MapMobs.cs" />
@@ -92,6 +102,7 @@
     <Compile Include="Core\Network\Session.cs" />
     <Compile Include="Core\IO\InPacket.cs" />
     <Compile Include="Game\Rectangle.cs" />
+    <Compile Include="Network\Handler\InventoryHandler.cs" />
     <Compile Include="Network\Handler\MobHandler.cs" />
     <Compile Include="Network\Handler\ShopHandler.cs" />
     <Compile Include="Network\Handler\UserHandler.cs" />
@@ -103,6 +114,7 @@
     <Compile Include="Destiny.cs" />
     <Compile Include="Core\Network\PacketProcessor.cs" />
     <Compile Include="Network\Packet\CommonPacket.cs" />
+    <Compile Include="Network\Packet\InventoryPacket.cs" />
     <Compile Include="Network\Packet\MobPacket.cs" />
     <Compile Include="Network\Packet\ServerPacket.cs" />
     <Compile Include="Network\Packet\ShopPacket.cs" />
@@ -119,6 +131,7 @@
     <Compile Include="Core\Security\ShandaCryptograph.cs" />
     <Compile Include="Server\ChannelServer.cs" />
     <Compile Include="Server\CommandFactory.cs" />
+    <Compile Include="Server\Commands\HelpCommand.cs" />
     <Compile Include="Server\Commands\ItemCommand.cs" />
     <Compile Include="Server\Commands\JobCommand.cs" />
     <Compile Include="Server\Commands\LevelCommand.cs" />

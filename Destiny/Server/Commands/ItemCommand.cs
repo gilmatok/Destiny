@@ -1,4 +1,5 @@
 ﻿using Destiny.Game.Characters;
+using System;
 
 namespace Destiny.Server.Commands
 {
@@ -51,6 +52,27 @@ namespace Destiny.Server.Commands
                 if (quantity < 1)
                 {
                     quantity = 1;
+                }
+
+                int itemID = -1;
+
+                try
+                {
+                    itemID = int.Parse(args[0]);
+                }
+                catch (FormatException)
+                {
+                    itemID = -1; // TODO: Obtain from strings.
+                }
+
+                if (MasterServer.Instance.Data.Items.ContainsKey(itemID) ||
+                    MasterServer.Instance.Data.Equips.ContainsKey(itemID))
+                {
+                    caller.Items.Add(itemID, quantity);
+                }
+                else
+                {
+                    caller.Notify("[Command] Invalid item.");
                 }
             }
         }

@@ -11,7 +11,7 @@ namespace Destiny.Core.Security
         {
             if (input == null)
             {
-                input = Destiny.Random.Next().ToString();
+                input = Constants.Random.Next().ToString();
             }
 
             return BitConverter.ToString(new MD5CryptoServiceProvider().ComputeHash(Encoding.ASCII.GetBytes(input))).Replace("-", "").ToLower();

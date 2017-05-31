@@ -6,8 +6,6 @@ namespace Destiny
 {
     internal static class Destiny
     {
-        public static Random Random = new Random();
-
         private static void Main(string[] args)
         {
             Logger.Entitle("Destiny");

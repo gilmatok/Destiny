@@ -94,6 +94,7 @@ namespace Destiny.Server
             mProcessor.Add(RecvOps.EnterMts, ServerHandler.HandleMTS);
             mProcessor.Add(RecvOps.UserChat, UserHandler.OnChat);
             mProcessor.Add(RecvOps.UserMove, UserHandler.OnMove);
+            mProcessor.Add(RecvOps.ItemMove, InventoryHandler.HandleItemMove);
             mProcessor.Add(RecvOps.MobMove, MobHandler.OnMobMove);
         }
 

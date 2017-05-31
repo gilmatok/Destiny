@@ -21,7 +21,7 @@ namespace Destiny.Network.Packet
                 {
                     for (int i = 0; i < 3; i++)
                     {
-                        oPacket.WriteInt(Destiny.Random.Next());
+                        oPacket.WriteInt(Constants.Random.Next());
                     }
 
                     character.Encode(oPacket);

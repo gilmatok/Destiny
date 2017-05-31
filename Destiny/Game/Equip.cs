@@ -1,4 +1,6 @@
 ﻿using Destiny.Core.IO;
+using Destiny.Game.Data;
+using Destiny.Server;
 using Destiny.Utility;
 
 namespace Destiny.Game
@@ -22,6 +24,30 @@ namespace Destiny.Game
         public short Hands { get; private set; }
         public short Speed { get; private set; }
         public short Jump { get; private set; }
+
+        public Equip(int mapleID)
+            : base(mapleID, 1)
+        {
+            EquipData data = MasterServer.Instance.Data.Equips[this.MapleID];
+
+            this.Slots = data.Slots;
+            this.Scrolls = 0;
+            this.Strength = data.Strength;
+            this.Dexterity = data.Dexterity;
+            this.Intelligence = data.Intelligence;
+            this.Luck = data.Luck;
+            this.Health = data.Health;
+            this.Mana = data.Mana;
+            this.WeaponAttack = data.WeaponAttack;
+            this.MagicAttack = data.MagicAttack;
+            this.WeaponDefense = data.WeaponDefense;
+            this.MagicDefense = data.MagicDefense;
+            this.Accuracy = data.Accuracy;
+            this.Avoidability = data.Avoidability;
+            this.Hands = data.Hands;
+            this.Speed = data.Speed;
+            this.Jump = data.Jump;
+        }
 
         public Equip(DatabaseQuery query)
             : base(query)

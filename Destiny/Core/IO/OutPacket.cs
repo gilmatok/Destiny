@@ -34,6 +34,13 @@ namespace Destiny.Core.IO
             return this;
         }
 
+        public OutPacket WriteSByte(sbyte value = 0)
+        {
+            mWriter.Write(value);
+
+            return this;
+        }
+
         public OutPacket WriteBool(bool value = false)
         {
             mWriter.Write(value);
