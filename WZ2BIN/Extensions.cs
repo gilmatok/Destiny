@@ -5,73 +5,36 @@ namespace WZ2BIN
 {
     internal static class Extensions
     {
-        public static byte GetByte(this WZObject node, string childName, byte def = 0)
+        public static int GetID(this WZObject node)
         {
-            if (node.HasChild(childName))
-            {
-                try
-                {
-                    return (byte)node[childName].ValueOrDie<int>();
-                }
-                catch (InvalidCastException)
-                {
-                    return byte.Parse(node[childName].ValueOrDie<string>());
-                }
-            }
-            else
-            {
-                return def;
-            }
+            return int.Parse(node.Name.Replace(".img", ""));
         }
 
-        public static short GetShort(this WZObject node, string childName, short def = 0)
+        public static int GetInt(this WZObject parentNode, string childName, int def = 0)
         {
-            if (node.HasChild(childName))
-            {
-                try
-                {
-                    return (short)node[childName].ValueOrDie<int>();
-                }
-                catch (InvalidCastException)
-                {
-                    return short.Parse(node[childName].ValueOrDie<string>());
-                }
-            }
-            else
+            if (!parentNode.HasChild(childName))
             {
                 return def;
             }
+
+            WZObject childNode = parentNode[childName];
+
+            if (childNode is WZInt32Property)
+                return (childNode as WZInt32Property).Value;
+            if (childNode is WZStringProperty)
+                return int.Parse((childNode as WZStringProperty).Value);
+
+            throw new Exception("unablet o cast");
         }
 
-        public static int GetInt(this WZObject node, string childName, int def = 0)
+        public static double GetDouble(this WZObject node, string childName, double def = 0)
         {
-            if (node.HasChild(childName))
-            {
-                try
-                {
-                    return node[childName].ValueOrDie<int>();
-                }
-                catch (InvalidCastException)
-                {
-                    return int.Parse(node[childName].ValueOrDie<string>());
-                }
-            }
-            else
-            {
-                return def;
-            }
+            return node.HasChild(childName) ? node[childName].ValueOrDie<double>() : def;
         }
 
         public static string GetString(this WZObject node, string childName, string def = "")
         {
-            if (node.HasChild(childName))
-            {
-                return node[childName].ValueOrDie<string>();
-            }
-            else
-            {
-                return def;
-            }
+            return node.HasChild(childName) ? node[childName].ValueOrDie<string>() : def;
         }
     }
 }

@@ -34,9 +34,9 @@ namespace Destiny.Network
             mHandlers = new PacketHandler[0xFFFF + 1];
         }
 
-        public void Add(short operationCode, PacketHandler handler)
+        public void Add(RecvOps operationCode, PacketHandler handler)
         {
-            mHandlers[operationCode] = handler;
+            mHandlers[(short)operationCode] = handler;
             mCount++;
         }
     }

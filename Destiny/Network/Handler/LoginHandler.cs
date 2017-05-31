@@ -2,20 +2,20 @@
 using Destiny.Core.Security;
 using Destiny.Game;
 using Destiny.Network;
-using Destiny.Packet;
+using Destiny.Network.Packet;
 using Destiny.Server;
 using Destiny.Utility;
 using MySql.Data.MySqlClient;
 
-namespace Destiny.Handler
+namespace Destiny.Network.Handler
 {
     public static class LoginHandler
     {
         // TODO: Handle different scenarios (ban, quiet ban, etcetera).
         public static void HandleLoginPassword(MapleClient client, InPacket iPacket)
         {
-            string username = iPacket.ReadString();
-            string password = iPacket.ReadString();
+            string username = iPacket.ReadMapleString();
+            string password = iPacket.ReadMapleString();
 
             Account account;
 
@@ -80,7 +80,7 @@ namespace Destiny.Handler
 
         public static void HandleCharacterNameCheck(MapleClient client, InPacket iPacket)
         {
-            string name = iPacket.ReadString();
+            string name = iPacket.ReadMapleString();
             bool unusable = (long)Database.Scalar("SELECT COUNT(*) FROM `characters` WHERE `name` = @name", new MySqlParameter("name", name)) != 0;
 
             client.Send(LoginPacket.CheckDuplicatedIDResult(name, unusable));
@@ -88,7 +88,7 @@ namespace Destiny.Handler
 
         public static void HandleCharacterCreation(MapleClient client, InPacket iPacket)
         {
-            string name = iPacket.ReadString();
+            string name = iPacket.ReadMapleString();
             int jobType = iPacket.ReadInt();
             int face = iPacket.ReadInt();
             int hair = iPacket.ReadInt();
@@ -147,9 +147,14 @@ namespace Destiny.Handler
         public static void HandleCharacterSelection(MapleClient client, InPacket iPacket)
         {
             int characterID = iPacket.ReadInt();
-            string macAddresses = iPacket.ReadString(); // TODO: Do something with these.
+            string macAddresses = iPacket.ReadMapleString(); // TODO: Do something with these.
 
-            MasterServer.Instance.Worlds[client.World].AddMigrationRequest(client.Host, client.Account.ID, characterID);
+            LoginHandler.MigrateClient(client, characterID);
+        }
+
+        private static void MigrateClient(MapleClient client, int characterID)
+        {
+            MasterServer.Instance.Worlds[client.World].Migrations.Add(client.Host, client.Account.ID, characterID);
 
             client.Send(LoginPacket.SelectCharacterResult(MasterServer.Instance.Worlds[client.World].Channels[client.Channel].Port, characterID));
         }

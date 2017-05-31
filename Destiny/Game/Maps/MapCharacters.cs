@@ -1,5 +1,5 @@
 ﻿using Destiny.Game.Characters;
-using Destiny.Packet;
+using Destiny.Network.Packet;
 
 namespace Destiny.Game.Maps
 {

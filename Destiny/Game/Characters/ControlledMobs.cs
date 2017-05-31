@@ -1,5 +1,5 @@
 ﻿using Destiny.Game.Maps;
-using Destiny.Packet;
+using Destiny.Network.Packet;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 

@@ -1,8 +1,7 @@
 ﻿using Destiny.Core.IO;
 using Destiny.Game.Maps;
-using Destiny.Network;
 
-namespace Destiny.Packet
+namespace Destiny.Network.Packet
 {
     public static class NpcPacket
     {
@@ -18,7 +17,7 @@ namespace Destiny.Packet
 
         private static byte[] NpcInternalPacket(Npc npc, bool requestControl)
         {
-            using (OutPacket oPacket = new OutPacket(requestControl ? SendOpcode.NpcChangeController : SendOpcode.NpcEnterField))
+            using (OutPacket oPacket = new OutPacket(requestControl ? SendOps.NpcChangeController : SendOps.NpcEnterField))
             {
                 if (requestControl)
                 {
@@ -29,11 +28,11 @@ namespace Destiny.Packet
                     .WriteInt(npc.ObjectID)
                     .WriteInt(npc.MapleID)
                     .WritePoint(npc.Position)
-                    .WriteBool(!npc.Flip)
-                    .WriteShort(npc.Foothold)
-                    .WriteShort(npc.MinimumClickX)
-                    .WriteShort(npc.MaximumClickX)
-                    .WriteBool(!npc.Hide);
+                    .WriteBool(!npc.Spawn.Flip)
+                    .WriteShort(npc.Spawn.Foothold)
+                    .WriteShort(npc.Spawn.MinimumClickX)
+                    .WriteShort(npc.Spawn.MaximumClickX)
+                    .WriteBool(!npc.Spawn.Hide);
 
                 return oPacket.ToArray();
             }
@@ -41,7 +40,7 @@ namespace Destiny.Packet
 
         public static byte[] NpcControlCancel(int objectID)
         {
-            using (OutPacket oPacket = new OutPacket(SendOpcode.NpcChangeController))
+            using (OutPacket oPacket = new OutPacket(SendOps.NpcChangeController))
             {
                 oPacket
                     .WriteBool()

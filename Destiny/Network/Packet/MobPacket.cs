@@ -1,8 +1,7 @@
 ﻿using Destiny.Core.IO;
 using Destiny.Game.Maps;
-using Destiny.Network;
 
-namespace Destiny.Packet
+namespace Destiny.Network.Packet
 {
     public static class MobPacket
     {
@@ -18,7 +17,7 @@ namespace Destiny.Packet
 
         private static byte[] MobInternalPacket(Mob mob, bool requestControl)
         {
-            using (OutPacket oPacket = new OutPacket(requestControl ? SendOpcode.MobChangeController : SendOpcode.MobEnterField))
+            using (OutPacket oPacket = new OutPacket(requestControl ? SendOps.MobChangeController : SendOps.MobEnterField))
             {
                 if (requestControl)
                 {
@@ -27,14 +26,14 @@ namespace Destiny.Packet
 
                 oPacket
                     .WriteInt(mob.ObjectID)
-                    .WriteByte(5) // TODO: 1 if mob is being controlled.
+                    .WriteByte((byte)(mob.Controller == null ? 5 : 1))
                     .WriteInt(mob.MapleID)
                     .WriteZero(15) // NOTE: Unknown.
                     .WriteByte(0x88) // NOTE: Unknown.
                     .WriteZero(6) // NOTE: Unknown.
                     .WritePoint(mob.Position)
-                    .WriteByte(mob.Stance)
-                    .WriteShort() // NOTE: Original foothold.
+                    .WriteByte((byte)(0x02 | (mob.FacesLeft ? 0x01 : 0x00)))
+                    .WriteShort(mob.Spawn.Foothold)
                     .WriteShort(mob.Foothold)
                     .WriteShort(-2) // NOTE: Spawn effect (-2 - new, -1 - existing).
                     .WriteByte(byte.MaxValue) // NOTE: Carnival team.
@@ -46,11 +45,27 @@ namespace Destiny.Packet
 
         public static byte[] MobControlCancel(int objectID)
         {
-            using (OutPacket oPacket = new OutPacket(SendOpcode.MobChangeController))
+            using (OutPacket oPacket = new OutPacket(SendOps.MobChangeController))
             {
                 oPacket
                     .WriteBool()
                     .WriteInt(objectID);
+
+                return oPacket.ToArray();
+            }
+        }
+
+        public static byte[] MobCtrlAck(int objectID, short moveAction, bool isUsingAbility, short mana)
+        {
+            using (OutPacket oPacket = new OutPacket(SendOps.MobCtrlAck))
+            {
+                oPacket
+                    .WriteInt(objectID)
+                    .WriteShort(moveAction)
+                    .WriteBool(isUsingAbility)
+                    .WriteShort(mana)
+                    .WriteByte() // NOTE: Ability ID.
+                    .WriteByte(); // NOTE: Ability level.
 
                 return oPacket.ToArray();
             }

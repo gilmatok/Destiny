@@ -1,7 +1,5 @@
 ﻿using Destiny.Core.IO;
-using Destiny.Server;
 using Destiny.Utility;
-using System.IO;
 
 namespace Destiny.Game
 {
@@ -25,35 +23,6 @@ namespace Destiny.Game
         public short Speed { get; private set; }
         public short Jump { get; private set; }
 
-        public override Item CachedReference
-        {
-            get
-            {
-                return MasterServer.Instance.Data.Equips[this.MapleID];
-            }
-        }
-
-        public Equip(BinaryReader reader)
-            : base(reader)
-        {
-            this.Slots = reader.ReadByte();
-            this.Strength = reader.ReadInt16();
-            this.Dexterity = reader.ReadInt16();
-            this.Intelligence = reader.ReadInt16();
-            this.Luck = reader.ReadInt16();
-            this.Health = reader.ReadInt16();
-            this.Mana = reader.ReadInt16();
-            this.WeaponAttack = reader.ReadInt16();
-            this.MagicAttack = reader.ReadInt16();
-            this.WeaponDefense = reader.ReadInt16();
-            this.MagicDefense = reader.ReadInt16();
-            this.Accuracy = reader.ReadInt16();
-            this.Avoidability = reader.ReadInt16();
-            this.Hands = reader.ReadInt16();
-            this.Speed = reader.ReadInt16();
-            this.Jump = reader.ReadInt16();
-        }
-
         public Equip(DatabaseQuery query)
             : base(query)
         {
@@ -74,27 +43,6 @@ namespace Destiny.Game
             this.Hands = query.GetShort("hands");
             this.Speed = query.GetShort("speed");
             this.Jump = query.GetShort("jump");
-        }
-
-        public Equip(int mapleID)
-            : base(mapleID)
-        {
-            this.Slots = (this.CachedReference as Equip).Slots;
-            this.Strength = (this.CachedReference as Equip).Strength;
-            this.Dexterity = (this.CachedReference as Equip).Dexterity;
-            this.Intelligence = (this.CachedReference as Equip).Intelligence;
-            this.Luck = (this.CachedReference as Equip).Luck;
-            this.Health = (this.CachedReference as Equip).Health;
-            this.Mana = (this.CachedReference as Equip).Mana;
-            this.WeaponAttack = (this.CachedReference as Equip).WeaponAttack;
-            this.MagicAttack = (this.CachedReference as Equip).MagicAttack;
-            this.WeaponDefense = (this.CachedReference as Equip).WeaponDefense;
-            this.MagicDefense = (this.CachedReference as Equip).MagicDefense;
-            this.Accuracy = (this.CachedReference as Equip).Accuracy;
-            this.Avoidability = (this.CachedReference as Equip).Avoidability;
-            this.Hands = (this.CachedReference as Equip).Hands;
-            this.Speed = (this.CachedReference as Equip).Speed;
-            this.Jump = (this.CachedReference as Equip).Jump;
         }
 
         public override void Encode(OutPacket oPacket)
@@ -121,7 +69,7 @@ namespace Destiny.Game
                 .WriteShort(this.Hands)
                 .WriteShort(this.Speed)
                 .WriteShort(this.Jump)
-                .WriteString(string.Empty) // NOTE: Creator.
+                .WriteMapleString(string.Empty) // NOTE: Creator.
                 .WriteShort() // NOTE: Flags.
                 .WriteByte()
                 .WriteByte()

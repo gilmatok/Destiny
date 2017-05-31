@@ -1,4 +1,5 @@
 ﻿using Destiny.Utility;
+using System.Diagnostics;
 
 namespace Destiny.Server
 {
@@ -38,9 +39,12 @@ namespace Destiny.Server
 
         public void Start()
         {
-            this.Data.Load();
+            Stopwatch sw = new Stopwatch();
 
-            this.Commands.Load();
+            sw.Start();
+
+            this.Data.Initialize();
+            this.Commands.Initialize();
 
             this.Login.Start();
 
@@ -51,7 +55,9 @@ namespace Destiny.Server
 
             this.IsAlive = true;
 
-            Logger.Write(LogLevel.Success, "MasterServer started.");
+            sw.Stop();
+
+            Logger.Write(LogLevel.Success, "Destiny started in {0:N2} seconds.", sw.Elapsed.TotalSeconds);
         }
 
         public void Stop()
@@ -65,7 +71,7 @@ namespace Destiny.Server
 
             this.IsAlive = false;
 
-            Logger.Write(LogLevel.Info, "MasterServer stopped.");
+            Logger.Write(LogLevel.Info, "Destiny stopped.");
         }
     }
 }

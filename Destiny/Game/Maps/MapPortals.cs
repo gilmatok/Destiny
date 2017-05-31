@@ -10,7 +10,7 @@
             {
                 foreach (Portal portal in this)
                 {
-                    if (portal.Label == label)
+                    if (portal.Data.Label == label)
                     {
                         return portal;
                     }

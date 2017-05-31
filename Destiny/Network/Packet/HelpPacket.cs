@@ -4,7 +4,7 @@ using Destiny.Utility;
 using MySql.Data.MySqlClient;
 using System.Collections.Generic;
 
-namespace Destiny.Packet
+namespace Destiny.Network.Packet
 {
     public static class HelpPacket
     {
@@ -12,7 +12,7 @@ namespace Destiny.Packet
         {
             oPacket
                 .WriteInt(query.GetInt("character_id"))
-                .WriteStringFixed(query.GetString("name"), 13)
+                .WritePaddedString(query.GetString("name"), 13)
                 .WriteByte(query.GetByte("gender"))
                 .WriteByte(query.GetByte("skin"))
                 .WriteInt(query.GetInt("face"))

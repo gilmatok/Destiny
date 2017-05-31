@@ -1,9 +1,9 @@
 ﻿using Destiny.Game.Characters;
-using System.IO;
+using Destiny.Game.Data;
 
 namespace Destiny.Game.Maps
 {
-    public sealed class Mob : MapObject
+    public sealed class Mob : MapObject, IMoveable
     {
         public override MapObjectType Type
         {
@@ -14,27 +14,31 @@ namespace Destiny.Game.Maps
         }
 
         public int MapleID { get; private set; }
-        public int RespawnTime { get; private set; }
-
+        public MapMobSpawnData Spawn { get; private set; }
+        public byte Stance { get; set; }
+        public short Foothold { get; set; }
         public Character Controller { get; set; }
+
+        public bool FacesLeft
+        {
+            get
+            {
+                return this.Stance % 2 == 0;
+            }
+        }
 
         public Mob(int mapleID)
         {
             this.MapleID = mapleID;
-
-            this.Stance = 5;
         }
 
-        public Mob(BinaryReader reader)
-            : this(reader.ReadInt32())
+        public Mob(MapMobSpawnData spawn)
+            : this(spawn.MapleID)
         {
-            this.Position = new Point(reader.ReadInt16(), reader.ReadInt16());
-            this.Foothold = reader.ReadInt16();
-            reader.ReadBoolean();
-            reader.ReadInt16();
-            reader.ReadInt16();
-            reader.ReadBoolean();
-            this.RespawnTime = reader.ReadInt32();
+            this.Spawn = spawn;
+            this.Stance = (byte)(spawn.Flip ? 0 : 1);
+            this.Foothold = spawn.Foothold;
+            this.Position = spawn.Positon;
         }
 
         public void AssignController()

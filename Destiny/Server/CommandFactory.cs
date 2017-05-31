@@ -48,7 +48,7 @@ namespace Destiny.Server
     {
         public CommandFactory() : base() { }
 
-        public void Load()
+        public void Initialize()
         {
             foreach (Type type in Assembly.GetExecutingAssembly().GetTypes())
             {
@@ -57,8 +57,6 @@ namespace Destiny.Server
                     this.Add((Command)Activator.CreateInstance(type));
                 }
             }
-
-            Logger.Write(LogLevel.Info, "Loaded {0} commands.", this.Count);
         }
 
         public void Execute(Character caller, string text)

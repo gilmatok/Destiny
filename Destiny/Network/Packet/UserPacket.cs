@@ -1,15 +1,14 @@
 ﻿using Destiny.Core.IO;
 using Destiny.Game.Characters;
-using Destiny.Network;
 using System;
 
-namespace Destiny.Packet
+namespace Destiny.Network.Packet
 {
     public static class UserPacket
     {
         public static byte[] StatChanged(Character character, params StatisticType[] statistics)
         {
-            using (OutPacket oPacket = new OutPacket(SendOpcode.StatChanged))
+            using (OutPacket oPacket = new OutPacket(SendOps.StatChanged))
             {
                 oPacket.WriteBool(); // TODO: bOnExclRequest.
 
@@ -108,7 +107,7 @@ namespace Destiny.Packet
 
         public static byte[] BrodcastMsg(string message, NoticeType type)
         {
-            using (OutPacket oPacket = new OutPacket(SendOpcode.BroadcastMsg))
+            using (OutPacket oPacket = new OutPacket(SendOps.BroadcastMsg))
             {
                 oPacket.WriteByte((byte)type);
 
@@ -117,7 +116,7 @@ namespace Destiny.Packet
                     oPacket.WriteBool(!string.IsNullOrEmpty(message));
                 }
 
-                oPacket.WriteString(message);
+                oPacket.WriteMapleString(message);
 
                 return oPacket.ToArray();
             }
@@ -125,13 +124,26 @@ namespace Destiny.Packet
 
         public static byte[] UserChat(int characterID, bool isGm, string text, bool shout)
         {
-            using (OutPacket oPacket = new OutPacket(SendOpcode.UserChat))
+            using (OutPacket oPacket = new OutPacket(SendOps.UserChat))
             {
                 oPacket
                     .WriteInt(characterID)
                     .WriteBool(isGm)
-                    .WriteString(text)
+                    .WriteMapleString(text)
                     .WriteBool(shout);
+
+                return oPacket.ToArray();
+            }
+        }
+
+        public static byte[] UserMove(int characterID, byte[] movements)
+        {
+            using (OutPacket oPacket = new OutPacket(SendOps.UserMove))
+            {
+                oPacket
+                    .WriteInt(characterID)
+                    .WriteInt()
+                    .WriteBytes(movements);
 
                 return oPacket.ToArray();
             }

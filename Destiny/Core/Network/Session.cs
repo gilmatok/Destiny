@@ -13,47 +13,55 @@ namespace Destiny.Core.Network
 
         private readonly Socket mSocket;
 
-        private readonly MapleCryptograph mSendCipher;
-        private readonly MapleCryptograph mRecvCipher;
-        
-        protected abstract void Dispatch(InPacket iPacket);
-        protected abstract void Terminate();
+        private MapleCryptograph mSendCipher;
+        private MapleCryptograph mRecvCipher;
 
+        private bool mHeader;
         private int mOffset;
         private byte[] mBuffer;
-        private byte[] mPacket;
 
         private object mLocker;
+
+        protected abstract void Dispatch(byte[] buffer);
+        protected abstract void Terminate();
 
         public Session(Socket socket)
         {
             mSocket = socket;
+            mSocket.NoDelay = true;
+            mSocket.SendBufferSize = 0xFFFF;
+            mSocket.ReceiveBufferSize = 0xFFFF;
+
+            mLocker = new object();
 
             this.Host = (mSocket.RemoteEndPoint as IPEndPoint).Address.ToString();
+            this.IsAlive = true;
 
             mSendCipher = new MapleCryptograph(Constants.Version, Constants.SIV, TransformDirection.Encrypt);
             mRecvCipher = new MapleCryptograph(Constants.Version, Constants.RIV, TransformDirection.Decrypt);
 
-            mBuffer = BufferPool.Get();
-            mPacket = BufferPool.Get();
-
-            mLocker = new object();
-
-            this.IsAlive = true;
-
-            this.BeginRead();
+            this.WaitForData(true, 4);
         }
 
-        private void BeginRead()
+        private void WaitForData(bool header, int length)
         {
             if (!this.IsAlive)
             {
                 return;
             }
 
+            mHeader = header;
+            mOffset = 0;
+            mBuffer = new byte[length];
+
+            this.BeginRead(mBuffer.Length);
+        }
+
+        private void BeginRead(int length)
+        {
             SocketError errorCode;
 
-            mSocket.BeginReceive(mBuffer, 0, mBuffer.Length, SocketFlags.None, out errorCode, this.ReadCallback, null);
+            mSocket.BeginReceive(mBuffer, mOffset, length, SocketFlags.None, out errorCode, this.ReadCallback, null);
 
             if (errorCode != SocketError.Success)
             {
@@ -78,55 +86,40 @@ namespace Destiny.Core.Network
                 return;
             }
 
-            this.Append(length);
-            this.ManipulateBuffer();
-            this.BeginRead();
-        }
-
-        private void Append(int length)
-        {
-            if (mPacket.Length - mOffset < length)
-            {
-                int newSize = mPacket.Length * 2;
-
-                while (newSize < mOffset + length)
-                {
-                    newSize *= 2;
-                }
-
-                Array.Resize<byte>(ref mPacket, newSize);
-            }
-
-            Buffer.BlockCopy(mBuffer, 0, mPacket, mOffset, length);
-
             mOffset += length;
+
+            if (mOffset == mBuffer.Length)
+            {
+                this.HandleStream();
+            }
+            else
+            {
+                this.BeginRead(mBuffer.Length - mOffset);
+            }
         }
 
-        private void ManipulateBuffer()
+        private void HandleStream()
         {
-            while (mOffset > 4)
+            if (mHeader)
             {
                 int length = MapleCryptograph.GetPacketLength(mBuffer);
 
-                if (mOffset < length + 4)
+                if (length > mSocket.ReceiveBufferSize || !mRecvCipher.CheckServerPacket(mBuffer, 0))
                 {
-                    break;
+                    this.Close();
+
+                    return;
                 }
 
-                byte[] buffer = new byte[length];
+                this.WaitForData(false, length);
+            }
+            else
+            {
+                mRecvCipher.Transform(mBuffer);
 
-                Buffer.BlockCopy(mPacket, 4, buffer, 0, length);
+                this.Dispatch(mBuffer);
 
-                mRecvCipher.Transform(buffer);
-
-                mOffset -= length + 4;
-
-                if (mOffset > 0)
-                {
-                    Buffer.BlockCopy(mPacket, length + 4, mPacket, 0, mOffset);
-                }
-
-                this.Dispatch(new InPacket(buffer));
+                this.WaitForData(true, 4);
             }
         }
 
@@ -209,18 +202,20 @@ namespace Destiny.Core.Network
             mSocket.Shutdown(SocketShutdown.Both);
             mSocket.Close();
 
+            if (mSendCipher != null)
+            {
+                mSendCipher.Dispose();
+            }
+
+            if (mRecvCipher != null)
+            {
+                mRecvCipher.Dispose();
+            }
+
             mOffset = 0;
-
-            BufferPool.Put(mBuffer);
-
-            if (mPacket.Length == BufferPool.BufferSize)
-            {
-                BufferPool.Put(mPacket);
-            }
-            else
-            {
-                mPacket = null;
-            }
+            mBuffer = null;
+            mSendCipher = null;
+            mRecvCipher = null;
 
             this.Terminate();
         }

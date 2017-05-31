@@ -1,16 +1,12 @@
 ﻿using Destiny.Game.Characters;
-using System.IO;
+using Destiny.Game.Data;
 
 namespace Destiny.Game.Maps
 {
     public sealed class Npc : MapObject
     {
         public int MapleID { get; private set; }
-        public bool Flip { get; private set; }
-        public short MinimumClickX { get; private set; }
-        public short MaximumClickX { get; private set; }
-        public bool Hide { get; private set; }
-
+        public MapNpcSpawnData Spawn { get; private set; }
         public Character Controller { get; set; }
 
         public override MapObjectType Type
@@ -21,16 +17,16 @@ namespace Destiny.Game.Maps
             }
         }
 
-        public Npc(BinaryReader reader)
+        public Npc(int mapleID)
         {
-            this.MapleID = reader.ReadInt32();
-            this.Position = new Point(reader.ReadInt16(), reader.ReadInt16());
-            this.Foothold = reader.ReadInt16();
-            this.Flip = reader.ReadBoolean();
-            this.MinimumClickX = reader.ReadInt16();
-            this.MaximumClickX = reader.ReadInt16();
-            this.Hide = reader.ReadBoolean();
-            reader.ReadInt32();
+            this.MapleID = mapleID;
+        }
+
+        public Npc(MapNpcSpawnData spawn)
+            : this(spawn.MapleID)
+        {
+            this.Spawn = spawn;
+            this.Position = spawn.Positon;
         }
 
         public void AssignController()

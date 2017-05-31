@@ -3,13 +3,13 @@ using Destiny.Network;
 using System;
 using Destiny.Game.Characters;
 
-namespace Destiny.Packet
+namespace Destiny.Network.Packet
 {
     public static class MapPacket
     {
         public static byte[] SetField(Character character, bool initial)
         {
-            using (OutPacket oPacket = new OutPacket(SendOpcode.SetField))
+            using (OutPacket oPacket = new OutPacket(SendOps.SetField))
             {
                 oPacket
                     .WriteInt(character.Client.Channel)

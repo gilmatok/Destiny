@@ -1,6 +1,4 @@
 ﻿using Destiny.Utility;
-using System;
-using System.Collections.Generic;
 
 namespace Destiny.Server
 {
@@ -12,8 +10,7 @@ namespace Destiny.Server
         public WorldFlag Flag { get; private set; }
         public string EventMessage { get; private set; }
         public string TickerMessage { get; private set; }
-
-        private List<MigrationData> mMigrationRequests;
+        public MigrationRegistery Migrations { get; private set; }
 
         public WorldStatus Status
         {
@@ -41,8 +38,7 @@ namespace Destiny.Server
             this.Flag = config.Flag;
             this.EventMessage = config.EventMessage;
             this.TickerMessage = config.TickerMessage;
-
-            mMigrationRequests = new List<MigrationData>();
+            this.Migrations = new MigrationRegistery();
         }
 
         public void Start()
@@ -63,41 +59,6 @@ namespace Destiny.Server
             }
 
             Logger.Write(LogLevel.Info, "WorldServer {0} stopped.", this.Name);
-        }
-
-        public void AddMigrationRequest(string host, int accountID, int characterID)
-        {
-            lock (mMigrationRequests)
-            {
-                mMigrationRequests.Add(new MigrationData(host, accountID, characterID));
-            }
-        }
-
-        public int EligableMigration(string host, int characterID)
-        {
-            lock (mMigrationRequests)
-            {
-                for (int i = mMigrationRequests.Count; i-- > 0;)
-                {
-                    MigrationData itr = mMigrationRequests[i];
-
-                    if ((DateTime.Now - itr.Expiry).Seconds > 30)
-                    {
-                        mMigrationRequests.Remove(itr);
-
-                        continue;
-                    }
-
-                    if (itr.Host == host && itr.CharacterID == characterID)
-                    {
-                        mMigrationRequests.Remove(itr);
-
-                        return itr.AccountID;
-                    }
-                }
-            }
-
-            return 0;
         }
 
         public void Notify(string message, NoticeType type)

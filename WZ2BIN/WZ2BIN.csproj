@@ -49,11 +49,17 @@
     <Compile Include="Extensions.cs" />
     <Compile Include="ItemExport.cs" />
     <Compile Include="MapExport.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="WZ2BIN.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Destiny\Destiny.csproj">
+      <Project>{05d44aba-f962-49bd-9cb2-e4f72b3c474f}</Project>
+      <Name>Destiny</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

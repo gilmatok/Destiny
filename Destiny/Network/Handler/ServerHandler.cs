@@ -2,12 +2,12 @@
 using Destiny.Game;
 using Destiny.Game.Characters;
 using Destiny.Network;
-using Destiny.Packet;
+using Destiny.Network.Packet;
 using Destiny.Server;
 using Destiny.Utility;
 using MySql.Data.MySqlClient;
 
-namespace Destiny.Handler
+namespace Destiny.Network.Handler
 {
     public static class ServerHandler
     {
@@ -16,7 +16,7 @@ namespace Destiny.Handler
             int accountID;
             int characterID = iPacket.ReadInt();
 
-            if ((accountID = MasterServer.Instance.Worlds[client.World].EligableMigration(client.Host, characterID)) == 0)
+            if ((accountID = MasterServer.Instance.Worlds[client.World].Migrations.Validate(client.Host, characterID)) == -1)
             {
                 client.Close();
 
@@ -51,7 +51,7 @@ namespace Destiny.Handler
             int accountID;
             int characterID = iPacket.ReadInt();
 
-            if ((accountID = MasterServer.Instance.Worlds[client.World].EligableMigration(client.Host, characterID)) == 0)
+            if ((accountID = MasterServer.Instance.Worlds[client.World].Migrations.Validate(client.Host, characterID)) == -1)
             {
                 client.Close();
 

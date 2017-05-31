@@ -1,5 +1,5 @@
 ﻿using Destiny.Core.IO;
-using Destiny.Packet;
+using Destiny.Network.Packet;
 using Destiny.Utility;
 
 namespace Destiny.Game.Characters
@@ -404,7 +404,7 @@ namespace Destiny.Game.Characters
         {
             oPacket
                 .WriteInt(this.Parent.ID)
-                .WriteStringFixed(this.Parent.Name, 13)
+                .WritePaddedString(this.Parent.Name, 13)
                 .WriteByte((byte)this.Gender)
                 .WriteByte(this.Skin)
                 .WriteInt(this.Face)

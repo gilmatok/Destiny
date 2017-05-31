@@ -1,38 +1,21 @@
-﻿using Destiny.Game;
-using Destiny.Game.Maps;
+﻿using Destiny.Game.Data;
 using Destiny.Utility;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 
 namespace Destiny.Server
 {
     public sealed class DataProvider
     {
-        public SortedDictionary<int, Item> Items { get; private set; }
-        public SortedDictionary<int, Equip> Equips { get; private set; }
-        public SortedDictionary<int, Map> Maps { get; private set; }
+        public Dictionary<int, ItemData> Items { get; private set; }
+        public Dictionary<int, EquipData> Equips { get; private set; }
+        public Dictionary<int, MapData> Maps { get; private set; }
 
-        public DataProvider()
+        public void Initialize()
         {
-            this.Items = new SortedDictionary<int, Item>();
-            this.Equips = new SortedDictionary<int, Equip>();
-            this.Maps = new SortedDictionary<int, Map>();
-        }
-
-        public void Load()
-        {
-            Stopwatch sw = new Stopwatch();
-
-            sw.Start();
-
             this.LoadItems();
             this.LoadEquips();
             this.LoadMaps();
-
-            sw.Stop();
-
-            Logger.Write(LogLevel.Info, "Loaded data in {0}ms.", sw.ElapsedMilliseconds);
         }
 
         private void LoadItems()
@@ -41,9 +24,15 @@ namespace Destiny.Server
             {
                 using (BinaryReader reader = new BinaryReader(stream))
                 {
-                    while (reader.BaseStream.Position < reader.BaseStream.Length)
+                    int count = reader.ReadInt32();
+
+                    this.Items = new Dictionary<int, ItemData>(count);
+
+                    while (count-- > 0)
                     {
-                        Item item = new Item(reader);
+                        ItemData item = new ItemData();
+
+                        item.Load(reader);
 
                         this.Items.Add(item.MapleID, item);
                     }
@@ -57,9 +46,15 @@ namespace Destiny.Server
             {
                 using (BinaryReader reader = new BinaryReader(stream))
                 {
-                    while (reader.BaseStream.Position < reader.BaseStream.Length)
+                    int count = reader.ReadInt32();
+
+                    this.Equips = new Dictionary<int, EquipData>(count);
+
+                    while (count-- > 0)
                     {
-                        Equip equip = new Equip(reader);
+                        EquipData equip = new EquipData();
+
+                        equip.Load(reader);
 
                         this.Equips.Add(equip.MapleID, equip);
                     }
@@ -73,32 +68,15 @@ namespace Destiny.Server
             {
                 using (BinaryReader reader = new BinaryReader(stream))
                 {
-                    while (reader.BaseStream.Position < reader.BaseStream.Length)
+                    int count = reader.ReadInt32();
+
+                    this.Maps = new Dictionary<int, MapData>(count);
+
+                    while (count-- > 0)
                     {
-                        Map map = new Map(reader);
+                        MapData map = new MapData();
 
-                        int portalsCount = reader.ReadInt32();
-
-                        while (portalsCount-- > 0)
-                        {
-                            map.Portals.Add(new Portal(reader));
-                        }
-
-                        int lifeCount = reader.ReadInt32();
-
-                        while (lifeCount-- > 0)
-                        {
-                            string type = reader.ReadString();
-
-                            if (type == "n")
-                            {
-                                map.Npcs.Add(new Npc(reader));
-                            }
-                            else
-                            {
-                                map.Mobs.Add(new Mob(reader));
-                            }
-                        }
+                        map.Load(reader);
 
                         this.Maps.Add(map.MapleID, map);
                     }

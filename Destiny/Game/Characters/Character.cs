@@ -4,11 +4,11 @@ using Destiny.Utility;
 using MySql.Data.MySqlClient;
 using Destiny.Core.IO;
 using Destiny.Game.Maps;
-using Destiny.Packet;
+using Destiny.Network.Packet;
 
 namespace Destiny.Game.Characters
 {
-    public sealed class Character : MapObject
+    public sealed class Character : MapObject, IMoveable
     {
         public MapleClient Client { get; private set; }
 
@@ -16,6 +16,8 @@ namespace Destiny.Game.Characters
         public int AccountID { get; set; }
         public string Name { get; set; }
         public byte SpawnPoint { get; set; }
+        public byte Stance { get; set; }
+        public short Foothold { get; set; }
         public byte Portals { get; set; }
         public bool IsInitialized { get; set; }
 
@@ -31,6 +33,14 @@ namespace Destiny.Game.Characters
             get
             {
                 return this.Client.Account.GmLevel >= GmLevel.Intern;
+            }
+        }
+
+        public bool FacesLeft
+        {
+            get
+            {
+                return this.Stance % 2 == 0;
             }
         }
 

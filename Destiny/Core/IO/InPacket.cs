@@ -1,149 +1,77 @@
-﻿using Destiny.Network;
+﻿using Destiny.Game;
 using System;
+using System.IO;
+using System.Text;
 
 namespace Destiny.Core.IO
 {
-    public sealed class InPacket
+    public sealed class InPacket : PacketBase
     {
-        private int mIndex;
-        private byte[] mBuffer;
-
-        public int Position
-        {
-            get
-            {
-                return mIndex;
-            }
-        }
-
-        public int Available
-        {
-            get
-            {
-                return mBuffer.Length - mIndex;
-            }
-        }
+        private BinaryReader mReader;
 
         public short OperationCode { get; private set; }
 
-        public InPacket(byte[] packet)
+        public InPacket(byte[] buffer)
         {
-            mBuffer = packet;
-            mIndex = 0;
+            mStream = new MemoryStream(buffer, false);
+            mReader = new BinaryReader(mStream, Encoding.ASCII);
 
             this.OperationCode = this.ReadShort();
         }
 
-        private void CheckLength(int length)
+        public byte[] ReadBytes(int count)
         {
-            if (mIndex + length > mBuffer.Length || length < 0)
-                throw new IndexOutOfRangeException();
+            return mReader.ReadBytes(count);
+        }
+
+        public byte ReadByte()
+        {
+            return mReader.ReadByte();
         }
 
         public bool ReadBool()
         {
-            return mBuffer[mIndex++] != 0;
-        }
-        public byte ReadByte()
-        {
-            return mBuffer[mIndex++];
-        }
-        public byte[] ReadBytes(int count)
-        {
-            CheckLength(count);
-            var temp = new byte[count];
-            Buffer.BlockCopy(mBuffer, mIndex, temp, 0, count);
-            mIndex += count;
-            return temp;
-        }
-        public unsafe short ReadShort()
-        {
-            CheckLength(2);
-
-            short value;
-
-            fixed (byte* ptr = mBuffer)
-            {
-                value = *(short*)(ptr + mIndex);
-            }
-
-            mIndex += 2;
-
-            return value;
-        }
-        public unsafe int ReadInt()
-        {
-            CheckLength(4);
-
-            int value;
-
-            fixed (byte* ptr = mBuffer)
-            {
-                value = *(int*)(ptr + mIndex);
-            }
-
-            mIndex += 4;
-
-            return value;
-        }
-        public unsafe long ReadLong()
-        {
-            CheckLength(8);
-
-            long value;
-
-            fixed (byte* ptr = mBuffer)
-            {
-                value = *(long*)(ptr + mIndex);
-            }
-
-            mIndex += 8;
-
-            return value;
+            return mReader.ReadBoolean();
         }
 
-        public string ReadString(int count = 0)
+        public short ReadShort()
         {
-            if (count == 0)
-            {
-                count = this.ReadShort();
-            }
-
-            CheckLength(count);
-
-            char[] final = new char[count];
-
-            for (int i = 0; i < count; i++)
-            {
-                final[i] = (char)ReadByte();
-            }
-
-            return new string(final);
+            return mReader.ReadInt16();
         }
 
-        public void Skip(int count)
+        public int ReadInt()
         {
-            CheckLength(count);
-            mIndex += count;
+            return mReader.ReadInt32();
         }
 
-        public byte[] ToArray()
+        public long ReadLong()
         {
-            var final = new byte[mBuffer.Length];
-            Buffer.BlockCopy(mBuffer, 0, final, 0, mBuffer.Length);
-            return final;
+            return mReader.ReadInt64();
         }
 
-        public override string ToString()
+        public string ReadString(int length)
         {
-            string ret = "";
+            return new string(mReader.ReadChars(length));
+        }
 
-            foreach (byte b in this.ToArray())
-            {
-                ret += string.Format("{0:X2} ", b);
-            }
+        public string ReadMapleString()
+        {
+            return ReadString(ReadShort());
+        }
 
-            return ret;
+        public DateTime ReadDateTime()
+        {
+            return DateTime.FromFileTimeUtc(this.ReadLong());
+        }
+
+        public Point ReadPoint()
+        {
+            return new Point(this.ReadShort(), this.ReadShort());
+        }
+
+        protected override void CustomDispose()
+        {
+            mReader.Dispose();
         }
     }
 }

@@ -39,24 +39,20 @@ namespace Destiny.Network
             mDeathAction(this);
         }
 
-        protected override void Dispatch(InPacket iPacket)
+        protected override void Dispatch(byte[] buffer)
         {
-            if (iPacket.OperationCode < 0)
+            using (InPacket iPacket = new InPacket(buffer))
             {
-                Logger.Write(LogLevel.Warning, "[{0}] Negative header from {1}.", mProcessor.Label, this.Host);
+                PacketHandler handler = mProcessor[iPacket.OperationCode];
 
-                return;
-            }
-
-            PacketHandler handler = mProcessor[iPacket.OperationCode];
-
-            if (handler != null)
-            {
-                handler(this, iPacket);
-            }
-            else
-            {
-                Logger.Write(LogLevel.Warning, "[{0}] Unhandled packet from {1}: {2}", mProcessor.Label, this.Host, iPacket.ToString());
+                if (handler != null)
+                {
+                    handler(this, iPacket);
+                }
+                else
+                {
+                    Logger.Write(LogLevel.Warning, "[{0}] Unhandled packet from {1}: {2}", mProcessor.Label, this.Host, iPacket.ToString());
+                }
             }
         }
     }

@@ -53,6 +53,7 @@
   <ItemGroup>
     <Compile Include="Constants.cs" />
     <Compile Include="Core\Collections\EnumerationHelper.cs" />
+    <Compile Include="Core\IO\PacketBase.cs" />
     <Compile Include="Game\Account.cs" />
     <Compile Include="Game\Characters\Character.cs" />
     <Compile Include="Game\Characters\CharacterItems.cs" />
@@ -61,6 +62,15 @@
     <Compile Include="Game\Characters\CharacterStats.cs" />
     <Compile Include="Game\Characters\ControlledMobs.cs" />
     <Compile Include="Game\Characters\ControlledNpcs.cs" />
+    <Compile Include="Game\Data\AbilityData.cs" />
+    <Compile Include="Game\Data\EquipData.cs" />
+    <Compile Include="Game\Data\ItemData.cs" />
+    <Compile Include="Game\Data\MapData.cs" />
+    <Compile Include="Game\Data\MobData.cs" />
+    <Compile Include="Game\Data\NpcData.cs" />
+    <Compile Include="Game\Data\ReactorData.cs" />
+    <Compile Include="Game\Data\SkillData.cs" />
+    <Compile Include="Game\IMoveable.cs" />
     <Compile Include="Game\Maps\Drop.cs" />
     <Compile Include="Game\Equip.cs" />
     <Compile Include="Game\Maps\MapMobs.cs" />
@@ -69,7 +79,6 @@
     <Compile Include="Game\Maps\MapObjectType.cs" />
     <Compile Include="Game\Maps\MapPortals.cs" />
     <Compile Include="Game\Maps\MapReactors.cs" />
-    <Compile Include="Game\Moveable.cs" />
     <Compile Include="Game\Item.cs" />
     <Compile Include="Game\Maps\Map.cs" />
     <Compile Include="Game\Maps\MapCharacters.cs" />
@@ -80,32 +89,31 @@
     <Compile Include="Game\Maps\Portal.cs" />
     <Compile Include="Game\Maps\Reactor.cs" />
     <Compile Include="Core\Network\Acceptor.cs" />
-    <Compile Include="Core\IO\BufferPool.cs" />
     <Compile Include="Core\Network\Session.cs" />
     <Compile Include="Core\IO\InPacket.cs" />
     <Compile Include="Game\Rectangle.cs" />
-    <Compile Include="Handler\MobHandler.cs" />
-    <Compile Include="Handler\UserHandler.cs" />
-    <Compile Include="Handler\LoginHandler.cs" />
-    <Compile Include="Handler\ServerHandler.cs" />
+    <Compile Include="Network\Handler\MobHandler.cs" />
+    <Compile Include="Network\Handler\UserHandler.cs" />
+    <Compile Include="Network\Handler\LoginHandler.cs" />
+    <Compile Include="Network\Handler\ServerHandler.cs" />
     <Compile Include="Network\MapleClient.cs" />
-    <Compile Include="Network\Opcodes.cs" />
+    <Compile Include="Network\OpCodes.cs" />
     <Compile Include="Core\IO\OutPacket.cs" />
     <Compile Include="Destiny.cs" />
     <Compile Include="Core\Network\PacketProcessor.cs" />
-    <Compile Include="Packet\MobPacket.cs" />
-    <Compile Include="Packet\UserPacket.cs" />
-    <Compile Include="Packet\HelpPacket.cs" />
-    <Compile Include="Packet\LoginPacket.cs" />
-    <Compile Include="Packet\MapPacket.cs" />
-    <Compile Include="Packet\NpcPacket.cs" />
+    <Compile Include="Network\Packet\CommonPacket.cs" />
+    <Compile Include="Network\Packet\MobPacket.cs" />
+    <Compile Include="Network\Packet\UserPacket.cs" />
+    <Compile Include="Network\Packet\HelpPacket.cs" />
+    <Compile Include="Network\Packet\LoginPacket.cs" />
+    <Compile Include="Network\Packet\MapPacket.cs" />
+    <Compile Include="Network\Packet\NpcPacket.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Core\Security\AesCryptograph.cs" />
     <Compile Include="Core\Security\HashGenerator.cs" />
     <Compile Include="Core\Security\MapleCryptograph.cs" />
     <Compile Include="Core\Security\SHACryptograph.cs" />
     <Compile Include="Core\Security\ShandaCryptograph.cs" />
-    <Compile Include="Server\ChannelCharacters.cs" />
     <Compile Include="Server\ChannelServer.cs" />
     <Compile Include="Server\CommandFactory.cs" />
     <Compile Include="Server\Commands\ItemCommand.cs" />
@@ -119,8 +127,7 @@
     <Compile Include="Server\LoginServer.cs" />
     <Compile Include="Server\MapFactory.cs" />
     <Compile Include="Server\MasterServer.cs" />
-    <Compile Include="Server\MigrationData.cs" />
-    <Compile Include="Server\ServerBase.cs" />
+    <Compile Include="Server\MigrationRegistery.cs" />
     <Compile Include="Server\WorldServer.cs" />
     <Compile Include="Utility\Config.cs" />
     <Compile Include="Utility\Database.cs" />
@@ -133,6 +140,8 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Game\Social\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

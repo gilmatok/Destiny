@@ -2,142 +2,99 @@
 using Destiny.Network;
 using System;
 using System.IO;
+using System.Text;
 
 namespace Destiny.Core.IO
 {
-    public sealed class OutPacket : IDisposable
+    public sealed class OutPacket : PacketBase
     {
-        public const int DefaultBufferSize = 32;
+        private BinaryWriter mWriter;
 
-        private MemoryStream mStream;
-
-        public int Length
-        {
-            get
-            {
-                return (int)mStream.Length;
-            }
-        }
-
-        public int Position
-        {
-            get
-            {
-                return (int)mStream.Position;
-            }
-            set
-            {
-                mStream.Position = value;
-            }
-        }
-
-        public OutPacket()
-        {
-            mStream = new MemoryStream(OutPacket.DefaultBufferSize);
-        }
-
-        public OutPacket(short operationCode, int size = OutPacket.DefaultBufferSize)
+        public OutPacket(short operationCode, int size = 64)
         {
             mStream = new MemoryStream(size);
+            mWriter = new BinaryWriter(mStream, Encoding.ASCII);
 
             this.WriteShort(operationCode);
         }
 
-        public OutPacket(SendOpcode operationCode) : this((short)operationCode) { }
+        public OutPacket(SendOps operationCode) : this((short)operationCode) { }
 
-        private void Append(long value, int count)
+        public OutPacket WriteBytes(byte[] value)
         {
-            for (int i = 0; i < count; i++)
-            {
-                mStream.WriteByte((byte)value);
-
-                value >>= 8;
-            }
-        }
-
-        public OutPacket WriteBool(bool value = false)
-        {
-            this.WriteByte(value ? (byte)1 : (byte)0);
+            mWriter.Write(value);
 
             return this;
         }
 
         public OutPacket WriteByte(byte value = 0)
         {
-            mStream.WriteByte(value);
+            mWriter.Write(value);
 
             return this;
         }
 
-        public OutPacket WriteBytes(params byte[] value)
+        public OutPacket WriteBool(bool value = false)
         {
-            foreach (byte b in value)
-            {
-                this.WriteByte(b);
-            }
+            mWriter.Write(value);
 
             return this;
         }
 
         public OutPacket WriteShort(short value = 0)
         {
-            this.Append(value, 2);
+            mWriter.Write(value);
 
             return this;
         }
 
         public OutPacket WriteInt(int value = 0)
         {
-            this.Append(value, 4);
+            mWriter.Write(value);
 
             return this;
         }
 
         public OutPacket WriteLong(long value = 0)
         {
-            this.Append(value, 8);
+            mWriter.Write(value);
 
             return this;
         }
 
         public OutPacket WriteString(string value)
         {
-            this.WriteShort((short)value.Length);
-
-            foreach (char c in value)
+            for (int i = 0; i < value.Length; i++)
             {
-                this.WriteByte((byte)c);
+                mWriter.Write(value[i]);
             }
 
             return this;
         }
 
-        public OutPacket WriteStringFixed(string value, int length)
+        public OutPacket WritePaddedString(string value, int length)
         {
             for (int i = 0; i < length; i++)
             {
                 if (i < value.Length)
                 {
-                    this.WriteByte((byte)value[i]);
+                    mWriter.Write(value[i]);
                 }
                 else
                 {
-                    this.WriteByte();
+                    WriteByte();
                 }
             }
 
             return this;
         }
 
-        public OutPacket WriteDateTime(DateTime value)
+        public OutPacket WriteMapleString(string fmt, params object[] args)
         {
-            return this.WriteLong(value.ToFileTimeUtc());
-        }
+            string final = string.Format(fmt, args);
 
-        public OutPacket WritePoint(Point value)
-        {
-            this.WriteShort(value.X);
-            this.WriteShort(value.Y);
+            WriteShort((short)final.Length);
+            WriteString(final);
 
             return this;
         }
@@ -145,28 +102,29 @@ namespace Destiny.Core.IO
         public OutPacket WriteZero(int count)
         {
             for (int i = 0; i < count; i++)
-            {
-                this.WriteByte();
-            }
+                WriteByte();
 
             return this;
         }
 
-        public byte[] ToArray()
+        public OutPacket WriteDateTime(DateTime value)
         {
-            return mStream.ToArray();
+            mWriter.Write(value.ToFileTimeUtc());
+
+            return this;
         }
 
-        public void Dispose()
+        public OutPacket WritePoint(Point value)
         {
-            mStream.Dispose();
+            WriteShort(value.X);
+            WriteShort(value.Y);
 
-            mStream = null;
+            return this;
         }
 
-        internal void WriteInt(object mapleID)
+        protected override void CustomDispose()
         {
-            throw new NotImplementedException();
+            mWriter.Dispose();
         }
     }
 }

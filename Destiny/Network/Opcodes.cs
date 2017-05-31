@@ -1,6 +1,6 @@
 ﻿namespace Destiny.Network
 {
-    public enum RecvOpcode : short
+    public enum RecvOps : short
     {
         /*CLogin::OnPacket*/
         LoginPassword = 1,
@@ -31,7 +31,7 @@
         TransferFieldRequest = 0x26,
         ChangeChannel = 0x27,
         EnterCashShop = 0x28,
-        MovePlayer = 0x29,
+        UserMove = 0x29,
         CancelChair = 0x2A,
         UseChair = 0x2B,
         CloseRangeAttack = 0x2C,
@@ -121,7 +121,7 @@
         SummonAttack = 0xAA,
         DamageSummon = 0xAB,
         Beholder = 0xAC,
-        MoveLife = 0xBC,
+        MobMove = 0xBC,
         AutoAggro = 0xBD,
         MobDamageModFriendly = 0xB6,
         MonsterBomb = 0xB7,
@@ -147,7 +147,7 @@
         MapleTV = 0x222
     }
 
-    public enum SendOpcode : short
+    public enum SendOps : short
     {
         /*CLogin::OnPacket*/
         CheckPasswordResult = 0,
