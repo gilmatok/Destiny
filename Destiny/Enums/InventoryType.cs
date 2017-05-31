@@ -2,11 +2,11 @@
 {
     public enum InventoryType : byte
     {
-        Equipment = 0,
-        Usable = 1,
-        Setup = 2,
-        Etcetera = 3,
-        Cash = 4,
-        Count = 5
+        Equipment = 1,
+        Usable = 2,
+        Setup = 3,
+        Etcetera = 4,
+        Cash = 5,
+        Count = 6
     }
 }

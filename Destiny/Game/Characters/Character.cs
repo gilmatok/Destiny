@@ -59,7 +59,7 @@ namespace Destiny.Game.Characters
             this.ID = query.GetInt("character_id");
             this.Name = query.GetString("name");
             this.Map = MasterServer.Instance.Worlds[this.Client.World].Channels[this.Client.Channel].Maps[query.GetInt("map")];
-            this.SpawnPoint = query.GetByte("map_spawn");
+            this.SpawnPoint = query.GetByte("spawn_point");
             this.Stats = new CharacterStats(this, query);
 
             using (DatabaseQuery itemQuery = Database.Query("SELECT * FROM `items` WHERE `character_id` = @character_id", new MySqlParameter("character_id", this.ID)))
@@ -91,7 +91,37 @@ namespace Destiny.Game.Characters
 
         public void Save()
         {
-
+            Database.Execute("UPDATE `characters` SET skin = @skin, face = @face, hair = @hair, level = @level, job = @job, strength = @strength, " +
+                             "dexterity = @dexterity, intelligence = @intelligence, luck = @luck, health = @health, max_health = @max_health, mana = @mana, " +
+                             "max_mana = @max_mana, ability_points = @ability_points, skill_points = @skill_points, experience = @experience, fame = @fame, " +
+                             "map = @map, spawn_point = @spawn_point, mesos = @mesos, equipment_slots = @equipment_slots, usable_slots = @usable_slots, " +
+                             "setup_slots = @setup_slots, etcetera_slots = @etcetera_slots, cash_slots = @cash_slots WHERE `character_id` = @character_id",
+                             new MySqlParameter("character_id", this.ID),
+                             new MySqlParameter("skin", this.Stats.Skin),
+                             new MySqlParameter("face", this.Stats.Face),
+                             new MySqlParameter("hair", this.Stats.Hair),
+                             new MySqlParameter("level", this.Stats.Level),
+                             new MySqlParameter("job", (short)this.Stats.Job),
+                             new MySqlParameter("strength", this.Stats.Strength),
+                             new MySqlParameter("dexterity", this.Stats.Dexterity),
+                             new MySqlParameter("intelligence", this.Stats.Intelligence),
+                             new MySqlParameter("luck", this.Stats.Luck),
+                             new MySqlParameter("health", this.Stats.Health),
+                             new MySqlParameter("max_health", this.Stats.MaxHealth),
+                             new MySqlParameter("mana", this.Stats.Mana),
+                             new MySqlParameter("max_mana", this.Stats.MaxMana),
+                             new MySqlParameter("ability_points", this.Stats.AbilityPoints),
+                             new MySqlParameter("skill_points", this.Stats.SkillPoints),
+                             new MySqlParameter("experience", this.Stats.Experience),
+                             new MySqlParameter("fame", this.Stats.Fame),
+                             new MySqlParameter("map", this.Map.MapleID),
+                             new MySqlParameter("spawn_point", this.SpawnPoint),
+                             new MySqlParameter("mesos", this.Stats.Mesos),
+                             new MySqlParameter("equipment_slots", 24),
+                             new MySqlParameter("usable_slots", 24),
+                             new MySqlParameter("setup_slots", 24),
+                             new MySqlParameter("etcetera_slots", 24),
+                             new MySqlParameter("cash_slots", 48));
         }
 
         public void Notify(string message, NoticeType type = NoticeType.Pink)

@@ -36,7 +36,7 @@ namespace Destiny.Network.Packet
                 .WriteShort(query.GetShort("fame"))
                 .WriteInt()
                 .WriteInt(query.GetInt("map"))
-                .WriteByte(query.GetByte("map_spawn"))
+                .WriteByte(query.GetByte("spawn_point"))
                 .WriteInt();
 
             oPacket
@@ -48,7 +48,7 @@ namespace Destiny.Network.Packet
 
             SortedDictionary<byte, Doublet<int, int>> equipment = new SortedDictionary<byte, Doublet<int, int>>();
 
-            using (DatabaseQuery equipmentQuery = Database.Query("SELECT `slot`, `maple_id` FROM `items` WHERE `character_id` = @character_id AND `inventory` = 0 AND `slot` < 0", new MySqlParameter("@character_id", query.GetInt("character_id"))))
+            using (DatabaseQuery equipmentQuery = Database.Query("SELECT `slot`, `maple_id` FROM `items` WHERE `character_id` = @character_id AND `inventory` = 1 AND `slot` < 0", new MySqlParameter("@character_id", query.GetInt("character_id"))))
             {
                 while (equipmentQuery.NextRow())
                 {

@@ -32,7 +32,7 @@ namespace Destiny.Network.Handler
         public static void HandleItemMove(MapleClient client, InPacket iPacket)
         {
             iPacket.Skip(4); // NOTE: tRequestTime (ticks).
-            InventoryType inventory = (InventoryType)(iPacket.ReadByte() -1);
+            InventoryType inventory = (InventoryType)iPacket.ReadByte();
             short slot1 = iPacket.ReadShort();
             short slot2 = iPacket.ReadShort();
             short quantity = iPacket.ReadShort();

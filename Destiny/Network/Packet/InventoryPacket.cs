@@ -20,7 +20,7 @@ namespace Destiny.Network.Packet
                 {
                     oPacket
                         .WriteByte((byte)operation.Type)
-                        .WriteByte((byte)(((byte)Item.GetInventory(operation.Item.MapleID)) + 1));
+                        .WriteByte((byte)Item.GetInventory(operation.Item.MapleID));
 
                     switch (operation.Type)
                     {

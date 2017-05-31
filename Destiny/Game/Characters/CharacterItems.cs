@@ -23,7 +23,7 @@ namespace Destiny.Game.Characters
             mCashEquipped = new Item[51];
             mItems = new Item[(byte)InventoryType.Count][];
 
-            for (byte i = 0; i < slots.Length; i++)
+            for (byte i = 1; i < slots.Length; i++)
             {
                 mItems[i] = new Item[slots[i]];
             }
@@ -133,32 +133,32 @@ namespace Destiny.Game.Characters
         // TODO: Beautify this.
         public void Encode(OutPacket oPacket)
         {
-            Array.ForEach(mItems, i => oPacket.WriteByte((byte)i.Length));
+            for (byte i = 1; i < mItems.Length; i++) { oPacket.WriteByte((byte)mItems[i].Length); }
 
             oPacket.WriteLong(); // NOTE: Unknown.
 
-            for (short i = 0; i < mEquipped.Length; i++) { if (mEquipped[i] != null) { oPacket.WriteShort(i); mEquipped[i].Encode(oPacket); } }
+            for (short i = 1; i < mEquipped.Length; i++) { if (mEquipped[i] != null) { oPacket.WriteShort(i); mEquipped[i].Encode(oPacket); } }
             oPacket.WriteShort();
 
-            for (short i = 0; i < mCashEquipped.Length; i++) { if (mCashEquipped[i] != null) { oPacket.WriteShort(i); mCashEquipped[i].Encode(oPacket); } }
+            for (short i = 1; i < mCashEquipped.Length; i++) { if (mCashEquipped[i] != null) { oPacket.WriteShort(i); mCashEquipped[i].Encode(oPacket); } }
             oPacket.WriteShort();
 
-            for (short i = 0; i < mItems[(byte)InventoryType.Equipment].Length; i++) { if (mItems[(byte)InventoryType.Equipment][i] != null) { oPacket.WriteShort(i); mItems[(byte)InventoryType.Equipment][i].Encode(oPacket); } }
+            for (short i = 1; i < mItems[(byte)InventoryType.Equipment].Length; i++) { if (mItems[(byte)InventoryType.Equipment][i] != null) { oPacket.WriteShort(i); mItems[(byte)InventoryType.Equipment][i].Encode(oPacket); } }
             oPacket.WriteShort();
 
             // TODO: Evan inventory.
             oPacket.WriteShort();
 
-            for (byte i = 0; i < mItems[(byte)InventoryType.Usable].Length; i++) { if (mItems[(byte)InventoryType.Usable][i] != null) { oPacket.WriteByte(i); mItems[(byte)InventoryType.Usable][i].Encode(oPacket); } }
+            for (byte i = 1; i < mItems[(byte)InventoryType.Usable].Length; i++) { if (mItems[(byte)InventoryType.Usable][i] != null) { oPacket.WriteByte(i); mItems[(byte)InventoryType.Usable][i].Encode(oPacket); } }
             oPacket.WriteByte();
 
-            for (byte i = 0; i < mItems[(byte)InventoryType.Setup].Length; i++) { if (mItems[(byte)InventoryType.Setup][i] != null) { oPacket.WriteByte(i); mItems[(byte)InventoryType.Setup][i].Encode(oPacket); } }
+            for (byte i = 1; i < mItems[(byte)InventoryType.Setup].Length; i++) { if (mItems[(byte)InventoryType.Setup][i] != null) { oPacket.WriteByte(i); mItems[(byte)InventoryType.Setup][i].Encode(oPacket); } }
             oPacket.WriteByte();
 
-            for (byte i = 0; i < mItems[(byte)InventoryType.Etcetera].Length; i++) { if (mItems[(byte)InventoryType.Etcetera][i] != null) { oPacket.WriteByte(i); mItems[(byte)InventoryType.Etcetera][i].Encode(oPacket); } }
+            for (byte i = 1; i < mItems[(byte)InventoryType.Etcetera].Length; i++) { if (mItems[(byte)InventoryType.Etcetera][i] != null) { oPacket.WriteByte(i); mItems[(byte)InventoryType.Etcetera][i].Encode(oPacket); } }
             oPacket.WriteByte();
 
-            for (byte i = 0; i < mItems[(byte)InventoryType.Cash].Length; i++) { if (mItems[(byte)InventoryType.Cash][i] != null) { oPacket.WriteByte(i); mItems[(byte)InventoryType.Cash][i].Encode(oPacket); } }
+            for (byte i = 1; i < mItems[(byte)InventoryType.Cash].Length; i++) { if (mItems[(byte)InventoryType.Cash][i] != null) { oPacket.WriteByte(i); mItems[(byte)InventoryType.Cash][i].Encode(oPacket); } }
             oPacket.WriteByte();
         }
 

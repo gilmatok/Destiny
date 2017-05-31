@@ -8,7 +8,7 @@ namespace Destiny.Game
     {
         public static InventoryType GetInventory(int mapleID)
         {
-            return (InventoryType)((mapleID / 1000000) - 1);
+            return (InventoryType)(mapleID / 1000000);
         }
 
         public int MapleID { get; private set; }
