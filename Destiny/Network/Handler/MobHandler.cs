@@ -32,7 +32,7 @@ namespace Destiny.Network.Handler
 
             int rewindOffset = iPacket.Position;
 
-            client.Character.Map.DecodeMovePath(mob, iPacket);
+            client.Character.Map.DecodeMovement(mob, iPacket);
 
             iPacket.Position = rewindOffset;
 

@@ -46,7 +46,7 @@ namespace Destiny.Game.Maps
             }
         }
 
-        public void DecodeMovePath(IMoveable moveable, InPacket iPacket)
+        public void DecodeMovement(IMoveable moveable, InPacket iPacket)
         {
             byte stance = 0;
             short foothold = 0;

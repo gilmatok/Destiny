@@ -21,6 +21,7 @@ namespace WZ2BIN
 
                 ItemExport.Export(inputPath, outputPath);
                 EquipExport.Export(inputPath, outputPath);
+                SkillExport.Export(inputPath, outputPath);
                 MapExport.Export(inputPath, outputPath);
 
                 sw.Stop();

@@ -12,6 +12,11 @@ namespace Destiny.Game.Characters
             this.Parent = parent;
         }
 
+        public void Save()
+        {
+
+        }
+
         public void Encode(OutPacket oPacket)
         {
             oPacket

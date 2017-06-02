@@ -9,12 +9,14 @@ namespace Destiny.Server
     {
         public Dictionary<int, ItemData> Items { get; private set; }
         public Dictionary<int, EquipData> Equips { get; private set; }
+        public Dictionary<int, Dictionary<byte, SkillData>> Skills { get; private set; }
         public Dictionary<int, MapData> Maps { get; private set; }
 
         public void Initialize()
         {
             this.LoadItems();
             this.LoadEquips();
+            this.LoadSkills();
             this.LoadMaps();
         }
 
@@ -57,6 +59,33 @@ namespace Destiny.Server
                         equip.Load(reader);
 
                         this.Equips.Add(equip.MapleID, equip);
+                    }
+                }
+            }
+        }
+
+        private void LoadSkills()
+        {
+            using (FileStream stream = File.Open(Path.Combine(Config.Instance.Binary, "Skills.bin"), FileMode.Open, FileAccess.Read))
+            {
+                using (BinaryReader reader = new BinaryReader(stream))
+                {
+                    int count = reader.ReadInt32();
+
+                    this.Skills = new Dictionary<int, Dictionary<byte, SkillData>>(count);
+
+                    while (count-- > 0)
+                    {
+                        SkillData skill = new SkillData();
+
+                        skill.Load(reader);
+
+                        if (!this.Skills.ContainsKey(skill.MapleID))
+                        {
+                            this.Skills.Add(skill.MapleID, new Dictionary<byte, SkillData>());
+                        }
+
+                        this.Skills[skill.MapleID].Add(skill.Level, skill);
                     }
                 }
             }

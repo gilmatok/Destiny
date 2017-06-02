@@ -75,7 +75,7 @@ namespace Destiny.Game.Characters
                 this.Items = new CharacterItems(this, slots, itemQuery);
             }
 
-            using (DatabaseQuery skillQuery = null)
+            using (DatabaseQuery skillQuery = Database.Query("SELECT * FROM `skills` WHERE `character_id` = @character_id", new MySqlParameter("character_id", this.ID)))
             {
                 this.Skills = new CharacterSkills(this, skillQuery);
             }

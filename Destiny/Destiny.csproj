@@ -102,6 +102,7 @@
     <Compile Include="Core\Network\Session.cs" />
     <Compile Include="Core\IO\InPacket.cs" />
     <Compile Include="Game\Rectangle.cs" />
+    <Compile Include="Game\Skill.cs" />
     <Compile Include="Network\Handler\InventoryHandler.cs" />
     <Compile Include="Network\Handler\MobHandler.cs" />
     <Compile Include="Network\Handler\ShopHandler.cs" />

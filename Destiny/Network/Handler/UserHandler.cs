@@ -57,7 +57,7 @@ namespace Destiny.Network.Handler
         {
             iPacket.Skip(9);
             int rewindOffset = iPacket.Position;
-            client.Character.Map.DecodeMovePath(client.Character, iPacket);
+            client.Character.Map.DecodeMovement(client.Character, iPacket);
             iPacket.Position = rewindOffset;
 
             client.Character.Map.Broadcast(UserPacket.UserMove(client.Character.ID, iPacket.ReadBytes(iPacket.Remaining)), client.Character);

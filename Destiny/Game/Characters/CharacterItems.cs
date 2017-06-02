@@ -2,7 +2,6 @@
 using Destiny.Network.Handler;
 using Destiny.Network.Packet;
 using Destiny.Utility;
-using System;
 
 namespace Destiny.Game.Characters
 {
@@ -57,6 +56,11 @@ namespace Destiny.Game.Characters
                     }
                 }
             }
+        }
+
+        public void Save()
+        {
+
         }
 
         public void Add(int mapleID, short quantity = 1)
