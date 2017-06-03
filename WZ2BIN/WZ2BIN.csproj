@@ -49,6 +49,7 @@
     <Compile Include="Extensions.cs" />
     <Compile Include="ItemExport.cs" />
     <Compile Include="MapExport.cs" />
+    <Compile Include="NpcExport.cs" />
     <Compile Include="SkillExport.cs" />
     <Compile Include="WZ2BIN.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

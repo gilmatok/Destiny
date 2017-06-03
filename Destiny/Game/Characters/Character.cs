@@ -5,6 +5,7 @@ using MySql.Data.MySqlClient;
 using Destiny.Core.IO;
 using Destiny.Game.Maps;
 using Destiny.Network.Packet;
+using Destiny.Game.Data;
 
 namespace Destiny.Game.Characters
 {
@@ -58,9 +59,29 @@ namespace Destiny.Game.Characters
 
             this.ID = query.GetInt("character_id");
             this.Name = query.GetString("name");
-            this.Map = MasterServer.Instance.Worlds[this.Client.World].Channels[this.Client.Channel].Maps[query.GetInt("map")];
             this.SpawnPoint = query.GetByte("spawn_point");
             this.Stats = new CharacterStats(this, query);
+
+            int mapID = query.GetInt("map");
+
+            if (this.IsGm) // NOTE: Gms are spawned in the Gm map by default to avoid being seen by other players.
+            {
+                mapID = 180000000;
+            }
+            else if (MasterServer.Instance.Data.Maps[mapID].ForcedReturnMapID != MapData.INVALID_MAP_ID)
+            {
+                mapID = MasterServer.Instance.Data.Maps[mapID].ForcedReturnMapID;
+            }
+            else if (!MasterServer.Instance.Data.Maps.ContainsKey(mapID)) // NOTE: Just in case the user purposely edits a wrong map in the database.
+            {
+                mapID = 100000000;
+            }
+
+            this.Map = MasterServer.Instance.Worlds[this.Client.World].Channels[this.Client.Channel].Maps[mapID];
+           
+            this.Position = this.Map.Portals[this.SpawnPoint].Position;
+            this.Foothold = 0;
+            this.Stance = 0;
 
             using (DatabaseQuery itemQuery = Database.Query("SELECT * FROM `items` WHERE `character_id` = @character_id", new MySqlParameter("character_id", this.ID)))
             {

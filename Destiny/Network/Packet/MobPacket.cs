@@ -55,17 +55,17 @@ namespace Destiny.Network.Packet
             }
         }
 
-        public static byte[] MobCtrlAck(int objectID, short moveAction, bool isUsingAbility, short mana)
+        public static byte[] MobCtrlAck(int objectID, short moveAction, bool cheatResult, short mana, byte abilityID, byte abilityLevel)
         {
             using (OutPacket oPacket = new OutPacket(SendOps.MobCtrlAck))
             {
                 oPacket
                     .WriteInt(objectID)
                     .WriteShort(moveAction)
-                    .WriteBool(isUsingAbility)
+                    .WriteBool(cheatResult)
                     .WriteShort(mana)
-                    .WriteByte() // NOTE: Ability ID.
-                    .WriteByte(); // NOTE: Ability level.
+                    .WriteByte(abilityID)
+                    .WriteByte(abilityLevel);
 
                 return oPacket.ToArray();
             }

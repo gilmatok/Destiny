@@ -1,7 +1,5 @@
 ﻿using Destiny.Core.IO;
-using Destiny.Game;
 using Destiny.Game.Maps;
-using Destiny.Network;
 using Destiny.Network.Packet;
 using System.Collections.Generic;
 
@@ -25,20 +23,13 @@ namespace Destiny.Network.Handler
             }
 
             short moveAction = iPacket.ReadShort();
-            bool isUsingAbility = iPacket.ReadBool();
-            byte usingAbility = iPacket.ReadByte();
-            Point projectileTarget = iPacket.ReadPoint();
-            iPacket.Skip(17);
+            bool cheatResult = (iPacket.ReadByte() & 0xF) != 0;
+            byte centerSplit = iPacket.ReadByte();
+            int illegalVelocity = iPacket.ReadInt();
+            byte unknown = iPacket.ReadByte();
+            iPacket.ReadInt();
 
-            int rewindOffset = iPacket.Position;
-
-            client.Character.Map.DecodeMovement(mob, iPacket);
-
-            iPacket.Position = rewindOffset;
-
-            client.Send(MobPacket.MobCtrlAck(objectID, moveAction, isUsingAbility, 0));
-
-            // TODO map.
+            client.Send(MobPacket.MobCtrlAck(objectID, moveAction, cheatResult, 0, 0, 0));
         }
     }
 }

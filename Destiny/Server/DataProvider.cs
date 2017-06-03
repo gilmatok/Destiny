@@ -9,6 +9,7 @@ namespace Destiny.Server
     {
         public Dictionary<int, ItemData> Items { get; private set; }
         public Dictionary<int, EquipData> Equips { get; private set; }
+        public Dictionary<int, NpcData> Npcs { get; private set; }
         public Dictionary<int, Dictionary<byte, SkillData>> Skills { get; private set; }
         public Dictionary<int, MapData> Maps { get; private set; }
 
@@ -16,6 +17,7 @@ namespace Destiny.Server
         {
             this.LoadItems();
             this.LoadEquips();
+            this.LoadNpcs();
             this.LoadSkills();
             this.LoadMaps();
         }
@@ -59,6 +61,28 @@ namespace Destiny.Server
                         equip.Load(reader);
 
                         this.Equips.Add(equip.MapleID, equip);
+                    }
+                }
+            }
+        }
+
+        private void LoadNpcs()
+        {
+            using (FileStream stream = File.Open(Path.Combine(Config.Instance.Binary, "Npcs.bin"), FileMode.Open, FileAccess.Read))
+            {
+                using (BinaryReader reader = new BinaryReader(stream))
+                {
+                    int count = reader.ReadInt32();
+
+                    this.Npcs = new Dictionary<int, NpcData>(count);
+
+                    while (count-- > 0)
+                    {
+                        NpcData npc = new NpcData();
+
+                        npc.Load(reader);
+
+                        this.Npcs.Add(npc.MapleID, npc);
                     }
                 }
             }

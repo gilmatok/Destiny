@@ -166,6 +166,8 @@ namespace Destiny.Game.Data
 
     public sealed class MapData
     {
+        public const int INVALID_MAP_ID = 999999999;
+
         public int MapleID { get; set; }
         public int ReturnMapID { get; set; }
         public int ForcedReturnMapID { get; set; }

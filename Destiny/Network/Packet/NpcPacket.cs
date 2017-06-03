@@ -1,4 +1,5 @@
 ﻿using Destiny.Core.IO;
+using Destiny.Game;
 using Destiny.Game.Maps;
 
 namespace Destiny.Network.Packet
@@ -45,6 +46,24 @@ namespace Destiny.Network.Packet
                 oPacket
                     .WriteBool()
                     .WriteInt(objectID);
+
+                return oPacket.ToArray();
+            }
+        }
+
+        public static byte[] NpcMovement(int objectID, byte a, byte b, Movements movements)
+        {
+            using (OutPacket oPacket = new OutPacket(SendOps.NpcMove))
+            {
+                oPacket
+                    .WriteInt(objectID)
+                    .WriteByte(a)
+                    .WriteByte(b);
+
+                if (movements != null)
+                {
+                    movements.Encode(oPacket);
+                }
 
                 return oPacket.ToArray();
             }

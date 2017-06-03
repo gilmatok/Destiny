@@ -1,11 +1,13 @@
 ﻿using Destiny.Game.Characters;
 using Destiny.Game.Data;
+using Destiny.Server;
 
 namespace Destiny.Game.Maps
 {
     public sealed class Npc : MapObject
     {
         public int MapleID { get; private set; }
+        public NpcData Data { get; private set; }
         public MapNpcSpawnData Spawn { get; private set; }
         public Character Controller { get; set; }
 
@@ -20,6 +22,7 @@ namespace Destiny.Game.Maps
         public Npc(int mapleID)
         {
             this.MapleID = mapleID;
+            this.Data = MasterServer.Instance.Data.Npcs[this.MapleID];
         }
 
         public Npc(MapNpcSpawnData spawn)

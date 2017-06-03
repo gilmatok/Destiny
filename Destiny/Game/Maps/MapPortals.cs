@@ -1,4 +1,6 @@
-﻿namespace Destiny.Game.Maps
+﻿using System.Collections.Generic;
+
+namespace Destiny.Game.Maps
 {
     public sealed class MapPortals : MapObjects<Portal>
     {
@@ -16,7 +18,7 @@
                     }
                 }
 
-                return null;
+                throw new KeyNotFoundException();
             }
         }
 

@@ -1,7 +1,9 @@
 ﻿using Destiny.Core.IO;
+using Destiny.Game;
 using Destiny.Game.Maps;
 using Destiny.Network.Packet;
 using Destiny.Server;
+using System.Collections.Generic;
 
 namespace Destiny.Network.Handler
 {
@@ -23,16 +25,18 @@ namespace Destiny.Network.Handler
                 case -1:
                     {
                         string label = iPacket.ReadMapleString();
-                        Portal portal = client.Character.Map.Portals[label];
+                        Portal portal;
 
-                        if (portal == null)
+                        try
+                        {
+                            portal = client.Character.Map.Portals[label];
+                        }
+                        catch (KeyNotFoundException)
                         {
                             return;
                         }
 
-                        //Portal destinationPortal = MasterServer.Instance.Data.Maps[portal.DestinationID].Portals[portal.DestinationLabel];
-
-                        //client.Character.ChangeMap(portal.DestinationID, destinationPortal.ID);
+                        client.Character.ChangeMap(portal.Data.DestinationMap, portal.Link.ID);
                     }
                     break;
             }
@@ -55,12 +59,18 @@ namespace Destiny.Network.Handler
 
         public static void OnMove(MapleClient client, InPacket iPacket)
         {
-            iPacket.Skip(9);
-            int rewindOffset = iPacket.Position;
-            client.Character.Map.DecodeMovement(client.Character, iPacket);
-            iPacket.Position = rewindOffset;
+            Movements movements = Movements.Decode(iPacket);
 
-            client.Character.Map.Broadcast(UserPacket.UserMove(client.Character.ID, iPacket.ReadBytes(iPacket.Remaining)), client.Character);
+            // TODO: Validate movements.
+
+            foreach (Movement movement in movements)
+            {
+                client.Character.Position = movement.Position;
+                client.Character.Foothold = movement.Foothold;
+                client.Character.Stance = movement.Stance;
+            }
+
+            client.Character.Map.Broadcast(UserPacket.UserMove(client.Character.ID, movements), client.Character);
         }
     }
 }

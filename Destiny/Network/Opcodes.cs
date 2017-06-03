@@ -129,7 +129,8 @@
         NpcAction = 0xBB,
         ItemPickup = 0xCA,
         DamageReactor = 0xC3,
-        ChangedMap = 0xC5,
+        ChangedMap = 0xC4,
+        NpcMove = 0xC5,
         TouchingReactor = 0xC4,
         MonsterCarnival = 0xD0,
         PartySearchRegister = 0xD2,
@@ -144,7 +145,7 @@
         MtsOperation = 0xF1,
         UseMapleLife = 0xF4,
         UseHammer = 0xF8,
-        MapleTV = 0x222
+        MapleTV = 0x222,
     }
 
     public enum SendOps : short

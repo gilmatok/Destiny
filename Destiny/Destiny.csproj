@@ -95,6 +95,7 @@
     <Compile Include="Game\Maps\MapNpcs.cs" />
     <Compile Include="Game\Maps\Mob.cs" />
     <Compile Include="Game\Maps\Npc.cs" />
+    <Compile Include="Game\Movements.cs" />
     <Compile Include="Game\Point.cs" />
     <Compile Include="Game\Maps\Portal.cs" />
     <Compile Include="Game\Maps\Reactor.cs" />
@@ -105,6 +106,7 @@
     <Compile Include="Game\Skill.cs" />
     <Compile Include="Network\Handler\InventoryHandler.cs" />
     <Compile Include="Network\Handler\MobHandler.cs" />
+    <Compile Include="Network\Handler\NpcHandler.cs" />
     <Compile Include="Network\Handler\ShopHandler.cs" />
     <Compile Include="Network\Handler\UserHandler.cs" />
     <Compile Include="Network\Handler\LoginHandler.cs" />

@@ -15,21 +15,26 @@ namespace Destiny.Server
             {
                 if (!base.ContainsKey(mapleID))
                 {
-                    Map map = new Map(mapleID);
+                    Map map = new Map(mapleID, this.World, this.Channel);
 
                     foreach (MapFootholdData foothold in map.Data.Footholds)
                     {
 
                     }
 
-                    foreach(MapMobSpawnData mob in map.Data.Mobs)
+                    foreach (MapMobSpawnData mob in map.Data.Mobs)
                     {
                         map.Mobs.Add(new Mob(mob));
                     }
 
-                    foreach(MapNpcSpawnData npc in map.Data.Npcs)
+                    foreach (MapNpcSpawnData npc in map.Data.Npcs)
                     {
                         map.Npcs.Add(new Npc(npc));
+                    }
+
+                    foreach (MapPortalData portal in map.Data.Portals)
+                    {
+                        map.Portals.Add(new Portal(portal));
                     }
 
                     base.Add(mapleID, map);

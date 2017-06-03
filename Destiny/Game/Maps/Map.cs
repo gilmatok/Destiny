@@ -1,5 +1,4 @@
-﻿using Destiny.Core.IO;
-using Destiny.Game.Characters;
+﻿using Destiny.Game.Characters;
 using Destiny.Game.Data;
 using Destiny.Server;
 using System;
@@ -11,15 +10,21 @@ namespace Destiny.Game.Maps
         public int MapleID { get; private set; }
         public MapData Data { get; private set; }
 
+        public byte World { get; private set; }
+        public byte Channel { get; private set; }
+
         public MapCharacters Characters { get; private set; }
         public MapMobs Mobs { get; private set; }
         public MapNpcs Npcs { get; private set; }
         public MapPortals Portals { get; private set; }
         
-        public Map(int mapleID)
+        public Map(int mapleID, byte world, byte channel)
         {
             this.MapleID = mapleID;
             this.Data = MasterServer.Instance.Data.Maps[this.MapleID];
+
+            this.World = world;
+            this.Channel = channel;
 
             this.Characters = new MapCharacters(this);
             this.Mobs = new MapMobs(this);
@@ -43,82 +48,6 @@ namespace Destiny.Game.Maps
                 {
                     character.Client.Send(buffer);
                 }
-            }
-        }
-
-        public void DecodeMovement(IMoveable moveable, InPacket iPacket)
-        {
-            byte stance = 0;
-            short foothold = 0;
-            Point position = null;
-
-            byte count = iPacket.ReadByte();
-
-            while (count-- > 0)
-            {
-                byte type = iPacket.ReadByte();
-
-                switch (type)
-                {
-                    case 0:
-                    case 5:
-                    case 17:
-                        position = iPacket.ReadPoint();
-                        iPacket.Skip(4);
-                        iPacket.Skip(2);
-                        stance = iPacket.ReadByte();
-                        iPacket.Skip(2);
-                        break;
-
-                    case 1:
-                    case 2:
-                    case 6:
-                    case 12:
-                    case 13:
-                    case 16:
-                        iPacket.Skip(4);
-                        stance = iPacket.ReadByte();
-                        iPacket.Skip(2);
-                        break;
-
-                    case 3:
-                    case 4:
-                    case 7:
-                    case 8:
-                    case 9:
-                    case 14:
-                        position = iPacket.ReadPoint();
-                        iPacket.Skip(4);
-                        stance = iPacket.ReadByte();
-                        break;
-
-                    case 10:
-                        iPacket.Skip(1);
-                        break;
-
-                    case 11:
-                        break;
-
-                    case 15:
-                        position = iPacket.ReadPoint();
-                        iPacket.Skip(4);
-                        iPacket.Skip(2);
-                        foothold = iPacket.ReadShort();
-                        stance = iPacket.ReadByte();
-                        iPacket.Skip(2);
-                        break;
-
-                    case 21:
-                        iPacket.Skip(3);
-                        break;
-                }
-            }
-
-            if (position != null)
-            {
-                moveable.Stance = stance;
-                moveable.Foothold = foothold;
-                moveable.Position = position;
             }
         }
 

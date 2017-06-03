@@ -1,4 +1,5 @@
 ﻿using Destiny.Core.IO;
+using Destiny.Game;
 using Destiny.Game.Characters;
 using System;
 
@@ -136,14 +137,12 @@ namespace Destiny.Network.Packet
             }
         }
 
-        public static byte[] UserMove(int characterID, byte[] movements)
+        public static byte[] UserMove(int characterID, Movements movements)
         {
             using (OutPacket oPacket = new OutPacket(SendOps.UserMove))
             {
-                oPacket
-                    .WriteInt(characterID)
-                    .WriteInt()
-                    .WriteBytes(movements);
+                oPacket.WriteInt(characterID);
+                movements.Encode(oPacket);
 
                 return oPacket.ToArray();
             }
