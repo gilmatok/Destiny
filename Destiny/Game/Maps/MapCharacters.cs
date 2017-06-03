@@ -1,5 +1,5 @@
-﻿using Destiny.Game.Characters;
-using Destiny.Network.Packet;
+﻿using Destiny.Core.IO;
+using Destiny.Game.Characters;
 
 namespace Destiny.Game.Maps
 {
@@ -17,7 +17,10 @@ namespace Destiny.Game.Maps
             {
                 foreach (Mob mob in this.Map.Mobs)
                 {
-                    item.Client.Send(MobPacket.MobEnterField(mob));
+                    using (OutPacket oPacket = mob.GetSpawnPacket())
+                    {
+                        item.Client.Send(oPacket);
+                    }
                 }
             }
 
@@ -25,7 +28,10 @@ namespace Destiny.Game.Maps
             {
                 foreach (Npc npc in this.Map.Npcs)
                 {
-                    item.Client.Send(NpcPacket.NpcEnterField(npc));
+                    using (OutPacket oPacket = npc.GetSpawnPacket())
+                    {
+                        item.Client.Send(oPacket);
+                    }
                 }
             }
 

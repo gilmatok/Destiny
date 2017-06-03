@@ -1,7 +1,6 @@
 ﻿using Destiny.Core.IO;
 using Destiny.Game;
 using Destiny.Game.Characters;
-using Destiny.Network.Packet;
 using Destiny.Server;
 using Destiny.Utility;
 using MySql.Data.MySqlClient;
@@ -36,13 +35,7 @@ namespace Destiny.Network.Handler
                 client.Character = new Character(client, query);
             }
 
-            client.Send(MapPacket.SetField(client.Character, true));
-
-            client.Character.Map.Characters.Add(client.Character);
-
-            client.Character.IsInitialized = true;
-
-            client.Character.Notify(MasterServer.Instance.Worlds[client.World].TickerMessage, NoticeType.Ticker);
+            client.Character.Initialize();
         }
 
         public static void HandleMigrateCashShop(MapleClient client, InPacket iPacket)
@@ -71,9 +64,7 @@ namespace Destiny.Network.Handler
                 client.Character = new Character(client, query);
             }
 
-            client.Send(ShopPacket.SetCashShop(client.Character));
-
-            client.Character.IsInitialized = true;
+            client.Character.Initialize(true);
         }
 
         public static void HandleChangeChannel(MapleClient client, InPacket iPacket)
@@ -82,14 +73,14 @@ namespace Destiny.Network.Handler
 
             MasterServer.Instance.Worlds[client.World].Channels[id].Migrations.Add(client.Host, client.Account.ID, client.Character.ID);
 
-            client.Send(ServerPacket.MigrateCommand(true, MasterServer.Instance.Worlds[client.World].Channels[id].Port));
+            client.Migrate(true, MasterServer.Instance.Worlds[client.World].Channels[id].Port);
         }
 
         public static void HandleCashShop(MapleClient client, InPacket iPacket)
         {
             MasterServer.Instance.Shop.Migrations.Add(client.Host, client.Account.ID, client.Character.ID);
 
-            client.Send(ServerPacket.MigrateCommand(true, MasterServer.Instance.Shop.Port));
+            client.Migrate(true, MasterServer.Instance.Shop.Port);
         }
 
         public static void HandleMTS(MapleClient client, InPacket iPacket)

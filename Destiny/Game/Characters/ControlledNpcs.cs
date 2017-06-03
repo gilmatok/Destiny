@@ -1,5 +1,5 @@
-﻿using Destiny.Game.Maps;
-using Destiny.Network.Packet;
+﻿using Destiny.Core.IO;
+using Destiny.Game.Maps;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
@@ -24,7 +24,10 @@ namespace Destiny.Game.Characters
 
                     base.InsertItem(index, item);
 
-                    this.Parent.Client.Send(NpcPacket.NpcControlRequest(item));
+                    using (OutPacket oPacket = item.GetControlRequestPacket())
+                    {
+                        this.Parent.Client.Send(oPacket);
+                    }
                 }
                 else
                 {
@@ -39,9 +42,12 @@ namespace Destiny.Game.Characters
             {
                 Npc item = base.Items[index];
 
-                if (item.Controller.Client.IsAlive)
+                if (this.Parent.Client.IsAlive)
                 {
-                    this.Parent.Client.Send(NpcPacket.NpcControlCancel(item.ObjectID));
+                    using (OutPacket oPacket = item.GetControlCancelPacket())
+                    {
+                        this.Parent.Client.Send(oPacket);
+                    }
                 }
 
                 item.Controller = null;

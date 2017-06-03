@@ -1,6 +1,7 @@
 ﻿using Destiny.Core.IO;
-using Destiny.Network.Packet;
+using Destiny.Network;
 using Destiny.Utility;
+using System;
 
 namespace Destiny.Game.Characters
 {
@@ -397,7 +398,101 @@ namespace Destiny.Game.Characters
 
         public void Update(params StatisticType[] statistics)
         {
-            this.Parent.Client.Send(UserPacket.StatChanged(this.Parent, statistics));
+            using (OutPacket oPacket = new OutPacket(SendOps.StatChanged))
+            {
+                oPacket.WriteBool(); // TODO: bOnExclRequest.
+
+                int flag = 0;
+
+                foreach (StatisticType statistic in statistics)
+                {
+                    flag |= (int)statistic;
+                }
+
+                oPacket.WriteInt(flag);
+
+                Array.Sort(statistics);
+
+                foreach (StatisticType statistic in statistics)
+                {
+                    switch (statistic)
+                    {
+                        case StatisticType.Skin:
+                            oPacket.WriteByte(this.Skin);
+                            break;
+
+                        case StatisticType.Face:
+                            oPacket.WriteInt(this.Face);
+                            break;
+
+                        case StatisticType.Hair:
+                            oPacket.WriteInt(this.Hair);
+                            break;
+
+                        case StatisticType.Level:
+                            oPacket.WriteByte(this.Level);
+                            break;
+
+                        case StatisticType.Job:
+                            oPacket.WriteShort((short)this.Job);
+                            break;
+
+                        case StatisticType.Strength:
+                            oPacket.WriteShort(this.Strength);
+                            break;
+
+                        case StatisticType.Dexterity:
+                            oPacket.WriteShort(this.Dexterity);
+                            break;
+
+                        case StatisticType.Intelligence:
+                            oPacket.WriteShort(this.Intelligence);
+                            break;
+
+                        case StatisticType.Luck:
+                            oPacket.WriteShort(this.Luck);
+                            break;
+
+                        case StatisticType.Health:
+                            oPacket.WriteShort(this.Health);
+                            break;
+
+                        case StatisticType.MaxHealth:
+                            oPacket.WriteShort(this.MaxHealth);
+                            break;
+
+                        case StatisticType.Mana:
+                            oPacket.WriteShort(this.Mana);
+                            break;
+
+                        case StatisticType.MaxMana:
+                            oPacket.WriteShort(this.MaxMana);
+                            break;
+
+                        case StatisticType.AbilityPoints:
+                            oPacket.WriteShort(this.AbilityPoints);
+                            break;
+
+                        case StatisticType.SkillPoints:
+                            oPacket.WriteShort(this.SkillPoints);
+                            break;
+
+                        case StatisticType.Experience:
+                            oPacket.WriteInt(this.Experience);
+                            break;
+
+                        case StatisticType.Fame:
+                            oPacket.WriteShort(this.Fame);
+                            break;
+
+                        case StatisticType.Mesos:
+                            oPacket.WriteInt(this.Mesos);
+                            break;
+                    }
+                }
+
+                this.Parent.Client.Send(oPacket);
+            }
         }
 
         public void Encode(OutPacket oPacket)

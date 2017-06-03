@@ -1,6 +1,6 @@
 ﻿using Destiny.Core.IO;
+using Destiny.Network;
 using Destiny.Network.Handler;
-using Destiny.Network.Packet;
 using Destiny.Utility;
 
 namespace Destiny.Game.Characters
@@ -84,7 +84,7 @@ namespace Destiny.Game.Characters
 
             InventoryOperation operation = new InventoryOperation(InventoryOperationType.AddItem, item, 0, slot);
 
-            this.Parent.Client.Send(InventoryPacket.InventoryOperation(false, operation));
+            this.Operate(false, operation);
         }
 
         public void Swap(InventoryType inventory, short slot1, short slot2)
@@ -116,7 +116,7 @@ namespace Destiny.Game.Characters
 
                     InventoryOperation operation = new InventoryOperation(InventoryOperationType.ModifySlot, item1, slot1, slot2);
 
-                    this.Parent.Client.Send(InventoryPacket.InventoryOperation(true, operation));
+                    this.Operate(true, operation);
                 }
             }
         }
@@ -213,6 +213,75 @@ namespace Destiny.Game.Characters
             set
             {
                 mItems[(byte)inventory][slot] = value;
+            }
+        }
+
+        private void Operate(bool unk, params InventoryOperation[] operations)
+        {
+            using (OutPacket oPacket = new OutPacket(SendOps.InventoryOperation))
+            {
+                oPacket
+                    .WriteBool(unk)
+                    .WriteByte((byte)operations.Length);
+
+                sbyte addedByte = -1;
+
+                foreach (InventoryOperation operation in operations)
+                {
+                    oPacket
+                        .WriteByte((byte)operation.Type)
+                        .WriteByte((byte)Item.GetInventory(operation.Item.MapleID));
+
+                    switch (operation.Type)
+                    {
+                        case InventoryOperationType.AddItem:
+                            {
+                                oPacket.WriteShort(operation.CurrentSlot);
+                                operation.Item.Encode(oPacket);
+                            }
+                            break;
+
+                        case InventoryOperationType.ModifyQuantity:
+                            {
+                                oPacket
+                                    .WriteShort(operation.CurrentSlot)
+                                    .WriteShort(operation.Item.Quantity);
+                            }
+                            break;
+
+                        case InventoryOperationType.ModifySlot:
+                            {
+                                oPacket
+                                    .WriteShort(operation.OldSlot)
+                                    .WriteShort(operation.CurrentSlot);
+
+                                if (addedByte == -1)
+                                {
+                                    if (operation.OldSlot < 0)
+                                    {
+                                        addedByte = 1;
+                                    }
+                                    else if (operation.CurrentSlot < 0)
+                                    {
+                                        addedByte = 2;
+                                    }
+                                }
+                            }
+                            break;
+                        case InventoryOperationType.RemoveItem:
+                            {
+                                oPacket.WriteShort(operation.CurrentSlot);
+                            }
+                            break;
+                    }
+                }
+
+                if (addedByte != -1)
+                {
+                    oPacket.WriteSByte(addedByte);
+                }
+
+                this.Parent.Client.Send(oPacket);
             }
         }
     }

@@ -1,4 +1,5 @@
-﻿using Destiny.Game.Characters;
+﻿using Destiny.Core.IO;
+using Destiny.Game.Characters;
 using Destiny.Game.Data;
 using Destiny.Server;
 using System;
@@ -32,21 +33,21 @@ namespace Destiny.Game.Maps
             this.Portals = new MapPortals(this);
         }
 
-        public void Broadcast(byte[] buffer)
+        public void Broadcast(OutPacket oPacket)
         {
             foreach (Character character in this.Characters)
             {
-                character.Client.Send(buffer);
+                character.Client.Send(oPacket);
             }
         }
 
-        public void Broadcast(byte[] buffer, Character ignored)
+        public void Broadcast(OutPacket oPacket, Character ignored)
         {
             foreach (Character character in this.Characters)
             {
                 if (character != ignored)
                 {
-                    character.Client.Send(buffer);
+                    character.Client.Send(oPacket);
                 }
             }
         }

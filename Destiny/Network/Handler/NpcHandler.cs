@@ -1,7 +1,6 @@
 ﻿using Destiny.Core.IO;
 using Destiny.Game;
 using Destiny.Game.Maps;
-using Destiny.Network.Packet;
 using System.Collections.Generic;
 
 namespace Destiny.Network.Handler
@@ -26,16 +25,22 @@ namespace Destiny.Network.Handler
             byte b = iPacket.ReadByte();
             Movements movements = null;
 
-            if (npc.Data.IsMoving)
+            using (OutPacket oPacket = new OutPacket(SendOps.NpcMove))
             {
-                movements = Movements.Decode(iPacket);
+                oPacket
+                    .WriteInt(npc.ObjectID)
+                    .WriteByte(a)
+                    .WriteByte(b);
 
-                // TODO: Validate movements.
+                if (npc.Data.IsMoving)
+                {
+                    movements = Movements.Decode(iPacket);
 
-                return;
+                    movements.Encode(oPacket);
+                }
+
+                client.Character.Map.Broadcast(oPacket);
             }
-
-            client.Character.Map.Broadcast(NpcPacket.NpcMovement(npc.ObjectID, a, b, movements));
         }
     }
 }

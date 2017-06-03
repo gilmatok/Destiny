@@ -29,7 +29,7 @@ namespace Destiny.Server
 
             for (byte id = 0; id < config.Channels; id++)
             {
-                this.Channels[id] = new ChannelServer(id, this.ID, port);
+                this.Channels[id] = new ChannelServer(id, this.ID, this.Name, port);
 
                 port++;
             }

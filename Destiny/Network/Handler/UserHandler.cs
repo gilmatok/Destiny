@@ -1,7 +1,6 @@
 ﻿using Destiny.Core.IO;
 using Destiny.Game;
 using Destiny.Game.Maps;
-using Destiny.Network.Packet;
 using Destiny.Server;
 using System.Collections.Generic;
 
@@ -53,7 +52,16 @@ namespace Destiny.Network.Handler
             }
             else
             {
-                client.Character.Map.Broadcast(UserPacket.UserChat(client.Character.ID, client.Character.IsGm, text, shout));
+                using (OutPacket oPacket = new OutPacket(SendOps.UserChat))
+                {
+                    oPacket
+                        .WriteInt(client.Character.ID)
+                        .WriteBool(client.Character.IsGm)
+                        .WriteMapleString(text)
+                        .WriteBool(shout);
+
+                    client.Character.Map.Broadcast(oPacket);
+                }
             }
         }
 
@@ -70,7 +78,13 @@ namespace Destiny.Network.Handler
                 client.Character.Stance = movement.Stance;
             }
 
-            client.Character.Map.Broadcast(UserPacket.UserMove(client.Character.ID, movements), client.Character);
+            using (OutPacket oPacket = new OutPacket(SendOps.UserMove))
+            {
+                oPacket.WriteInt(client.Character.ID);
+                movements.Encode(oPacket);
+
+                client.Character.Map.Broadcast(oPacket, client.Character);
+            }
         }
     }
 }

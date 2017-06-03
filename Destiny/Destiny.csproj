@@ -79,8 +79,10 @@
     <Compile Include="Game\Data\NpcData.cs" />
     <Compile Include="Game\Data\ReactorData.cs" />
     <Compile Include="Game\Data\SkillData.cs" />
+    <Compile Include="Game\IControllable.cs" />
     <Compile Include="Game\IMoveable.cs" />
     <Compile Include="Game\InventoryFullException.cs" />
+    <Compile Include="Game\ISpawnable.cs" />
     <Compile Include="Game\Maps\Drop.cs" />
     <Compile Include="Game\Equip.cs" />
     <Compile Include="Game\Maps\MapMobs.cs" />
@@ -116,16 +118,6 @@
     <Compile Include="Core\IO\OutPacket.cs" />
     <Compile Include="Destiny.cs" />
     <Compile Include="Core\Network\PacketProcessor.cs" />
-    <Compile Include="Network\Packet\CommonPacket.cs" />
-    <Compile Include="Network\Packet\InventoryPacket.cs" />
-    <Compile Include="Network\Packet\MobPacket.cs" />
-    <Compile Include="Network\Packet\ServerPacket.cs" />
-    <Compile Include="Network\Packet\ShopPacket.cs" />
-    <Compile Include="Network\Packet\UserPacket.cs" />
-    <Compile Include="Network\Packet\HelpPacket.cs" />
-    <Compile Include="Network\Packet\LoginPacket.cs" />
-    <Compile Include="Network\Packet\MapPacket.cs" />
-    <Compile Include="Network\Packet\NpcPacket.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Core\Security\AesCryptograph.cs" />
     <Compile Include="Core\Security\HashGenerator.cs" />
@@ -147,6 +139,7 @@
     <Compile Include="Server\MapFactory.cs" />
     <Compile Include="Server\MasterServer.cs" />
     <Compile Include="Server\MigrationRegistery.cs" />
+    <Compile Include="Server\ServerBase.cs" />
     <Compile Include="Server\ShopServer.cs" />
     <Compile Include="Server\WorldServer.cs" />
     <Compile Include="Utility\Config.cs" />

@@ -1,9 +1,11 @@
-﻿using Destiny.Game.Characters;
+﻿using Destiny.Core.IO;
+using Destiny.Game.Characters;
 using Destiny.Game.Data;
+using Destiny.Network;
 
 namespace Destiny.Game.Maps
 {
-    public sealed class Mob : MapObject, IMoveable
+    public sealed class Mob : MapObject, IMoveable, ISpawnable, IControllable
     {
         public override MapObjectType Type
         {
@@ -65,6 +67,71 @@ namespace Destiny.Game.Maps
                     newController.ControlledMobs.Add(this);
                 }
             }
+        }
+
+        public OutPacket GetCreatePacket()
+        {
+            return this.GetInternalPacket(false, true);
+        }
+
+        public OutPacket GetSpawnPacket()
+        {
+            return this.GetInternalPacket(false, false);
+        }
+
+        public OutPacket GetControlRequestPacket()
+        {
+            return this.GetInternalPacket(true, false);
+        }
+
+        private OutPacket GetInternalPacket(bool requestControl, bool newSpawn)
+        {
+            OutPacket oPacket = new OutPacket(requestControl ? SendOps.MobChangeController : SendOps.MobEnterField);
+
+            if (requestControl)
+            {
+                oPacket.WriteByte(1); // TODO: 2 if mob is provoked (aggro).
+            }
+
+            oPacket
+                .WriteInt(this.ObjectID)
+                .WriteByte((byte)(this.Controller == null ? 5 : 1))
+                .WriteInt(this.MapleID)
+                .WriteZero(15) // NOTE: Unknown.
+                .WriteByte(0x88) // NOTE: Unknown.
+                .WriteZero(6) // NOTE: Unknown.
+                .WritePoint(this.Position)
+                .WriteByte((byte)(0x02 | (this.FacesLeft ? 0x01 : 0x00)))
+                .WriteShort(this.Spawn.Foothold)
+                .WriteShort(this.Foothold)
+                .WriteByte((byte)(newSpawn ? -2 : -1))
+                .WriteByte()
+                .WriteByte(byte.MaxValue) // NOTE: Carnival team.
+                .WriteInt(); // NOTE: Unknown.
+
+            return oPacket;
+        }
+
+        public OutPacket GetControlCancelPacket()
+        {
+            OutPacket oPacket = new OutPacket(SendOps.MobChangeController);
+
+            oPacket
+                .WriteBool()
+                .WriteInt(this.ObjectID);
+
+            return oPacket;
+        }
+
+        public OutPacket GetDestroyPacket()
+        {
+            OutPacket oPacket = new OutPacket(SendOps.MobLeaveField);
+
+            oPacket
+                .WriteByte() // TODO: Death effect.
+                .WriteInt(this.ObjectID);
+
+            return oPacket;
         }
     }
 }

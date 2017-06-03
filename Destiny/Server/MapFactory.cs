@@ -17,11 +17,6 @@ namespace Destiny.Server
                 {
                     Map map = new Map(mapleID, this.World, this.Channel);
 
-                    foreach (MapFootholdData foothold in map.Data.Footholds)
-                    {
-
-                    }
-
                     foreach (MapMobSpawnData mob in map.Data.Mobs)
                     {
                         map.Mobs.Add(new Mob(mob));

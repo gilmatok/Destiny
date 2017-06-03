@@ -1,6 +1,5 @@
 ﻿using Destiny.Core.IO;
 using Destiny.Game.Maps;
-using Destiny.Network.Packet;
 using System.Collections.Generic;
 
 namespace Destiny.Network.Handler
@@ -29,7 +28,18 @@ namespace Destiny.Network.Handler
             byte unknown = iPacket.ReadByte();
             iPacket.ReadInt();
 
-            client.Send(MobPacket.MobCtrlAck(objectID, moveAction, cheatResult, 0, 0, 0));
+            using (OutPacket oPacket = new OutPacket(SendOps.MobCtrlAck))
+            {
+                oPacket
+                    .WriteInt(objectID)
+                    .WriteShort(moveAction)
+                    .WriteBool(cheatResult)
+                    .WriteShort() // NOTE: Mob mana.
+                    .WriteByte() // NOTE: Ability ID.
+                    .WriteByte(); // NOTE: Ability level.
+
+                client.Send(oPacket);
+            }
         }
     }
 }

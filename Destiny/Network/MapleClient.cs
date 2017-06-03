@@ -56,5 +56,18 @@ namespace Destiny.Network
                 }
             }
         }
+
+        public void Migrate(bool valid, short port)
+        {
+            using (OutPacket oPacket = new OutPacket(SendOps.MigrateCommand))
+            {
+                oPacket
+                    .WriteBool(valid)
+                    .WriteBytes(new byte[4] { 127, 0, 0, 1 })
+                    .WriteShort(port);
+
+                this.Send(oPacket);
+            }
+        }
     }
 }

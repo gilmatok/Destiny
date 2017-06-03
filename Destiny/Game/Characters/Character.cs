@@ -4,8 +4,8 @@ using Destiny.Utility;
 using MySql.Data.MySqlClient;
 using Destiny.Core.IO;
 using Destiny.Game.Maps;
-using Destiny.Network.Packet;
 using Destiny.Game.Data;
+using System;
 
 namespace Destiny.Game.Characters
 {
@@ -78,7 +78,7 @@ namespace Destiny.Game.Characters
             }
 
             this.Map = MasterServer.Instance.Worlds[this.Client.World].Channels[this.Client.Channel].Maps[mapID];
-           
+
             this.Position = this.Map.Portals[this.SpawnPoint].Position;
             this.Foothold = 0;
             this.Stance = 0;
@@ -145,22 +145,121 @@ namespace Destiny.Game.Characters
                              new MySqlParameter("cash_slots", 48));
         }
 
+        public void Initialize(bool cashShop = false)
+        {
+            using (OutPacket oPacket = new OutPacket(cashShop ? SendOps.SetCashShop : SendOps.SetField))
+            {
+                if (cashShop)
+                {
+                    this.Encode(oPacket);
+
+                    oPacket
+                        .WriteByte(1)
+                        .WriteMapleString(this.Client.Account.Username)
+                        .WriteInt()
+                        .WriteShort()
+                        .WriteZero(121);
+
+                    for (int i = 1; i <= 8; i++)
+                    {
+                        for (int j = 0; j < 2; j++)
+                        {
+                            oPacket
+                                .WriteInt(i)
+                                .WriteInt(j)
+                                .WriteInt(50200004)
+                                .WriteInt(i)
+                                .WriteInt(j)
+                                .WriteInt(50200069)
+                                .WriteInt(i)
+                                .WriteInt(j)
+                                .WriteInt(50200117)
+                                .WriteInt(i)
+                                .WriteInt(j)
+                                .WriteInt(50100008)
+                                .WriteInt(i)
+                                .WriteInt(j)
+                                .WriteInt(50000047);
+                        }
+                    }
+
+                    oPacket
+                        .WriteInt()
+                        .WriteShort()
+                        .WriteByte()
+                        .WriteInt(75);
+                }
+                else
+                {
+                    oPacket
+                        .WriteInt(this.Client.Channel)
+                        .WriteByte(++this.Portals)
+                        .WriteBool(true)
+                        .WriteShort(); // NOTE: Floating messages at top corner.
+
+                    for (int i = 0; i < 3; i++)
+                    {
+                        oPacket.WriteInt(Constants.Random.Next());
+                    }
+
+                    this.Encode(oPacket);
+                    oPacket.WriteDateTime(DateTime.Now);
+                }
+
+                this.Client.Send(oPacket);
+            }
+
+            this.IsInitialized = true;
+
+            if (!cashShop)
+            {
+                this.Map.Characters.Add(this);
+
+                this.Notify(MasterServer.Instance.Worlds[this.Client.World].TickerMessage, NoticeType.Ticker);
+            }
+        }
+
         public void Notify(string message, NoticeType type = NoticeType.Pink)
         {
-            this.Client.Send(UserPacket.BrodcastMsg(message, type));
+            using (OutPacket oPacket = new OutPacket(SendOps.BroadcastMsg))
+            {
+                oPacket.WriteByte((byte)type);
+
+                if (type == NoticeType.Ticker)
+                {
+                    oPacket.WriteBool(!string.IsNullOrEmpty(message));
+                }
+
+                oPacket.WriteMapleString(message);
+
+                this.Client.Send(oPacket);
+            }
         }
 
         public void ChangeMap(int mapID, byte portalID = 0)
         {
-            this.SpawnPoint = portalID;
-
             this.Map.Characters.Remove(this);
 
-            this.Map = MasterServer.Instance.Worlds[this.Client.World].Channels[this.Client.Channel].Maps[mapID];
+            this.SpawnPoint = portalID;
 
-            this.Client.Send(MapPacket.SetField(this, false));
+            using (OutPacket oPacket = new OutPacket(SendOps.SetField))
+            {
+                oPacket
+                    .WriteInt(this.Client.Channel)
+                    .WriteByte(++this.Portals)
+                    .WriteBool()
+                    .WriteShort()
+                    .WriteByte()
+                    .WriteInt(mapID)
+                    .WriteByte(this.SpawnPoint)
+                    .WriteShort(this.Stats.Health)
+                    .WriteBool(false) // NOTE: Follow.
+                    .WriteDateTime(DateTime.Now);
 
-            this.Map.Characters.Add(this);
+                this.Client.Send(oPacket);
+            }
+
+            MasterServer.Instance.Worlds[this.Client.World].Channels[this.Client.Channel].Maps[mapID].Characters.Add(this);
         }
 
         public void Encode(OutPacket oPacket, long flag = long.MaxValue)
