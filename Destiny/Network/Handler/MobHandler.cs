@@ -1,4 +1,5 @@
 ﻿using Destiny.Core.IO;
+using Destiny.Game;
 using Destiny.Game.Maps;
 using System.Collections.Generic;
 
@@ -28,6 +29,14 @@ namespace Destiny.Network.Handler
             byte unknown = iPacket.ReadByte();
             iPacket.ReadInt();
 
+            Movements movements = Movements.Decode(iPacket);
+
+            Movement lastMovement = movements[movements.Count - 1];
+
+            mob.Position = lastMovement.Position;
+            mob.Foothold = lastMovement.Foothold;
+            mob.Stance = lastMovement.Stance;
+
             using (OutPacket oPacket = new OutPacket(SendOps.MobCtrlAck))
             {
                 oPacket
@@ -39,6 +48,19 @@ namespace Destiny.Network.Handler
                     .WriteByte(); // NOTE: Ability level.
 
                 client.Send(oPacket);
+            }
+
+            using (OutPacket oPacket = new OutPacket(SendOps.MobMove))
+            {
+                oPacket
+                    .WriteInt(objectID)
+                    .WriteBool(cheatResult)
+                    .WriteByte(centerSplit)
+                    .WriteInt(illegalVelocity);
+
+                movements.Encode(oPacket);
+
+                client.Character.Map.Broadcast(oPacket, client.Character);
             }
         }
     }

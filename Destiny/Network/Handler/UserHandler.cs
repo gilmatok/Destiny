@@ -71,12 +71,11 @@ namespace Destiny.Network.Handler
 
             // TODO: Validate movements.
 
-            foreach (Movement movement in movements)
-            {
-                client.Character.Position = movement.Position;
-                client.Character.Foothold = movement.Foothold;
-                client.Character.Stance = movement.Stance;
-            }
+            Movement lastMovement = movements[movements.Count - 1];
+
+            client.Character.Position = lastMovement.Position;
+            client.Character.Foothold = lastMovement.Foothold;
+            client.Character.Stance = lastMovement.Stance;
 
             using (OutPacket oPacket = new OutPacket(SendOps.UserMove))
             {

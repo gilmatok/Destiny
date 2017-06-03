@@ -59,25 +59,29 @@ namespace Destiny.Game.Characters
 
             this.ID = query.GetInt("character_id");
             this.Name = query.GetString("name");
-            this.SpawnPoint = query.GetByte("spawn_point");
             this.Stats = new CharacterStats(this, query);
 
             int mapID = query.GetInt("map");
+            byte spawnPoint = query.GetByte("spawn_point");
 
             if (this.IsGm) // NOTE: Gms are spawned in the Gm map by default to avoid being seen by other players.
             {
                 mapID = 180000000;
+                spawnPoint = 0;
             }
             else if (MasterServer.Instance.Data.Maps[mapID].ForcedReturnMapID != MapData.INVALID_MAP_ID)
             {
                 mapID = MasterServer.Instance.Data.Maps[mapID].ForcedReturnMapID;
+                spawnPoint = 0; // TODO: Should it be randomized?
             }
             else if (!MasterServer.Instance.Data.Maps.ContainsKey(mapID)) // NOTE: Just in case the user purposely edits a wrong map in the database.
             {
                 mapID = 100000000;
+                spawnPoint = 0;
             }
 
             this.Map = MasterServer.Instance.Worlds[this.Client.World].Channels[this.Client.Channel].Maps[mapID];
+            this.SpawnPoint = spawnPoint;
 
             this.Position = this.Map.Portals[this.SpawnPoint].Position;
             this.Foothold = 0;
