@@ -42,7 +42,7 @@ namespace Destiny.Server.Commands
                 {
                     if (!(command is HelpCommand))
                     {
-                        caller.Notify(string.Format("    {0}{1} {2}", Constants.CommandIndiciator, command.Name, command.Parameters));
+                        caller.Notify(string.Format("\t{0}{1}", Constants.CommandIndiciator, command.Name));
                     }
                 }
             }

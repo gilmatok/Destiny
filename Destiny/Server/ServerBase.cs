@@ -48,15 +48,22 @@ namespace Destiny.Server
 
         private void OnClientAccepted(Socket socket)
         {
-            MapleClient client = new MapleClient(socket, mProcessor, mClients.Remove);
+            try
+            {
+                MapleClient client = new MapleClient(socket, mProcessor, mClients.Remove);
 
-            this.SetClientAttributes(client);
+                this.SetClientAttributes(client);
 
-            mClients.Add(client);
+                mClients.Add(client);
 
-            client.Handshake();
+                client.Handshake();
 
-            Logger.Write(LogLevel.Info, "[{0}] Accepted client from {1}.", mLabel, client.Host);
+                Logger.Write(LogLevel.Info, "[{0}] Accepted client from {1}.", mLabel, client.Host);
+            }
+            catch 
+            {
+                // ?
+            }
         }
 
         protected void AddHandler(RecvOps operationCode, PacketHandler handler)

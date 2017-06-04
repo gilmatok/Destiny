@@ -53,6 +53,7 @@
   <ItemGroup>
     <Compile Include="Constants.cs" />
     <Compile Include="Core\Collections\EnumerationHelper.cs" />
+    <Compile Include="Core\IO\BufferPool.cs" />
     <Compile Include="Core\IO\PacketBase.cs" />
     <Compile Include="Enum\Gender.cs" />
     <Compile Include="Enum\GmLevel.cs" />

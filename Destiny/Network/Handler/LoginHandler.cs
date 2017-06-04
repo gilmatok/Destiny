@@ -10,6 +10,21 @@ namespace Destiny.Network.Handler
 {
     public static class LoginHandler
     {
+        public static void HandleClientStart(MapleClient client, InPacket iPacket)
+        {
+            if (client.Host == "127.0.0.1")
+            {
+                using (DatabaseQuery query = Database.Query("SELECT * FROM `accounts` WHERE `username` = @username", new MySqlParameter("username", "admin")))
+                {
+                    query.NextRow();
+
+                    client.Account = new Account(query);
+                }
+
+                LoginHandler.SendLoginResult(client, LoginResult.Valid);
+            }
+        }
+
         // TODO: Handle different scenarios (ban, quiet ban, etcetera).
         public static void HandleLoginPassword(MapleClient client, InPacket iPacket)
         {

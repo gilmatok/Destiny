@@ -27,6 +27,7 @@ namespace Destiny.Server
 
         protected override void SpawnHandlers()
         {
+            this.AddHandler(RecvOps.ClientStart, LoginHandler.HandleClientStart);
             this.AddHandler(RecvOps.LoginPassword, LoginHandler.HandleLoginPassword);
             this.AddHandler(RecvOps.WorldList, LoginHandler.HandleWorldList);
             this.AddHandler(RecvOps.WorldRelist, LoginHandler.HandleWorldList);

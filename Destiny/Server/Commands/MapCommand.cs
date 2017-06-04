@@ -16,7 +16,7 @@ namespace Destiny.Server.Commands
         {
             get
             {
-                return "{id}";
+                return "id";
             }
         }
 

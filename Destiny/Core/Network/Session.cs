@@ -1,16 +1,24 @@
 ﻿using Destiny.Core.IO;
 using Destiny.Core.Security;
 using System;
+using System.Net;
 using System.Net.Sockets;
 
 namespace Destiny.Core.Network
 {
-    public abstract class Session : NetworkStream
+    public abstract class Session
     {
+        private const int HeaderSize = sizeof(int);
+
+        private readonly Socket mSocket;
+
         private readonly MapleCryptograph mSendCipher;
         private readonly MapleCryptograph mRecvCipher;
 
+        private int mOffset;
+
         private byte[] mBuffer;
+        private byte[] mPacket;
 
         private object mLocker;
 
@@ -20,51 +28,102 @@ namespace Destiny.Core.Network
         protected abstract void Dispatch(byte[] buffer);
         protected abstract void Terminate();
 
-        public Session(Socket socket)
-            : base(socket)
+        public Session(Socket suckit)
         {
+            this.Host = (suckit.RemoteEndPoint as IPEndPoint).Address.ToString();
+            this.IsAlive = true;
+
+            suckit.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.NoDelay, true); // bye nagle
+            suckit.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true); // ty rajan
+
+            mSocket = suckit;
+
+            mBuffer = BufferPool.Get();
+            mPacket = BufferPool.Get();
+
             mSendCipher = new MapleCryptograph(Constants.Version, Constants.SIV, TransformDirection.Encrypt);
             mRecvCipher = new MapleCryptograph(Constants.Version, Constants.RIV, TransformDirection.Decrypt);
 
             mLocker = new object();
 
-            this.Host = "127.0.0.1"; //lolwut
-            this.IsAlive = true;
+            BeginRead();
         }
 
-        private async void Receive()
+        private void BeginRead()
         {
-            while (this.IsAlive)
+            if (!this.IsAlive)
             {
-                if (!this.DataAvailable)
-                {
-                    continue;
-                }
+                return;
+            }
 
-                int length = 4;
+            SocketError outError = SocketError.Success;
 
-                mBuffer = new byte[length];
+            mSocket.BeginReceive(mBuffer, 0, mBuffer.Length, SocketFlags.None, out outError, ReadCallback, null);
 
-                if (await this.ReadAsync(mBuffer, 0, length) == length)
-                {
-                    length = MapleCryptograph.GetPacketLength(mBuffer);
-                }
+            if (outError != SocketError.Success)
+            {
+                Close();
+            }
+        }
 
-                if (!mRecvCipher.CheckServerPacket(mBuffer, 0))
-                {
-                    this.Close();
+        private void ReadCallback(IAsyncResult iar)
+        {
+            if (!this.IsAlive)
+            {
+                return;
+            }
 
-                    return;
-                }
+            SocketError error;
+            int received = mSocket.EndReceive(iar, out error);
 
-                mBuffer = new byte[length];
+            if (received == 0 || error != SocketError.Success)
+            {
+                Close();
+                return;
+            }
 
-                if (await this.ReadAsync(mBuffer, 0, length) == length)
-                {
-                    mRecvCipher.Transform(mBuffer);
+            Append(received);
+            ManipulateBuffer();
+            BeginRead();
+        }
 
-                    this.Dispatch(mBuffer);
-                }
+        private void Append(int length)
+        {
+            if (mPacket.Length - mOffset < length)
+            {
+                int newSize = mPacket.Length * 2;
+
+                while (newSize < mOffset + length)
+                    newSize *= 2;
+
+                Array.Resize<byte>(ref mPacket, newSize);
+            }
+
+            Buffer.BlockCopy(mBuffer, 0, mPacket, mOffset, length);
+
+            mOffset += length;
+        }
+
+        private void ManipulateBuffer()
+        {
+            while (mOffset > HeaderSize) //header room
+            {
+                int packetSize = MapleCryptograph.GetPacketLength(mPacket);
+
+                if (mOffset < packetSize + HeaderSize) //header + packet room
+                    break;
+
+                byte[] packetBuffer = new byte[packetSize];
+                Buffer.BlockCopy(mPacket, HeaderSize, packetBuffer, 0, packetSize); //copy packet
+
+                mRecvCipher.Transform(packetBuffer); //decrypt
+
+                mOffset -= packetSize + HeaderSize; //fix len
+
+                if (mOffset > 0) //move reamining bytes
+                    Buffer.BlockCopy(mPacket, packetSize + HeaderSize, mPacket, 0,mOffset);
+
+                Dispatch(packetBuffer); // we done fam
             }
         }
 
@@ -81,16 +140,14 @@ namespace Destiny.Core.Network
 
                 this.SendRaw(oPacket.ToArray());
             }
-
-            this.Receive();
-        }
+                            }
 
         public void Send(OutPacket oPacket)
         {
             this.Send(oPacket.ToArray());
         }
 
-        public void Send(params byte[][] buffers)
+        public void Send(byte[] buffer)
         {
             if (!this.IsAlive)
             {
@@ -99,56 +156,56 @@ namespace Destiny.Core.Network
 
             lock (mLocker)
             {
-                int length = 0;
-                int offset = 0;
+                byte[] final = new byte[buffer.Length + 4];
 
-                foreach (byte[] buffer in buffers)
-                {
-                    length += 4;
-                    length += buffer.Length;
-                }
+                mSendCipher.GetHeaderToClient(final, 0, buffer.Length);
+                mSendCipher.Transform(buffer);
 
-                byte[] final = new byte[length];
-
-                foreach (byte[] buffer in buffers)
-                {
-                    mSendCipher.GetHeaderToClient(final, offset, buffer.Length);
-
-                    offset += 4;
-
-                    mSendCipher.Transform(buffer);
-
-                    Buffer.BlockCopy(buffer, 0, final, offset, buffer.Length);
-
-                    offset += buffer.Length;
-                }
+                Buffer.BlockCopy(buffer, 0, final, 4, buffer.Length);
 
                 this.SendRaw(final);
             }
         }
 
-        public async void SendRaw(byte[] buffer)
+        public void SendRaw(byte[] buffer)
         {
             if (!this.IsAlive)
             {
                 return;
             }
 
-            await this.WriteAsync(buffer, 0, buffer.Length);
+            int offset = 0;
+
+            while (offset < buffer.Length)
+            {
+                SocketError outError = SocketError.Success;
+                int sent = mSocket.Send(buffer, offset, buffer.Length - offset, SocketFlags.None, out outError);
+
+                if (sent == 0 || outError != SocketError.Success)
+                {
+                    Close();
+                    return;
+                }
+
+                offset += sent;
+            }
         }
 
-        public new void Close()
+        public void Close()
         {
-            if (!this.IsAlive)
+            if (IsAlive)
             {
-                return;
+                IsAlive = false;
+
+                mSocket.Shutdown(SocketShutdown.Both);
+                mSocket.Close();
+
+                BufferPool.Put(mBuffer); BufferPool.Put(mPacket);
+
+                //fkurjan
+
+                Terminate();
             }
-
-            this.IsAlive = false;
-
-            this.Terminate();
-
-            base.Close();
         }
     }
 }
