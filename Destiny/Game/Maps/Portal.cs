@@ -1,4 +1,4 @@
-﻿using Destiny.Game.Data;
+﻿using Destiny.Server.Data;
 using Destiny.Server;
 
 namespace Destiny.Game.Maps

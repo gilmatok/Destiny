@@ -67,7 +67,7 @@ namespace Destiny.Network.Handler
             client.Character.Initialize(true);
         }
 
-        public static void HandleChangeChannel(MapleClient client, InPacket iPacket)
+        public static void HandleChannelChange(MapleClient client, InPacket iPacket)
         {
             byte id = iPacket.ReadByte();
 
@@ -76,14 +76,14 @@ namespace Destiny.Network.Handler
             client.Migrate(true, MasterServer.Instance.Worlds[client.World].Channels[id].Port);
         }
 
-        public static void HandleCashShop(MapleClient client, InPacket iPacket)
+        public static void HandleCashShopMigrate(MapleClient client, InPacket iPacket)
         {
             MasterServer.Instance.Shop.Migrations.Add(client.Host, client.Account.ID, client.Character.ID);
 
             client.Migrate(true, MasterServer.Instance.Shop.Port);
         }
 
-        public static void HandleMTS(MapleClient client, InPacket iPacket)
+        public static void HandleMtsMigration(MapleClient client, InPacket iPacket)
         {
             if (client.Character.Map.MapleID == 910000000)
             {

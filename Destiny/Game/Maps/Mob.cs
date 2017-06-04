@@ -1,6 +1,6 @@
 ﻿using Destiny.Core.IO;
 using Destiny.Game.Characters;
-using Destiny.Game.Data;
+using Destiny.Server.Data;
 using Destiny.Network;
 
 namespace Destiny.Game.Maps

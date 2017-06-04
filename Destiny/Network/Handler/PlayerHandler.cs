@@ -6,9 +6,9 @@ using System.Collections.Generic;
 
 namespace Destiny.Network.Handler
 {
-    public static class UserHandler
+    public static class PlayerHandler
     {
-        public static void OnTransferFieldRequest(MapleClient client, InPacket iPacket)
+        public static void HandleMapChange(MapleClient client, InPacket iPacket)
         {
             byte portals = iPacket.ReadByte();
 
@@ -41,7 +41,7 @@ namespace Destiny.Network.Handler
             }
         }
 
-        public static void OnChat(MapleClient client, InPacket iPacket)
+        public static void HandlePlayerChat(MapleClient client, InPacket iPacket)
         {
             string text = iPacket.ReadMapleString();
             bool shout = iPacket.ReadBool(); // NOTE: Used for skill macros.
@@ -65,7 +65,7 @@ namespace Destiny.Network.Handler
             }
         }
 
-        public static void OnMove(MapleClient client, InPacket iPacket)
+        public static void HandlePlayerMovement(MapleClient client, InPacket iPacket)
         {
             Movements movements = Movements.Decode(iPacket);
 

@@ -65,8 +65,8 @@ namespace Destiny.Server.Commands
                     itemID = -1; // TODO: Obtain from strings.
                 }
 
-                if (MasterServer.Instance.Data.Items.ContainsKey(itemID) ||
-                    MasterServer.Instance.Data.Equips.ContainsKey(itemID))
+                if (MasterServer.Instance.Data.Items.IsValidItem(itemID) ||
+                    MasterServer.Instance.Data.Equips.IsValidEquip(itemID))
                 {
                     caller.Items.Add(itemID, quantity);
                 }

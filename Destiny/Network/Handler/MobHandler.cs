@@ -7,7 +7,7 @@ namespace Destiny.Network.Handler
 {
     public static class MobHandler
     {
-        public static void OnMobMove(MapleClient client, InPacket iPacket)
+        public static void HandleMobMovement(MapleClient client, InPacket iPacket)
         {
             int objectID = iPacket.ReadInt();
 

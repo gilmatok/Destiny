@@ -56,15 +56,15 @@ namespace Destiny.Server
         protected override void SpawnHandlers()
         {
             this.AddHandler(RecvOps.MigrateIn, ServerHandler.HandleMigrateChannel);
-            this.AddHandler(RecvOps.TransferFieldRequest, UserHandler.OnTransferFieldRequest);
-            this.AddHandler(RecvOps.ChangeChannel, ServerHandler.HandleChangeChannel);
-            this.AddHandler(RecvOps.EnterCashShop, ServerHandler.HandleCashShop);
-            this.AddHandler(RecvOps.EnterMts, ServerHandler.HandleMTS);
-            this.AddHandler(RecvOps.UserChat, UserHandler.OnChat);
-            this.AddHandler(RecvOps.UserMove, UserHandler.OnMove);
-            this.AddHandler(RecvOps.ItemMove, InventoryHandler.HandleItemMove);
-            this.AddHandler(RecvOps.NpcMove, NpcHandler.HandleNpcMove);
-            this.AddHandler(RecvOps.MobMove, MobHandler.OnMobMove);
+            this.AddHandler(RecvOps.MapChange, PlayerHandler.HandleMapChange);
+            this.AddHandler(RecvOps.ChannelChange, ServerHandler.HandleChannelChange);
+            this.AddHandler(RecvOps.CashShopMigration, ServerHandler.HandleCashShopMigrate);
+            this.AddHandler(RecvOps.MtsMigration, ServerHandler.HandleMtsMigration);
+            this.AddHandler(RecvOps.PlayerChat, PlayerHandler.HandlePlayerChat);
+            this.AddHandler(RecvOps.PlayerMovement, PlayerHandler.HandlePlayerMovement);
+            this.AddHandler(RecvOps.ItemMovement, InventoryHandler.HandleItemMovement);
+            this.AddHandler(RecvOps.NpcMovement, NpcHandler.HandleNpcMovement);
+            this.AddHandler(RecvOps.MobMovement, MobHandler.HandleMobMovement);
         }
 
         protected override void SetClientAttributes(MapleClient client)

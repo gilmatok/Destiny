@@ -7,7 +7,7 @@ namespace Destiny.Network.Handler
 {
     public static class NpcHandler
     {
-        public static void HandleNpcMove(MapleClient client, InPacket iPacket)
+        public static void HandleNpcMovement(MapleClient client, InPacket iPacket)
         {
             int objectID = iPacket.ReadInt();
             Npc npc;

@@ -1,6 +1,6 @@
 ﻿using Destiny.Core.IO;
 using Destiny.Game.Characters;
-using Destiny.Game.Data;
+using Destiny.Server.Data;
 using Destiny.Server;
 using Destiny.Network;
 
@@ -24,7 +24,7 @@ namespace Destiny.Game.Maps
         public Npc(int mapleID)
         {
             this.MapleID = mapleID;
-            this.Data = MasterServer.Instance.Data.Npcs[this.MapleID];
+            this.Data = MasterServer.Instance.Data.Npcs.GetNpcData(this.MapleID);
         }
 
         public Npc(MapNpcSpawnData spawn)

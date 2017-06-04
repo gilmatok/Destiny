@@ -24,7 +24,7 @@ namespace Destiny.Server
         protected override void SpawnHandlers()
         {
             this.AddHandler(RecvOps.MigrateIn, ServerHandler.HandleMigrateCashShop);
-            this.AddHandler(RecvOps.TransferFieldRequest, ShopHandler.OnTransferFieldRequest);
+            this.AddHandler(RecvOps.MapChange, ShopHandler.OnTransferFieldRequest);
         }
 
         // TODO: We need to get the last world/channel the client was in before the migration

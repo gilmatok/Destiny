@@ -38,7 +38,7 @@ namespace Destiny.Server.Commands
             {
                 int mapID = int.Parse(args[0]);
 
-                if (MasterServer.Instance.Data.Maps.ContainsKey(mapID))
+                if (MasterServer.Instance.Data.Maps.IsValidMap(mapID))
                 {
                     caller.ChangeMap(mapID); // TODO: Should we spawn in a randomized spawn point?
                 }

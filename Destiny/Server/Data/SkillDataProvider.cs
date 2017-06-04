@@ -1,7 +1,43 @@
-﻿using System.IO;
+﻿using Destiny.Utility;
+using System.Collections.Generic;
+using System.IO;
 
-namespace Destiny.Game.Data
+namespace Destiny.Server.Data
 {
+    public sealed class SkillDataProvider
+    {
+        private Dictionary<int, Dictionary<byte, SkillData>> mSkills;
+
+        public SkillDataProvider()
+        {
+            mSkills = new Dictionary<int, Dictionary<byte, SkillData>>();
+        }
+
+        public void Load()
+        {
+            mSkills.Clear();
+
+            int count;
+
+            using (BinaryReader reader = new BinaryReader(File.OpenRead(Path.Combine(Config.Instance.Binary, "Skills.bin"))))
+            {
+                count = reader.ReadInt32();
+                while (count-- > 0)
+                {
+                    SkillData skill = new SkillData();
+                    skill.Load(reader);
+
+                    if (!mSkills.ContainsKey(skill.MapleID))
+                    {
+                        mSkills.Add(skill.MapleID, new Dictionary<byte, SkillData>());
+                    }
+
+                    mSkills[skill.MapleID].Add(skill.Level, skill);
+                }
+            }
+        }
+    }
+
     public sealed class SkillData
     {
         public static bool IsFourthJobRelated(int pSkillIdentifier) { return ((pSkillIdentifier / 10000) % 10) == 2; }

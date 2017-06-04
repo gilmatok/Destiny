@@ -1,4 +1,4 @@
-﻿using Destiny.Game.Data;
+﻿using Destiny.Server.Data;
 using Destiny.Game.Maps;
 using System.Collections.Generic;
 

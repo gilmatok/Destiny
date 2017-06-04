@@ -29,7 +29,7 @@ namespace Destiny.Network.Handler
 
     public static class InventoryHandler
     {
-        public static void HandleItemMove(MapleClient client, InPacket iPacket)
+        public static void HandleItemMovement(MapleClient client, InPacket iPacket)
         {
             iPacket.Skip(4); // NOTE: tRequestTime (ticks).
             InventoryType inventory = (InventoryType)iPacket.ReadByte();

@@ -1,8 +1,48 @@
-﻿using System.Collections.Generic;
+﻿using Destiny.Game;
+using Destiny.Utility;
+using System.Collections.Generic;
 using System.IO;
 
-namespace Destiny.Game.Data
+namespace Destiny.Server.Data
 {
+    public sealed class MapDataProvider
+    {
+        private Dictionary<int, MapData> mMaps;
+
+        public MapDataProvider()
+        {
+            mMaps = new Dictionary<int, MapData>();
+        }
+
+        public void Load()
+        {
+            mMaps.Clear();
+
+            int count;
+
+            using (BinaryReader reader = new BinaryReader(File.OpenRead(Path.Combine(Config.Instance.Binary, "Maps.bin"))))
+            {
+                count = reader.ReadInt32();
+                while (count-- > 0)
+                {
+                    MapData map = new MapData();
+                    map.Load(reader);
+                    mMaps.Add(map.MapleID, map);
+                }
+            }
+        }
+
+        public bool IsValidMap(int mapleID)
+        {
+            return mMaps.ContainsKey(mapleID);
+        }
+
+        public MapData GetMapData(int mapleID)
+        {
+            return mMaps[mapleID];
+        }
+    }
+
     public sealed class MapFootholdData
     {
         public short ID { get; set; }
