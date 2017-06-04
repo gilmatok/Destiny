@@ -9,7 +9,7 @@ namespace Destiny.Server
         public ChannelServer[] Channels { get; private set; }
         public WorldFlag Flag { get; private set; }
         public string EventMessage { get; private set; }
-        public string TickerMessage { get; private set; }
+        public string TickerMessage { get; set; }
 
         public WorldStatus Status
         {

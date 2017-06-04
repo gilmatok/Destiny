@@ -36,7 +36,11 @@ namespace Destiny.Server.Commands
             }
             else
             {
-                MasterServer.Instance.Worlds[caller.Client.World].Notify(this.CombineArgs(args), NoticeType.Ticker);
+                string message = this.CombineArgs(args);
+
+                MasterServer.Instance.Worlds[caller.Client.World].TickerMessage = message;
+
+                MasterServer.Instance.Worlds[caller.Client.World].Notify(message, NoticeType.Ticker);
             }
         }
     }

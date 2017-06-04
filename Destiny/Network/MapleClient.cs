@@ -48,7 +48,14 @@ namespace Destiny.Network
 
                 if (handler != null)
                 {
-                    handler(this, iPacket);
+                    try
+                    {
+                        handler(this, iPacket);
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Exception(ex);
+                    }
                 }
                 else
                 {

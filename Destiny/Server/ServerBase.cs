@@ -1,5 +1,4 @@
-﻿using Destiny.Core.IO;
-using Destiny.Core.Network;
+﻿using Destiny.Core.Network;
 using Destiny.Network;
 using System.Collections.Generic;
 using System.Net.Sockets;
@@ -55,17 +54,7 @@ namespace Destiny.Server
 
             mClients.Add(client);
 
-            using (OutPacket oPacket = new OutPacket(14, 16))
-            {
-                oPacket
-                    .WriteShort(Constants.Version)
-                    .WriteMapleString(Constants.Patch)
-                    .WriteBytes(Constants.RIV)
-                    .WriteBytes(Constants.SIV)
-                    .WriteByte(Constants.Locale);
-
-                client.SendRaw(oPacket.ToArray());
-            }
+            client.Handshake();
 
             Logger.Write(LogLevel.Info, "[{0}] Accepted client from {1}.", mLabel, client.Host);
         }

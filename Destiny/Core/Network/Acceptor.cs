@@ -30,25 +30,26 @@ namespace Destiny.Core.Network
         public void Start()
         {
             m_listener.Start(50);
-            m_listener.BeginAcceptSocket(EndAccept, null);
+            m_listener.BeginAcceptSocket(this.EndAccept, null);
         }
 
         public void Stop()
         {
-            Dispose();
+            this.Dispose();
         }
 
         private void EndAccept(IAsyncResult iar)
         {
             if (m_disposed) { return; }
 
-            Socket client = m_listener.EndAcceptSocket(iar);
+            Socket socket = m_listener.EndAcceptSocket(iar);
 
-            if (OnClientAccepted != null)
-                OnClientAccepted(client);
-
-
-            m_listener.BeginAcceptSocket(EndAccept, null);
+            if (this.OnClientAccepted != null)
+            {
+                this.OnClientAccepted(socket);
+            }
+            
+            m_listener.BeginAcceptSocket(this.EndAccept, null);
 
         }
 
