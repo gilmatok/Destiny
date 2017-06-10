@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Destiny.Game.Maps
+﻿namespace Destiny.Game.Maps
 {
     public sealed class Reactor : MapObject
     {
@@ -14,7 +12,7 @@ namespace Destiny.Game.Maps
         {
             get
             {
-                throw new NotImplementedException();
+                return MapObjectType.Reactor;
             }
         }
 
@@ -22,14 +20,5 @@ namespace Destiny.Game.Maps
         {
             this.MapleID = mapleID;
         }
-
-        //public Reactor(MapData.MapReactorData data)
-        //    : this(data.ReactorIdentifier)
-        //{
-        //    this.Flags = data.Flags;
-        //    this.Foothold = data.Foothold;
-        //    this.Position = new Point(data.X, data.Y);
-        //    this.Label = data.Name;
-        //}
     }
 }

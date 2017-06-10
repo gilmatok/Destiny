@@ -1,5 +1,5 @@
-﻿using Destiny.Network;
-using Destiny.Network.Handler;
+﻿using Destiny.Core.Network;
+using Destiny.Handler;
 using Destiny.Utility;
 
 namespace Destiny.Server

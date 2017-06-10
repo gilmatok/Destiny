@@ -1,5 +1,5 @@
 ﻿using Destiny.Core.IO;
-using Destiny.Server.Data;
+using Destiny.Game.Data;
 using Destiny.Server;
 using Destiny.Utility;
 
@@ -28,7 +28,7 @@ namespace Destiny.Game
         public Equip(int mapleID)
             : base(mapleID, 1)
         {
-            EquipData data = MasterServer.Instance.Data.Equips.GetEquipData(this.MapleID);
+            EquipData data = MasterServer.Instance.Equips.GetEquipData(this.MapleID);
 
             this.Slots = data.Slots;
             this.Scrolls = 0;

@@ -1,6 +1,6 @@
 ﻿using Destiny.Core.IO;
 using Destiny.Game.Characters;
-using Destiny.Server.Data;
+using Destiny.Game.Data;
 using Destiny.Server;
 using System;
 
@@ -22,7 +22,7 @@ namespace Destiny.Game.Maps
         public Map(int mapleID, byte world, byte channel)
         {
             this.MapleID = mapleID;
-            this.Data = MasterServer.Instance.Data.Maps.GetMapData(this.MapleID);
+            this.Data = MasterServer.Instance.Maps.GetMapData(this.MapleID);
 
             this.World = world;
             this.Channel = channel;

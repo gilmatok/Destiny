@@ -1,6 +1,6 @@
 ﻿using Destiny.Core.IO;
-using Destiny.Network;
-using Destiny.Network.Handler;
+using Destiny.Core.Network;
+using Destiny.Handler;
 using Destiny.Utility;
 
 namespace Destiny.Game.Characters
@@ -9,51 +9,39 @@ namespace Destiny.Game.Characters
     {
         public Character Parent { get; private set; }
 
-        private Item[] mEquipped;
-        private Item[] mCashEquipped;
-        private Item[][] mItems;
+        private Item[] m_equipped;
+        private Item[] m_cashEquipped;
+        private Item[][] m_items;
 
         public CharacterItems(Character parent, byte[] slots, DatabaseQuery query)
             : base()
         {
             this.Parent = parent;
 
-            mEquipped = new Item[51];
-            mCashEquipped = new Item[51];
-            mItems = new Item[(byte)InventoryType.Count][];
+            m_equipped = new Item[51];
+            m_cashEquipped = new Item[51];
+            m_items = new Item[(byte)InventoryType.Count][];
 
             for (byte i = 1; i < slots.Length; i++)
-            {
-                mItems[i] = new Item[slots[i]];
-            }
+                m_items[i] = new Item[slots[i]];
 
             while (query.NextRow())
             {
                 short slot = query.GetShort("slot");
 
                 if (slot < 0)
-                {
                     if (slot < -100)
-                    {
-                        mCashEquipped[(-slot) - 100] = new Equip(query);
-                    }
+                        m_cashEquipped[(-slot) - 100] = new Equip(query);
                     else
-                    {
-                        mEquipped[-slot] = new Equip(query);
-                    }
-                }
+                        m_equipped[-slot] = new Equip(query);
                 else
                 {
                     byte inventory = query.GetByte("inventory");
 
                     if (inventory == (byte)InventoryType.Equipment)
-                    {
-                        mItems[inventory][slot] = new Equip(query);
-                    }
+                        m_items[inventory][slot] = new Equip(query);
                     else
-                    {
-                        mItems[inventory][slot] = new Item(query);
-                    }
+                        m_items[inventory][slot] = new Item(query);
                 }
             }
         }
@@ -70,13 +58,9 @@ namespace Destiny.Game.Characters
             InventoryType inventory = Item.GetInventory(mapleID);
 
             if (inventory == InventoryType.Equipment)
-            {
                 item = new Equip(mapleID);
-            }
             else
-            {
                 item = new Item(mapleID, quantity);
-            }
 
             short slot = this.GetNextFreeSlot(inventory);
 
@@ -101,9 +85,7 @@ namespace Destiny.Game.Characters
                 Item item2 = this[inventory, slot2];
 
                 if (item1 == null)
-                {
                     return;
-                }
 
                 if (item2 != null && item1.MapleID == item2.MapleID)
                 {
@@ -123,12 +105,10 @@ namespace Destiny.Game.Characters
 
         private short GetNextFreeSlot(InventoryType inventory)
         {
-            for (short i = 1; i < mItems[(byte)inventory].Length; i++)
+            for (short i = 1; i < m_items[(byte)inventory].Length; i++)
             {
-                if (mItems[(byte)inventory][i] == null)
-                {
+                if (m_items[(byte)inventory][i] == null)
                     return i;
-                }
             }
 
             throw new InventoryFullException();
@@ -137,32 +117,32 @@ namespace Destiny.Game.Characters
         // TODO: Beautify this.
         public void Encode(OutPacket oPacket)
         {
-            for (byte i = 1; i < mItems.Length; i++) { oPacket.WriteByte((byte)mItems[i].Length); }
+            for (byte i = 1; i < m_items.Length; i++) { oPacket.WriteByte((byte)m_items[i].Length); }
 
             oPacket.WriteLong(); // NOTE: Unknown.
 
-            for (short i = 1; i < mEquipped.Length; i++) { if (mEquipped[i] != null) { oPacket.WriteShort(i); mEquipped[i].Encode(oPacket); } }
+            for (short i = 1; i < m_equipped.Length; i++) { if (m_equipped[i] != null) { oPacket.WriteShort(i); m_equipped[i].Encode(oPacket); } }
             oPacket.WriteShort();
 
-            for (short i = 1; i < mCashEquipped.Length; i++) { if (mCashEquipped[i] != null) { oPacket.WriteShort(i); mCashEquipped[i].Encode(oPacket); } }
+            for (short i = 1; i < m_cashEquipped.Length; i++) { if (m_cashEquipped[i] != null) { oPacket.WriteShort(i); m_cashEquipped[i].Encode(oPacket); } }
             oPacket.WriteShort();
 
-            for (short i = 1; i < mItems[(byte)InventoryType.Equipment].Length; i++) { if (mItems[(byte)InventoryType.Equipment][i] != null) { oPacket.WriteShort(i); mItems[(byte)InventoryType.Equipment][i].Encode(oPacket); } }
+            for (short i = 1; i < m_items[(byte)InventoryType.Equipment].Length; i++) { if (m_items[(byte)InventoryType.Equipment][i] != null) { oPacket.WriteShort(i); m_items[(byte)InventoryType.Equipment][i].Encode(oPacket); } }
             oPacket.WriteShort();
 
             // TODO: Evan inventory.
             oPacket.WriteShort();
 
-            for (byte i = 1; i < mItems[(byte)InventoryType.Usable].Length; i++) { if (mItems[(byte)InventoryType.Usable][i] != null) { oPacket.WriteByte(i); mItems[(byte)InventoryType.Usable][i].Encode(oPacket); } }
+            for (byte i = 1; i < m_items[(byte)InventoryType.Usable].Length; i++) { if (m_items[(byte)InventoryType.Usable][i] != null) { oPacket.WriteByte(i); m_items[(byte)InventoryType.Usable][i].Encode(oPacket); } }
             oPacket.WriteByte();
 
-            for (byte i = 1; i < mItems[(byte)InventoryType.Setup].Length; i++) { if (mItems[(byte)InventoryType.Setup][i] != null) { oPacket.WriteByte(i); mItems[(byte)InventoryType.Setup][i].Encode(oPacket); } }
+            for (byte i = 1; i < m_items[(byte)InventoryType.Setup].Length; i++) { if (m_items[(byte)InventoryType.Setup][i] != null) { oPacket.WriteByte(i); m_items[(byte)InventoryType.Setup][i].Encode(oPacket); } }
             oPacket.WriteByte();
 
-            for (byte i = 1; i < mItems[(byte)InventoryType.Etcetera].Length; i++) { if (mItems[(byte)InventoryType.Etcetera][i] != null) { oPacket.WriteByte(i); mItems[(byte)InventoryType.Etcetera][i].Encode(oPacket); } }
+            for (byte i = 1; i < m_items[(byte)InventoryType.Etcetera].Length; i++) { if (m_items[(byte)InventoryType.Etcetera][i] != null) { oPacket.WriteByte(i); m_items[(byte)InventoryType.Etcetera][i].Encode(oPacket); } }
             oPacket.WriteByte();
 
-            for (byte i = 1; i < mItems[(byte)InventoryType.Cash].Length; i++) { if (mItems[(byte)InventoryType.Cash][i] != null) { oPacket.WriteByte(i); mItems[(byte)InventoryType.Cash][i].Encode(oPacket); } }
+            for (byte i = 1; i < m_items[(byte)InventoryType.Cash].Length; i++) { if (m_items[(byte)InventoryType.Cash][i] != null) { oPacket.WriteByte(i); m_items[(byte)InventoryType.Cash][i].Encode(oPacket); } }
             oPacket.WriteByte();
         }
 
@@ -208,11 +188,11 @@ namespace Destiny.Game.Characters
         {
             get
             {
-                return mItems[(byte)inventory][slot];
+                return m_items[(byte)inventory][slot];
             }
             set
             {
-                mItems[(byte)inventory][slot] = value;
+                m_items[(byte)inventory][slot] = value;
             }
         }
 
@@ -256,16 +236,10 @@ namespace Destiny.Game.Characters
                                     .WriteShort(operation.CurrentSlot);
 
                                 if (addedByte == -1)
-                                {
                                     if (operation.OldSlot < 0)
-                                    {
                                         addedByte = 1;
-                                    }
                                     else if (operation.CurrentSlot < 0)
-                                    {
                                         addedByte = 2;
-                                    }
-                                }
                             }
                             break;
                         case InventoryOperationType.RemoveItem:
@@ -277,9 +251,7 @@ namespace Destiny.Game.Characters
                 }
 
                 if (addedByte != -1)
-                {
                     oPacket.WriteSByte(addedByte);
-                }
 
                 this.Parent.Client.Send(oPacket);
             }

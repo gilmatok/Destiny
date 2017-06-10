@@ -2,7 +2,6 @@
 using System.Security.Cryptography;
 using System.Text;
 
-// CREDITS: Loki
 namespace Destiny.Core.Security
 {
     public enum SHAMode

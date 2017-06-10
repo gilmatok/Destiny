@@ -1,5 +1,5 @@
-﻿using Destiny.Game;
-using Destiny.Network;
+﻿using Destiny.Core.Network;
+using Destiny.Game;
 using System;
 using System.IO;
 using System.Text;

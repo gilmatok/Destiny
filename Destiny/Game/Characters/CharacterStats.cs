@@ -9,35 +9,35 @@ namespace Destiny.Game.Characters
     {
         public Character Parent { get; private set; }
 
-        private Gender gender;
-        private byte skin;
-        private int face;
-        private int hair;
-        private byte level;
-        private Job job;
-        private short strength;
-        private short dexterity;
-        private short intelligence;
-        private short luck;
-        private short health;
-        private short maxHealth;
-        private short mana;
-        private short maxMana;
-        private short abilityPoints;
-        private short skillPoints;
-        private int experience;
-        private short fame;
-        private int mesos;
+        private Gender m_gender;
+        private byte m_skin;
+        private int m_face;
+        private int m_hair;
+        private byte m_level;
+        private Job m_job;
+        private short m_strength;
+        private short m_dexterity;
+        private short m_intelligence;
+        private short m_luck;
+        private short m_health;
+        private short m_maxHealth;
+        private short m_mana;
+        private short m_maxMana;
+        private short m_abilityPoints;
+        private short m_skillPoints;
+        private int m_experience;
+        private short m_fame;
+        private int m_mesos;
 
         public Gender Gender
         {
             get
             {
-                return gender;
+                return m_gender;
             }
             set
             {
-                gender = value;
+                m_gender = value;
 
                 if (this.Parent.IsInitialized)
                 {
@@ -50,17 +50,17 @@ namespace Destiny.Game.Characters
         {
             get
             {
-                return skin;
+                return m_skin;
             }
             set
             {
-                skin = value;
+                m_skin = value;
 
                 if (this.Parent.IsInitialized)
                 {
                     this.Update(StatisticType.Skin);
 
-                    // TODO: Appearance update to map.
+                    //  TODO: Appearance update to map.
                 }
             }
         }
@@ -69,11 +69,11 @@ namespace Destiny.Game.Characters
         {
             get
             {
-                return face;
+                return m_face;
             }
             set
             {
-                face = value;
+                m_face = value;
 
                 if (this.Parent.IsInitialized)
                 {
@@ -88,11 +88,11 @@ namespace Destiny.Game.Characters
         {
             get
             {
-                return hair;
+                return m_hair;
             }
             set
             {
-                hair = value;
+                m_hair = value;
 
                 if (this.Parent.IsInitialized)
                 {
@@ -107,12 +107,12 @@ namespace Destiny.Game.Characters
         {
             get
             {
-                return level;
+                return m_level;
             }
 
             set
             {
-                level = value;
+                m_level = value;
 
                 if (this.Parent.IsInitialized)
                 {
@@ -125,11 +125,11 @@ namespace Destiny.Game.Characters
         {
             get
             {
-                return job;
+                return m_job;
             }
             set
             {
-                job = value;
+                m_job = value;
 
                 if (this.Parent.IsInitialized)
                 {
@@ -142,12 +142,12 @@ namespace Destiny.Game.Characters
         {
             get
             {
-                return strength;
+                return m_strength;
             }
 
             set
             {
-                strength = value;
+                m_strength = value;
 
                 if (this.Parent.IsInitialized)
                 {
@@ -160,12 +160,12 @@ namespace Destiny.Game.Characters
         {
             get
             {
-                return dexterity;
+                return m_dexterity;
             }
 
             set
             {
-                dexterity = value;
+                m_dexterity = value;
 
                 if (this.Parent.IsInitialized)
                 {
@@ -178,12 +178,12 @@ namespace Destiny.Game.Characters
         {
             get
             {
-                return intelligence;
+                return m_intelligence;
             }
 
             set
             {
-                intelligence = value;
+                m_intelligence = value;
 
                 if (this.Parent.IsInitialized)
                 {
@@ -196,12 +196,12 @@ namespace Destiny.Game.Characters
         {
             get
             {
-                return luck;
+                return m_luck;
             }
 
             set
             {
-                luck = value;
+                m_luck = value;
 
                 if (this.Parent.IsInitialized)
                 {
@@ -214,12 +214,12 @@ namespace Destiny.Game.Characters
         {
             get
             {
-                return health;
+                return m_health;
             }
 
             set
             {
-                health = value;
+                m_health = value;
 
                 if (this.Parent.IsInitialized)
                 {
@@ -232,12 +232,12 @@ namespace Destiny.Game.Characters
         {
             get
             {
-                return maxHealth;
+                return m_maxHealth;
             }
 
             set
             {
-                maxHealth = value;
+                m_maxHealth = value;
 
                 if (this.Parent.IsInitialized)
                 {
@@ -250,12 +250,12 @@ namespace Destiny.Game.Characters
         {
             get
             {
-                return mana;
+                return m_mana;
             }
 
             set
             {
-                mana = value;
+                m_mana = value;
 
                 if (this.Parent.IsInitialized)
                 {
@@ -268,12 +268,12 @@ namespace Destiny.Game.Characters
         {
             get
             {
-                return maxMana;
+                return m_maxMana;
             }
 
             set
             {
-                maxMana = value;
+                m_maxMana = value;
 
                 if (this.Parent.IsInitialized)
                 {
@@ -286,12 +286,12 @@ namespace Destiny.Game.Characters
         {
             get
             {
-                return abilityPoints;
+                return m_abilityPoints;
             }
 
             set
             {
-                abilityPoints = value;
+                m_abilityPoints = value;
 
                 if (this.Parent.IsInitialized)
                 {
@@ -304,12 +304,12 @@ namespace Destiny.Game.Characters
         {
             get
             {
-                return skillPoints;
+                return m_skillPoints;
             }
 
             set
             {
-                skillPoints = value;
+                m_skillPoints = value;
 
                 if (this.Parent.IsInitialized)
                 {
@@ -322,12 +322,12 @@ namespace Destiny.Game.Characters
         {
             get
             {
-                return experience;
+                return m_experience;
             }
 
             set
             {
-                experience = value;
+                m_experience = value;
 
                 if (this.Parent.IsInitialized)
                 {
@@ -340,12 +340,12 @@ namespace Destiny.Game.Characters
         {
             get
             {
-                return fame;
+                return m_fame;
             }
 
             set
             {
-                fame = value;
+                m_fame = value;
 
                 if (this.Parent.IsInitialized)
                 {
@@ -358,11 +358,11 @@ namespace Destiny.Game.Characters
         {
             get
             {
-                return mesos;
+                return m_mesos;
             }
             set
             {
-                mesos = value;
+                m_mesos = value;
 
                 if (this.Parent.IsInitialized)
                 {

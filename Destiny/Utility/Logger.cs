@@ -66,7 +66,7 @@ namespace Destiny
                 File.AppendAllText("EXCEPTIONS.txt", message);
             }
 
-            //Keep outside to prevent a deadlock.
+            // Keep outside to prevent a deadlock.
             Write(LogLevel.Error, "An exception was logged{0}{1}", Environment.NewLine, exception);
         }
     }

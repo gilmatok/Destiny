@@ -4,8 +4,8 @@ using Destiny.Utility;
 using MySql.Data.MySqlClient;
 using Destiny.Core.IO;
 using Destiny.Game.Maps;
-using Destiny.Server.Data;
 using System;
+using Destiny.Game.Data;
 
 namespace Destiny.Game.Characters
 {
@@ -69,12 +69,12 @@ namespace Destiny.Game.Characters
                 mapID = 180000000;
                 spawnPoint = 0;
             }
-            else if (MasterServer.Instance.Data.Maps.GetMapData(mapID).ForcedReturnMapID != MapData.INVALID_MAP_ID)
+            else if (MasterServer.Instance.Maps.GetMapData(mapID).ForcedReturnMapID != MapData.INVALID_MAP_ID)
             {
-                mapID = MasterServer.Instance.Data.Maps.GetMapData(mapID).ForcedReturnMapID;
+                mapID = MasterServer.Instance.Maps.GetMapData(mapID).ForcedReturnMapID;
                 spawnPoint = 0; // TODO: Should it be randomized?
             }
-            else if (!MasterServer.Instance.Data.Maps.IsValidMap(mapID)) // NOTE: Just in case the user purposely edits a wrong map in the database.
+            else if (!MasterServer.Instance.Maps.IsValidMap(mapID)) // NOTE: Just in case the user purposely edits a wrong map in the database.
             {
                 mapID = 100000000;
                 spawnPoint = 0;

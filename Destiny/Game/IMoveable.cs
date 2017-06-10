@@ -5,6 +5,5 @@
         byte Stance { get; set; }
         short Foothold { get; set; }
         Point Position { get; set; }
-        bool FacesLeft { get; }
     }
 }

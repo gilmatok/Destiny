@@ -1,7 +1,6 @@
 ﻿using MySql.Data.MySqlClient;
 using System;
 
-// CREDITS: Chronicle
 namespace Destiny.Utility
 {
     public sealed class DatabaseQuery : IDisposable

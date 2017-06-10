@@ -8,17 +8,17 @@ namespace Destiny.Game.Characters
     {
         public Character Parent { get; private set; }
 
-        private List<Skill> mSkills;
+        private List<Skill> m_skills;
 
         public CharacterSkills(Character parent, DatabaseQuery query)
         {
             this.Parent = parent;
 
-            mSkills = new List<Skill>();
+            m_skills = new List<Skill>();
 
             while (query.NextRow())
             {
-                mSkills.Add(new Skill(query));
+                m_skills.Add(new Skill(query));
             }
         }
 
@@ -29,9 +29,9 @@ namespace Destiny.Game.Characters
 
         public void Encode(OutPacket oPacket)
         {
-            oPacket.WriteShort((short)mSkills.Count);
+            oPacket.WriteShort((short)m_skills.Count);
 
-            foreach (Skill skill in mSkills)
+            foreach (Skill skill in m_skills)
             {
                 skill.Encode(oPacket);
             }

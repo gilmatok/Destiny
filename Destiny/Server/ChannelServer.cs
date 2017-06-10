@@ -1,56 +1,66 @@
-﻿using Destiny.Core.Collections;
-using Destiny.Game.Characters;
+﻿using Destiny.Core.Network;
+using Destiny.Game.Data;
 using Destiny.Game.Maps;
-using Destiny.Network;
-using Destiny.Network.Handler;
+using Destiny.Handler;
 using System.Collections.Generic;
 
 namespace Destiny.Server
 {
-    public sealed class ChannelCharacters : EnumerationHelper<int, Character>
+    public sealed class ChannelMaps : Dictionary<int, Map>
     {
         public byte World { get; private set; }
         public byte Channel { get; private set; }
 
-        public ChannelCharacters(byte world, byte channel)
+        public new Map this[int mapleID]
+        {
+            get
+            {
+                if (!base.ContainsKey(mapleID))
+                {
+                    Map map = new Map(mapleID, this.World, this.Channel);
+
+                    foreach (MapMobSpawnData mob in map.Data.Mobs)
+                    {
+                        map.Mobs.Add(new Mob(mob));
+                    }
+
+                    foreach (MapNpcSpawnData npc in map.Data.Npcs)
+                    {
+                        map.Npcs.Add(new Npc(npc));
+                    }
+
+                    foreach (MapPortalData portal in map.Data.Portals)
+                    {
+                        map.Portals.Add(new Portal(portal));
+                    }
+
+                    base.Add(mapleID, map);
+                }
+
+                return base[mapleID];
+            }
+        }
+
+        public ChannelMaps(byte world, byte channel)
+            : base()
         {
             this.World = world;
             this.Channel = channel;
         }
-
-        public override IEnumerator<Character> GetEnumerator()
-        {
-            foreach (Map map in MasterServer.Instance.Worlds[this.World].Channels[this.Channel].Maps.Values)
-            {
-                foreach (Character character in map.Characters)
-                {
-                    yield return character;
-                }
-            }
-        }
-
-        public override int GetKeyForObject(Character item)
-        {
-            return item.ID;
-        }
     }
-
+    
     public sealed class ChannelServer : ServerBase
     {
         public byte ID { get; private set; }
         public byte WorldID { get; private set; }
-        public MigrationRegistery Migrations { get; private set; }
-        public MapFactory Maps { get; private set; }
-        public ChannelCharacters Characters { get; private set; }
+        public ChannelMaps Maps { get; private set; }
 
-        public ChannelServer(byte id, byte worldID, string worldName, short port)
-            : base(string.Format("{0}-{1}", worldName, id), port)
+        public ChannelServer(byte id, byte worldID, string label, short port)
+            : base(label, port)
         {
             this.ID = id;
             this.WorldID = worldID;
-            this.Migrations = new MigrationRegistery();
-            this.Maps = new MapFactory(this.WorldID, this.ID);
-            this.Characters = new ChannelCharacters(this.WorldID, this.ID);
+            this.Maps = new ChannelMaps(this.WorldID, this.ID);
         }
 
         protected override void SpawnHandlers()
@@ -75,10 +85,10 @@ namespace Destiny.Server
 
         public void Notify(string message, NoticeType type)
         {
-            foreach (Character character in this.Characters)
-            {
-                character.Notify(message, type);
-            }
+            //foreach (Character character in this.Characters)
+            //{
+            //    character.Notify(message, type);
+            //}
         }
     }
 }
