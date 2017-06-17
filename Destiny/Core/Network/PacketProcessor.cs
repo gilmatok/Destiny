@@ -1,5 +1,6 @@
 ﻿using Destiny.Core.IO;
 using Destiny.Core.Network;
+using Destiny.Server;
 
 namespace Destiny.Network
 {

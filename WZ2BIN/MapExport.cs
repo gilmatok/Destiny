@@ -1,6 +1,6 @@
 ﻿using Destiny;
-using Destiny.Game;
-using Destiny.Game.Data;
+using Destiny.Maple;
+using Destiny.Maple.Data;
 using reWZ;
 using System.Collections.Generic;
 using System.IO;

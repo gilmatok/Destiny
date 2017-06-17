@@ -74,7 +74,7 @@
         SkillEffect = 0x5D,
         MesoDrop = 0x5E,
         GiveFame = 0x5F,
-        CharacterInformation = 97,
+        PlayerInformation = 97,
         SpawnPet = 0x61,
         CancelDebuff = 0x62,
         ChangeMapSpecial = 100,

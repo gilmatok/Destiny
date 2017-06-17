@@ -2,8 +2,10 @@
 {
     public enum LoginResult : int
     {
-        Valid,
+        Valid = 0,
+        Banned = 3,
         InvalidPassword = 4,
-        InvalidUsername,
+        InvalidUsername = 5,
+        LoggedIn = 7
     }
 }

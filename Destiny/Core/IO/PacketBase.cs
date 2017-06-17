@@ -5,13 +5,13 @@ namespace Destiny.Core.IO
 {
     public abstract class PacketBase : IDisposable
     {
-        protected MemoryStream mStream;
+        protected MemoryStream m_stream;
 
         public int Length
         {
             get
             {
-                return (int)mStream.Length;
+                return (int)m_stream.Length;
             }
         }
 
@@ -19,11 +19,11 @@ namespace Destiny.Core.IO
         {
             get
             {
-                return (int)mStream.Position;
+                return (int)m_stream.Position;
             }
             set
             {
-                mStream.Position = value;
+                m_stream.Position = value;
             }
         }
 
@@ -42,7 +42,7 @@ namespace Destiny.Core.IO
 
         public byte[] ToArray()
         {
-            return mStream.ToArray();
+            return m_stream.ToArray();
         }
 
         public override string ToString()
@@ -63,7 +63,7 @@ namespace Destiny.Core.IO
         {
             this.CustomDispose();
 
-            mStream.Dispose();
+            m_stream.Dispose();
         }
     }
 }

@@ -3,62 +3,50 @@ using System;
 
 namespace Destiny.Utility
 {
-    public sealed class DatabaseQuery : IDisposable
+    public sealed class Database
     {
-        private MySqlConnection mConnection;
-        private MySqlDataReader mReader;
+        public static string Host { get; set; }
+        public static string Schema { get; set; }
+        public static string Username { get; set; }
+        public static string Password { get; set; }
 
-        public object this[string field]
+        public static string ConnectionString
         {
             get
             {
-                return mReader[field];
+                return string.Format("Server={0}; Database={1}; Username={2}; Password={3}; Pooling=true; Min Pool Size=4; Max Pool Size=32",
+                                     Database.Host,
+                                     Database.Schema,
+                                     Database.Username,
+                                     Database.Password);
             }
         }
 
-        public DatabaseQuery(MySqlConnection connection, MySqlDataReader reader)
-        {
-            mConnection = connection;
-            mReader = reader;
-        }
-
-        public bool NextRow()
-        {
-            return mReader.Read();
-        }
-
-        public void Dispose()
-        {
-            mReader.Close();
-            mConnection.Close();
-        }
-    }
-
-    public sealed class Database
-    {
-        private static string sConnectionString;
-
         public static void Initialize()
         {
-            sConnectionString = string.Format("Server={0}; Database={1}; Username={2}; Password={3}; Pooling=true; Min Pool Size=4; Max Pool Size=32",
-                               Config.Instance.Database.Host,
-                               Config.Instance.Database.Schema,
-                               Config.Instance.Database.Username,
-                               Config.Instance.Database.Password);
+            Database.Host = "localhost";
+            Database.Schema = "destiny";
+            Database.Username = "root";
+            Database.Password = "root";
 
-            using (MySqlConnection connection = new MySqlConnection(sConnectionString))
+            using (MySqlConnection connection = new MySqlConnection(Database.ConnectionString))
             {
                 connection.Open();
 
-                Logger.Write(LogLevel.Info, "Able to connect to database '{0}'.", Config.Instance.Database.Schema);
+                Logger.Write(LogLevel.Info, "Able to connect to database '{0}'.", "destiny");
 
                 connection.Close();
             }
         }
 
+        public static TemporarySchema TemporarySchema(string schema)
+        {
+            return new TemporarySchema(schema);
+        }
+
         public static DatabaseQuery Query(string query, params MySqlParameter[] args)
         {
-            MySqlConnection connection = new MySqlConnection(sConnectionString);
+            MySqlConnection connection = new MySqlConnection(Database.ConnectionString);
             connection.Open();
             MySqlCommand command = connection.CreateCommand();
             command.CommandText = query;
@@ -68,7 +56,7 @@ namespace Destiny.Utility
 
         public static void Execute(string query, params MySqlParameter[] args)
         {
-            using (MySqlConnection connection = new MySqlConnection(sConnectionString))
+            using (MySqlConnection connection = new MySqlConnection(Database.ConnectionString))
             {
                 connection.Open();
                 MySqlCommand command = connection.CreateCommand();
@@ -80,7 +68,7 @@ namespace Destiny.Utility
 
         public static object Scalar(string query, params MySqlParameter[] args)
         {
-            using (MySqlConnection connection = new MySqlConnection(sConnectionString))
+            using (MySqlConnection connection = new MySqlConnection(Database.ConnectionString))
             {
                 connection.Open();
                 MySqlCommand command = connection.CreateCommand();
@@ -92,7 +80,7 @@ namespace Destiny.Utility
 
         public static int InsertAndReturnIdentifier(string query, params MySqlParameter[] args)
         {
-            using (MySqlConnection connection = new MySqlConnection(sConnectionString))
+            using (MySqlConnection connection = new MySqlConnection(Database.ConnectionString))
             {
                 connection.Open();
                 MySqlCommand command = connection.CreateCommand();
@@ -103,6 +91,19 @@ namespace Destiny.Utility
                 command.Parameters.Clear();
                 return (int)(ulong)command.ExecuteScalar();
             }
+        }
+    }
+
+    public sealed class TemporarySchema : IDisposable
+    {
+        public TemporarySchema(string schema)
+        {
+            Database.Schema = schema;
+        }
+
+        public void Dispose()
+        {
+            Database.Schema = "Destiny";
         }
     }
 }

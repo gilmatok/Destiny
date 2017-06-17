@@ -1,6 +1,4 @@
-﻿using Destiny.Core.IO;
-using Destiny.Network;
-using System;
+﻿using System;
 using System.Net;
 using System.Net.Sockets;
 
@@ -30,10 +28,14 @@ namespace Destiny.Core.Network
         public void Start()
         {
             if (m_disposed)
+            {
                 throw new ObjectDisposedException(this.GetType().Name);
+            }
 
             if (m_active)
+            {
                 throw new InvalidOperationException();
+            }
 
             m_socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             m_socket.Bind(new IPEndPoint(IPAddress.Any, m_port));
@@ -47,10 +49,14 @@ namespace Destiny.Core.Network
         public void Stop()
         {
             if (m_disposed)
+            {
                 throw new ObjectDisposedException(GetType().Name);
+            }
 
             if (m_active == false)
+            {
                 throw new InvalidOperationException();
+            }
 
             m_active = false;
 
@@ -64,10 +70,14 @@ namespace Destiny.Core.Network
                 Socket socket = m_socket.EndAccept(iar);
 
                 if (m_clientAcceptedEvent != null)
+                {
                     m_clientAcceptedEvent(socket);
+                }
 
                 if (!m_disposed && m_active)
+                {
                     m_socket.BeginAccept(this.EndAccept, null);
+                }
             }
         }
 
@@ -76,7 +86,9 @@ namespace Destiny.Core.Network
             if (!m_disposed)
             {
                 if (m_active)
+                {
                     this.Stop();
+                }
 
                 m_disposed = true;
             }

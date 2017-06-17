@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 
 namespace Destiny
@@ -12,7 +13,7 @@ namespace Destiny
         Connection,
         Success,
     }
-
+    
     public static class Logger
     {
         private static object sLocker = new object();

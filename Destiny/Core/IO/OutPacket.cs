@@ -1,5 +1,5 @@
 ﻿using Destiny.Core.Network;
-using Destiny.Game;
+using Destiny.Maple;
 using System;
 using System.IO;
 using System.Text;
@@ -8,12 +8,12 @@ namespace Destiny.Core.IO
 {
     public sealed class OutPacket : PacketBase
     {
-        private BinaryWriter mWriter;
-
+        private BinaryWriter m_writer;
+        
         public OutPacket(short operationCode, int size = 64)
         {
-            mStream = new MemoryStream(size);
-            mWriter = new BinaryWriter(mStream, Encoding.ASCII);
+            m_stream = new MemoryStream(size);
+            m_writer = new BinaryWriter(m_stream, Encoding.ASCII);
 
             this.WriteShort(operationCode);
         }
@@ -22,49 +22,49 @@ namespace Destiny.Core.IO
 
         public OutPacket WriteBytes(byte[] value)
         {
-            mWriter.Write(value);
+            m_writer.Write(value);
 
             return this;
         }
 
         public OutPacket WriteByte(byte value = 0)
         {
-            mWriter.Write(value);
+            m_writer.Write(value);
 
             return this;
         }
 
         public OutPacket WriteSByte(sbyte value = 0)
         {
-            mWriter.Write(value);
+            m_writer.Write(value);
 
             return this;
         }
 
         public OutPacket WriteBool(bool value = false)
         {
-            mWriter.Write(value);
+            m_writer.Write(value);
 
             return this;
         }
 
         public OutPacket WriteShort(short value = 0)
         {
-            mWriter.Write(value);
+            m_writer.Write(value);
 
             return this;
         }
 
         public OutPacket WriteInt(int value = 0)
         {
-            mWriter.Write(value);
+            m_writer.Write(value);
 
             return this;
         }
 
         public OutPacket WriteLong(long value = 0)
         {
-            mWriter.Write(value);
+            m_writer.Write(value);
 
             return this;
         }
@@ -73,7 +73,7 @@ namespace Destiny.Core.IO
         {
             for (int i = 0; i < value.Length; i++)
             {
-                mWriter.Write(value[i]);
+                m_writer.Write(value[i]);
             }
 
             return this;
@@ -85,7 +85,7 @@ namespace Destiny.Core.IO
             {
                 if (i < value.Length)
                 {
-                    mWriter.Write(value[i]);
+                    m_writer.Write(value[i]);
                 }
                 else
                 {
@@ -116,7 +116,7 @@ namespace Destiny.Core.IO
 
         public OutPacket WriteDateTime(DateTime value)
         {
-            mWriter.Write(value.ToFileTimeUtc());
+            m_writer.Write(value.ToFileTimeUtc());
 
             return this;
         }
@@ -131,7 +131,7 @@ namespace Destiny.Core.IO
 
         protected override void CustomDispose()
         {
-            mWriter.Dispose();
+            m_writer.Dispose();
         }
     }
 }
