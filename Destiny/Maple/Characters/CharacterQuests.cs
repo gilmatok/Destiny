@@ -1,4 +1,5 @@
 ﻿using Destiny.Core.IO;
+using Destiny.Utility;
 
 namespace Destiny.Maple.Characters
 {
@@ -6,14 +7,9 @@ namespace Destiny.Maple.Characters
     {
         public Character Parent { get; private set; }
 
-        public CharacterQuests(Character parent)
+        public CharacterQuests(Character parent, DatabaseQuery query)
         {
             this.Parent = parent;
-        }
-
-        public void Load()
-        {
-
         }
 
         public void Save()

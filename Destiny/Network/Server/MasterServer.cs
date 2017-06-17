@@ -1,5 +1,4 @@
-﻿using Destiny.Maple.Commands;
-using Destiny.Maple.Data;
+﻿using Destiny.Maple.Data;
 using System.Diagnostics;
 
 namespace Destiny.Server

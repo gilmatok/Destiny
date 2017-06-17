@@ -1,7 +1,6 @@
 ﻿using Destiny.Core.IO;
 using Destiny.Core.Network;
 using Destiny.Utility;
-using MySql.Data.MySqlClient;
 
 namespace Destiny.Maple.Characters
 {
@@ -37,7 +36,7 @@ namespace Destiny.Maple.Characters
         private Item[] mCashEquipped;
         private Item[][] mItems;
 
-        public CharacterItems(Character parent, byte equipmentSlots, byte usableSlots, byte setupSlots, byte etceteraSlot, byte cashSlots)
+        public CharacterItems(Character parent, byte[] slots, DatabaseQuery query)
             : base()
         {
             this.Parent = parent;
@@ -46,39 +45,32 @@ namespace Destiny.Maple.Characters
             mCashEquipped = new Item[51];
             mItems = new Item[(byte)InventoryType.Count][];
 
-            mItems[(byte)InventoryType.Equipment] = new Item[equipmentSlots];
-            mItems[(byte)InventoryType.Usable] = new Item[usableSlots];
-            mItems[(byte)InventoryType.Setup] = new Item[setupSlots];
-            mItems[(byte)InventoryType.Etcetera] = new Item[etceteraSlot];
-            mItems[(byte)InventoryType.Cash] = new Item[cashSlots];
-        }
-
-        public void Load()
-        {
-            using (DatabaseQuery query = Database.Query("SELECT * FROM items WHERE character_id = @character_id", new MySqlParameter("character_id", this.Parent.ID)))
+            for (byte i = 1; i < slots.Length; i++)
             {
-                while (query.NextRow())
+                mItems[(byte)i] = new Item[slots[i]];
+            }
+
+            while (query.NextRow())
+            {
+                byte inventory = query.GetByte("inventory");
+                short slot = query.GetShort("slot");
+
+                Item item = new Item(query);
+
+                if (slot < 0)
                 {
-                    byte inventory = query.GetByte("inventory");
-                    short slot = query.GetShort("slot");
-
-                    Item item = new Item(query);
-
-                    if (slot < 0)
+                    if (slot < -100)
                     {
-                        if (slot < -100)
-                        {
-                            mCashEquipped[(-slot) - 100] = item;
-                        }
-                        else
-                        {
-                            mEquipped[-slot] = item;
-                        }
+                        mCashEquipped[(-slot) - 100] = item;
                     }
                     else
                     {
-                        mItems[inventory][slot] = item;
+                        mEquipped[-slot] = item;
                     }
+                }
+                else
+                {
+                    mItems[inventory][slot] = item;
                 }
             }
         }

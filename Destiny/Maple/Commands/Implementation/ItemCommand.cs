@@ -1,13 +1,33 @@
 ﻿using Destiny.Maple.Characters;
-using Destiny.Server;
+using Destiny.Maple.Data;
 
 namespace Destiny.Maple.Commands
 {
     public sealed class ItemCommand : Command
     {
-        public override string Name => "item";
-        public override string Parameters => "{ id } [ quantity ]";
-        public override GmLevel RequiredLevel => GmLevel.Gm;
+        public override string Name
+        {
+            get
+            {
+                return "item";
+            }
+        }
+
+        public override string Parameters
+        {
+            get
+            {
+                return "{ id } [ quantity ]";
+            }
+        }
+
+        public override GmLevel RequiredLevel
+        {
+            get
+            {
+                return GmLevel.Gm;
+            }
+        }
 
         public override void Execute(Character caller, string[] args)
         {
@@ -36,12 +56,14 @@ namespace Destiny.Maple.Commands
 
                 int itemID = int.Parse(args[0]);
 
-
-
-                //if (MasterServer.Instance.Items.IsValidItem(itemID) || MasterServer.Instance.Equips.IsValidEquip(itemID))
-                //    caller.Items.Add(itemID, quantity);
-                //else
-                //    caller.Notify("[Command] Invalid item.");
+                if (DataProvider.CachedItems.Contains(itemID))
+                {
+                    caller.Items.Add(itemID, quantity);
+                }
+                else
+                {
+                    caller.Notify("[Command] Invalid item.");
+                }
             }
         }
     }

@@ -28,12 +28,12 @@ namespace Destiny.Handler
                 client.Account = new Account(query);
             }
 
-            //using (DatabaseQuery query = Database.Query("SELECT * FROM `characters` WHERE `character_id` = @character_id", new MySqlParameter("character_id", characterID)))
-            //{
-            //    query.NextRow();
+            using (DatabaseQuery query = Database.Query("SELECT * FROM `characters` WHERE `character_id` = @character_id", new MySqlParameter("character_id", characterID)))
+            {
+                query.NextRow();
 
-            //    client.Character = new Character(client, query);
-            //}
+                client.Character = new Character(client, query);
+            }
 
             client.Character.Initialize();
         }
@@ -57,12 +57,12 @@ namespace Destiny.Handler
                 client.Account = new Account(query);
             }
 
-            //using (DatabaseQuery query = Database.Query("SELECT * FROM `characters` WHERE `character_id` = @character_id", new MySqlParameter("character_id", characterID)))
-            //{
-            //    query.NextRow();
+            using (DatabaseQuery query = Database.Query("SELECT * FROM `characters` WHERE `character_id` = @character_id", new MySqlParameter("character_id", characterID)))
+            {
+                query.NextRow();
 
-            //    client.Character = new Character(client, query);
-            //}
+                client.Character = new Character(client, query);
+            }
 
             client.Character.Initialize(true);
         }

@@ -1,4 +1,5 @@
 ﻿using Destiny.Core.IO;
+using Destiny.Utility;
 using System.Collections.Generic;
 
 namespace Destiny.Maple.Characters
@@ -9,16 +10,11 @@ namespace Destiny.Maple.Characters
 
         private List<Skill> mSkills;
 
-        public CharacterSkills(Character parent)
+        public CharacterSkills(Character parent, DatabaseQuery query)
         {
             this.Parent = parent;
 
             mSkills = new List<Skill>();
-        }
-
-        public void Load()
-        {
-
         }
 
         public void Save()
