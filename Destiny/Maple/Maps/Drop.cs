@@ -2,5 +2,6 @@
 {
     public sealed class Drop : MapObject
     {
+
     }
 }

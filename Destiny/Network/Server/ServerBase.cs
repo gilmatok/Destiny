@@ -100,7 +100,7 @@ namespace Destiny.Server
         {
             mAcceptor.Start();
 
-            Logger.Write(LogLevel.Info, "{0} started on port {1}.", mLabel, this.Port);
+            Log.Inform("{0} started on port {1}.", mLabel, this.Port);
         }
 
         public virtual void Stop()
@@ -117,7 +117,7 @@ namespace Destiny.Server
                 client.Close();
             }
 
-            Logger.Write(LogLevel.Info, "{0} stopped.", mLabel);
+            Log.Inform("{0} stopped.", mLabel);
         }
 
         private void OnClientAccepted(Socket socket)
@@ -130,7 +130,7 @@ namespace Destiny.Server
 
             client.Handshake();
 
-            Logger.Write(LogLevel.Info, "[{0}] Accepted client from {1}.", mLabel, client.Host);
+            Log.Inform("[{0}] Accepted client from {1}.", mLabel, client.Host);
         }
 
         protected void AddHandler(RecvOps operationCode, PacketHandler handler)

@@ -1,4 +1,5 @@
-﻿using Destiny.Maple.Data;
+﻿using Destiny.IO;
+using Destiny.Maple.Data;
 using System.Diagnostics;
 
 namespace Destiny.Server
@@ -14,9 +15,10 @@ namespace Destiny.Server
         static MasterServer()
         {
             MasterServer.Login = new LoginServer(8484);
-            MasterServer.Channels = new ChannelServer[2];
 
-            for (byte i = 0; i < 2; i++)
+            MasterServer.Channels = new ChannelServer[Settings.GetByte("Server/Channels")];
+
+            for (byte i = 0; i < MasterServer.Channels.Length; i++)
             {
                 MasterServer.Channels[i] = new ChannelServer(i, (short)(8585 + i));
             }
@@ -45,7 +47,7 @@ namespace Destiny.Server
 
             MasterServer.IsAlive = true;
 
-            Logger.Write(LogLevel.Success, "MasterServer started in {0}ms.", sw.ElapsedMilliseconds);
+            Log.Success("MasterServer started in {0}ms.", sw.ElapsedMilliseconds);
         }
 
         public static void Stop()
@@ -61,7 +63,7 @@ namespace Destiny.Server
 
             MasterServer.IsAlive = false;
 
-            Logger.Write(LogLevel.Info, "MasterServer stopped.");
+            Log.Inform("MasterServer stopped.");
         }
     }
 }

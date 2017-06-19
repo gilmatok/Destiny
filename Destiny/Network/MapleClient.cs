@@ -51,12 +51,12 @@ namespace Destiny
                     }
                     catch (Exception ex)
                     {
-                        Logger.Exception(ex);
+                        Log.Error(ex);
                     }
                 }
                 else
                 {
-                    Logger.Write(LogLevel.Warning, "[{0}] Unhandled packet from {1}: {2}", m_processor.Label, this.Host, iPacket.ToString());
+                    Log.Warn("[{0}] Unhandled packet from {1}: {2}", m_processor.Label, this.Host, iPacket.ToString());
                 }
             }
         }

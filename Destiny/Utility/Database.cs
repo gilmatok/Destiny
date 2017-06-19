@@ -1,5 +1,6 @@
 ﻿using MySql.Data.MySqlClient;
 using System;
+using System.IO;
 
 namespace Destiny.Utility
 {
@@ -22,18 +23,13 @@ namespace Destiny.Utility
             }
         }
 
-        public static void Initialize()
+        public static void Test()
         {
-            Database.Host = "localhost";
-            Database.Schema = "destiny";
-            Database.Username = "root";
-            Database.Password = "root";
-
             using (MySqlConnection connection = new MySqlConnection(Database.ConnectionString))
             {
                 connection.Open();
 
-                Logger.Write(LogLevel.Info, "Able to connect to database '{0}'.", "destiny");
+                Log.Inform("Able to connect to database '{0}'.", Database.Schema);
 
                 connection.Close();
             }
@@ -42,6 +38,11 @@ namespace Destiny.Utility
         public static TemporarySchema TemporarySchema(string schema)
         {
             return new TemporarySchema(schema);
+        }
+
+        public static TemporaryConnection TemporaryConnection(string host, string schema, string username, string password)
+        {
+            return new TemporaryConnection(host, schema, username, password);
         }
 
         public static DatabaseQuery Query(string query, params MySqlParameter[] args)
@@ -63,6 +64,31 @@ namespace Destiny.Utility
                 command.CommandText = query;
                 Array.ForEach(args, p => command.Parameters.Add(p));
                 command.ExecuteNonQuery();
+            }
+        }
+
+        public static void ExecuteScript(string host, string username, string password, string query, params object[] args)
+        {
+            using (MySqlConnection connection = new MySqlConnection(string.Format("SERVER={0}; UID={1}; PASSWORD={2};", host, username, password)))
+            {
+                connection.Open();
+                new MySqlScript(connection, string.Format(query, args)).Execute();
+                connection.Close();
+            }
+        }
+
+        public static void ExecuteFile(string host, string username, string password, string path)
+        {
+            using (MySqlConnection connection = new MySqlConnection(string.Format("SERVER={0}; UID={1}; PASSWORD={2};", host, username, password)))
+            {
+                connection.Open();
+
+                using (TextReader reader = new StreamReader(path))
+                {
+                    new MySqlScript(connection, reader.ReadToEnd()).Execute();
+                }
+
+                connection.Close();
             }
         }
 
@@ -94,16 +120,48 @@ namespace Destiny.Utility
         }
     }
 
-    public sealed class TemporarySchema : IDisposable
+    public class TemporarySchema : IDisposable
     {
-        public TemporarySchema(string schema)
+        private string oldSchema;
+
+        internal TemporarySchema(string schema)
         {
+            this.oldSchema = Database.Schema;
             Database.Schema = schema;
         }
 
         public void Dispose()
         {
-            Database.Schema = "Destiny";
+            Database.Schema = this.oldSchema;
+        }
+    }
+
+    public class TemporaryConnection : IDisposable
+    {
+        private string oldHost;
+        private string oldSchema;
+        private string oldUsername;
+        private string oldPassword;
+
+        internal TemporaryConnection(string host, string schema, string username, string password)
+        {
+            this.oldHost = Database.Host;
+            this.oldSchema = Database.Schema;
+            this.oldUsername = Database.Username;
+            this.oldPassword = Database.Password;
+
+            Database.Host = host;
+            Database.Schema = schema;
+            Database.Username = username;
+            Database.Password = password;
+        }
+
+        public void Dispose()
+        {
+            Database.Host = this.oldHost;
+            Database.Schema = this.oldSchema;
+            Database.Username = this.oldUsername;
+            Database.Password = this.oldPassword;
         }
     }
 }

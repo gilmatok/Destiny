@@ -21,7 +21,7 @@ namespace Destiny.Maple.Maps
 
         public Portal(DatabaseQuery query)
         {
-            this.ID = query.GetByte("id");
+            this.ID = (byte)query.GetInt("id");
             this.Label = query.GetString("label");
             this.Position = new Point(query.GetShort("x_pos"), query.GetShort("y_pos"));
             this.DestinationMap = query.GetInt("destination");

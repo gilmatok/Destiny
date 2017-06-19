@@ -63,6 +63,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\Collections\EnumerationHelper.cs" />
+    <Compile Include="IO\LogLevel.cs" />
+    <Compile Include="IO\SettingReadException.cs" />
+    <Compile Include="IO\Settings.cs" />
     <Compile Include="Maple\Commands\Commands.cs" />
     <Compile Include="Maple\Data\CachedItems.cs" />
     <Compile Include="Maple\Data\DataProvider.cs" />
@@ -70,6 +73,7 @@
     <Compile Include="Maple\Maps\MapFactory.cs" />
     <Compile Include="Maple\Life\SpawnPoint.cs" />
     <Compile Include="Maple\Maps\MapSpawnPoints.cs" />
+    <Compile Include="Setup.cs" />
     <Compile Include="Utility\Constants.cs" />
     <Compile Include="Core\IO\BufferPool.cs" />
     <Compile Include="Core\IO\PacketBase.cs" />
@@ -152,7 +156,7 @@
     <Compile Include="Utility\DatabaseQuery.cs" />
     <Compile Include="Utility\Doublet.cs" />
     <Compile Include="Utility\Extensions.cs" />
-    <Compile Include="Utility\Logger.cs" />
+    <Compile Include="IO\Log.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Maple\Interaction\" />
