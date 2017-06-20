@@ -130,7 +130,7 @@ namespace Destiny.Server
 
             client.Handshake();
 
-            Log.Inform("[{0}] Accepted client from {1}.", mLabel, client.Host);
+            Log.Inform("Accepted client from {0} on {1}.", client.Host, mLabel);
         }
 
         protected void AddHandler(RecvOps operationCode, PacketHandler handler)

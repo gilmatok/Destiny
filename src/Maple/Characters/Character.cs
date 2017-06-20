@@ -28,35 +28,35 @@ namespace Destiny.Maple.Characters
         public ControlledMobs ControlledMobs { get; private set; }
         public ControlledNpcs ControlledNpcs { get; private set; }
 
-        private Gender m_gender;
-        private byte m_skin;
-        private int m_face;
-        private int m_hair;
-        private byte m_level;
-        private Job m_job;
-        private short m_strength;
-        private short m_dexterity;
-        private short m_intelligence;
-        private short m_luck;
-        private short m_health;
-        private short m_maxHealth;
-        private short m_mana;
-        private short m_maxMana;
-        private short m_abilityPoints;
-        private short m_skillPoints;
-        private int m_experience;
-        private short m_fame;
-        private int m_mesos;
+        private Gender mGender;
+        private byte mSkin;
+        private int mFace;
+        private int mHair;
+        private byte mLevel;
+        private Job mJob;
+        private short mStrength;
+        private short mDexterity;
+        private short mIntelligence;
+        private short mLuck;
+        private short mHealth;
+        private short mMaxHealth;
+        private short mMana;
+        private short mMaxMana;
+        private short mAbilityPoints;
+        private short mSkillPoints;
+        private int mExperience;
+        private short mFame;
+        private int mMeso;
 
         public Gender Gender
         {
             get
             {
-                return m_gender;
+                return mGender;
             }
             set
             {
-                m_gender = value;
+                mGender = value;
 
                 if (this.IsInitialized)
                 {
@@ -69,11 +69,11 @@ namespace Destiny.Maple.Characters
         {
             get
             {
-                return m_skin;
+                return mSkin;
             }
             set
             {
-                m_skin = value;
+                mSkin = value;
 
                 if (this.IsInitialized)
                 {
@@ -87,11 +87,11 @@ namespace Destiny.Maple.Characters
         {
             get
             {
-                return m_face;
+                return mFace;
             }
             set
             {
-                m_face = value;
+                mFace = value;
 
                 if (this.IsInitialized)
                 {
@@ -105,11 +105,11 @@ namespace Destiny.Maple.Characters
         {
             get
             {
-                return m_hair;
+                return mHair;
             }
             set
             {
-                m_hair = value;
+                mHair = value;
 
                 if (this.IsInitialized)
                 {
@@ -123,12 +123,12 @@ namespace Destiny.Maple.Characters
         {
             get
             {
-                return m_level;
+                return mLevel;
             }
 
             set
             {
-                m_level = value;
+                mLevel = value;
 
                 if (this.IsInitialized)
                 {
@@ -150,11 +150,11 @@ namespace Destiny.Maple.Characters
         {
             get
             {
-                return m_job;
+                return mJob;
             }
             set
             {
-                m_job = value;
+                mJob = value;
 
                 if (this.IsInitialized)
                 {
@@ -176,12 +176,12 @@ namespace Destiny.Maple.Characters
         {
             get
             {
-                return m_strength;
+                return mStrength;
             }
 
             set
             {
-                m_strength = value;
+                mStrength = value;
 
                 if (this.IsInitialized)
                 {
@@ -194,12 +194,12 @@ namespace Destiny.Maple.Characters
         {
             get
             {
-                return m_dexterity;
+                return mDexterity;
             }
 
             set
             {
-                m_dexterity = value;
+                mDexterity = value;
 
                 if (this.IsInitialized)
                 {
@@ -212,12 +212,12 @@ namespace Destiny.Maple.Characters
         {
             get
             {
-                return m_intelligence;
+                return mIntelligence;
             }
 
             set
             {
-                m_intelligence = value;
+                mIntelligence = value;
 
                 if (this.IsInitialized)
                 {
@@ -230,12 +230,12 @@ namespace Destiny.Maple.Characters
         {
             get
             {
-                return m_luck;
+                return mLuck;
             }
 
             set
             {
-                m_luck = value;
+                mLuck = value;
 
                 if (this.IsInitialized)
                 {
@@ -248,12 +248,12 @@ namespace Destiny.Maple.Characters
         {
             get
             {
-                return m_health;
+                return mHealth;
             }
 
             set
             {
-                m_health = value;
+                mHealth = value;
 
                 if (this.IsInitialized)
                 {
@@ -266,12 +266,12 @@ namespace Destiny.Maple.Characters
         {
             get
             {
-                return m_maxHealth;
+                return mMaxHealth;
             }
 
             set
             {
-                m_maxHealth = value;
+                mMaxHealth = value;
 
                 if (this.IsInitialized)
                 {
@@ -284,12 +284,12 @@ namespace Destiny.Maple.Characters
         {
             get
             {
-                return m_mana;
+                return mMana;
             }
 
             set
             {
-                m_mana = value;
+                mMana = value;
 
                 if (this.IsInitialized)
                 {
@@ -302,12 +302,12 @@ namespace Destiny.Maple.Characters
         {
             get
             {
-                return m_maxMana;
+                return mMaxMana;
             }
 
             set
             {
-                m_maxMana = value;
+                mMaxMana = value;
 
                 if (this.IsInitialized)
                 {
@@ -320,12 +320,12 @@ namespace Destiny.Maple.Characters
         {
             get
             {
-                return m_abilityPoints;
+                return mAbilityPoints;
             }
 
             set
             {
-                m_abilityPoints = value;
+                mAbilityPoints = value;
 
                 if (this.IsInitialized)
                 {
@@ -338,12 +338,12 @@ namespace Destiny.Maple.Characters
         {
             get
             {
-                return m_skillPoints;
+                return mSkillPoints;
             }
 
             set
             {
-                m_skillPoints = value;
+                mSkillPoints = value;
 
                 if (this.IsInitialized)
                 {
@@ -356,12 +356,12 @@ namespace Destiny.Maple.Characters
         {
             get
             {
-                return m_experience;
+                return mExperience;
             }
 
             set
             {
-                m_experience = value;
+                mExperience = value;
 
                 if (this.IsInitialized)
                 {
@@ -374,12 +374,12 @@ namespace Destiny.Maple.Characters
         {
             get
             {
-                return m_fame;
+                return mFame;
             }
 
             set
             {
-                m_fame = value;
+                mFame = value;
 
                 if (this.IsInitialized)
                 {
@@ -388,15 +388,15 @@ namespace Destiny.Maple.Characters
             }
         }
 
-        public int Mesos
+        public int Meso
         {
             get
             {
-                return m_mesos;
+                return mMeso;
             }
             set
             {
-                m_mesos = value;
+                mMeso = value;
 
                 if (this.IsInitialized)
                 {
@@ -454,7 +454,7 @@ namespace Destiny.Maple.Characters
             this.SkillPoints = query.GetShort("skill_points");
             this.Experience = query.GetInt("experience");
             this.Fame = query.GetShort("fame");
-            this.Mesos = query.GetInt("mesos");
+            this.Meso = query.GetInt("meso");
             this.Map = MasterServer.Channels[this.Client.Channel].Maps[query.GetInt("map")];
             this.SpawnPoint = query.GetByte("spawn_point");
 
@@ -512,7 +512,7 @@ namespace Destiny.Maple.Characters
                              new MySqlParameter("fame", this.Fame),
                              new MySqlParameter("map", this.Map.MapleID),
                              new MySqlParameter("spawn_point", this.SpawnPoint),
-                             new MySqlParameter("mesos", this.Mesos),
+                             new MySqlParameter("meso", this.Meso),
                              new MySqlParameter("equipment_slots", 24),
                              new MySqlParameter("usable_slots", 24),
                              new MySqlParameter("setup_slots", 24),
@@ -683,7 +683,7 @@ namespace Destiny.Maple.Characters
                             break;
 
                         case StatisticType.Mesos:
-                            oPacket.WriteInt(this.Mesos);
+                            oPacket.WriteInt(this.Meso);
                             break;
                     }
                 }

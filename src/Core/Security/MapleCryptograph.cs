@@ -30,56 +30,56 @@ namespace Destiny.Core.Security
             0x84, 0x7F, 0x61, 0x1E, 0xCF, 0xC5, 0xD1, 0x56, 0x3D, 0xCA, 0xF4, 0x05, 0xC6, 0xE5, 0x08, 0x49
         };
 
-        private short m_majorVersion;
-        private byte[] m_IV;
-        private TransformDirection m_direction;
+        private short mMajorVersion;
+        private byte[] mIV;
+        private TransformDirection mDirection;
 
-        private Action<byte[]> m_transformer;
+        private Action<byte[]> mTransformer;
 
         public short MajorVersion
         {
-            get { return m_majorVersion; }
+            get { return mMajorVersion; }
         }
         public TransformDirection TransformationDirection
         {
-            get { return m_direction; }
+            get { return mDirection; }
         }
 
         public MapleCryptograph(short majorVersion, byte[] IV, TransformDirection transformDirection)
         {
-            m_majorVersion = majorVersion;
+            mMajorVersion = majorVersion;
 
-            m_IV = new byte[4];
-            Buffer.BlockCopy(IV, 0, m_IV, 0, 4);
+            mIV = new byte[4];
+            Buffer.BlockCopy(IV, 0, mIV, 0, 4);
 
-            m_direction = transformDirection;
+            mDirection = transformDirection;
 
             //Like i just cant deal with a cmp every time idk
-            m_transformer = m_direction == TransformDirection.Encrypt ? new Action<byte[]>(EncryptTransform) : new Action<byte[]>(DecryptTransform);
+            mTransformer = mDirection == TransformDirection.Encrypt ? new Action<byte[]>(EncryptTransform) : new Action<byte[]>(DecryptTransform);
         }
 
         public void Transform(byte[] data)
         {
-            m_transformer(data);
-            byte[] newIV = Shuffle(m_IV);
-            m_IV = newIV;
+            mTransformer(data);
+            byte[] newIV = Shuffle(mIV);
+            mIV = newIV;
         }
 
         private void EncryptTransform(byte[] data)
         {
             ShandaCryptograph.Encrypt(data);
-            AESEncryption.Transform(data, m_IV);
+            AESEncryption.Transform(data, mIV);
         }
         private void DecryptTransform(byte[] data)
         {
-            AESEncryption.Transform(data, m_IV);
+            AESEncryption.Transform(data, mIV);
             ShandaCryptograph.Decrypt(data);
         }
 
         public void GetHeaderToClient(byte[] packet, int offset, int size)
         {
-            int a = m_IV[3] * 0x100 + m_IV[2];
-            a ^= -(m_majorVersion + 1);
+            int a = mIV[3] * 0x100 + mIV[2];
+            a ^= -(mMajorVersion + 1);
             int b = a ^ size;
             packet[offset] = (byte)(a % 0x100);
             packet[offset + 1] = (byte)((a - packet[0]) / 0x100);
@@ -88,8 +88,8 @@ namespace Destiny.Core.Security
         }
         public void GetHeaderToServer(byte[] packet, int offset, int size)
         {
-            int a = m_IV[3] * 0x100 + m_IV[2];
-            a = a ^ (m_majorVersion);
+            int a = mIV[3] * 0x100 + mIV[2];
+            a = a ^ (mMajorVersion);
             int b = a ^ size;
             packet[offset] = (byte)(a % 0x100);
             packet[offset + 1] = (byte)(a / 0x100);
@@ -104,10 +104,10 @@ namespace Destiny.Core.Security
 
         public bool CheckServerPacket(byte[] packet, int offset)
         {
-            int a = packet[offset] ^ m_IV[2];
-            int b = m_majorVersion;
-            int c = packet[offset + 1] ^ m_IV[3];
-            int d = m_majorVersion >> 8;
+            int a = packet[offset] ^ mIV[2];
+            int b = mMajorVersion;
+            int c = packet[offset + 1] ^ mIV[3];
+            int d = mMajorVersion >> 8;
             return (a == b && c == d);
         }
 
@@ -156,8 +156,8 @@ namespace Destiny.Core.Security
 
         public void Dispose()
         {
-            m_transformer = null;
-            m_IV = null;
+            mTransformer = null;
+            mIV = null;
         }
     }
 }

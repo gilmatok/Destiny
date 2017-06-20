@@ -8,89 +8,89 @@ namespace Destiny.Core.Network
     {
         private const int Backlog = 2500;
 
-        private readonly short m_port;
-        private Socket m_socket;
-        private bool m_active;
-        private bool m_disposed;
-        private Action<Socket> m_clientAcceptedEvent;
+        private readonly short mPort;
+        private Socket mSocket;
+        private bool mActive;
+        private bool mDisposed;
+        private Action<Socket> mClientAcceptedEvent;
 
-        public short Port => m_port;
-        public bool Active => m_active;
+        public short Port => mPort;
+        public bool Active => mActive;
 
         public Acceptor(short port, Action<Socket> clientAcceptedEvent)
         {
-            m_port = port;
-            m_active = false;
-            m_disposed = false;
-            m_clientAcceptedEvent = clientAcceptedEvent;
+            mPort = port;
+            mActive = false;
+            mDisposed = false;
+            mClientAcceptedEvent = clientAcceptedEvent;
         }
 
         public void Start()
         {
-            if (m_disposed)
+            if (mDisposed)
             {
                 throw new ObjectDisposedException(this.GetType().Name);
             }
 
-            if (m_active)
+            if (mActive)
             {
                 throw new InvalidOperationException();
             }
 
-            m_socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            m_socket.Bind(new IPEndPoint(IPAddress.Any, m_port));
-            m_socket.Listen(Backlog);
+            mSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            mSocket.Bind(new IPEndPoint(IPAddress.Any, mPort));
+            mSocket.Listen(Backlog);
 
-            m_active = true;
+            mActive = true;
 
-            m_socket.BeginAccept(this.EndAccept, null);
+            mSocket.BeginAccept(this.EndAccept, null);
         }
 
         public void Stop()
         {
-            if (m_disposed)
+            if (mDisposed)
             {
                 throw new ObjectDisposedException(GetType().Name);
             }
 
-            if (m_active == false)
+            if (mActive == false)
             {
                 throw new InvalidOperationException();
             }
 
-            m_active = false;
+            mActive = false;
 
-            m_socket.Dispose();
+            mSocket.Dispose();
         }
 
         private void EndAccept(IAsyncResult iar)
         {
-            if (!m_disposed && m_active)
+            if (!mDisposed && mActive)
             {
-                Socket socket = m_socket.EndAccept(iar);
+                Socket socket = mSocket.EndAccept(iar);
 
-                if (m_clientAcceptedEvent != null)
+                if (mClientAcceptedEvent != null)
                 {
-                    m_clientAcceptedEvent(socket);
+                    mClientAcceptedEvent(socket);
                 }
 
-                if (!m_disposed && m_active)
+                if (!mDisposed && mActive)
                 {
-                    m_socket.BeginAccept(this.EndAccept, null);
+                    mSocket.BeginAccept(this.EndAccept, null);
                 }
             }
         }
 
         public void Dispose()
         {
-            if (!m_disposed)
+            if (!mDisposed)
             {
-                if (m_active)
+                if (mActive)
                 {
                     this.Stop();
                 }
 
-                m_disposed = true;
+                mDisposed = true;
             }
         }
     }

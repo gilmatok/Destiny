@@ -1,4 +1,5 @@
 ﻿using Destiny.Core.IO;
+using Destiny.Core.Network;
 using Destiny.Maple;
 using Destiny.Maple.Characters;
 using Destiny.Server;
@@ -71,16 +72,34 @@ namespace Destiny.Handler
         {
             byte id = iPacket.ReadByte();
 
-            //MasterServer.Instance.Worlds[client.World].Channels[id].Migrations.Add(client.Host, client.Account.ID, client.Character.ID);
+            // TODO: Validate ID.
 
-            //client.Migrate(true, MasterServer.Instance.Worlds[client.World].Channels[id].Port);
+            MasterServer.Channels[id].Migrations.Add(client.Host, client.Account.ID, client.Character.ID);
+
+            using (OutPacket oPacket = new OutPacket(SendOps.MigrateCommand))
+            {
+                oPacket
+                    .WriteBool(true)
+                    .WriteBytes(new byte[4] { 127, 0, 0, 1 })
+                    .WriteShort(MasterServer.Channels[id].Port);
+
+                client.Send(oPacket);
+            }
         }
 
         public static void HandleCashShopMigrate(MapleClient client, InPacket iPacket)
         {
-            //MasterServer.Instance.Shop.Migrations.Add(client.Host, client.Account.ID, client.Character.ID);
+            MasterServer.CashShop.Migrations.Add(client.Host, client.Account.ID, client.Character.ID);
 
-            //client.Migrate(true, MasterServer.Instance.Shop.Port);
+            using (OutPacket oPacket = new OutPacket(SendOps.MigrateCommand))
+            {
+                oPacket
+                    .WriteBool(true)
+                    .WriteBytes(new byte[4] { 127, 0, 0, 1 })
+                    .WriteShort(MasterServer.CashShop.Port);
+
+                client.Send(oPacket);
+            }
         }
 
         public static void HandleMtsMigration(MapleClient client, InPacket iPacket)

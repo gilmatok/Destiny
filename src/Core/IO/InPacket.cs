@@ -7,51 +7,51 @@ namespace Destiny.Core.IO
 {
     public sealed class InPacket : PacketBase
     {
-        private BinaryReader m_reader;
+        private BinaryReader mReader;
 
         public short OperationCode { get; private set; }
 
         public InPacket(byte[] buffer)
         {
-            m_stream = new MemoryStream(buffer, false);
-            m_reader = new BinaryReader(m_stream, Encoding.ASCII);
+            mStream = new MemoryStream(buffer, false);
+            mReader = new BinaryReader(mStream, Encoding.ASCII);
 
             this.OperationCode = this.ReadShort();
         }
 
         public byte[] ReadBytes(int count)
         {
-            return m_reader.ReadBytes(count);
+            return mReader.ReadBytes(count);
         }
 
         public byte ReadByte()
         {
-            return m_reader.ReadByte();
+            return mReader.ReadByte();
         }
 
         public bool ReadBool()
         {
-            return m_reader.ReadBoolean();
+            return mReader.ReadBoolean();
         }
 
         public short ReadShort()
         {
-            return m_reader.ReadInt16();
+            return mReader.ReadInt16();
         }
 
         public int ReadInt()
         {
-            return m_reader.ReadInt32();
+            return mReader.ReadInt32();
         }
 
         public long ReadLong()
         {
-            return m_reader.ReadInt64();
+            return mReader.ReadInt64();
         }
 
         public string ReadString(int length)
         {
-            return new string(m_reader.ReadChars(length));
+            return new string(mReader.ReadChars(length));
         }
 
         public string ReadMapleString()
@@ -71,7 +71,7 @@ namespace Destiny.Core.IO
 
         protected override void CustomDispose()
         {
-            m_reader.Dispose();
+            mReader.Dispose();
         }
     }
 }

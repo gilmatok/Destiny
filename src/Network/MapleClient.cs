@@ -10,8 +10,8 @@ namespace Destiny
 {
     public sealed class MapleClient : Session
     {
-        private PacketProcessor m_processor;
-        private Func<MapleClient, bool> m_deathAction;
+        private PacketProcessor mProcessor;
+        private Func<MapleClient, bool> mDeathAction;
 
         public Account Account { get; set; }
         public Character Character { get; set; }
@@ -21,8 +21,8 @@ namespace Destiny
         public MapleClient(Socket socket, PacketProcessor processor, Func<MapleClient, bool> deathAction)
             : base(socket)
         {
-            m_processor = processor;
-            m_deathAction = deathAction;
+            mProcessor = processor;
+            mDeathAction = deathAction;
         }
 
         protected override void Terminate()
@@ -34,14 +34,14 @@ namespace Destiny
                 this.Character.Map.Characters.Remove(this.Character);
             }
 
-            m_deathAction(this);
+            mDeathAction(this);
         }
 
         protected override void Dispatch(byte[] buffer)
         {
             using (InPacket iPacket = new InPacket(buffer))
             {
-                PacketHandler handler = m_processor[iPacket.OperationCode];
+                PacketHandler handler = mProcessor[iPacket.OperationCode];
 
                 if (handler != null)
                 {
@@ -56,21 +56,8 @@ namespace Destiny
                 }
                 else
                 {
-                    Log.Warn("[{0}] Unhandled packet from {1}: {2}", m_processor.Label, this.Host, iPacket.ToString());
+                    Log.Hex("Unhandled {0} from {1} on {2}: \n", iPacket.ToArray(), iPacket.OperationCode.ToString(), this.Host, mProcessor.Label);
                 }
-            }
-        }
-
-        public void Migrate(bool valid, short port)
-        {
-            using (OutPacket oPacket = new OutPacket(SendOps.MigrateCommand))
-            {
-                oPacket
-                    .WriteBool(valid)
-                    .WriteBytes(new byte[4] { 127, 0, 0, 1 })
-                    .WriteShort(port);
-
-                this.Send(oPacket);
             }
         }
     }
