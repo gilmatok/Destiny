@@ -5,6 +5,7 @@ using System;
 using Destiny.Core.Network;
 using Destiny.Utility;
 using MySql.Data.MySqlClient;
+using Destiny.Maple.Script;
 
 namespace Destiny.Maple.Characters
 {
@@ -27,6 +28,8 @@ namespace Destiny.Maple.Characters
         public CharacterQuests Quests { get; private set; }
         public ControlledMobs ControlledMobs { get; private set; }
         public ControlledNpcs ControlledNpcs { get; private set; }
+
+        public NpcScript NpcScript { get; set; }
 
         private Gender mGender;
         private byte mSkin;
@@ -484,7 +487,7 @@ namespace Destiny.Maple.Characters
             this.ControlledMobs = new ControlledMobs(this);
             this.ControlledNpcs = new ControlledNpcs(this);
         }
-        
+
         public void Save()
         {
             Database.Execute("UPDATE `characters` SET skin = @skin, face = @face, hair = @hair, level = @level, job = @job, strength = @strength, " +
@@ -849,7 +852,69 @@ namespace Destiny.Maple.Characters
         {
             OutPacket oPacket = new OutPacket(SendOps.UserEnterField);
 
-            oPacket.WriteInt(this.ID);
+            oPacket
+                .WriteInt(this.ID)
+                .WriteByte(this.Level)
+                .WriteMapleString(this.Name)
+                .WriteMapleString(string.Empty) // NOTE: Guild name.
+                .WriteZero(6) // NOTE: Guild emblems.
+                .WriteInt()
+                .WriteShort()
+                .WriteByte(0xFC)
+                .WriteByte(1)
+                .WriteInt();
+
+            int buffmask = 0;
+
+            oPacket
+                .WriteInt((int)((buffmask >> 32) & 0xFFFFFFFFL))
+                .WriteInt((int)(buffmask & 0xFFFFFFFFL));
+
+            int magic = Constants.Random.Next();
+
+            oPacket
+                .WriteZero(6)
+                .WriteInt(magic)
+                .WriteZero(11)
+                .WriteInt(magic)
+                .WriteZero(11)
+                .WriteInt(magic)
+                .WriteShort()
+                .WriteByte()
+                .WriteLong()
+                .WriteInt(magic)
+                .WriteZero(9)
+                .WriteInt(magic)
+                .WriteShort()
+                .WriteInt()
+                .WriteZero(10)
+                .WriteInt(magic)
+                .WriteZero(13)
+                .WriteInt(magic)
+                .WriteShort()
+                .WriteByte()
+                .WriteShort((short)this.Job);
+
+            this.EncodeApperance(oPacket);
+
+            oPacket
+                .WriteInt()
+                .WriteInt()
+                .WriteInt()
+                .WritePoint(this.Position)
+                .WriteByte(this.Stance)
+                .WriteShort(this.Foothold)
+                .WriteByte()
+                .WriteByte()
+                .WriteInt(1)
+                .WriteLong()
+                .WriteBool()
+                .WriteBool()
+                .WriteByte()
+                .WriteByte()
+                .WriteByte()
+                .WriteZero(3)
+                .WriteByte(byte.MaxValue);
 
             return oPacket;
         }

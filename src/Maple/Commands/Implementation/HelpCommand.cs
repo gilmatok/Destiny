@@ -42,7 +42,7 @@ namespace Destiny.Maple.Commands
                 {
                     if (!(command is HelpCommand))
                     {
-                        caller.Notify(string.Format("\t{0}{1}", Constants.CommandIndiciator, command.Name));
+                        caller.Notify(string.Format("    !{0} {1}", command.Name, command.Parameters.ClearFormatters()));
                     }
                 }
             }

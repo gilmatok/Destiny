@@ -25,6 +25,7 @@ namespace Destiny.Server
         {
             this.AddHandler(RecvOps.MigrateIn, ServerHandler.HandleMigrateChannel);
             this.AddHandler(RecvOps.MapChange, PlayerHandler.HandleMapChange);
+            this.AddHandler(RecvOps.ChangeMapSpecial, PlayerHandler.HandleMapChangeSpecial);
             this.AddHandler(RecvOps.ChannelChange, ServerHandler.HandleChannelChange);
             this.AddHandler(RecvOps.CashShopMigration, ServerHandler.HandleCashShopMigrate);
             this.AddHandler(RecvOps.MtsMigration, ServerHandler.HandleMtsMigration);
@@ -35,7 +36,8 @@ namespace Destiny.Server
             this.AddHandler(RecvOps.MobMovement, MobHandler.HandleMobMovement);
             this.AddHandler(RecvOps.PlayerInformation, PlayerHandler.HandlePlayerInformation);
             this.AddHandler(RecvOps.MesoDrop, InventoryHandler.HandleMesoDrop);
-            this.AddHandler(RecvOps.ItemPickup, InventoryHandler.HandlePickup);
+            this.AddHandler(RecvOps.DropPickup, InventoryHandler.HandlePickup);
+            this.AddHandler(RecvOps.NpcConverse, NpcHandler.HandleNpcConverse);
         }
 
         protected override void SetClientAttributes(MapleClient client)

@@ -4,8 +4,11 @@ using Destiny.Maple;
 using Destiny.Maple.Characters;
 using Destiny.Maple.Commands;
 using Destiny.Maple.Maps;
+using Destiny.Maple.Script;
 using Destiny.Server;
+using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace Destiny.Handler
 {
@@ -41,6 +44,44 @@ namespace Destiny.Handler
                         client.Character.ChangeMap(portal.DestinationMap, portal.Link.ID);
                     }
                     break;
+            }
+        }
+
+        public static void HandleMapChangeSpecial(MapleClient client, InPacket iPacket)
+        {
+            byte portals = iPacket.ReadByte();
+
+            if (portals != client.Character.Portals)
+            {
+                return;
+            }
+
+            string label = iPacket.ReadMapleString();
+            Portal portal;
+
+            try
+            {
+                portal = client.Character.Map.Portals[label];
+            }
+            catch (KeyNotFoundException)
+            {
+                return;
+            }
+
+            if (!File.Exists(portal.ScriptPath))
+            {
+                Log.Warn("'{0}' tried to enter an unimplemented portal '{1}'.", client.Character.Name, portal.Script);
+            }
+            else
+            {
+                try
+                {
+                    new PortalScript(portal, client.Character).Execute();
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex);
+                }
             }
         }
 

@@ -19,6 +19,14 @@ namespace Destiny.Maple.Maps
             }
         }
 
+        public string ScriptPath
+        {
+            get
+            {
+                return string.Format(@"..\..\scripts\portals\{0}.js", this.Script);
+            }
+        }
+
         public Portal(DatabaseQuery query)
         {
             this.ID = (byte)query.GetInt("id");
