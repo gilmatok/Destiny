@@ -1,4 +1,5 @@
-﻿using Destiny.Maple.Characters;
+﻿using Destiny.Core.IO;
+using Destiny.Maple.Characters;
 using Destiny.Maple.Life;
 
 namespace Destiny.Maple.Script
@@ -11,6 +12,11 @@ namespace Destiny.Maple.Script
             : base(npc.ScriptPath, character)
         {
             mNpc = npc;
+        }
+
+        public void Handle(InPacket iPacket)
+        {
+
         }
     }
 }

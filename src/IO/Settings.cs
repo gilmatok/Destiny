@@ -1,4 +1,5 @@
-﻿using Destiny.Utility;
+﻿using Destiny.Core.IO;
+using Destiny.Utility;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -60,6 +61,7 @@ namespace Destiny.IO
 
                 Log.Inform("Settings file '{0}' {1}.", name, showRefresh ? "refreshed" : "loaded");
 
+                InPacket.LogLevel = Settings.GetEnum<LogLevel>("Log/Packets");
                 Log.ShowStackTrace = Settings.GetBool("Log/StackTrace");
                 LoadingIndicator.ShowTime = Settings.GetBool("Log/LoadTime");
 

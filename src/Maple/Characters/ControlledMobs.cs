@@ -14,6 +14,24 @@ namespace Destiny.Maple.Characters
             this.Parent = parent;
         }
 
+        public void Move(InPacket iPacket)
+        {
+            int objectID = iPacket.ReadInt();
+
+            Mob mob;
+
+            try
+            {
+                mob = this[objectID];
+            }
+            catch (KeyNotFoundException)
+            {
+                return;
+            }
+
+            mob.Move(iPacket);
+        }
+
         protected override void InsertItem(int index, Mob item)
         {
             lock (this)

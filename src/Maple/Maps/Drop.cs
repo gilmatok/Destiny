@@ -55,7 +55,7 @@ namespace Destiny.Maple.Maps
 
         private OutPacket GetInternalPacket(bool dropped, Character temporaryOwner)
         {
-            OutPacket oPacket = new OutPacket(SendOps.DropEnterField);
+            OutPacket oPacket = new OutPacket(ServerOperationCode.DropEnterField);
 
             oPacket
                 .WriteByte((byte)(dropped ? 1 : 2))
@@ -95,7 +95,7 @@ namespace Destiny.Maple.Maps
 
         public OutPacket GetDestroyPacket()
         {
-            OutPacket oPacket = new OutPacket(SendOps.DropLeaveField);
+            OutPacket oPacket = new OutPacket(ServerOperationCode.DropLeaveField);
 
             oPacket
                 .WriteByte((byte)(this.Picker == null ? 0 : 2))

@@ -40,6 +40,50 @@ namespace Destiny.Maple.Life
             this.Position = this.SpawnPoint.Position;
         }
 
+        public void Move(InPacket iPacket)
+        {
+            short moveAction = iPacket.ReadShort();
+            bool cheatResult = (iPacket.ReadByte() & 0xF) != 0;
+            byte centerSplit = iPacket.ReadByte();
+            int illegalVelocity = iPacket.ReadInt();
+            byte unknown = iPacket.ReadByte();
+            iPacket.ReadInt();
+
+            Movements movements = Movements.Decode(iPacket);
+
+            Movement lastMovement = movements[movements.Count - 1];
+
+            this.Position = lastMovement.Position;
+            this.Foothold = lastMovement.Foothold;
+            this.Stance = lastMovement.Stance;
+
+            using (OutPacket oPacket = new OutPacket(ServerOperationCode.MobCtrlAck))
+            {
+                oPacket
+                    .WriteInt(this.ObjectID)
+                    .WriteShort(moveAction)
+                    .WriteBool(cheatResult)
+                    .WriteShort() // NOTE: Mob mana.
+                    .WriteByte() // NOTE: Ability ID.
+                    .WriteByte(); // NOTE: Ability level.
+
+                this.Controller.Client.Send(oPacket);
+            }
+
+            using (OutPacket oPacket = new OutPacket(ServerOperationCode.MobMove))
+            {
+                oPacket
+                    .WriteInt(this.ObjectID)
+                    .WriteBool(cheatResult)
+                    .WriteByte(centerSplit)
+                    .WriteInt(illegalVelocity);
+
+                movements.Encode(oPacket);
+
+                this.Map.Broadcast(oPacket, this.Controller);
+            }
+        }
+
         public void AssignController()
         {
             if (this.Controller == null)
@@ -83,7 +127,7 @@ namespace Destiny.Maple.Life
 
         private OutPacket GetInternalPacket(bool requestControl, bool newSpawn)
         {
-            OutPacket oPacket = new OutPacket(requestControl ? SendOps.MobChangeController : SendOps.MobEnterField);
+            OutPacket oPacket = new OutPacket(requestControl ? ServerOperationCode.MobChangeController : ServerOperationCode.MobEnterField);
 
             if (requestControl)
             {
@@ -111,7 +155,7 @@ namespace Destiny.Maple.Life
 
         public OutPacket GetControlCancelPacket()
         {
-            OutPacket oPacket = new OutPacket(SendOps.MobChangeController);
+            OutPacket oPacket = new OutPacket(ServerOperationCode.MobChangeController);
 
             oPacket
                 .WriteBool()
@@ -122,7 +166,7 @@ namespace Destiny.Maple.Life
 
         public OutPacket GetDestroyPacket()
         {
-            OutPacket oPacket = new OutPacket(SendOps.MobLeaveField);
+            OutPacket oPacket = new OutPacket(ServerOperationCode.MobLeaveField);
 
             oPacket
                 .WriteByte() // TODO: Death effect.

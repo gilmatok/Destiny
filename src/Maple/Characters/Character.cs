@@ -6,6 +6,10 @@ using Destiny.Core.Network;
 using Destiny.Utility;
 using MySql.Data.MySqlClient;
 using Destiny.Maple.Script;
+using System.Collections.Generic;
+using Destiny.Maple.Commands;
+using Destiny.Maple.Life;
+using System.IO;
 
 namespace Destiny.Maple.Characters
 {
@@ -137,7 +141,7 @@ namespace Destiny.Maple.Characters
                 {
                     this.Update(StatisticType.Level);
 
-                    using (OutPacket oPacket = new OutPacket(SendOps.ShowForeignBuff))
+                    using (OutPacket oPacket = new OutPacket(ServerOperationCode.ShowForeignBuff))
                     {
                         oPacket
                             .WriteInt(this.ID)
@@ -163,7 +167,7 @@ namespace Destiny.Maple.Characters
                 {
                     this.Update(StatisticType.Job);
 
-                    using (OutPacket oPacket = new OutPacket(SendOps.ShowForeignBuff))
+                    using (OutPacket oPacket = new OutPacket(ServerOperationCode.ShowForeignBuff))
                     {
                         oPacket
                             .WriteInt(this.ID)
@@ -525,7 +529,7 @@ namespace Destiny.Maple.Characters
 
         public void Initialize(bool cashShop = false)
         {
-            using (OutPacket oPacket = new OutPacket(cashShop ? SendOps.SetCashShop : SendOps.SetField))
+            using (OutPacket oPacket = new OutPacket(cashShop ? ServerOperationCode.SetCashShop : ServerOperationCode.SetField))
             {
                 if (cashShop)
                 {
@@ -598,7 +602,7 @@ namespace Destiny.Maple.Characters
 
         public void Update(params StatisticType[] statistics)
         {
-            using (OutPacket oPacket = new OutPacket(SendOps.StatChanged))
+            using (OutPacket oPacket = new OutPacket(ServerOperationCode.StatChanged))
             {
                 oPacket.WriteBool(); // TODO: bOnExclRequest.
 
@@ -697,7 +701,7 @@ namespace Destiny.Maple.Characters
 
         private void UpdateApperance()
         {
-            using (OutPacket oPacket = new OutPacket(SendOps.AvatarModified))
+            using (OutPacket oPacket = new OutPacket(ServerOperationCode.AvatarModified))
             {
                 oPacket
                     .WriteInt(this.ID)
@@ -715,7 +719,7 @@ namespace Destiny.Maple.Characters
 
         public void Notify(string message, NoticeType type = NoticeType.Pink)
         {
-            using (OutPacket oPacket = new OutPacket(SendOps.BroadcastMsg))
+            using (OutPacket oPacket = new OutPacket(ServerOperationCode.BroadcastMsg))
             {
                 oPacket.WriteByte((byte)type);
 
@@ -730,13 +734,46 @@ namespace Destiny.Maple.Characters
             }
         }
 
+        public void ChangeMap(InPacket iPacket)
+        {
+            byte portals = iPacket.ReadByte();
+
+            if (portals != this.Portals)
+            {
+                return;
+            }
+
+            int destinationID = iPacket.ReadInt();
+
+            switch (destinationID)
+            {
+                case -1:
+                    {
+                        string label = iPacket.ReadMapleString();
+                        Portal portal;
+
+                        try
+                        {
+                            portal = this.Map.Portals[label];
+                        }
+                        catch (KeyNotFoundException)
+                        {
+                            return;
+                        }
+
+                        this.ChangeMap(portal.DestinationMap, portal.Link.ID);
+                    }
+                    break;
+            }
+        }
+
         public void ChangeMap(int mapID, byte portalID = 0)
         {
             this.Map.Characters.Remove(this);
 
             this.SpawnPoint = portalID;
 
-            using (OutPacket oPacket = new OutPacket(SendOps.SetField))
+            using (OutPacket oPacket = new OutPacket(ServerOperationCode.SetField))
             {
                 oPacket
                     .WriteInt(this.Client.Channel)
@@ -754,6 +791,216 @@ namespace Destiny.Maple.Characters
             }
 
             MasterServer.Channels[this.Client.Channel].Maps[mapID].Characters.Add(this);
+        }
+
+        public void Move(InPacket iPacket)
+        {
+            Movements movements = Movements.Decode(iPacket);
+
+            // TODO: Validate movements.
+
+            Movement lastMovement = movements[movements.Count - 1];
+
+            this.Position = lastMovement.Position;
+            this.Foothold = lastMovement.Foothold;
+            this.Stance = lastMovement.Stance;
+
+            using (OutPacket oPacket = new OutPacket(ServerOperationCode.UserMove))
+            {
+                oPacket.WriteInt(this.ID);
+
+                movements.Encode(oPacket);
+
+                this.Map.Broadcast(oPacket, this);
+            }
+        }
+
+        public void Talk(InPacket iPacket)
+        {
+            string text = iPacket.ReadMapleString();
+            bool shout = iPacket.ReadBool(); // NOTE: Used for skill macros.
+
+            if (text.StartsWith(Constants.CommandIndiciator.ToString()))
+            {
+                CommandFactory.Execute(this, text);
+            }
+            else
+            {
+                using (OutPacket oPacket = new OutPacket(ServerOperationCode.UserChat))
+                {
+                    oPacket
+                        .WriteInt(this.ID)
+                        .WriteBool(this.IsGm)
+                        .WriteMapleString(text)
+                        .WriteBool(shout);
+
+                    this.Map.Broadcast(oPacket);
+                }
+            }
+        }
+
+        public void Express(InPacket iPacket)
+        {
+            int expressionID = iPacket.ReadInt();
+
+            if (expressionID > 7) // NOTE: Cash facial expression.
+            {
+                int mapleID = 5159992 + expressionID;
+
+                // TODO: Validate if item exists.
+            }
+
+            using (OutPacket oPacket = new OutPacket(ServerOperationCode.UserEmotion))
+            {
+                oPacket
+                    .WriteInt(this.ID)
+                    .WriteInt(expressionID);
+
+                this.Map.Broadcast(oPacket, this);
+            }
+        }
+
+        public void Converse(InPacket iPacket)
+        {
+            int objectID = iPacket.ReadInt();
+
+            this.Converse(this.Map.Npcs[objectID]);
+        }
+
+        public void Converse(Npc npc)
+        {
+            if (this.NpcScript != null)
+            {
+                return;
+            }
+
+            if (!File.Exists(npc.ScriptPath))
+            {
+                Log.Warn("'{0}' tried to converse with an unimplemented npc {1}.", this.Name, npc.MapleID);
+            }
+            else
+            {
+                this.NpcScript = new NpcScript(npc, this);
+
+                try
+                {
+                    this.NpcScript.Execute();
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex);
+                }
+                finally
+                {
+                    this.NpcScript = null;
+                }
+            }
+        }
+
+        public void DropMeso(InPacket iPacket)
+        {
+            iPacket.Skip(4); // NOTE: tRequestTime (ticks).
+            int amount = iPacket.ReadInt();
+
+            if (amount > this.Meso || amount < 10 || amount > 50000)
+            {
+                return;
+            }
+
+            this.Meso -= amount;
+
+            Meso meso = new Meso(amount)
+            {
+                Dropper = this,
+                Owner = null
+            };
+
+            this.Map.Drops.Add(meso);
+        }
+
+        public void InformOnCharacter(InPacket iPacket)
+        {
+            iPacket.Skip(4);
+            int characterID = iPacket.ReadInt();
+
+            Character target;
+
+            try
+            {
+                target = this.Map.Characters[characterID];
+            }
+            catch (KeyNotFoundException)
+            {
+                return;
+            }
+
+            if (target.IsGm)
+            {
+                return;
+            }
+
+            using (OutPacket oPacket = new OutPacket(ServerOperationCode.CharacterInformation))
+            {
+                oPacket
+                    .WriteInt(target.ID)
+                    .WriteByte(target.Level)
+                    .WriteShort((short)target.Job)
+                    .WriteShort(target.Fame)
+                    .WriteBool() // NOTE: Marriage.
+                    .WriteMapleString("-") // NOTE: Guild name.
+                    .WriteMapleString("-") // NOTE: Alliance name.
+                    .WriteByte() // NOTE: Unknown.
+                    .WriteByte() // NOTE: Pets.
+                    .WriteByte() // NOTE: Mount.
+                    .WriteByte() // NOTE: Wishlist.
+                    .WriteInt() // NOTE: Monster Book level.
+                    .WriteInt() // NOTE: Monster Book normal cards. 
+                    .WriteInt() // NOTE: Monster Book special cards.
+                    .WriteInt() // NOTE: Monster Book total cards.
+                    .WriteInt() // NOTE: Monster Book cover.
+                    .WriteInt() // NOTE: Medal ID.
+                    .WriteShort(); // NOTE: Medal quests.
+
+                this.Client.Send(oPacket);
+            }
+        }
+
+        public void ChangeMapSpecial(InPacket iPacket)
+        {
+            byte portals = iPacket.ReadByte();
+
+            if (portals != this.Portals)
+            {
+                return;
+            }
+
+            string label = iPacket.ReadMapleString();
+            Portal portal;
+
+            try
+            {
+                portal = this.Map.Portals[label];
+            }
+            catch (KeyNotFoundException)
+            {
+                return;
+            }
+
+            if (!File.Exists(portal.ScriptPath))
+            {
+                Log.Warn("'{0}' tried to enter an unimplemented portal '{1}'.", this.Name, portal.Script);
+            }
+            else
+            {
+                try
+                {
+                    new PortalScript(portal, this).Execute();
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex);
+                }
+            }
         }
 
         public void EncodeStatistics(OutPacket oPacket)
@@ -850,7 +1097,7 @@ namespace Destiny.Maple.Characters
 
         public OutPacket GetSpawnPacket()
         {
-            OutPacket oPacket = new OutPacket(SendOps.UserEnterField);
+            OutPacket oPacket = new OutPacket(ServerOperationCode.UserEnterField);
 
             oPacket
                 .WriteInt(this.ID)
@@ -921,7 +1168,7 @@ namespace Destiny.Maple.Characters
 
         public OutPacket GetDestroyPacket()
         {
-            OutPacket oPacket = new OutPacket(SendOps.UserLeaveField);
+            OutPacket oPacket = new OutPacket(ServerOperationCode.UserLeaveField);
 
             oPacket.WriteInt(this.ID);
 

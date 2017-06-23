@@ -1,5 +1,4 @@
-﻿using Destiny.IO;
-using Destiny.Maple.Data;
+﻿using Destiny.Maple.Data;
 
 namespace Destiny.Server
 {
@@ -15,7 +14,7 @@ namespace Destiny.Server
         {
             MasterServer.Login = new LoginServer(8484);
 
-            MasterServer.Channels = new ChannelServer[Settings.GetByte("Server/Channels")];
+            MasterServer.Channels = new ChannelServer[2];
 
             for (byte i = 0; i < MasterServer.Channels.Length; i++)
             {

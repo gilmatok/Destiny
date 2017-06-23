@@ -1,67 +1,131 @@
-﻿using Destiny.Maple;
+﻿using Destiny.Core.Network;
+using Destiny.Maple;
 using System;
-using System.IO;
-using System.Text;
 
 namespace Destiny.Core.IO
 {
-    public sealed class InPacket : PacketBase
+    public sealed class InPacket
     {
-        private BinaryReader mReader;
+        private int mIndex;
+        private byte[] mBuffer;
 
-        public short OperationCode { get; private set; }
+        public static LogLevel LogLevel { get; set; }
+
+        public ClientOperationCode OperationCode { get; private set; }
 
         public InPacket(byte[] buffer)
         {
-            mStream = new MemoryStream(buffer, false);
-            mReader = new BinaryReader(mStream, Encoding.ASCII);
+            mIndex = 0;
+            mBuffer = buffer;
 
-            this.OperationCode = this.ReadShort();
+            this.OperationCode = (ClientOperationCode)this.ReadShort();
         }
 
-        public byte[] ReadBytes(int count)
+        private void CheckLength(int count)
         {
-            return mReader.ReadBytes(count);
+            if (mIndex + count > mBuffer.Length)
+            {
+                throw new IndexOutOfRangeException();
+            }
         }
 
-        public byte ReadByte()
+        public void Skip(int count)
         {
-            return mReader.ReadByte();
+            this.CheckLength(count);
+
+            mIndex += count;
         }
 
         public bool ReadBool()
         {
-            return mReader.ReadBoolean();
+            return this.ReadByte() == 1;
         }
 
-        public short ReadShort()
+        public byte ReadByte()
         {
-            return mReader.ReadInt16();
+            return mBuffer[mIndex++];
         }
 
-        public int ReadInt()
+        public byte[] ReadBytes(int count)
         {
-            return mReader.ReadInt32();
+            this.CheckLength(count);
+
+            byte[] value = new byte[count];
+
+            Buffer.BlockCopy(mBuffer, mIndex, value, 0, count);
+
+            mIndex += count;
+
+            return value;
         }
 
-        public long ReadLong()
+        public unsafe short ReadShort()
         {
-            return mReader.ReadInt64();
+            CheckLength(2);
+
+            short value;
+
+            fixed (byte* ptr = mBuffer)
+            {
+                value = *(short*)(ptr + mIndex);
+            }
+
+            mIndex += 2;
+
+            return value;
         }
 
-        public string ReadString(int length)
+        public unsafe int ReadInt()
         {
-            return new string(mReader.ReadChars(length));
+            CheckLength(4);
+
+            int value;
+
+            fixed (byte* ptr = mBuffer)
+            {
+                value = *(int*)(ptr + mIndex);
+            }
+
+            mIndex += 4;
+
+            return value;
+        }
+
+        public unsafe long ReadLong()
+        {
+            this.CheckLength(8);
+
+            long value;
+
+            fixed (byte* ptr = mBuffer)
+            {
+                value = *(long*)(ptr + mIndex);
+            }
+
+            mIndex += 8;
+
+            return value;
+        }
+
+        public string ReadString(int count)
+        {
+            this.CheckLength(count);
+
+            char[] value = new char[count];
+
+            for (int i = 0; i < count; i++)
+            {
+                value[i] = (char)this.ReadByte();
+            }
+
+            return new string(value);
         }
 
         public string ReadMapleString()
         {
-            return ReadString(ReadShort());
-        }
+            short length = ReadShort();
 
-        public DateTime ReadDateTime()
-        {
-            return DateTime.FromFileTimeUtc(this.ReadLong());
+            return ReadString(length);
         }
 
         public Point ReadPoint()
@@ -69,9 +133,13 @@ namespace Destiny.Core.IO
             return new Point(this.ReadShort(), this.ReadShort());
         }
 
-        protected override void CustomDispose()
+        public byte[] ToArray()
         {
-            mReader.Dispose();
+            byte[] value = new byte[mBuffer.Length];
+
+            Buffer.BlockCopy(mBuffer, 0, value, 0, mBuffer.Length);
+
+            return value;
         }
     }
 }

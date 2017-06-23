@@ -17,4 +17,74 @@ namespace Destiny
 
         public static object CommandIndicator { get; internal set; }
     }
+
+    public enum WorldNames : byte
+    {
+        Scania,
+        Bera,
+        Broa,
+        Windia,
+        Khaini,
+        Bellocan,
+        Mardia,
+        Kradia,
+        Yellonde,
+        Demethos,
+        Elnido,
+        Kastia,
+        Judis,
+        Arkenia,
+        Plana,
+        Galicia,
+        Kalluna,
+        Stius,
+        Croa,
+        Zenith,
+        Medere
+    }
+
+    public static class WorldNameResolver
+    {
+        public static byte GetID(string name)
+        {
+            try
+            {
+                return (byte)Enum.Parse(typeof(WorldNames), name.ToCamel());
+            }
+            catch
+            {
+                throw new ArgumentException("The specified World name is invalid.");
+            }
+        }
+
+        public static string GetName(byte id)
+        {
+            try
+            {
+                return Enum.GetName(typeof(WorldNames), id);
+            }
+            catch
+            {
+                throw new ArgumentException("The specified World ID is invalid.");
+            }
+        }
+
+        public static bool IsValid(byte id)
+        {
+            return Enum.IsDefined(typeof(WorldNames), id);
+        }
+
+        public static bool IsValid(string name)
+        {
+            try
+            {
+                WorldNameResolver.GetID(name);
+                return true;
+            }
+            catch (ArgumentException)
+            {
+                return false;
+            }
+        }
+    }
 }

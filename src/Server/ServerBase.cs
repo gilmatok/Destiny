@@ -1,8 +1,6 @@
 ﻿using Destiny.Core.Network;
-using Destiny.Network;
 using System;
 using System.Collections.Generic;
-using System.Net.Sockets;
 
 namespace Destiny.Server
 {
@@ -72,7 +70,6 @@ namespace Destiny.Server
         public string Label { get; private set; }
 
         private Acceptor mAcceptor;
-        private PacketProcessor mProcessor;
         private List<MapleClient> mClients;
 
         public MigrationRegistery Migrations { get; private set; }
@@ -100,12 +97,9 @@ namespace Destiny.Server
         {
             this.Label = label;
             mAcceptor = new Acceptor(port, this.OnClientAccepted);
-            mProcessor = new PacketProcessor(this.Label);
             mClients = new List<MapleClient>();
 
             this.Migrations = new MigrationRegistery();
-
-            this.SpawnHandlers();
         }
 
         public virtual void Start()
@@ -132,26 +126,13 @@ namespace Destiny.Server
             Log.Warn("{0} server stopped.", this.Label);
         }
 
-        private void OnClientAccepted(Socket socket)
+        protected virtual void OnClientAccepted(MapleClient client)
         {
-            MapleClient client = new MapleClient(socket, mProcessor, mClients.Remove);
-
-            this.SetClientAttributes(client);
-
             mClients.Add(client);
 
             client.Handshake();
 
             Log.Inform("Accepted client from {0} on {1} server.", client.Host, this.Label);
         }
-
-        protected void AddHandler(RecvOps operationCode, PacketHandler handler)
-        {
-            mProcessor.Add(operationCode, handler);
-        }
-
-        protected virtual void SetClientAttributes(MapleClient client) { }
-
-        protected abstract void SpawnHandlers();
     }
 }

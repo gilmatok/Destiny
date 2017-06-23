@@ -9,24 +9,24 @@ namespace Destiny.Core.Network
     public abstract class Session
     {
         private const int HeaderSize = sizeof(int);
-        
+
         private readonly Socket mSocket;
 
         private readonly MapleCryptograph mSendCipher;
         private readonly MapleCryptograph mRecvCipher;
-    
+
         private int mOffset;
 
         private byte[] mBuffer;
         private byte[] mPacket;
 
         private object mLocker;
-       
+
         public string Host { get; private set; }
 
         public bool IsAlive { get; private set; }
 
-        protected abstract void Dispatch(byte[] buffer);
+        protected abstract void Dispatch(InPacket iPacket);
         protected abstract void Terminate();
 
         public Session(Socket socket)
@@ -131,7 +131,27 @@ namespace Destiny.Core.Network
                     Buffer.BlockCopy(mPacket, packetSize + Session.HeaderSize, mPacket, 0, mOffset);
                 }
 
-                this.Dispatch(buffer);
+                InPacket iPacket = new InPacket(buffer);
+
+                if (Enum.IsDefined(typeof(ClientOperationCode), iPacket.OperationCode))
+                {
+                    switch (InPacket.LogLevel)
+                    {
+                        case LogLevel.Name:
+                            Log.Inform("Received {0} packet from {1}.", Enum.GetName(typeof(ClientOperationCode), iPacket.OperationCode), this.Host);
+                            break;
+
+                        case LogLevel.Full:
+                            Log.Hex("Received {0} packet from {1}: ", iPacket.ToArray(), Enum.GetName(typeof(ClientOperationCode), iPacket.OperationCode), this.Host);
+                            break;
+                    }
+                }
+                else
+                {
+                    Log.Hex("Received unknown (0x{0:X2}) packet from {1}: ", iPacket.ToArray(), (short)iPacket.OperationCode, this.Host);
+                }
+
+                this.Dispatch(iPacket);
             }
         }
 

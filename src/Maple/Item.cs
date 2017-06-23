@@ -128,7 +128,7 @@ namespace Destiny.Maple
 
         public override OutPacket GetShowGainPacket()
         {
-            OutPacket oPacket = new OutPacket(SendOps.Message);
+            OutPacket oPacket = new OutPacket(ServerOperationCode.Message);
 
             oPacket
                 .WriteByte()

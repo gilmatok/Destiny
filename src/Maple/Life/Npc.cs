@@ -62,7 +62,7 @@ namespace Destiny.Maple.Life
 
         private OutPacket GetInternalPacket(bool requestControl)
         {
-            OutPacket oPacket = new OutPacket(requestControl ? SendOps.NpcChangeController : SendOps.NpcEnterField);
+            OutPacket oPacket = new OutPacket(requestControl ? ServerOperationCode.NpcChangeController : ServerOperationCode.NpcEnterField);
 
             if (requestControl)
             {
@@ -84,7 +84,7 @@ namespace Destiny.Maple.Life
 
         public OutPacket GetControlCancelPacket()
         {
-            OutPacket oPacket = new OutPacket(SendOps.NpcChangeController);
+            OutPacket oPacket = new OutPacket(ServerOperationCode.NpcChangeController);
 
             oPacket
                 .WriteBool()
@@ -95,7 +95,7 @@ namespace Destiny.Maple.Life
 
         public OutPacket GetDestroyPacket()
         {
-            OutPacket oPacket = new OutPacket(SendOps.NpcLeaveField);
+            OutPacket oPacket = new OutPacket(ServerOperationCode.NpcLeaveField);
 
             oPacket.WriteInt(this.ObjectID);
 

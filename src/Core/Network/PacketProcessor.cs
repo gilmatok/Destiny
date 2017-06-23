@@ -1,45 +1,19 @@
 ﻿using Destiny.Core.IO;
 using Destiny.Core.Network;
-using Destiny.Server;
+using System.Collections.Generic;
 
 namespace Destiny.Network
 {
     public delegate void PacketHandler(MapleClient client, InPacket iPacket);
 
-    public sealed class PacketProcessor
+    public sealed class PacketProcessor : Dictionary<ClientOperationCode, PacketHandler>
     {
         public string Label { get; private set; }
 
-        private PacketHandler[] mHandlers;
-        private int mCount;
-
-        public int Count
-        {
-            get
-            {
-                return mCount;
-            }
-        }
-
-        public PacketHandler this[short operationCode]
-        {
-            get
-            {
-                return mHandlers[operationCode];
-            }
-        }
-
         public PacketProcessor(string label)
+             : base()
         {
             this.Label = label;
-
-            mHandlers = new PacketHandler[0xFFFF + 1];
-        }
-
-        public void Add(RecvOps operationCode, PacketHandler handler)
-        {
-            mHandlers[(short)operationCode] = handler;
-            mCount++;
         }
     }
 }

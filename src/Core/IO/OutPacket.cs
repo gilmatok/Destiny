@@ -18,7 +18,7 @@ namespace Destiny.Core.IO
             this.WriteShort(operationCode);
         }
 
-        public OutPacket(SendOps operationCode) : this((short)operationCode) { }
+        public OutPacket(ServerOperationCode operationCode) : this((short)operationCode) { }
 
         public OutPacket WriteBytes(byte[] value)
         {

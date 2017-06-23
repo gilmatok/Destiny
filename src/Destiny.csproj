@@ -130,14 +130,7 @@
     <Compile Include="Core\IO\InPacket.cs" />
     <Compile Include="Maple\Rectangle.cs" />
     <Compile Include="Maple\Skill.cs" />
-    <Compile Include="Network\Handlers\InventoryHandler.cs" />
-    <Compile Include="Network\Handlers\MobHandler.cs" />
-    <Compile Include="Network\Handlers\NpcHandler.cs" />
-    <Compile Include="Network\Handlers\ShopHandler.cs" />
-    <Compile Include="Network\Handlers\PlayerHandler.cs" />
-    <Compile Include="Network\Handlers\LoginHandler.cs" />
-    <Compile Include="Network\Handlers\ServerHandler.cs" />
-    <Compile Include="Network\MapleClient.cs" />
+    <Compile Include="Server\MapleClient.cs" />
     <Compile Include="Core\Network\OpCodes.cs" />
     <Compile Include="Core\IO\OutPacket.cs" />
     <Compile Include="Application.cs" />
@@ -148,7 +141,7 @@
     <Compile Include="Core\Security\MapleCryptograph.cs" />
     <Compile Include="Core\Security\SHACryptograph.cs" />
     <Compile Include="Core\Security\ShandaCryptograph.cs" />
-    <Compile Include="Network\Server\ChannelServer.cs" />
+    <Compile Include="Server\ChannelServer.cs" />
     <Compile Include="Maple\Commands\CommandFactory.cs" />
     <Compile Include="Maple\Commands\Implementation\HelpCommand.cs" />
     <Compile Include="Maple\Commands\Implementation\ItemCommand.cs" />
@@ -158,10 +151,10 @@
     <Compile Include="Maple\Commands\Implementation\MesoCommand.cs" />
     <Compile Include="Maple\Commands\Implementation\NoticeCommand.cs" />
     <Compile Include="Maple\Commands\Implementation\TickerCommand.cs" />
-    <Compile Include="Network\Server\LoginServer.cs" />
-    <Compile Include="Network\Server\MasterServer.cs" />
-    <Compile Include="Network\Server\ServerBase.cs" />
-    <Compile Include="Network\Server\CashShopServer.cs" />
+    <Compile Include="Server\LoginServer.cs" />
+    <Compile Include="Server\MasterServer.cs" />
+    <Compile Include="Server\ServerBase.cs" />
+    <Compile Include="Server\CashShopServer.cs" />
     <Compile Include="Threading\Delay.cs" />
     <Compile Include="Utility\Database.cs" />
     <Compile Include="Utility\DatabaseQuery.cs" />
@@ -172,9 +165,6 @@
     <Folder Include="Maple\Interaction\" />
     <Folder Include="Maple\Shops\" />
     <Folder Include="Maple\Social\" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -1,6 +1,8 @@
 ﻿using Destiny.Core.IO;
 using Destiny.Core.Network;
+using Destiny.Maple.Maps;
 using Destiny.Utility;
+using System.Collections.Generic;
 
 namespace Destiny.Maple.Characters
 {
@@ -80,6 +82,15 @@ namespace Destiny.Maple.Characters
 
         }
 
+        public void Handle(InPacket iPacket)
+        {
+            iPacket.Skip(4); // NOTE: tRequestTime (ticks).
+            InventoryType inventory = (InventoryType)iPacket.ReadByte();
+            short slot1 = iPacket.ReadShort();
+            short slot2 = iPacket.ReadShort();
+            short quantity = iPacket.ReadShort();
+        }
+
         public void Add(int mapleID, short quantity = 1)
         {
             //InventoryType inventory = Item.GetInventory(mapleID);
@@ -101,6 +112,58 @@ namespace Destiny.Maple.Characters
             //InventoryOperation operation = new InventoryOperation(InventoryOperationType.AddItem, item, 0, slot);
 
             //this.Operate(false, operation);
+        }
+
+        public void Pickup(InPacket iPacket)
+        {
+            iPacket.Skip(1);
+            iPacket.Skip(4);
+            Point position = iPacket.ReadPoint();
+
+            // TODO: Validate distance between picker and position.
+
+            int objectID = iPacket.ReadInt();
+
+            Drop drop;
+
+            try
+            {
+                drop = this.Parent.Map.Drops[objectID];
+            }
+            catch (KeyNotFoundException)
+            {
+                return;
+            }
+
+            if (drop.Picker != null)
+            {
+                return;
+            }
+
+            try
+            {
+                drop.Picker = this.Parent;
+
+                if (drop is Meso)
+                {
+                    this.Parent.Meso += ((Meso)drop).Amount;
+                }
+                else if (drop is Item)
+                {
+
+                }
+
+                this.Parent.Map.Drops.Remove(objectID);
+
+                using (OutPacket oPacket = drop.GetShowGainPacket())
+                {
+                    this.Parent.Client.Send(oPacket);
+                }
+            }
+            catch (InventoryFullException)
+            {
+
+            }
         }
 
         public void Swap(InventoryType inventory, short slot1, short slot2)
@@ -237,7 +300,7 @@ namespace Destiny.Maple.Characters
 
         private void Operate(bool unk, params InventoryOperation[] operations)
         {
-            using (OutPacket oPacket = new OutPacket(SendOps.InventoryOperation))
+            using (OutPacket oPacket = new OutPacket(ServerOperationCode.InventoryOperation))
             {
                 oPacket
                     .WriteBool(unk)

@@ -8,7 +8,6 @@ namespace Destiny
 {
     public static class Setup
     {
-        private const string DbFileName = @"..\..\sql\Destiny.sql";
         private const string McdbFileName = @"..\..\sql\MCDB.sql";
 
         public static void Run()
@@ -139,6 +138,13 @@ namespace Destiny
                               PRIMARY KEY (`character_id`,`inventory`,`slot`),
                               CONSTRAINT `items_ibfk_1` FOREIGN KEY (`character_id`) REFERENCES `characters` (`character_id`) ON DELETE CASCADE
                             ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+                            CREATE TABLE `skills` (
+                              `skill_id` int(11) NOT NULL AUTO_INCREMENT,
+                              `character_id` int(11) NOT NULL DEFAULT '0',
+                              `maple_id` int(11) NOT NULL DEFAULT '0',
+                              PRIMARY KEY (`skill_id`)
+                            ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
                             ", databaseSchema);
 
                         Log.Inform("Database '{0}' created.", databaseSchema);
@@ -211,13 +217,101 @@ namespace Destiny
 
             Log.Entitle("Server Configuration");
 
-            string serverName = Log.Input("Enter the server's name: ", "Destiny");
-            int channels = Log.Input("Enter the number of channels: ", 2);
-            IPAddress externalIP = Log.Input("Enter the public server IP: ", IPAddress.Loopback);
+            bool requireStaffIP = Log.YesNo("Require staff to connect through specific IPs? ", true);
+            bool autoRegister = Log.YesNo("Allow players to register in-game? ", true);
+            bool requestPin = Log.YesNo("Require players to enter PIN on login? ", false);
+            bool requestPic = Log.YesNo("Require players to enter PIC on character selection? ", true);
+            int maxCharacters = Log.Input("Maximum characters per account: ", 3);
 
             Log.SkipLine();
 
-            Log.Success("Server configured!");
+            Log.Entitle("World Configuration");
+
+            bool configuredWorld = true;
+
+            int WorldExperienceRate = 1;
+            int WorldQuestExperienceRate = 1;
+            int WorldPartyQuestExperienceRate = 1;
+            int WorldMesoDropRate = 1;
+            int WorldItemDropRate = 1;
+            string WorldName = string.Empty;
+            WorldFlag WorldFlag = WorldFlag.None;
+            IPAddress WorldIP = IPAddress.Loopback;
+
+            if (Log.YesNo("Skip World configuration (not recommended)? ", false))
+            {
+                configuredWorld = false;
+                goto userProfile;
+            }
+
+            Log.SkipLine();
+            Log.Inform("Please enter the basic details: ");
+
+            WorldName = string.Empty;
+
+            do
+            {
+                WorldName = Log.Input("World name (examples: Bera, Khaini): ", "Scania");
+            }
+            while (!WorldNameResolver.IsValid(WorldName));
+
+            WorldIP = Log.Input("Host IP (external for remote only): ", IPAddress.Loopback);
+
+            Log.SkipLine();
+            Log.Inform("Please specify the World rates: ");
+
+            WorldExperienceRate = Log.Input("Normal experience: ", 1);
+            WorldQuestExperienceRate = Log.Input("Quest experience: ", 1);
+            WorldPartyQuestExperienceRate = Log.Input("Party quest experience: ", 1);
+            WorldMesoDropRate = Log.Input("Meso drop: ", 1);
+            WorldItemDropRate = Log.Input("Item drop: ", 1);
+
+            Log.SkipLine();
+
+            Log.Inform("Which flag should be shown with this World?\n  None\n  New\n  Hot\n  Event");
+
+        inputFlag:
+            Log.SkipLine();
+            try
+            {
+                WorldFlag = (WorldFlag)Enum.Parse(typeof(WorldFlag), Log.Input("World flag: ", "None"));
+            }
+            catch
+            {
+                goto inputFlag;
+            }
+
+            Log.SkipLine();
+
+            Log.Success("World '{0}' configured!", WorldName);
+
+        userProfile:
+            Log.Inform("Please choose what information to display.\n  A. Hide packets (recommended)\n  B. Show names\n  C. Show content");
+            Log.SkipLine();
+
+            LogLevel logLevel;
+
+        multipleChoice:
+            switch (Log.Input("Please enter yours choice: ", "Hide").ToLower())
+            {
+                case "a":
+                case "hide":
+                    logLevel = LogLevel.None;
+                    break;
+
+                case "b":
+                case "names":
+                    logLevel = LogLevel.Name;
+                    break;
+
+                case "c":
+                case "content":
+                    logLevel = LogLevel.Full;
+                    break;
+
+                default:
+                    goto multipleChoice;
+            }
 
             Log.Entitle("Please wait...");
 
@@ -225,26 +319,43 @@ namespace Destiny
 
             string lines = string.Format(
                 @"[Log]
+				Packets={0}
 				StackTrace=False
 				LoadTime=False
 				
-				[Login]
-				Port=8484
-				
 				[Server]
-				Name={0}
-				Channels={1}
-				ExternalIP={2}
-				AutoRestartTime=30
+				Port=8484
+				AutoRegister={1}
+				RequestPin={2}
+				RequestPic={3}
+				MaxCharacters={4}
+				RequireStaffIP={5}
 				
 				[Database]
-				Host={3}
-				Schema={4}
-				Username={5}
-				Password={6}",
-                serverName, channels, externalIP,
-                databaseHost, databaseSchema,
-                databaseUsername, databasePassword).Replace("	", "");
+				Host={6}
+				Schema={7}
+				Username={8}
+				Password={9}",
+                logLevel, autoRegister, requestPin, requestPic,
+                maxCharacters, requireStaffIP, databaseHost,
+                databaseSchema, databaseUsername, databasePassword).Replace("	", "");
+
+            if (configuredWorld)
+            {
+                lines += string.Format(@"
+				
+				[World]
+				HostIP={0}
+				StaffOnly=False
+				Flag={1}
+				ExperienceRate={2}
+				QuestExperienceRate={3}
+				PartyQuestExperienceRate={4}
+				MesoDropRate={5}
+				ItemDropRate={6}",
+                WorldIP, WorldFlag, WorldExperienceRate, WorldQuestExperienceRate,
+                WorldPartyQuestExperienceRate, WorldMesoDropRate, WorldItemDropRate).Replace("	", "");
+            }
 
             using (StreamWriter file = new StreamWriter(Application.ExecutablePath + "Configuration.ini"))
             {
