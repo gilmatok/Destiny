@@ -34,6 +34,8 @@ namespace Destiny.Server
             this.AddHandler(RecvOps.NpcMovement, NpcHandler.HandleNpcMovement);
             this.AddHandler(RecvOps.MobMovement, MobHandler.HandleMobMovement);
             this.AddHandler(RecvOps.PlayerInformation, PlayerHandler.HandlePlayerInformation);
+            this.AddHandler(RecvOps.MesoDrop, InventoryHandler.HandleMesoDrop);
+            this.AddHandler(RecvOps.ItemPickup, InventoryHandler.HandlePickup);
         }
 
         protected override void SetClientAttributes(MapleClient client)

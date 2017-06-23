@@ -1,11 +1,13 @@
 ﻿using Destiny.Core.IO;
+using Destiny.Core.Network;
 using Destiny.Maple.Data;
+using Destiny.Maple.Maps;
 using Destiny.Utility;
 using System;
 
 namespace Destiny.Maple
 {
-    public class Item
+    public sealed class Item : Drop
     {
         public int MapleID { get; private set; }
         public short Quantity { get; private set; }
@@ -122,6 +124,21 @@ namespace Destiny.Maple
                     .WriteMapleString(string.Empty) // NOTE: Creator.
                     .WriteShort(); // NOTE: Flags.
             }
+        }
+
+        public override OutPacket GetShowGainPacket()
+        {
+            OutPacket oPacket = new OutPacket(SendOps.Message);
+
+            oPacket
+                .WriteByte()
+                .WriteByte()
+                .WriteInt(this.MapleID)
+                .WriteInt(this.Quantity)
+                .WriteInt()
+                .WriteInt();
+
+            return oPacket;
         }
     }
 }

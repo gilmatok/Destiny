@@ -1,4 +1,7 @@
 ﻿using Destiny.Core.IO;
+using Destiny.Maple;
+using Destiny.Maple.Maps;
+using System.Collections.Generic;
 
 namespace Destiny.Handler
 {
@@ -26,6 +29,79 @@ namespace Destiny.Handler
             }
 
             if (equippedSlot1 || equippedSlot2)
+            {
+
+            }
+        }
+
+        public static void HandleMesoDrop(MapleClient client, InPacket iPacket)
+        {
+            iPacket.Skip(4); // NOTE: tRequestTime (ticks).
+            int amount = iPacket.ReadInt();
+
+            if (amount > client.Character.Meso || amount < 10 || amount > 50000)
+            {
+                return;
+            }
+
+            client.Character.Meso -= amount;
+
+            Meso meso = new Meso(amount)
+            {
+                Dropper = client.Character,
+                Owner = null
+            };
+
+            client.Character.Map.Drops.Add(meso);
+        }
+
+        public static void HandlePickup(MapleClient client, InPacket iPacket)
+        {
+            iPacket.Skip(1);
+            iPacket.Skip(4);
+            Point position = iPacket.ReadPoint();
+
+            // TODO: Validate distance between picker and position.
+
+            int objectID = iPacket.ReadInt();
+
+            Drop drop;
+
+            try
+            {
+                drop = client.Character.Map.Drops[objectID];
+            }
+            catch (KeyNotFoundException)
+            {
+                return;
+            }
+
+            if (drop.Picker != null)
+            {
+                return;
+            }
+
+            try
+            {
+                drop.Picker = client.Character;
+
+                if (drop is Meso)
+                {
+                    client.Character.Meso += ((Meso)drop).Amount;
+                }
+                else if (drop is Item)
+                {
+
+                }
+
+                client.Character.Map.Drops.Remove(objectID);
+
+                using (OutPacket oPacket = drop.GetShowGainPacket())
+                {
+                    client.Send(oPacket);
+                }
+            }
+            catch (InventoryFullException)
             {
 
             }

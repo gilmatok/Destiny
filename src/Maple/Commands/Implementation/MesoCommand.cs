@@ -2,13 +2,13 @@
 
 namespace Destiny.Maple.Commands
 {
-    public sealed class MesosCommand : Command
+    public sealed class MesoCommand : Command
     {
         public override string Name
         {
             get
             {
-                return "mesos";
+                return "meso";
             }
         }
 

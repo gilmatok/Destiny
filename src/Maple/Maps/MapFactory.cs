@@ -6,7 +6,10 @@ namespace Destiny.Maple.Maps
     {
         private byte mChannel;
 
-        public MapFactory(byte channel)
+        // NOTE: To ensure external map factories are functioning properly,
+        // the default channel is 0 so the server can obtain data about maps
+        // regardless of not being owned by a channel.
+        public MapFactory(byte channel = 0)
             : base()
         {
             mChannel = channel;

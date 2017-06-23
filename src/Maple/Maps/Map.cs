@@ -30,6 +30,7 @@ namespace Destiny.Maple.Maps
         public bool NoPartyLeaderPass { get; private set; }
 
         public MapCharacters Characters { get; private set; }
+        public MapDrops Drops { get; private set; }
         public MapMobs Mobs { get; private set; }
         public MapNpcs Npcs { get; private set; }
         public MapPortals Portals { get; private set; }
@@ -51,6 +52,7 @@ namespace Destiny.Maple.Maps
             this.ForcedReturnMapID = this.CachedReference.ForcedReturnMapID;
 
             this.Characters = this.CachedReference.Characters;
+            this.Drops = this.CachedReference.Drops;
             this.Mobs = this.CachedReference.Mobs;
             this.Npcs = this.CachedReference.Npcs;
             this.Portals = this.CachedReference.Portals;
@@ -64,6 +66,7 @@ namespace Destiny.Maple.Maps
             this.ForcedReturnMapID = query.GetInt("forced_return_map");
 
             this.Characters = new MapCharacters(this);
+            this.Drops = new MapDrops(this);
             this.Mobs = new MapMobs(this);
             this.Npcs = new MapNpcs(this);
             this.Portals = new MapPortals(this);

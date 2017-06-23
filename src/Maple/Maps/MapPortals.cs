@@ -12,7 +12,7 @@ namespace Destiny.Maple.Maps
             {
                 foreach (Portal portal in this)
                 {
-                    if (portal.Label == label)
+                    if (portal.Label.ToLower() == label.ToLower())
                     {
                         return portal;
                     }

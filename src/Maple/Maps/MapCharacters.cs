@@ -1,6 +1,7 @@
 ﻿using Destiny.Core.IO;
 using Destiny.Maple.Characters;
 using Destiny.Maple.Life;
+using System.Collections.Generic;
 
 namespace Destiny.Maple.Maps
 {
@@ -8,11 +9,59 @@ namespace Destiny.Maple.Maps
     {
         public MapCharacters(Map map) : base(map) { }
 
+        public Character this[string name]
+        {
+            get
+            {
+                foreach (Character character in this)
+                {
+                    if (character.Name.ToLower() == name.ToLower())
+                    {
+                        return character;
+                    }
+                }
+
+                throw new KeyNotFoundException();
+            }
+        }
+
         protected override void InsertItem(int index, Character item)
         {
-            // TODO: Broadcast characters enter field packet to character.
+            lock (this)
+            {
+                foreach (Character character in this)
+                {
+                    using (OutPacket oPacket = character.GetSpawnPacket())
+                    {
+                        item.Client.Send(oPacket);
+                    }
+                }
+            }
+
+            item.Position = this.Map.Portals[item.SpawnPoint].Position;
 
             base.InsertItem(index, item);
+
+            lock (this.Map.Drops)
+            {
+                foreach (Drop drop in this.Map.Drops)
+                {
+                    if (drop.Owner == null)
+                    {
+                        using (OutPacket oPacket = drop.GetSpawnPacket(item))
+                        {
+                            item.Client.Send(oPacket);
+                        }
+                    }
+                    else
+                    {
+                        using (OutPacket oPacket = drop.GetSpawnPacket())
+                        {
+                            item.Client.Send(oPacket);
+                        }
+                    }
+                }
+            }
 
             lock (this.Map.Mobs)
             {
@@ -52,15 +101,26 @@ namespace Destiny.Maple.Maps
                 }
             }
 
-            // TODO: Broadcast character enter field packet to map.
+            using (OutPacket oPacket = item.GetCreatePacket())
+            {
+                this.Map.Broadcast(oPacket, item);
+            }
         }
 
         protected override void RemoveItem(int index)
         {
-            Character item = base.Items[index];
+            lock (this)
+            {
+                Character item = base.Items[index];
 
-            item.ControlledMobs.Clear();
-            item.ControlledNpcs.Clear();
+                item.ControlledMobs.Clear();
+                item.ControlledNpcs.Clear();
+
+                using (OutPacket oPacket = item.GetDestroyPacket())
+                {
+                    this.Map.Broadcast(oPacket, item);
+                }
+            }
 
             base.RemoveItem(index);
 
@@ -79,8 +139,6 @@ namespace Destiny.Maple.Maps
                     npc.AssignController();
                 }
             }
-
-            // TODO: Broadcast character leave field packet to map.
         }
 
         protected override int GetKeyForItem(Character item)

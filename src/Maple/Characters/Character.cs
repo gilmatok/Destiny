@@ -813,7 +813,7 @@ namespace Destiny.Maple.Characters
             oPacket
                 .WriteByte(20) // NOTE: Max buddylist size.
                 .WriteBool(false) // NOTE: Blessing of Fairy.
-                .WriteInt(); // NOTE: Mesos.
+                .WriteInt(this.Meso);
 
             this.Items.Encode(oPacket);
             this.Skills.Encode(oPacket);
@@ -842,17 +842,25 @@ namespace Destiny.Maple.Characters
 
         public OutPacket GetCreatePacket()
         {
-            throw new NotImplementedException();
+            return this.GetSpawnPacket();
         }
 
         public OutPacket GetSpawnPacket()
         {
-            throw new NotImplementedException();
+            OutPacket oPacket = new OutPacket(SendOps.UserEnterField);
+
+            oPacket.WriteInt(this.ID);
+
+            return oPacket;
         }
 
         public OutPacket GetDestroyPacket()
         {
-            throw new NotImplementedException();
+            OutPacket oPacket = new OutPacket(SendOps.UserLeaveField);
+
+            oPacket.WriteInt(this.ID);
+
+            return oPacket;
         }
     }
 }
