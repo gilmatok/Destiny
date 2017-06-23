@@ -1,6 +1,4 @@
-﻿using Destiny.Maple.Life;
-using Destiny.Utility;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 
 namespace Destiny.Maple.Maps
 {
@@ -14,47 +12,16 @@ namespace Destiny.Maple.Maps
             mChannel = channel;
         }
 
-        public void Load()
+        public new Map this[int key]
         {
-            using (Database.TemporarySchema("mcdb"))
+            get
             {
-                using (DatabaseQuery query = Database.Query("SELECT * FROM map_data"))
+                if (!base.Contains(key))
                 {
-                    while (query.NextRow())
-                    {
-                        this.Add(new Map(mChannel, query));
-                    }
+                    this.Add(new Map(key, mChannel));
                 }
 
-                using (DatabaseQuery query = Database.Query("SELECT * FROM map_portals"))
-                {
-                    while (query.NextRow())
-                    {
-                        this[query.GetInt("mapid")].Portals.Add(new Portal(query));
-                    }
-                }
-
-                using (DatabaseQuery query = Database.Query("SELECT * FROM map_life"))
-                {
-                    while (query.NextRow())
-                    {
-                        switch (query.GetString("life_type"))
-                        {
-                            case "npc":
-                                this[query.GetInt("mapid")].Npcs.Add(new Npc(query));
-                                break;
-
-                            case "mob":
-                                this[query.GetInt("mapid")].SpawnPoints.Add(new SpawnPoint(query));
-                                break;
-                        }
-                    }
-                }
-            }
-
-            foreach (Map map in this)
-            {
-                map.SpawnPoints.Spawn();
+                return base[key];
             }
         }
 

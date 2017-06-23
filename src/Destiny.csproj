@@ -68,6 +68,7 @@
     <Compile Include="IO\Settings.cs" />
     <Compile Include="Maple\Commands\Commands.cs" />
     <Compile Include="Maple\Data\CachedItems.cs" />
+    <Compile Include="Maple\Data\CachedMaps.cs" />
     <Compile Include="Maple\Data\DataProvider.cs" />
     <Compile Include="Maple\Life\LifeObject.cs" />
     <Compile Include="Maple\Maps\MapFactory.cs" />

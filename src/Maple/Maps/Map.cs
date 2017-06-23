@@ -1,13 +1,14 @@
 ﻿using Destiny.Core.IO;
 using Destiny.Maple.Characters;
+using Destiny.Maple.Data;
 using Destiny.Utility;
 
 namespace Destiny.Maple.Maps
 {
     public sealed class Map
     {
-        public byte Channel { get; private set; }
         public int MapleID { get; private set; }
+        public byte Channel { get; private set; }
         public int ReturnMapID { get; private set; }
         public int ForcedReturnMapID { get; private set; }
         public byte RegenerationRate { get; private set; }
@@ -34,9 +35,30 @@ namespace Destiny.Maple.Maps
         public MapPortals Portals { get; private set; }
         public MapSpawnPoints SpawnPoints { get; private set; }
 
-        public Map(byte channel, DatabaseQuery query)
+        public Map CachedReference
         {
+            get
+            {
+                return DataProvider.CachedMaps[this.MapleID];
+            }
+        }
+
+        public Map(int mapleID, byte channel)
+        {
+            this.MapleID = mapleID;
             this.Channel = channel;
+            this.ReturnMapID = this.CachedReference.ReturnMapID;
+            this.ForcedReturnMapID = this.CachedReference.ForcedReturnMapID;
+
+            this.Characters = this.CachedReference.Characters;
+            this.Mobs = this.CachedReference.Mobs;
+            this.Npcs = this.CachedReference.Npcs;
+            this.Portals = this.CachedReference.Portals;
+            this.SpawnPoints = this.CachedReference.SpawnPoints;
+        }
+
+        public Map(DatabaseQuery query)
+        {
             this.MapleID = query.GetInt("mapid");
             this.ReturnMapID = query.GetInt("return_map");
             this.ForcedReturnMapID = query.GetInt("forced_return_map");

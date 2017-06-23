@@ -19,8 +19,6 @@ namespace Destiny.Server
         public override void Start()
         {
             base.Start();
-
-            this.Maps.Load();
         }
 
         protected override void SpawnHandlers()

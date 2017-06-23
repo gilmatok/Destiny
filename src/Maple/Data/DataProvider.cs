@@ -9,6 +9,7 @@ namespace Destiny.Maple.Data
         public static bool IsInitialized { get; private set; }
 
         public static CachedItems CachedItems { get; private set; }
+        public static CachedMaps CachedMaps { get; private set; }
 
         public static void Initialize()
         {
@@ -21,6 +22,11 @@ namespace Destiny.Maple.Data
                     DataProvider.CachedItems.Clear();
                 }
 
+                if (DataProvider.CachedMaps!= null)
+                {
+                    DataProvider.CachedMaps.Clear();
+                }
+
                 Database.Test();
 
                 Stopwatch sw = new Stopwatch();
@@ -30,6 +36,7 @@ namespace Destiny.Maple.Data
                 Log.Inform("Loading data...");
 
                 DataProvider.CachedItems = new CachedItems();
+                DataProvider.CachedMaps = new CachedMaps();
 
                 CommandFactory.Initialize();
 
