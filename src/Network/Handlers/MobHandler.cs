@@ -1,7 +1,7 @@
 ﻿using Destiny.Core.IO;
 using Destiny.Core.Network;
 using Destiny.Maple;
-using Destiny.Maple.Maps;
+using Destiny.Maple.Life;
 using System.Collections.Generic;
 
 namespace Destiny.Handler
@@ -10,59 +10,59 @@ namespace Destiny.Handler
     {
         public static void HandleMobMovement(MapleClient client, InPacket iPacket)
         {
-            //int objectID = iPacket.ReadInt();
+            int objectID = iPacket.ReadInt();
 
-            //Mob mob;
+            Mob mob;
 
-            //try
-            //{
-            //    mob = client.Character.ControlledMobs[objectID];
-            //}
-            //catch (KeyNotFoundException)
-            //{
-            //    return;
-            //}
+            try
+            {
+                mob = client.Character.ControlledMobs[objectID];
+            }
+            catch (KeyNotFoundException)
+            {
+                return;
+            }
 
-            //short moveAction = iPacket.ReadShort();
-            //bool cheatResult = (iPacket.ReadByte() & 0xF) != 0;
-            //byte centerSplit = iPacket.ReadByte();
-            //int illegalVelocity = iPacket.ReadInt();
-            //byte unknown = iPacket.ReadByte();
-            //iPacket.ReadInt();
+            short moveAction = iPacket.ReadShort();
+            bool cheatResult = (iPacket.ReadByte() & 0xF) != 0;
+            byte centerSplit = iPacket.ReadByte();
+            int illegalVelocity = iPacket.ReadInt();
+            byte unknown = iPacket.ReadByte();
+            iPacket.ReadInt();
 
-            //Movements movements = Movements.Decode(iPacket);
+            Movements movements = Movements.Decode(iPacket);
 
-            //Movement lastMovement = movements[movements.Count - 1];
+            Movement lastMovement = movements[movements.Count - 1];
 
-            //mob.Position = lastMovement.Position;
-            //mob.Foothold = lastMovement.Foothold;
-            //mob.Stance = lastMovement.Stance;
+            mob.Position = lastMovement.Position;
+            mob.Foothold = lastMovement.Foothold;
+            mob.Stance = lastMovement.Stance;
 
-            //using (OutPacket oPacket = new OutPacket(SendOps.MobCtrlAck))
-            //{
-            //    oPacket
-            //        .WriteInt(objectID)
-            //        .WriteShort(moveAction)
-            //        .WriteBool(cheatResult)
-            //        .WriteShort() // NOTE: Mob mana.
-            //        .WriteByte() // NOTE: Ability ID.
-            //        .WriteByte(); // NOTE: Ability level.
+            using (OutPacket oPacket = new OutPacket(SendOps.MobCtrlAck))
+            {
+                oPacket
+                    .WriteInt(objectID)
+                    .WriteShort(moveAction)
+                    .WriteBool(cheatResult)
+                    .WriteShort() // NOTE: Mob mana.
+                    .WriteByte() // NOTE: Ability ID.
+                    .WriteByte(); // NOTE: Ability level.
 
-            //    client.Send(oPacket);
-            //}
+                client.Send(oPacket);
+            }
 
-            //using (OutPacket oPacket = new OutPacket(SendOps.MobMove))
-            //{
-            //    oPacket
-            //        .WriteInt(objectID)
-            //        .WriteBool(cheatResult)
-            //        .WriteByte(centerSplit)
-            //        .WriteInt(illegalVelocity);
+            using (OutPacket oPacket = new OutPacket(SendOps.MobMove))
+            {
+                oPacket
+                    .WriteInt(objectID)
+                    .WriteBool(cheatResult)
+                    .WriteByte(centerSplit)
+                    .WriteInt(illegalVelocity);
 
-            //    movements.Encode(oPacket);
+                movements.Encode(oPacket);
 
-            //    client.Character.Map.Broadcast(oPacket, client.Character);
-            //}
+                client.Character.Map.Broadcast(oPacket, client.Character);
+            }
         }
     }
 }

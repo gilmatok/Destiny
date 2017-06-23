@@ -1,7 +1,7 @@
 ﻿using Destiny.Core.IO;
 using Destiny.Core.Network;
 using Destiny.Maple;
-using Destiny.Maple.Maps;
+using Destiny.Maple.Life;
 using System.Collections.Generic;
 
 namespace Destiny.Handler
@@ -10,21 +10,22 @@ namespace Destiny.Handler
     {
         public static void HandleNpcMovement(MapleClient client, InPacket iPacket)
         {
-            //int objectID = iPacket.ReadInt();
-            //Npc npc;
+            int objectID = iPacket.ReadInt();
+            Npc npc;
 
-            //try
-            //{
-            //    npc = client.Character.ControlledNpcs[objectID];
-            //}
-            //catch (KeyNotFoundException)
-            //{
-            //    return;
-            //}
+            try
+            {
+                npc = client.Character.ControlledNpcs[objectID];
+            }
+            catch (KeyNotFoundException)
+            {
+                return;
+            }
 
-            //byte a = iPacket.ReadByte();
-            //byte b = iPacket.ReadByte();
-            //Movements movements = null;
+            byte a = iPacket.ReadByte();
+            byte b = iPacket.ReadByte();
+
+            // TODO: Implement movements.
 
             //using (OutPacket oPacket = new OutPacket(SendOps.NpcMove))
             //{
@@ -32,15 +33,6 @@ namespace Destiny.Handler
             //        .WriteInt(npc.ObjectID)
             //        .WriteByte(a)
             //        .WriteByte(b);
-
-            //    if (npc.Data.IsMoving)
-            //    {
-            //        movements = Movements.Decode(iPacket);
-
-            //        TODO: Validate movements.
-
-            //        movements.Encode(oPacket);
-            //    }
 
             //    client.Character.Map.Broadcast(oPacket);
             //}

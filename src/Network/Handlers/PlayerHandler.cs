@@ -70,70 +70,70 @@ namespace Destiny.Handler
 
         public static void HandlePlayerMovement(MapleClient client, InPacket iPacket)
         {
-            //Movements movements = Movements.Decode(iPacket);
+            Movements movements = Movements.Decode(iPacket);
 
-            //// TODO: Validate movements.
+            // TODO: Validate movements.
 
-            //Movement lastMovement = movements[movements.Count - 1];
+            Movement lastMovement = movements[movements.Count - 1];
 
-            //client.Character.Position = lastMovement.Position;
-            //client.Character.Foothold = lastMovement.Foothold;
-            //client.Character.Stance = lastMovement.Stance;
+            client.Character.Position = lastMovement.Position;
+            client.Character.Foothold = lastMovement.Foothold;
+            client.Character.Stance = lastMovement.Stance;
 
-            //using (OutPacket oPacket = new OutPacket(SendOps.UserMove))
-            //{
-            //    oPacket.WriteInt(client.Character.ID);
-            //    movements.Encode(oPacket);
+            using (OutPacket oPacket = new OutPacket(SendOps.UserMove))
+            {
+                oPacket.WriteInt(client.Character.ID);
+                movements.Encode(oPacket);
 
-            //    client.Character.Map.Broadcast(oPacket, client.Character);
-            //}
+                client.Character.Map.Broadcast(oPacket, client.Character);
+            }
         }
 
         public static void HandlePlayerInformation(MapleClient client, InPacket iPacket)
         {
-            //iPacket.Skip(4);
-            //int characterID = iPacket.ReadInt();
+            iPacket.Skip(4);
+            int characterID = iPacket.ReadInt();
 
-            //Character target;
+            Character target;
 
-            //try
-            //{
-            //    target = client.Character.Map.Characters[characterID];
-            //}
-            //catch (KeyNotFoundException)
-            //{
-            //    return;
-            //}
+            try
+            {
+                target = client.Character.Map.Characters[characterID];
+            }
+            catch (KeyNotFoundException)
+            {
+                return;
+            }
 
-            //if (target.IsGm)
-            //{
-            //    return;
-            //}
+            if (target.IsGm)
+            {
+                return;
+            }
 
-            //using (OutPacket oPacket = new OutPacket(SendOps.CharacterInformation))
-            //{
-            //    oPacket
-            //        .WriteInt(target.ID)
-            //        .WriteByte(target.Stats.Level)
-            //        .WriteShort((short)target.Stats.Job)
-            //        .WriteShort(target.Stats.Fame)
-            //        .WriteBool() // NOTE: Marriage.
-            //        .WriteMapleString("-") // NOTE: Guild name.
-            //        .WriteMapleString("-") // NOTE: Alliance name.
-            //        .WriteByte() // NOTE: Unknown.
-            //        .WriteByte() // NOTE: Pets.
-            //        .WriteByte() // NOTE: Mount.
-            //        .WriteByte() // NOTE: Wishlist.
-            //        .WriteInt() // NOTE: Monster Book level.
-            //        .WriteInt() // NOTE: Monster Book normal cards. 
-            //        .WriteInt() // NOTE: Monster Book special cards.
-            //        .WriteInt() // NOTE: Monster Book total cards.
-            //        .WriteInt() // NOTE: Monster Book cover.
-            //        .WriteInt() // NOTE: Medal ID.
-            //        .WriteShort(); // NOTE: Medal quests.
+            using (OutPacket oPacket = new OutPacket(SendOps.CharacterInformation))
+            {
+                oPacket
+                    .WriteInt(target.ID)
+                    .WriteByte(target.Level)
+                    .WriteShort((short)target.Job)
+                    .WriteShort(target.Fame)
+                    .WriteBool() // NOTE: Marriage.
+                    .WriteMapleString("-") // NOTE: Guild name.
+                    .WriteMapleString("-") // NOTE: Alliance name.
+                    .WriteByte() // NOTE: Unknown.
+                    .WriteByte() // NOTE: Pets.
+                    .WriteByte() // NOTE: Mount.
+                    .WriteByte() // NOTE: Wishlist.
+                    .WriteInt() // NOTE: Monster Book level.
+                    .WriteInt() // NOTE: Monster Book normal cards. 
+                    .WriteInt() // NOTE: Monster Book special cards.
+                    .WriteInt() // NOTE: Monster Book total cards.
+                    .WriteInt() // NOTE: Monster Book cover.
+                    .WriteInt() // NOTE: Medal ID.
+                    .WriteShort(); // NOTE: Medal quests.
 
-            //    client.Send(oPacket);
-            //}
+                client.Send(oPacket);
+            }
         }
     }
 }

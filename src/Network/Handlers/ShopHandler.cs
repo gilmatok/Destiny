@@ -1,4 +1,5 @@
 ﻿using Destiny.Core.IO;
+using Destiny.Core.Network;
 using Destiny.Server;
 
 namespace Destiny.Handler
@@ -7,9 +8,17 @@ namespace Destiny.Handler
     {
         public static void OnTransferFieldRequest(MapleClient client, InPacket iPacket)
         {
-            //MasterServer.Instance.Worlds[client.World].Channels[client.Channel].Migrations.Add(client.Host, client.Account.ID, client.Character.ID);
+            MasterServer.Channels[client.Channel].Migrations.Add(client.Host, client.Account.ID, client.Character.ID);
 
-            //client.Migrate(true, MasterServer.Instance.Worlds[client.World].Channels[client.Channel].Port);
+            using (OutPacket oPacket = new OutPacket(SendOps.MigrateCommand))
+            {
+                oPacket
+                    .WriteBool(true)
+                    .WriteBytes(new byte[4] { 127, 0, 0, 1 })
+                    .WriteShort(MasterServer.Channels[client.Channel].Port);
+
+                client.Send(oPacket);
+            }
         }
     }
 }

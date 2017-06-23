@@ -1,6 +1,5 @@
 ﻿using Destiny.IO;
 using Destiny.Maple.Data;
-using System.Diagnostics;
 
 namespace Destiny.Server
 {

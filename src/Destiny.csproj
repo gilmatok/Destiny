@@ -74,7 +74,7 @@
     <Compile Include="Maple\Life\SpawnPoint.cs" />
     <Compile Include="Maple\Maps\MapSpawnPoints.cs" />
     <Compile Include="Setup.cs" />
-    <Compile Include="Utility\Constants.cs" />
+    <Compile Include="Constants.cs" />
     <Compile Include="Core\IO\BufferPool.cs" />
     <Compile Include="Core\IO\PacketBase.cs" />
     <Compile Include="Enums\Gender.cs" />
@@ -154,7 +154,6 @@
     <Compile Include="Network\Server\CashShopServer.cs" />
     <Compile Include="Utility\Database.cs" />
     <Compile Include="Utility\DatabaseQuery.cs" />
-    <Compile Include="Utility\Doublet.cs" />
     <Compile Include="Utility\Extensions.cs" />
     <Compile Include="IO\Log.cs" />
   </ItemGroup>

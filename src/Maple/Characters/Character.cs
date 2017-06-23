@@ -490,7 +490,7 @@ namespace Destiny.Maple.Characters
             Database.Execute("UPDATE `characters` SET skin = @skin, face = @face, hair = @hair, level = @level, job = @job, strength = @strength, " +
                              "dexterity = @dexterity, intelligence = @intelligence, luck = @luck, health = @health, max_health = @max_health, mana = @mana, " +
                              "max_mana = @max_mana, ability_points = @ability_points, skill_points = @skill_points, experience = @experience, fame = @fame, " +
-                             "map = @map, spawn_point = @spawn_point, mesos = @mesos, equipment_slots = @equipment_slots, usable_slots = @usable_slots, " +
+                             "map = @map, spawn_point = @spawn_point, meso = @meso, equipment_slots = @equipment_slots, usable_slots = @usable_slots, " +
                              "setup_slots = @setup_slots, etcetera_slots = @etcetera_slots, cash_slots = @cash_slots WHERE `character_id` = @character_id",
                              new MySqlParameter("character_id", this.ID),
                              new MySqlParameter("skin", this.Skin),

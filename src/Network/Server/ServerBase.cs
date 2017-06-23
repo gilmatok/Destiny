@@ -69,7 +69,8 @@ namespace Destiny.Server
 
     public abstract class ServerBase
     {
-        private string mLabel;
+        public string Label { get; private set; }
+
         private Acceptor mAcceptor;
         private PacketProcessor mProcessor;
         private List<MapleClient> mClients;
@@ -84,11 +85,22 @@ namespace Destiny.Server
             }
         }
 
+        public int Load
+        {
+            get
+            {
+                lock (mClients)
+                {
+                    return mClients.Count;
+                }
+            }
+        }
+
         protected ServerBase(string label, short port)
         {
-            mLabel = label;
+            this.Label = label;
             mAcceptor = new Acceptor(port, this.OnClientAccepted);
-            mProcessor = new PacketProcessor(mLabel);
+            mProcessor = new PacketProcessor(this.Label);
             mClients = new List<MapleClient>();
 
             this.Migrations = new MigrationRegistery();
@@ -100,7 +112,7 @@ namespace Destiny.Server
         {
             mAcceptor.Start();
 
-            Log.Inform("{0} started on port {1}.", mLabel, this.Port);
+            Log.Inform("{0} server started on port {1}.", this.Label, this.Port);
         }
 
         public virtual void Stop()
@@ -117,7 +129,7 @@ namespace Destiny.Server
                 client.Close();
             }
 
-            Log.Warn("{0} stopped.", mLabel);
+            Log.Warn("{0} server stopped.", this.Label);
         }
 
         private void OnClientAccepted(Socket socket)
@@ -130,7 +142,7 @@ namespace Destiny.Server
 
             client.Handshake();
 
-            Log.Inform("Accepted client from {0} on {1}.", client.Host, mLabel);
+            Log.Inform("Accepted client from {0} on {1} server.", client.Host, this.Label);
         }
 
         protected void AddHandler(RecvOps operationCode, PacketHandler handler)

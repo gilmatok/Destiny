@@ -2,7 +2,6 @@
 using Destiny.Core.Network;
 using Destiny.Core.Security;
 using Destiny.Maple;
-using Destiny.Maple.Characters;
 using Destiny.Server;
 using Destiny.Utility;
 using MySql.Data.MySqlClient;
@@ -17,36 +16,44 @@ namespace Destiny.Handler
             string username = iPacket.ReadMapleString();
             string password = iPacket.ReadMapleString();
 
-            Account account = null;
             LoginResult result = LoginResult.Valid;
 
-            using (DatabaseQuery query = Database.Query("SELECT * FROM `accounts` WHERE `username` = @username", new MySqlParameter("username", username)))
-            {
-                if (query.NextRow())
-                {
-                    account = new Account(query);
-                }
-            }
-
-            if (account == null)
+            if (!username.IsAlphaNumeric())
             {
                 result = LoginResult.InvalidUsername;
             }
-            else if (SHACryptograph.Encrypt(SHAMode.SHA512, password + account.Salt) != account.Password)
-            {
-                result = LoginResult.InvalidPassword;
-            }
-            else if (false) // TODO: Handle ban scenario.
-            {
-                result = LoginResult.Banned;
-            }
-            else if (false) // TODO: Handle logged-in scenario.
-            {
-                result = LoginResult.LoggedIn;
-            }
             else
             {
-                client.Account = account;
+                Account account = null;
+
+                using (DatabaseQuery query = Database.Query("SELECT * FROM `accounts` WHERE `username` = @username", new MySqlParameter("username", username)))
+                {
+                    if (query.NextRow())
+                    {
+                        account = new Account(query);
+                    }
+                }
+
+                if (account == null)
+                {
+                    result = LoginResult.InvalidUsername;
+                }
+                else if (SHACryptograph.Encrypt(SHAMode.SHA512, password + account.Salt) != account.Password)
+                {
+                    result = LoginResult.InvalidPassword;
+                }
+                else if (false) // TODO: Handle ban scenario.
+                {
+                    result = LoginResult.Banned;
+                }
+                else if (false) // TODO: Handle logged-in scenario.
+                {
+                    result = LoginResult.LoggedIn;
+                }
+                else
+                {
+                    client.Account = account;
+                }
             }
 
             using (OutPacket oPacket = new OutPacket(SendOps.CheckPasswordResult))
@@ -59,12 +66,12 @@ namespace Destiny.Handler
                 if (result == LoginResult.Valid)
                 {
                     oPacket
-                        .WriteInt(account.ID)
+                        .WriteInt(client.Account.ID)
                         .WriteByte()
                         .WriteBool()
                         .WriteByte()
                         .WriteByte()
-                        .WriteMapleString(account.Username)
+                        .WriteMapleString(client.Account.Username)
                         .WriteByte()
                         .WriteBool()
                         .WriteLong()
@@ -94,8 +101,8 @@ namespace Destiny.Handler
                 foreach (ChannelServer channel in MasterServer.Channels)
                 {
                     oPacket
-                        .WriteMapleString(string.Format("{0}-{1}", "Destiny", channel.ID))
-                        .WriteInt()
+                        .WriteMapleString(channel.Label)
+                        .WriteInt(channel.Load)
                         .WriteByte(1)
                         .WriteShort(channel.ID);
                 }
@@ -196,68 +203,58 @@ namespace Destiny.Handler
                 .WriteBool(true)
                 .WriteInt(query.GetInt("hair"));
 
-            SortedDictionary<byte, Doublet<int, int>> equipment = new SortedDictionary<byte, Doublet<int, int>>();
+            Dictionary<byte, int> visibleLayer = new Dictionary<byte, int>();
+            Dictionary<byte, int> hiddenLayer = new Dictionary<byte, int>();
 
             using (DatabaseQuery equipmentQuery = Database.Query("SELECT `slot`, `maple_id` FROM `items` WHERE `character_id` = @character_id AND `inventory` = 1 AND `slot` < 0", new MySqlParameter("@character_id", query.GetInt("character_id"))))
             {
                 while (equipmentQuery.NextRow())
                 {
-                    short slot = (short)(-(equipmentQuery.GetShort("slot")));
+                    byte slot = (byte)(short)(-(equipmentQuery.GetShort("slot")));
+                    int mapleID = equipmentQuery.GetInt("maple_id");
 
-                    if (slot > 100)
+                    if (slot < 100 && !visibleLayer.ContainsKey(slot))
+                    {
+                        visibleLayer[slot] = mapleID;
+                    }
+                    else if (slot > 100 && slot != 111)
                     {
                         slot -= 100;
-                    }
 
-                    Doublet<int, int> pair = equipment.GetOrDefault((byte)slot, null);
+                        if (visibleLayer.ContainsKey(slot))
+                        {
+                            hiddenLayer[slot] = visibleLayer[slot];
+                        }
 
-                    if (pair == null)
-                    {
-                        pair = new Doublet<int, int>(equipmentQuery.GetInt("maple_id"), 0);
-                        equipment.Add((byte)slot, pair);
+                        visibleLayer[slot] = mapleID;
                     }
-                    else if (equipmentQuery.GetShort("slot") < -100)
+                    else if (visibleLayer.ContainsKey(slot))
                     {
-                        pair.Second = pair.First;
-                        pair.First = equipmentQuery.GetInt("maple_id");
-                    }
-                    else
-                    {
-                        pair.Second = (int)equipmentQuery["maple_id"];
+                        hiddenLayer[slot] = mapleID;
                     }
                 }
             }
 
-            foreach (KeyValuePair<byte, Doublet<int, int>> pair in equipment)
+            foreach (KeyValuePair<byte, int> entry in visibleLayer)
             {
-                oPacket.WriteByte(pair.Key);
-
-                if (pair.Key == 11 && pair.Value.Second > 0)
-                {
-                    oPacket.WriteInt(pair.Value.Second);
-                }
-                else
-                {
-                    oPacket.WriteInt(pair.Value.First);
-                }
+                oPacket
+                    .WriteByte(entry.Key)
+                    .WriteInt(entry.Value);
             }
+
             oPacket.WriteByte(byte.MaxValue);
 
-            foreach (KeyValuePair<byte, Doublet<int, int>> pair in equipment)
+            foreach (KeyValuePair<byte, int> entry in hiddenLayer)
             {
-                if (pair.Key != 11 && pair.Value.Second > 0)
-                {
-                    oPacket
-                        .WriteByte(pair.Key)
-                        .WriteInt(pair.Value.Second);
-                }
+                oPacket
+                    .WriteByte(entry.Key)
+                    .WriteInt(entry.Value);
             }
-            oPacket.WriteByte(byte.MaxValue);
 
-            Doublet<int, int> cashWeapon = equipment.GetOrDefault((byte)11, null);
+            oPacket.WriteByte(byte.MaxValue);
 
             oPacket
-                .WriteInt(cashWeapon == null ? 0 : cashWeapon.First)
+                .WriteInt() // TODO: Cash weapon.
                 .WriteZero(12)
                 .WriteByte()
                 .WriteBool();

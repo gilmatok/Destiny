@@ -10,7 +10,7 @@ namespace Destiny.Server
         public MapFactory Maps { get; private set; }
 
         public ChannelServer(byte id, short port)
-            : base(string.Format("Channel {0}", id), port)
+            : base(string.Format("Destiny-{0}", id), port)
         {
             this.ID = id;
             this.Maps = new MapFactory(this.ID);
@@ -41,14 +41,6 @@ namespace Destiny.Server
         protected override void SetClientAttributes(MapleClient client)
         {
             client.Channel = this.ID;
-        }
-
-        public void Notify(string message, NoticeType type)
-        {
-            //foreach (Character character in this.Characters)
-            //{
-            //    character.Notify(message, type);
-            //}
         }
     }
 }
