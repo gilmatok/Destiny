@@ -529,10 +529,6 @@ namespace Destiny.Maple.Characters
             datum["EtceteraSlots"] = this.Items.MaxSlots[ItemType.Etcetera];
             datum["CashSlots"] = this.Items.MaxSlots[ItemType.Cash];
 
-            this.Items.Save();
-            this.Skills.Save();
-            this.Quests.Save();
-
             if (this.Assigned)
             {
                 datum.Update("ID = '{0}'", this.ID);
@@ -541,9 +537,13 @@ namespace Destiny.Maple.Characters
             {
                 this.ID = datum.InsertAndReturnID();
                 this.Assigned = true;
-
-                Log.Inform("Saved character '{0}' to database.", this.Name);
             }
+
+            this.Items.Save();
+            this.Skills.Save();
+            this.Quests.Save();
+
+            Log.Inform("Saved character '{0}' to database.", this.Name);
         }
 
         public void Delete()

@@ -368,7 +368,44 @@ namespace Destiny.Maple
 
         public void Save()
         {
+            Datum datum = new Datum("items");
 
+            datum["CharacterID"] = this.Character.ID;
+            datum["MapleID"] = this.MapleID;
+            datum["Quantity"] = this.Quantity;
+            datum["Slot"] = this.Slot;
+            datum["Creator"] = this.Creator;
+            datum["UpgradesAvailable"] = this.UpgradesAvailable;
+            datum["UpgradesApplied"] = this.UpgradesApplied;
+            datum["Strength"] = this.Strength;
+            datum["Dexterity"] = this.Dexterity;
+            datum["Intelligence"] = this.Intelligence;
+            datum["Luck"] = this.Luck;
+            datum["Health"] = this.Health;
+            datum["Mana"] = this.Mana;
+            datum["WeaponAttack"] = this.WeaponAttack;
+            datum["MagicAttack"] = this.MagicAttack;
+            datum["WeaponDefense"] = this.WeaponDefense;
+            datum["MagicDefense"] = this.MagicDefense;
+            datum["Accuracy"] = this.Accuracy;
+            datum["Avoidability"] = this.Avoidability;
+            datum["Agility"] = this.Agility;
+            datum["Speed"] = this.Speed;
+            datum["Jump"] = this.Jump;
+            datum["IsScisored"] = this.IsScisored;
+            datum["PreventsSlipping"] = this.PreventsSlipping;
+            datum["PreventsColdness"] = this.PreventsColdness;
+            datum["IsStored"] = false;
+
+            if (this.Assigned)
+            {
+                datum.Update("ID = '{0}'", this.ID);
+            }
+            else
+            {
+                this.ID = datum.InsertAndReturnID();
+                this.Assigned = true;
+            }
         }
 
         public void Delete()
