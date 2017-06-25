@@ -151,7 +151,14 @@ namespace Destiny.Core.Network
                     Log.Hex("Received unknown (0x{0:X2}) packet from {1}: ", iPacket.ToArray(), (short)iPacket.OperationCode, this.Host);
                 }
 
-                this.Dispatch(iPacket);
+                try
+                {
+                    this.Dispatch(iPacket);
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex); // TODO: Add a detailed message.
+                }
             }
         }
 

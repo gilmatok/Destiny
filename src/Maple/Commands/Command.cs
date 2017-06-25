@@ -6,7 +6,7 @@ namespace Destiny.Maple.Commands
     {
         public abstract string Name { get; }
         public abstract string Parameters { get; }
-        public abstract GmLevel RequiredLevel { get; }
+        public abstract bool IsRestricted { get; }
 
         public abstract void Execute(Character caller, string[] args);
 

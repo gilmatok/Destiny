@@ -1,5 +1,4 @@
 ﻿using Destiny.Maple.Characters;
-using Destiny.Server;
 
 namespace Destiny.Maple.Commands
 {
@@ -21,11 +20,11 @@ namespace Destiny.Maple.Commands
             }
         }
 
-        public override GmLevel RequiredLevel
+        public override bool IsRestricted
         {
             get
             {
-                return GmLevel.SuperGm;
+                return true;
             }
         }
 

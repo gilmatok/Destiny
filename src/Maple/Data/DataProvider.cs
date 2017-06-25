@@ -1,5 +1,5 @@
-﻿using Destiny.Maple.Commands;
-using Destiny.Utility;
+﻿using Destiny.Data;
+using Destiny.Maple.Commands;
 using System.Diagnostics;
 
 namespace Destiny.Maple.Data
@@ -15,18 +15,6 @@ namespace Destiny.Maple.Data
         {
             using (Database.TemporarySchema("mcdb"))
             {
-                DataProvider.IsInitialized = false;
-
-                if (DataProvider.CachedItems != null)
-                {
-                    DataProvider.CachedItems.Clear();
-                }
-
-                if (DataProvider.CachedMaps!= null)
-                {
-                    DataProvider.CachedMaps.Clear();
-                }
-
                 Database.Test();
 
                 Stopwatch sw = new Stopwatch();

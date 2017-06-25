@@ -1,4 +1,6 @@
-﻿using Destiny.IO;
+﻿using Destiny.Data;
+using Destiny.IO;
+using Destiny.Maple.Data;
 using Destiny.Server;
 using Destiny.Utility;
 using System;
@@ -40,6 +42,9 @@ namespace Destiny
                 Settings.Initialize();
 
                 Database.Test();
+                Database.Analyze(true);
+
+                DataProvider.Initialize();
 
                 MasterServer.Start();
             }

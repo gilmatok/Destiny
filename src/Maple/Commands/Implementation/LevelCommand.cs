@@ -20,11 +20,11 @@ namespace Destiny.Maple.Commands
             }
         }
 
-        public override GmLevel RequiredLevel
+        public override bool IsRestricted
         {
             get
             {
-                return GmLevel.Gm;
+                return true;
             }
         }
 

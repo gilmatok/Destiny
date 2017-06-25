@@ -3,13 +3,12 @@ using Destiny.Core.IO;
 using Destiny.Maple.Maps;
 using System;
 using Destiny.Core.Network;
-using Destiny.Utility;
-using MySql.Data.MySqlClient;
 using Destiny.Maple.Script;
 using System.Collections.Generic;
 using Destiny.Maple.Commands;
 using Destiny.Maple.Life;
 using System.IO;
+using Destiny.Data;
 
 namespace Destiny.Maple.Characters
 {
@@ -416,7 +415,7 @@ namespace Destiny.Maple.Characters
         {
             get
             {
-                return this.Client.Account.GmLevel >= GmLevel.Intern;
+                return true;
             }
         }
 
@@ -436,95 +435,120 @@ namespace Destiny.Maple.Characters
             }
         }
 
-        public Character(MapleClient client, DatabaseQuery query)
+        private bool Assigned { get; set; }
+
+        public Character(int id = 0, MapleClient client = null)
         {
+            this.ID = id;
             this.Client = client;
 
-            this.ID = query.GetInt("character_id");
-            this.AccountID = query.GetInt("account_id");
-            this.Name = query.GetString("name");
-            this.Gender = (Gender)query.GetByte("gender");
-            this.Skin = query.GetByte("skin");
-            this.Face = query.GetInt("face");
-            this.Hair = query.GetInt("hair");
-            this.Level = query.GetByte("level");
-            this.Job = (Job)query.GetShort("job");
-            this.Strength = query.GetShort("strength");
-            this.Dexterity = query.GetShort("dexterity");
-            this.Intelligence = query.GetShort("intelligence");
-            this.Luck = query.GetShort("luck");
-            this.Health = query.GetShort("health");
-            this.MaxHealth = query.GetShort("max_health");
-            this.Mana = query.GetShort("mana");
-            this.MaxMana = query.GetShort("max_mana");
-            this.AbilityPoints = query.GetShort("ability_points");
-            this.SkillPoints = query.GetShort("skill_points");
-            this.Experience = query.GetInt("experience");
-            this.Fame = query.GetShort("fame");
-            this.Meso = query.GetInt("meso");
-            this.Map = MasterServer.Channels[this.Client.Channel].Maps[query.GetInt("map")];
-            this.SpawnPoint = query.GetByte("spawn_point");
+            this.Items = new CharacterItems(this, 24, 24, 24, 24, 48);
+            this.Skills = new CharacterSkills(this);
+            this.Quests = new CharacterQuests(this);
 
-            using (DatabaseQuery itemQuery = Database.Query("SELECT * FROM items WHERE character_id = @character_id", new MySqlParameter("character_id", this.ID)))
-            {
-                byte[] slots = new byte[(byte)InventoryType.Count];
-
-                slots[(byte)InventoryType.Equipment] = query.GetByte("equipment_slots");
-                slots[(byte)InventoryType.Usable] = query.GetByte("usable_slots");
-                slots[(byte)InventoryType.Setup] = query.GetByte("setup_slots");
-                slots[(byte)InventoryType.Etcetera] = query.GetByte("etcetera_slots");
-                slots[(byte)InventoryType.Cash] = query.GetByte("cash_slots");
-
-                this.Items = new CharacterItems(this, slots, itemQuery);
-            }
-
-            using (DatabaseQuery skillQuery = Database.Query("SELECT * FROM skills WHERE character_id = @character_id", new MySqlParameter("character_id", this.ID)))
-            {
-                this.Skills = new CharacterSkills(this, skillQuery);
-            }
-
-            using (DatabaseQuery questQuery = null)
-            {
-                this.Quests = new CharacterQuests(this, questQuery);
-            }
-
+            this.Position = new Point(0, 0);
             this.ControlledMobs = new ControlledMobs(this);
             this.ControlledNpcs = new ControlledNpcs(this);
         }
 
+        public void Load()
+        {
+            Datum datum = new Datum("characters");
+
+            datum.Populate("ID = '{0}'", this.ID);
+
+            this.ID = (int)datum["ID"];
+            this.Assigned = true;
+
+            this.AccountID = (int)datum["AccountID"];
+            this.Name = (string)datum["Name"];
+            this.Gender = (Gender)datum["Gender"];
+            this.Skin = (byte)datum["Skin"];
+            this.Face = (int)datum["Face"];
+            this.Hair = (int)datum["Hair"];
+            this.Level = (byte)datum["Level"];
+            this.Job = (Job)datum["Job"];
+            this.Strength = (short)datum["Strength"];
+            this.Dexterity = (short)datum["Dexterity"];
+            this.Intelligence = (short)datum["Intelligence"];
+            this.Luck = (short)datum["Luck"];
+            this.Health = (short)datum["Health"];
+            this.MaxHealth = (short)datum["MaxHealth"];
+            this.Mana = (short)datum["Mana"];
+            this.MaxMana = (short)datum["MaxMana"];
+            this.AbilityPoints = (short)datum["AbilityPoints"];
+            this.SkillPoints = (short)datum["SkillPoints"];
+            this.Experience = (int)datum["Experience"];
+            this.Fame = (short)datum["Fame"];
+            this.Map = MasterServer.Channels[this.Client.Channel].Maps[(int)datum["Map"]];
+            this.SpawnPoint = (byte)datum["SpawnPoint"];
+            this.Meso = (int)datum["Meso"];
+
+            this.Items.MaxSlots[ItemType.Equipment] = (byte)datum["EquipmentSlots"];
+            this.Items.MaxSlots[ItemType.Usable] = (byte)datum["UsableSlots"];
+            this.Items.MaxSlots[ItemType.Setup] = (byte)datum["SetupSlots"];
+            this.Items.MaxSlots[ItemType.Etcetera] = (byte)datum["EtceteraSlots"];
+            this.Items.MaxSlots[ItemType.Cash] = (byte)datum["CashSlots"];
+
+            this.Items.Load();
+            this.Skills.Load();
+            this.Quests.Load();
+        }
+
         public void Save()
         {
-            Database.Execute("UPDATE `characters` SET skin = @skin, face = @face, hair = @hair, level = @level, job = @job, strength = @strength, " +
-                             "dexterity = @dexterity, intelligence = @intelligence, luck = @luck, health = @health, max_health = @max_health, mana = @mana, " +
-                             "max_mana = @max_mana, ability_points = @ability_points, skill_points = @skill_points, experience = @experience, fame = @fame, " +
-                             "map = @map, spawn_point = @spawn_point, meso = @meso, equipment_slots = @equipment_slots, usable_slots = @usable_slots, " +
-                             "setup_slots = @setup_slots, etcetera_slots = @etcetera_slots, cash_slots = @cash_slots WHERE `character_id` = @character_id",
-                             new MySqlParameter("character_id", this.ID),
-                             new MySqlParameter("skin", this.Skin),
-                             new MySqlParameter("face", this.Face),
-                             new MySqlParameter("hair", this.Hair),
-                             new MySqlParameter("level", this.Level),
-                             new MySqlParameter("job", (short)this.Job),
-                             new MySqlParameter("strength", this.Strength),
-                             new MySqlParameter("dexterity", this.Dexterity),
-                             new MySqlParameter("intelligence", this.Intelligence),
-                             new MySqlParameter("luck", this.Luck),
-                             new MySqlParameter("health", this.Health),
-                             new MySqlParameter("max_health", this.MaxHealth),
-                             new MySqlParameter("mana", this.Mana),
-                             new MySqlParameter("max_mana", this.MaxMana),
-                             new MySqlParameter("ability_points", this.AbilityPoints),
-                             new MySqlParameter("skill_points", this.SkillPoints),
-                             new MySqlParameter("experience", this.Experience),
-                             new MySqlParameter("fame", this.Fame),
-                             new MySqlParameter("map", this.Map.MapleID),
-                             new MySqlParameter("spawn_point", this.SpawnPoint),
-                             new MySqlParameter("meso", this.Meso),
-                             new MySqlParameter("equipment_slots", 24),
-                             new MySqlParameter("usable_slots", 24),
-                             new MySqlParameter("setup_slots", 24),
-                             new MySqlParameter("etcetera_slots", 24),
-                             new MySqlParameter("cash_slots", 48));
+            Datum datum = new Datum("characters");
+
+            datum["AccountID"] = this.AccountID;
+            datum["Name"] = this.Name;
+            datum["Gender"] = (byte)this.Gender;
+            datum["Skin"] = this.Skin;
+            datum["Face"] = this.Face;
+            datum["Hair"] = this.Hair;
+            datum["Level"] = this.Level;
+            datum["Job"] = (short)this.Job;
+            datum["Strength"] = this.Strength;
+            datum["Dexterity"] = this.Dexterity;
+            datum["Intelligence"] = this.Intelligence;
+            datum["Luck"] = this.Luck;
+            datum["Health"] = this.Health;
+            datum["MaxHealth"] = this.MaxHealth;
+            datum["Mana"] = this.Mana;
+            datum["MaxMana"] = this.MaxMana;
+            datum["AbilityPoints"] = this.AbilityPoints;
+            datum["SkillPoints"] = this.SkillPoints;
+            datum["Experience"] = this.Experience;
+            datum["Fame"] = this.Fame;
+            datum["Map"] = this.Map.MapleID;
+            datum["SpawnPoint"] = this.SpawnPoint;
+            datum["Meso"] = this.Meso;
+
+            datum["EquipmentSlots"] = this.Items.MaxSlots[ItemType.Equipment];
+            datum["UsableSlots"] = this.Items.MaxSlots[ItemType.Usable];
+            datum["SetupSlots"] = this.Items.MaxSlots[ItemType.Setup];
+            datum["EtceteraSlots"] = this.Items.MaxSlots[ItemType.Etcetera];
+            datum["CashSlots"] = this.Items.MaxSlots[ItemType.Cash];
+
+            this.Items.Save();
+            this.Skills.Save();
+            this.Quests.Save();
+
+            if (this.Assigned)
+            {
+                datum.Update("ID = '{0}'", this.ID);
+            }
+            else
+            {
+                this.ID = datum.InsertAndReturnID();
+                this.Assigned = true;
+
+                Log.Inform("Saved character '{0}' to database.", this.Name);
+            }
+        }
+
+        public void Delete()
+        {
+
         }
 
         public void Initialize(bool cashShop = false)
@@ -699,7 +723,7 @@ namespace Destiny.Maple.Characters
             }
         }
 
-        private void UpdateApperance()
+        public void UpdateApperance()
         {
             using (OutPacket oPacket = new OutPacket(ServerOperationCode.AvatarModified))
             {
@@ -1003,6 +1027,25 @@ namespace Destiny.Maple.Characters
             }
         }
 
+        public void Encode(OutPacket oPacket)
+        {
+            this.EncodeStatistics(oPacket);
+            this.EncodeApperance(oPacket);
+
+            oPacket
+                .WriteByte()
+                .WriteBool(this.IsRanked);
+
+            if (this.IsRanked)
+            {
+                oPacket
+                    .WriteInt()
+                    .WriteInt()
+                    .WriteInt()
+                    .WriteInt();
+            }
+        }
+
         public void EncodeStatistics(OutPacket oPacket)
         {
             oPacket
@@ -1044,7 +1087,55 @@ namespace Destiny.Maple.Characters
                 .WriteBool(true)
                 .WriteInt(this.Hair);
 
-            this.Items.EncodeEquipment(oPacket);
+            Dictionary<byte, int> visibleLayer = new Dictionary<byte, int>();
+            Dictionary<byte, int> hiddenLayer = new Dictionary<byte, int>();
+
+            foreach (Item item in this.Items.GetEquipped())
+            {
+                byte slot = item.AbsoluteSlot;
+
+                if (slot < 100 && !visibleLayer.ContainsKey(slot))
+                {
+                    visibleLayer[slot] = item.MapleID;
+                }
+                else if (slot > 100 && slot != 111)
+                {
+                    slot -= 100;
+
+                    if (visibleLayer.ContainsKey(slot))
+                    {
+                        hiddenLayer[slot] = visibleLayer[slot];
+                    }
+
+                    visibleLayer[slot] = item.MapleID;
+                }
+                else if (visibleLayer.ContainsKey(slot))
+                {
+                    hiddenLayer[slot] = item.MapleID;
+                }
+            }
+
+            foreach (KeyValuePair<byte, int> entry in visibleLayer)
+            {
+                oPacket
+                    .WriteByte(entry.Key)
+                    .WriteInt(entry.Value);
+            }
+
+            oPacket.WriteByte(byte.MaxValue);
+
+            foreach (KeyValuePair<byte, int> entry in hiddenLayer)
+            {
+                oPacket
+                    .WriteByte(entry.Key)
+                    .WriteInt(entry.Value);
+            }
+
+            oPacket.WriteByte(byte.MaxValue);
+
+            Item cashWeapon = this.Items[EquipmentSlot.CashWeapon];
+
+            oPacket.WriteInt(cashWeapon != null ? cashWeapon.MapleID : 0);
 
             oPacket
                 .WriteInt()

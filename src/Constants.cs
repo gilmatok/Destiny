@@ -18,6 +18,223 @@ namespace Destiny
         public static object CommandIndicator { get; internal set; }
     }
 
+    public enum AccountLevel : byte
+    {
+        Normal,
+        Intern,
+        Gm,
+        SuperGm,
+        Administrator
+    }
+
+    public enum WorldFlag : byte
+    {
+        None,
+        Event,
+        New,
+        Hot
+    }
+
+    public enum WorldStatus : short
+    {
+        Normal,
+        HighlyPopulated,
+        Full
+    }
+
+    [Flags]
+    public enum StatisticType : int
+    {
+        Skin = 0x1,
+        Face = 0x2,
+        Hair = 0x4,
+        Level = 0x10,
+        Job = 0x20,
+        Strength = 0x40,
+        Dexterity = 0x80,
+        Intelligence = 0x100,
+        Luck = 0x200,
+        Health = 0x400,
+        MaxHealth = 0x800,
+        Mana = 0x1000,
+        MaxMana = 0x2000,
+        AbilityPoints = 0x4000,
+        SkillPoints = 0x8000,
+        Experience = 0x10000,
+        Fame = 0x20000,
+        Mesos = 0x40000,
+        Pet = 0x180000,
+        GachaponExperience = 0x200000
+    }
+    public enum ServerType
+    {
+        Login,
+        Channel,
+        Shop,
+        ITC
+    }
+
+    public enum NoticeType : byte
+    {
+        Notice,
+        Popup,
+        Background,
+        Ticker = 4,
+        Pink,
+        Blue
+    }
+
+    public enum LoginResult : int
+    {
+        Valid = 0,
+        Banned = 3,
+        InvalidPassword = 4,
+        InvalidUsername = 5,
+        LoggedIn = 7
+    }
+
+    public enum Job : short
+    {
+        Beginner,
+
+        Warrior = 100,
+        Fighter = 110,
+        Crusader,
+        Hero,
+        Page = 120,
+        WhiteKnight,
+        Paladin,
+        Spearman = 130,
+        DragonKnight,
+        DarkKnight,
+
+        Magician = 200,
+        FirePoisonWizard = 210,
+        FirePoisonMage,
+        FirePoisonArchMage,
+        IceLightningWizard = 220,
+        IceLightningMage,
+        IceLightningArchMage,
+        Cleric = 230,
+        Priest,
+        Bishop,
+
+        Bowman = 300,
+        Hunter = 310,
+        Ranger,
+        BowMaster,
+        CrossbowMan = 320,
+        Sniper,
+        CrossbowMaster,
+
+        Thief = 400,
+        Assassin = 410,
+        Hermit,
+        NightLord,
+        Bandit = 420,
+        ChiefBandit,
+        Shadower,
+
+        Pirate = 500,
+        Brawler = 510,
+        Marauder,
+        Buccaneer,
+        Gunslinger = 520,
+        Outlaw,
+        Corsair,
+
+        GM = 900,
+        SuperGM = 910,
+
+        Noblesse = 1000,
+
+        DawnWarrior1 = 1100,
+        DawnWarrior2 = 1110,
+        DawnWarrior3 = 1111,
+
+        BlazeWizard1 = 1200,
+        BlazeWizard2 = 1210,
+        BlazeWizard3 = 1211,
+
+        WindArcher1 = 1300,
+        WindArcher2 = 1310,
+        WindArcher3 = 1311,
+
+        NightWalker1 = 1400,
+        NightWalker2 = 1410,
+        NightWalker3 = 1411,
+
+        ThunderBreaker1 = 1500,
+        ThunderBreaker2 = 1510,
+        ThunderBreaker3 = 1511
+    }
+
+    [Flags]
+    public enum ItemFlags : short
+    {
+        Sealed = 0x01,
+        AddPreventSlipping = 0x02,
+        AddPreventColdness = 0x04,
+        Untradeable = 0x08,
+        Scisored = 0x10
+    }
+
+    public enum ItemType : byte
+    {
+        Equipment = 1,
+        Usable = 2,
+        Setup = 3,
+        Etcetera = 4,
+        Cash = 5,
+        Count = 6
+    }
+
+    public enum Gender : byte
+    {
+        Male,
+        Female,
+        Both
+    }
+
+    public enum EquippedQueryMode
+    {
+        Any,
+        Cash,
+        Normal
+    }
+
+    public enum EquipmentSlot : sbyte
+    {
+        Hat = -1,
+        Face = -2,
+        Eye = -3,
+        Mantle = -4,
+        Top = -5,
+        Bottom = -6,
+        Shoes = -7,
+        Gloves = -8,
+        Cape = -9,
+        Shield = -10,
+        Weapon = -11,
+        Ring = -12,
+        Necklace = -17,
+        Mount = -18,
+        CashHat = -101,
+        CashFace = -102,
+        CashEye = -103,
+        CashTop = -104,
+        CashOverall = -105,
+        CashBottom = -106,
+        CashShoes = -107,
+        CashGloves = -108,
+        CashCape = -109,
+        CashShield = -110,
+        CashWeapon = -111,
+        CashRing = -112,
+        CashNecklace = -117,
+        CashMount = -118
+    }
+
     public enum WorldNames : byte
     {
         Scania,

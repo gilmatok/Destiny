@@ -1,8 +1,8 @@
 ﻿using Destiny.Core.IO;
 using Destiny.Core.Network;
+using Destiny.Data;
 using Destiny.Maple.Characters;
 using Destiny.Maple.Maps;
-using Destiny.Utility;
 
 namespace Destiny.Maple.Life
 {
@@ -22,9 +22,9 @@ namespace Destiny.Maple.Life
             }
         }
 
-        public Mob(DatabaseQuery query)
+        public Mob(Datum datum)
         {
-            this.MapleID = query.GetInt("mobid");
+            this.MapleID = (int)datum["mobid"];
         }
 
         public Mob(int mapleID)

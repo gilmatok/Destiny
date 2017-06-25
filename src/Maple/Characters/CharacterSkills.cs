@@ -1,20 +1,21 @@
 ﻿using Destiny.Core.IO;
-using Destiny.Utility;
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace Destiny.Maple.Characters
 {
-    public sealed class CharacterSkills
+    public sealed class CharacterSkills : KeyedCollection<int, Skill>
     {
         public Character Parent { get; private set; }
 
-        private List<Skill> mSkills;
-
-        public CharacterSkills(Character parent, DatabaseQuery query)
+        public CharacterSkills(Character parent)
+             : base()
         {
             this.Parent = parent;
+        }
 
-            mSkills = new List<Skill>();
+        public void Load()
+        {
+
         }
 
         public void Save()
@@ -22,16 +23,26 @@ namespace Destiny.Maple.Characters
 
         }
 
+        public void Delete()
+        {
+
+        }
+
         public void Encode(OutPacket oPacket)
         {
-            oPacket.WriteShort((short)mSkills.Count);
+            oPacket.WriteShort((short)this.Count);
 
-            foreach (Skill skill in mSkills)
+            foreach (Skill loopSkill in this)
             {
-                skill.Encode(oPacket);
+                loopSkill.Encode(oPacket);
             }
 
             oPacket.WriteShort(); // NOTE: Cooldowns.
+        }
+
+        protected override int GetKeyForItem(Skill item)
+        {
+            return item.MapleID;
         }
     }
 }

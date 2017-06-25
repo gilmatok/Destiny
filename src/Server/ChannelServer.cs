@@ -8,7 +8,7 @@ namespace Destiny.Server
         public MapFactory Maps { get; private set; }
 
         public ChannelServer(byte id, short port)
-            : base(string.Format("Destiny-{0}", id), port)
+            : base(string.Format("{0}-{1}", MasterServer.World.Name, id), port)
         {
             this.ID = id;
             this.Maps = new MapFactory(this.ID);

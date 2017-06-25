@@ -1,5 +1,5 @@
-﻿using Destiny.Server;
-using Destiny.Utility;
+﻿using Destiny.Data;
+using Destiny.Server;
 
 namespace Destiny.Maple.Maps
 {
@@ -27,14 +27,14 @@ namespace Destiny.Maple.Maps
             }
         }
 
-        public Portal(DatabaseQuery query)
+        public Portal(Datum datum)
         {
-            this.ID = (byte)query.GetInt("id");
-            this.Label = query.GetString("label");
-            this.Position = new Point(query.GetShort("x_pos"), query.GetShort("y_pos"));
-            this.DestinationMap = query.GetInt("destination");
-            this.DestinationLabel = query.GetString("destination_label");
-            this.Script = query.GetString("script");
+            this.ID = (byte)(int)datum["id"];
+            this.Label = (string)datum["label"];
+            this.Position = new Point((short)datum["x_pos"], (short)datum["y_pos"]);
+            this.DestinationMap = (int)datum["destination"];
+            this.DestinationLabel = (string)datum["destination_label"];
+            this.Script = (string)datum["script"];
         }
     }
 }

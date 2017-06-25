@@ -1,13 +1,13 @@
 ﻿using Destiny.Core.IO;
 using Destiny.Maple.Characters;
 using Destiny.Core.Network;
-using Destiny.Utility;
+using Destiny.Data;
 
 namespace Destiny.Maple.Life
 {
     public sealed class Npc : LifeObject, ISpawnable, IControllable
     {
-        public Npc(DatabaseQuery query) : base(query) { }
+        public Npc(Datum datum) : base(datum) { }
 
         public Character Controller { get; set; }
 

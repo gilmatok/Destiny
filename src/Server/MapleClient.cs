@@ -4,10 +4,10 @@ using Destiny.Maple;
 using Destiny.Core.IO;
 using Destiny.Maple.Characters;
 using Destiny.Core.Security;
-using Destiny.Utility;
-using MySql.Data.MySqlClient;
 using Destiny.Server;
 using System.Collections.Generic;
+using Destiny.Data;
+using System;
 
 namespace Destiny
 {
@@ -15,6 +15,9 @@ namespace Destiny
     {
         public Account Account { get; set; }
         public Character Character { get; set; }
+
+        public string LastUsername { get; private set; }
+        public string LastPassword { get; private set; }
 
         public byte Channel { get; set; }
         public bool IsInCashShop { get; set; }
@@ -451,35 +454,46 @@ namespace Destiny
             }
             else
             {
-                Account account = null;
+                this.Account = new Account(this);
 
-                using (DatabaseQuery query = Database.Query("SELECT * FROM `accounts` WHERE `username` = @username", new MySqlParameter("username", username)))
+                try
                 {
-                    if (query.NextRow())
+                    this.Account.Load(username);
+
+                    if (SHACryptograph.Encrypt(SHAMode.SHA512, password + this.Account.Salt) != this.Account.Password)
                     {
-                        account = new Account(query);
+                        result = LoginResult.InvalidPassword;
                     }
-                }
+                    else if (this.Account.IsBanned)
+                    {
+                        result = LoginResult.Banned;
+                    }
 
-                if (account == null)
-                {
-                    result = LoginResult.InvalidUsername;
+                    // TODO: Add more scenarios (require master IP, check banned IP, check logged in).
                 }
-                else if (SHACryptograph.Encrypt(SHAMode.SHA512, password + account.Salt) != account.Password)
+                catch (NoAccountException)
                 {
-                    result = LoginResult.InvalidPassword;
-                }
-                else if (false) // TODO: Handle ban scenario.
-                {
-                    result = LoginResult.Banned;
-                }
-                else if (false) // TODO: Handle logged-in scenario.
-                {
-                    result = LoginResult.LoggedIn;
-                }
-                else
-                {
-                    this.Account = account;
+                    if (true && username == this.LastUsername && password == this.LastPassword)
+                    {
+                        this.Account.Username = username;
+                        this.Account.Salt = HashGenerator.GenerateMD5();
+                        this.Account.Password = SHACryptograph.Encrypt(SHAMode.SHA512, password + this.Account.Salt);
+                        this.Account.Pin = string.Empty;
+                        this.Account.Pic = string.Empty;
+                        this.Account.IsBanned = false;
+                        this.Account.IsMaster = false;
+                        this.Account.Creation = DateTime.UtcNow;
+                        this.Account.Birthday = DateTime.UtcNow;
+
+                        this.Account.Save();
+                    }
+                    else
+                    {
+                        result = LoginResult.InvalidUsername;
+
+                        this.LastUsername = username;
+                        this.LastPassword = password;
+                    }
                 }
             }
 
@@ -517,9 +531,9 @@ namespace Destiny
             {
                 oPacket
                     .WriteByte()
-                    .WriteMapleString("Destiny")
-                    .WriteByte((byte)WorldFlag.New)
-                    .WriteMapleString("Welcome to #rDestiny#k!")
+                    .WriteMapleString(MasterServer.World.Name)
+                    .WriteByte((byte)MasterServer.World.Flag)
+                    .WriteMapleString(MasterServer.World.EventMessage)
                     .WriteShort(100)
                     .WriteShort(100)
                     .WriteByte()
@@ -563,29 +577,28 @@ namespace Destiny
         {
             iPacket.Skip(1);
             iPacket.Skip(1); // NOTE: World ID, but we're not using it.
-            byte channelID = iPacket.ReadByte();
+            this.Channel = iPacket.ReadByte();
 
-            // TODO: Validate channel ID.
+            List<Character> characters = new List<Character>();
 
-            this.Channel = channelID;
+            foreach (Datum datum in new Datums("characters").PopulateWith("ID", "AccountID = '{0}'", this.Account.ID))
+            {
+                Character character = new Character((int)datum["ID"], this);
 
-            byte characterCount = (byte)(long)Database.Scalar("SELECT COUNT(*) FROM `characters` WHERE `account_id` = @account_id", new MySqlParameter("@account_id", this.Account.ID));
+                character.Load();
+
+                characters.Add(character);
+            }
 
             using (OutPacket oPacket = new OutPacket(ServerOperationCode.SelectWorldResult))
             {
                 oPacket
                     .WriteBool(false)
-                    .WriteByte(characterCount);
+                    .WriteByte((byte)characters.Count);
 
-                if (characterCount > 0)
+                foreach (Character character in characters)
                 {
-                    using (DatabaseQuery query = Database.Query("SELECT * FROM `characters` WHERE `account_id` = @account_id", new MySqlParameter("@account_id", this.Account.ID)))
-                    {
-                        while (query.NextRow())
-                        {
-                            this.AddCharacterEntry(oPacket, query);
-                        }
-                    }
+                    character.Encode(oPacket);
                 }
 
                 oPacket
@@ -599,7 +612,7 @@ namespace Destiny
         private void CheckCharacterName(InPacket iPacket)
         {
             string name = iPacket.ReadMapleString();
-            bool unusable = (long)Database.Scalar("SELECT COUNT(*) FROM `characters` WHERE `name` = @name", new MySqlParameter("name", name)) != 0;
+            bool unusable = Database.Exists("characters", "Name = '{0}'", name);
 
             using (OutPacket oPacket = new OutPacket(ServerOperationCode.CheckDuplicatedIDResult))
             {
@@ -629,51 +642,46 @@ namespace Destiny
 
             // TODO: Validate name, beauty and equipment before creating the character.
 
-            int id = Database.InsertAndReturnIdentifier("INSERT INTO `characters` (account_id, name, gender, skin, face, hair) " +
-                                                        "VALUES (@account_id, @name, @gender, @skin, @face, @hair)",
-                                                        new MySqlParameter("account_id", this.Account.ID),
-                                                        new MySqlParameter("name", name),
-                                                        new MySqlParameter("gender", gender),
-                                                        new MySqlParameter("skin", skin),
-                                                        new MySqlParameter("face", face),
-                                                        new MySqlParameter("hair", hair));
+            Character character = new Character();
 
-            // TODO: Validate the default equipment statistics. I'm pretty sure some of them are untradable.
+            character.AccountID = this.Account.ID;
+            character.Name = name;
+            character.Gender = gender;
+            character.Skin = skin;
+            character.Face = face;
+            character.Hair = hair + hairColor;
+            character.Level = 1;
+            character.Job = Job.Beginner;
+            character.Strength = 12;
+            character.Dexterity = 5;
+            character.Intelligence = 4;
+            character.Luck = 4;
+            character.Health = 50;
+            character.MaxHealth = 50;
+            character.Mana = 5;
+            character.MaxMana = 5;
+            character.AbilityPoints = 0;
+            character.SkillPoints = 0;
+            character.Experience = 0;
+            character.Fame = 0;
+            character.Map = MasterServer.Channels[this.Channel].Maps[10000];
+            character.SpawnPoint = 0;
+            character.Meso = 0;
 
-            Database.Execute("INSERT INTO `items` (character_id, inventory, slot, maple_id, weapon_defense) " +
-                             "VALUES (@character_id, 1, -5, @maple_id, 3)",
-                             new MySqlParameter("character_id", id),
-                             new MySqlParameter("maple_id", topID));
+            character.Items.Add(new Item(topID, equipped: true));
+            character.Items.Add(new Item(bottomID, equipped: true));
+            character.Items.Add(new Item(shoesID, equipped: true));
+            character.Items.Add(new Item(weaponID, equipped: true));
 
-            Database.Execute("INSERT INTO `items` (character_id, inventory, slot, maple_id, weapon_defense) " +
-                             "VALUES (@character_id, 1, -6, @maple_id, 2)",
-                             new MySqlParameter("character_id", id),
-                             new MySqlParameter("maple_id", bottomID));
+            character.Save();
 
-            Database.Execute("INSERT INTO `items` (character_id, inventory, slot, maple_id, slots, weapon_defense) " +
-                             "VALUES (@character_id, 1, -7, @maple_id, 5, 3)",
-                             new MySqlParameter("character_id", id),
-                             new MySqlParameter("maple_id", shoesID));
-
-            Database.Execute("INSERT INTO `items` (character_id, inventory, slot, maple_id, slots, weapon_attack) " +
-                             "VALUES (@character_id, 1, -11, @maple_id, 7, 17)",
-                             new MySqlParameter("character_id", id),
-                             new MySqlParameter("maple_id", weaponID));
-
-            // TODO: Add beginner's guide (based on job).
-
-            using (DatabaseQuery query = Database.Query("SELECT * FROM characters WHERE `character_id` = @character_id", new MySqlParameter("character_id", id)))
+            using (OutPacket oPacket = new OutPacket(ServerOperationCode.CreateNewCharacterResult))
             {
-                query.NextRow();
+                oPacket.WriteBool(error);
 
-                using (OutPacket oPacket = new OutPacket(ServerOperationCode.CreateNewCharacterResult))
-                {
-                    oPacket.WriteBool(error);
+                character.Encode(oPacket);
 
-                    this.AddCharacterEntry(oPacket, query);
-
-                    this.Send(oPacket);
-                }
+                this.Send(oPacket);
             }
         }
 
@@ -694,7 +702,7 @@ namespace Destiny
                 oPacket
                     .WriteByte()
                     .WriteByte()
-                    .WriteBytes(new byte[4] { 127, 0, 0, 1 })
+                    .WriteBytes(MasterServer.World.HostIP.GetAddressBytes())
                     .WriteShort(MasterServer.Channels[this.Channel].Port)
                     .WriteInt(characterID)
                     .WriteInt()
@@ -716,116 +724,9 @@ namespace Destiny
                 return;
             }
 
-            using (DatabaseQuery query = Database.Query("SELECT * FROM `accounts` WHERE `account_id` = @account_id", new MySqlParameter("account_id", accountID)))
-            {
-                query.NextRow();
-
-                this.Account = new Account(query);
-            }
-
-            using (DatabaseQuery query = Database.Query("SELECT * FROM `characters` WHERE `character_id` = @character_id", new MySqlParameter("character_id", characterID)))
-            {
-                query.NextRow();
-
-                this.Character = new Character(this, query);
-            }
-
+            this.Character = new Character(characterID, this);
+            this.Character.Load();
             this.Character.Initialize();
-        }
-
-        private void AddCharacterEntry(OutPacket oPacket, DatabaseQuery query)
-        {
-            oPacket
-                .WriteInt(query.GetInt("character_id"))
-                .WritePaddedString(query.GetString("name"), 13)
-                .WriteByte(query.GetByte("gender"))
-                .WriteByte(query.GetByte("skin"))
-                .WriteInt(query.GetInt("face"))
-                .WriteInt(query.GetInt("hair"))
-                .WriteLong()
-                .WriteLong()
-                .WriteLong()
-                .WriteByte(query.GetByte("level"))
-                .WriteShort(query.GetShort("job"))
-                .WriteShort(query.GetShort("strength"))
-                .WriteShort(query.GetShort("dexterity"))
-                .WriteShort(query.GetShort("intelligence"))
-                .WriteShort(query.GetShort("luck"))
-                .WriteShort(query.GetShort("health"))
-                .WriteShort(query.GetShort("max_health"))
-                .WriteShort(query.GetShort("mana"))
-                .WriteShort(query.GetShort("max_mana"))
-                .WriteShort(query.GetShort("ability_points"))
-                .WriteShort(query.GetShort("skill_points"))
-                .WriteInt(query.GetInt("experience"))
-                .WriteShort(query.GetShort("fame"))
-                .WriteInt()
-                .WriteInt(query.GetInt("map"))
-                .WriteByte(query.GetByte("spawn_point"))
-                .WriteInt();
-
-            oPacket
-                .WriteByte(query.GetByte("gender"))
-                .WriteByte(query.GetByte("skin"))
-                .WriteInt(query.GetInt("face"))
-                .WriteBool(true)
-                .WriteInt(query.GetInt("hair"));
-
-            Dictionary<byte, int> visibleLayer = new Dictionary<byte, int>();
-            Dictionary<byte, int> hiddenLayer = new Dictionary<byte, int>();
-
-            using (DatabaseQuery equipmentQuery = Database.Query("SELECT `slot`, `maple_id` FROM `items` WHERE `character_id` = @character_id AND `inventory` = 1 AND `slot` < 0", new MySqlParameter("@character_id", query.GetInt("character_id"))))
-            {
-                while (equipmentQuery.NextRow())
-                {
-                    byte slot = (byte)(short)(-(equipmentQuery.GetShort("slot")));
-                    int mapleID = equipmentQuery.GetInt("maple_id");
-
-                    if (slot < 100 && !visibleLayer.ContainsKey(slot))
-                    {
-                        visibleLayer[slot] = mapleID;
-                    }
-                    else if (slot > 100 && slot != 111)
-                    {
-                        slot -= 100;
-
-                        if (visibleLayer.ContainsKey(slot))
-                        {
-                            hiddenLayer[slot] = visibleLayer[slot];
-                        }
-
-                        visibleLayer[slot] = mapleID;
-                    }
-                    else if (visibleLayer.ContainsKey(slot))
-                    {
-                        hiddenLayer[slot] = mapleID;
-                    }
-                }
-            }
-
-            foreach (KeyValuePair<byte, int> entry in visibleLayer)
-            {
-                oPacket
-                    .WriteByte(entry.Key)
-                    .WriteInt(entry.Value);
-            }
-
-            oPacket.WriteByte(byte.MaxValue);
-
-            foreach (KeyValuePair<byte, int> entry in hiddenLayer)
-            {
-                oPacket
-                    .WriteByte(entry.Key)
-                    .WriteInt(entry.Value);
-            }
-
-            oPacket.WriteByte(byte.MaxValue);
-
-            oPacket
-                .WriteInt() // TODO: Cash weapon.
-                .WriteZero(12)
-                .WriteByte()
-                .WriteBool();
         }
     }
 }

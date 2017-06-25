@@ -1,20 +1,19 @@
-﻿using Destiny.Maple.Data;
-
-namespace Destiny.Server
+﻿namespace Destiny.Server
 {
     public static class MasterServer
     {
         public static bool IsAlive { get; private set; }
 
         public static LoginServer Login { get; private set; }
+        public static WorldServer World { get; private set; }
         public static ChannelServer[] Channels { get; private set; }
         public static CashShopServer CashShop { get; private set; }
 
         static MasterServer()
         {
             MasterServer.Login = new LoginServer(8484);
-
-            MasterServer.Channels = new ChannelServer[2];
+            MasterServer.World = new WorldServer();
+            MasterServer.Channels = new ChannelServer[MasterServer.World.Channels];
 
             for (byte i = 0; i < MasterServer.Channels.Length; i++)
             {
@@ -26,8 +25,6 @@ namespace Destiny.Server
 
         public static void Start()
         {
-            DataProvider.Initialize();
-
             MasterServer.Login.Start();
 
             foreach (ChannelServer channel in MasterServer.Channels)
@@ -56,6 +53,25 @@ namespace Destiny.Server
             MasterServer.IsAlive = false;
 
             Log.Warn("MasterServer stopped.");
+        }
+
+        public static bool IsAccountOnline(int accountID)
+        {
+            foreach (ChannelServer channel in MasterServer.Channels)
+            {
+                lock (channel.Clients)
+                {
+                    foreach (MapleClient client in channel.Clients)
+                    {
+                        if (client.Account != null && client.Account.ID == accountID)
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            return false;
         }
     }
 }

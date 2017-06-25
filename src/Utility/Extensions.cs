@@ -21,6 +21,11 @@ namespace Destiny.Utility
             return query[field] == DBNull.Value ? (byte)0 : (byte)query[field];
         }
 
+        public static sbyte GetSByte(this DatabaseQuery query, string field)
+        {
+            return query[field] == DBNull.Value ? (sbyte)0 : (sbyte)query[field];
+        }
+
         public static short GetShort(this DatabaseQuery query, string field)
         {
             return query[field] == DBNull.Value ? (short)0 : (short)query[field];

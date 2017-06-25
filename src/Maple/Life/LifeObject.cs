@@ -1,5 +1,5 @@
-﻿using Destiny.Maple.Maps;
-using Destiny.Utility;
+﻿using Destiny.Data;
+using Destiny.Maple.Maps;
 
 namespace Destiny.Maple.Life
 {
@@ -11,14 +11,14 @@ namespace Destiny.Maple.Life
         public short MaximumClickX { get; private set; }
         public bool FacesLeft { get; private set; }
 
-        public LifeObject(DatabaseQuery query)
+        public LifeObject(Datum datum)
         {
-            this.MapleID = query.GetInt("lifeid");
-            this.Position = new Point(query.GetShort("x_pos"), query.GetShort("y_pos"));
-            this.Foothold = query.GetShort("foothold");
-            this.MinimumClickX = query.GetShort("min_click_pos");
-            this.MaximumClickX = query.GetShort("max_click_pos");
-            this.FacesLeft = query.GetString("flags").Contains("faces_left");
+            this.MapleID = (int)datum["lifeid"];
+            this.Position = new Point((short)datum["x_pos"], (short)datum["y_pos"]);
+            this.Foothold = (short)datum["foothold"];
+            this.MinimumClickX = (short)datum["min_click_pos"];
+            this.MaximumClickX = (short)datum["max_click_pos"];
+            this.FacesLeft = ((string)datum["flags"]).Contains("faces_left");
         }
     }
 }

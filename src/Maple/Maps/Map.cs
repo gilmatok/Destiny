@@ -1,4 +1,5 @@
 ﻿using Destiny.Core.IO;
+using Destiny.Data;
 using Destiny.Maple.Characters;
 using Destiny.Maple.Data;
 using Destiny.Utility;
@@ -59,11 +60,11 @@ namespace Destiny.Maple.Maps
             this.SpawnPoints = this.CachedReference.SpawnPoints;
         }
 
-        public Map(DatabaseQuery query)
+        public Map(Datum datum)
         {
-            this.MapleID = query.GetInt("mapid");
-            this.ReturnMapID = query.GetInt("return_map");
-            this.ForcedReturnMapID = query.GetInt("forced_return_map");
+            this.MapleID = (int)datum["mapid"];
+            this.ReturnMapID = (int)datum["return_map"];
+            this.ForcedReturnMapID = (int)datum["forced_return_map"];
 
             this.Characters = new MapCharacters(this);
             this.Drops = new MapDrops(this);

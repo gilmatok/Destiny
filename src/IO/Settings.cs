@@ -1,5 +1,5 @@
 ﻿using Destiny.Core.IO;
-using Destiny.Utility;
+using Destiny.Data;
 using System;
 using System.Collections.Generic;
 using System.IO;

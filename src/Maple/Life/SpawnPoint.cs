@@ -1,10 +1,10 @@
-﻿using Destiny.Utility;
+﻿using Destiny.Data;
 
 namespace Destiny.Maple.Life
 {
     public sealed class SpawnPoint : LifeObject
     {
-        public SpawnPoint(DatabaseQuery query) : base(query) { }
+        public SpawnPoint(Datum datum) : base(datum) { }
 
         public void Spawn()
         {

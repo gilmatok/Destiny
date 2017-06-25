@@ -40,7 +40,7 @@ namespace Destiny.Maple.Commands
             {
                 Command command = CommandFactory.Commands[commandName];
 
-                if (caller.Client.Account.GmLevel >= command.RequiredLevel)
+                if (false)
                 {
                     try
                     {

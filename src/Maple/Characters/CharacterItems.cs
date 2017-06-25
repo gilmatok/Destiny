@@ -1,210 +1,275 @@
-﻿using Destiny.Core.IO;
-using Destiny.Core.Network;
-using Destiny.Maple.Maps;
+﻿using Destiny.Maple.Maps;
 using Destiny.Utility;
 using System.Collections.Generic;
+using System;
+using System.Collections;
+using Destiny.Core.IO;
+using MySql.Data.MySqlClient;
+using Destiny.Data;
 
 namespace Destiny.Maple.Characters
 {
-    public enum InventoryOperationType : byte
-    {
-        AddItem,
-        ModifyQuantity,
-        ModifySlot,
-        RemoveItem
-    }
-
-    public sealed class InventoryOperation
-    {
-        public InventoryOperationType Type { get; private set; }
-        public Item Item { get; private set; }
-        public short OldSlot { get; private set; }
-        public short CurrentSlot { get; private set; }
-
-        public InventoryOperation(InventoryOperationType type, Item item, short oldSlot, short currentSlot)
-        {
-            this.Type = type;
-            this.Item = item;
-            this.OldSlot = oldSlot;
-            this.CurrentSlot = currentSlot;
-        }
-    }
-
-    public sealed class CharacterItems
+    public sealed class CharacterItems : IEnumerable<Item>
     {
         public Character Parent { get; private set; }
+        public Dictionary<ItemType, byte> MaxSlots { get; private set; }
+        private List<Item> Items { get; set; }
 
-        private Item[] mEquipped;
-        private Item[] mCashEquipped;
-        private Item[][] mItems;
-
-        public CharacterItems(Character parent, byte[] slots, DatabaseQuery query)
+        public CharacterItems(Character parent, byte equipmentSlots, byte usableSlots, byte setupSlots, byte etceteraSlots, byte cashSlots)
             : base()
         {
             this.Parent = parent;
 
-            mEquipped = new Item[51];
-            mCashEquipped = new Item[51];
-            mItems = new Item[(byte)InventoryType.Count][];
+            this.MaxSlots = new Dictionary<ItemType, byte>(Enum.GetValues(typeof(ItemType)).Length);
 
-            for (byte i = 1; i < slots.Length; i++)
+            this.MaxSlots.Add(ItemType.Equipment, equipmentSlots);
+            this.MaxSlots.Add(ItemType.Usable, usableSlots);
+            this.MaxSlots.Add(ItemType.Setup, setupSlots);
+            this.MaxSlots.Add(ItemType.Etcetera, etceteraSlots);
+            this.MaxSlots.Add(ItemType.Cash, cashSlots);
+
+            this.Items = new List<Item>();
+        }
+
+        public void Load()
+        {
+            foreach (Datum datum in new Datums("items").Populate("CharacterID = '{0}'", this.Parent.ID))
             {
-                mItems[(byte)i] = new Item[slots[i]];
-            }
-
-            while (query.NextRow())
-            {
-                byte inventory = query.GetByte("inventory");
-                short slot = query.GetShort("slot");
-
-                Item item = new Item(query);
-
-                if (slot < 0)
-                {
-                    if (slot < -100)
-                    {
-                        mCashEquipped[(-slot) - 100] = item;
-                    }
-                    else
-                    {
-                        mEquipped[-slot] = item;
-                    }
-                }
-                else
-                {
-                    mItems[inventory][slot] = item;
-                }
+                this.Add(new Item(datum));
             }
         }
 
         public void Save()
         {
-
-        }
-
-        public void Handle(InPacket iPacket)
-        {
-            iPacket.Skip(4); // NOTE: tRequestTime (ticks).
-            InventoryType inventory = (InventoryType)iPacket.ReadByte();
-            short slot1 = iPacket.ReadShort();
-            short slot2 = iPacket.ReadShort();
-            short quantity = iPacket.ReadShort();
-        }
-
-        public void Add(int mapleID, short quantity = 1)
-        {
-            //InventoryType inventory = Item.GetInventory(mapleID);
-            //short slot = this.GetNextFreeSlot(inventory);
-
-            //Item item;
-
-            //if (inventory == InventoryType.Equipment)
-            //{
-            //    item = new Equip(mapleID);
-            //}
-            //else
-            //{
-            //    item = new Item(mapleID, quantity);
-            //}
-
-            //this[inventory, slot] = item;
-
-            //InventoryOperation operation = new InventoryOperation(InventoryOperationType.AddItem, item, 0, slot);
-
-            //this.Operate(false, operation);
-        }
-
-        public void Pickup(InPacket iPacket)
-        {
-            iPacket.Skip(1);
-            iPacket.Skip(4);
-            Point position = iPacket.ReadPoint();
-
-            // TODO: Validate distance between picker and position.
-
-            int objectID = iPacket.ReadInt();
-
-            Drop drop;
-
-            try
+            foreach (Item item in this)
             {
-                drop = this.Parent.Map.Drops[objectID];
-            }
-            catch (KeyNotFoundException)
-            {
-                return;
-            }
-
-            if (drop.Picker != null)
-            {
-                return;
-            }
-
-            try
-            {
-                drop.Picker = this.Parent;
-
-                if (drop is Meso)
-                {
-                    this.Parent.Meso += ((Meso)drop).Amount;
-                }
-                else if (drop is Item)
-                {
-
-                }
-
-                this.Parent.Map.Drops.Remove(objectID);
-
-                using (OutPacket oPacket = drop.GetShowGainPacket())
-                {
-                    this.Parent.Client.Send(oPacket);
-                }
-            }
-            catch (InventoryFullException)
-            {
-
+                item.Save();
             }
         }
 
-        public void Swap(InventoryType inventory, short slot1, short slot2)
+        public void Delete()
         {
-            bool equippedSlot2 = slot2 < 0;
-
-            if (inventory == InventoryType.Equipment && equippedSlot2)
+            foreach (Item item in this)
             {
-
+                item.Delete();
             }
-            else
+        }
+
+        public void Add(Item item, bool fromDrop = false, bool autoMerge = true)
+        {
+            if (this.Available(item.MapleID) % item.MaxPerStack != 0 && autoMerge)
             {
-                Item item1 = this[inventory, slot1];
-                Item item2 = this[inventory, slot2];
-
-                if (item1 == null)
+                foreach (Item loopItem in this)
                 {
-                    return;
+                    if (loopItem.MapleID == item.MapleID && loopItem.Quantity < loopItem.MaxPerStack)
+                    {
+                        if (loopItem.Quantity + item.Quantity <= loopItem.MaxPerStack)
+                        {
+                            loopItem.Quantity += item.Quantity;
+                            //loopItem.Update();
+
+                            item.Quantity = 0;
+
+                            break;
+                        }
+                        else
+                        {
+                            item.Quantity -= (short)(loopItem.MaxPerStack - loopItem.Quantity);
+                            item.Slot = this.GetNextFreeSlot(item.Type);
+
+                            loopItem.Quantity = loopItem.MaxPerStack;
+                            if (this.Parent.IsInitialized)
+                            {
+                                //loopItem.Update();
+                            }
+
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (item.Quantity > 0)
+            {
+                item.Parent = this;
+
+                if (this.Parent.IsInitialized && item.Slot == 0)
+                {
+                    item.Slot = this.GetNextFreeSlot(item.Type);
                 }
 
-                if (item2 != null && item1.MapleID == item2.MapleID)
+                this.Items.Add(item);
+
+                if (this.Parent.IsInitialized)
                 {
+                    //using (Packet outPacket = new Packet(MapleServerOperationCode.ModifyInventoryItem))
+                    //{
+                    //    outPacket.WriteBool(fromDrop);
+                    //    outPacket.WriteBytes(1, 0);
+                    //    outPacket.WriteByte((byte)item.Type);
+                    //    outPacket.WriteSByte(item.Slot);
+                    //    outPacket.WriteBytes(item.ToByteArray(true));
 
-                }
-                else
-                {
-                    this[inventory, slot1] = item2;
-                    this[inventory, slot2] = item1;
-
-                    InventoryOperation operation = new InventoryOperation(InventoryOperationType.ModifySlot, item1, slot1, slot2);
-
-                    this.Operate(true, operation);
+                    //    this.Parent.Client.Send(outPacket);
+                    //}
                 }
             }
         }
 
-        private short GetNextFreeSlot(InventoryType inventory)
+        public void AddRange(IEnumerable<Item> items, bool fromDrop = false, bool autoMerge = true)
         {
-            for (short i = 1; i < mItems[(byte)inventory].Length; i++)
+            foreach (Item loopItem in items)
             {
-                if (mItems[(byte)inventory][i] == null)
+                this.Add(loopItem, fromDrop, autoMerge);
+            }
+        }
+
+        public void Remove(int mapleId, short quantity)
+        {
+            short leftToRemove = quantity;
+
+            List<Item> toRemove = new List<Item>();
+
+            foreach (Item loopItem in this)
+            {
+                if (loopItem.MapleID == mapleId)
+                {
+                    if (loopItem.Quantity > leftToRemove)
+                    {
+                        loopItem.Quantity -= leftToRemove;
+                        //loopItem.Update();
+                        break;
+                    }
+                    else
+                    {
+                        leftToRemove -= loopItem.Quantity;
+                        toRemove.Add(loopItem);
+                    }
+                }
+            }
+
+            foreach (Item loopItem in toRemove)
+            {
+                this.Remove(loopItem, true);
+            }
+        }
+
+        public void Remove(Item item, bool removeFromSlot, bool fromDrop = false)
+        {
+            if (removeFromSlot && item.IsEquipped)
+            {
+                throw new InvalidOperationException("Cannot remove equipped items from slot.");
+            }
+
+            if (removeFromSlot)
+            {
+                //using (Packet outPacket = new Packet(MapleServerOperationCode.ModifyInventoryItem))
+                //{
+                //    outPacket.WriteBool(fromDrop);
+                //    outPacket.WriteBytes(1, 3);
+                //    outPacket.WriteByte((byte)item.Type);
+                //    outPacket.WriteShort((short)item.Slot);
+
+                //    this.Parent.Client.Send(outPacket);
+                //}
+            }
+
+            if (item.Assigned)
+            {
+                item.Delete();
+            }
+
+            item.Parent = null;
+
+            bool wasEquipped = item.IsEquipped;
+
+            this.Items.Remove(item);
+
+            if (wasEquipped)
+            {
+                //this.Parent.UpdateLook();
+            }
+        }
+
+        public void Clear(bool removeFromSlot)
+        {
+            List<Item> toRemove = new List<Item>();
+
+            foreach (Item loopItem in this)
+            {
+                toRemove.Add(loopItem);
+            }
+
+            foreach (Item loopItem in toRemove)
+            {
+                if (!(loopItem.IsEquipped && removeFromSlot))
+                {
+                    this.Remove(loopItem, removeFromSlot);
+                }
+            }
+        }
+
+        public bool Contains(int mapleId)
+        {
+            foreach (Item loopItem in this)
+            {
+                if (loopItem.MapleID == mapleId)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public bool Contains(int mapleId, short quantity)
+        {
+            int count = 0;
+
+            foreach (Item loopItem in this)
+            {
+                if (loopItem.MapleID == mapleId)
+                {
+                    count += loopItem.Quantity;
+                }
+            }
+
+            return count >= quantity;
+        }
+
+        public int Available(int mapleId)
+        {
+            int count = 0;
+
+            foreach (Item loopItem in this)
+            {
+                if (loopItem.MapleID == mapleId)
+                {
+                    count += loopItem.Quantity;
+                }
+            }
+
+            return count;
+        }
+
+        //public void NotifyStatus(byte status)
+        //{
+        //    using (Packet outPacket = new Packet(MapleServerOperationCode.ShowStatusInfo))
+        //    {
+        //        outPacket.WriteByte();
+        //        outPacket.WriteByte(status);
+        //        outPacket.WriteInt();
+        //        outPacket.WriteInt();
+
+        //        this.Parent.Client.Send(outPacket);
+        //    }
+        //}
+
+        public sbyte GetNextFreeSlot(ItemType type)
+        {
+            for (sbyte i = 1; i <= this.MaxSlots[type]; i++)
+            {
+                if (this[type, i] == null)
                 {
                     return i;
                 }
@@ -213,159 +278,350 @@ namespace Destiny.Maple.Characters
             throw new InventoryFullException();
         }
 
-        // TODO: Beautify this.
-        public void Encode(OutPacket oPacket)
+        //public void NotifyFull()
+        //{
+        //    using (Packet outPacket = new Packet(MapleServerOperationCode.ModifyInventoryItem))
+        //    {
+        //        outPacket.WriteBytes(1, 0);
+
+        //        this.Parent.Client.Send(outPacket);
+        //    }
+
+        //    this.NotifyStatus(0xFF);
+        //}
+
+        public bool IsFull(ItemType type)
         {
-            for (byte i = 1; i < mItems.Length; i++) oPacket.WriteByte((byte)mItems[i].Length);
+            short count = 0;
 
-            oPacket.WriteLong(); // NOTE: Unknown.
-
-            for (short i = 1; i < mEquipped.Length; i++) { if (mEquipped[i] != null) { oPacket.WriteShort(i); mEquipped[i].Encode(oPacket); } }
-            oPacket.WriteShort();
-
-            for (short i = 1; i < mCashEquipped.Length; i++) { if (mCashEquipped[i] != null) { oPacket.WriteShort(i); mCashEquipped[i].Encode(oPacket); } }
-            oPacket.WriteShort();
-
-            for (short i = 1; i < mItems[(byte)InventoryType.Equipment].Length; i++) { if (mItems[(byte)InventoryType.Equipment][i] != null) { oPacket.WriteShort(i); mItems[(byte)InventoryType.Equipment][i].Encode(oPacket); } }
-            oPacket.WriteShort();
-
-            // TODO: Evan inventory.
-            oPacket.WriteShort();
-
-            for (byte i = 1; i < mItems[(byte)InventoryType.Usable].Length; i++) { if (mItems[(byte)InventoryType.Usable][i] != null) { oPacket.WriteByte(i); mItems[(byte)InventoryType.Usable][i].Encode(oPacket); } }
-            oPacket.WriteByte();
-
-            for (byte i = 1; i < mItems[(byte)InventoryType.Setup].Length; i++) { if (mItems[(byte)InventoryType.Setup][i] != null) { oPacket.WriteByte(i); mItems[(byte)InventoryType.Setup][i].Encode(oPacket); } }
-            oPacket.WriteByte();
-
-            for (byte i = 1; i < mItems[(byte)InventoryType.Etcetera].Length; i++) { if (mItems[(byte)InventoryType.Etcetera][i] != null) { oPacket.WriteByte(i); mItems[(byte)InventoryType.Etcetera][i].Encode(oPacket); } }
-            oPacket.WriteByte();
-
-            for (byte i = 1; i < mItems[(byte)InventoryType.Cash].Length; i++) { if (mItems[(byte)InventoryType.Cash][i] != null) { oPacket.WriteByte(i); mItems[(byte)InventoryType.Cash][i].Encode(oPacket); } }
-            oPacket.WriteByte();
-        }
-
-        public void EncodeEquipment(OutPacket oPacket)
-        {
-            for (byte i = 0; i < 51; i++)
+            foreach (Item item in this)
             {
-                if (mEquipped[i] == null && mCashEquipped[i] == null)
+                if (item.Type == type)
                 {
-                    continue;
-                }
-
-                oPacket.WriteByte(i);
-
-                if (i == 11 && mEquipped[i] != null)
-                {
-                    oPacket.WriteInt(mEquipped[i].MapleID);
-                }
-                else if (mCashEquipped[i] != null)
-                {
-                    oPacket.WriteInt(mCashEquipped[i].MapleID);
-                }
-                else if (mEquipped[i] != null)
-                {
-                    oPacket.WriteInt(mEquipped[i].MapleID);
+                    count++;
                 }
             }
-            oPacket.WriteByte(byte.MaxValue);
 
-            for (byte i = 0; i < 51; i++)
-            {
-                if (i == 11 || mEquipped[i] == null || mCashEquipped[i] == null)
-                {
-                    continue;
-                }
-
-                oPacket.WriteByte(i);
-                oPacket.WriteInt(mEquipped[i].MapleID);
-            }
-            oPacket.WriteByte(byte.MaxValue);
-
-            oPacket.WriteInt(mCashEquipped[11] == null ? 0 : mCashEquipped[11].MapleID);
+            return (count == this.MaxSlots[type]);
         }
 
-        public Item this[InventoryType inventory, short slot]
+        public int RemainingSlots(ItemType type)
+        {
+            short remaining = this.MaxSlots[type];
+
+            foreach (Item item in this)
+            {
+                if (item.Type == type)
+                {
+                    remaining--;
+                }
+            }
+
+            return remaining;
+        }
+
+        public void Handle(InPacket iPacket)
+        {
+            iPacket.ReadInt();
+
+            ItemType type = (ItemType)iPacket.ReadByte();
+            short source = iPacket.ReadShort();
+            short destination = iPacket.ReadShort();
+            short quantity = iPacket.ReadShort();
+
+            try
+            {
+                Item item = this[type, source];
+
+                if (destination < 0)
+                {
+                    item.Equip();
+                }
+                else if (source < 0 && destination > 0)
+                {
+                    item.Unequip(destination);
+                }
+                else if (destination == 0)
+                {
+                    item.Drop(quantity);
+                }
+                else
+                {
+                    item.Move(destination);
+                }
+            }
+            catch (InventoryFullException)
+            {
+                //this.NotifyFull();
+            }
+        }
+
+        public void Pickup(Drop drop)
+        {
+            if (drop.Picker == null)
+            {
+                try
+                {
+                    drop.Picker = this.Parent;
+
+                    if (drop is Meso)
+                    {
+                        this.Parent.Meso += ((Meso)drop).Amount; // TODO: Check for max meso.
+                    }
+                    else if (drop is Item)
+                    {
+                        ((Item)drop).Slot = this.GetNextFreeSlot(((Item)drop).Type); // TODO: Check for inv. full. 
+                        this.Add((Item)drop, true);
+                    }
+
+                    this.Parent.Map.Drops.Remove(drop);
+
+                    using (OutPacket oPacket = drop.GetShowGainPacket())
+                    {
+                        drop.Picker.Client.Send(oPacket);
+                    }
+                }
+                catch (InventoryFullException)
+                {
+                    //this.NotifyFull();
+                }
+            }
+        }
+
+        public void Pickup(InPacket iPacket)
+        {
+            iPacket.Skip(1);
+            iPacket.Skip(4);
+            Point position = iPacket.ReadPoint();
+
+            // TODO: Validate position relative to the picker.
+
+            int objectId = iPacket.ReadInt();
+
+            lock (this.Parent.Map.Drops)
+            {
+                if (this.Parent.Map.Drops.Contains(objectId))
+                {
+                    this.Pickup(this.Parent.Map.Drops[objectId]);
+                }
+            }
+        }
+
+        public Item this[ItemType type, short slot]
         {
             get
             {
-                return mItems[(byte)inventory][slot];
-            }
-            set
-            {
-                mItems[(byte)inventory][slot] = value;
+                foreach (Item item in this)
+                {
+                    if (item.Type == type && item.Slot == slot)
+                    {
+                        return item;
+                    }
+                }
+
+                return null;
             }
         }
 
-        private void Operate(bool unk, params InventoryOperation[] operations)
+        public Item this[EquipmentSlot slot]
         {
-            using (OutPacket oPacket = new OutPacket(ServerOperationCode.InventoryOperation))
+            get
             {
-                oPacket
-                    .WriteBool(unk)
-                    .WriteByte((byte)operations.Length);
-
-                sbyte addedByte = -1;
-
-                foreach (InventoryOperation operation in operations)
+                foreach (Item item in this)
                 {
-                    oPacket
-                        .WriteByte((byte)operation.Type)
-                        .WriteByte((byte)operation.Item.Type);
-
-                    switch (operation.Type)
+                    if (item.Slot == (sbyte)slot)
                     {
-                        case InventoryOperationType.AddItem:
+                        return item;
+                    }
+                }
+
+                return null; // TODO: Should be keynotfoundexception, but I'm lazy.
+            }
+        }
+
+        public Item this[int mapleId, short slot]
+        {
+            get
+            {
+                foreach (Item item in this)
+                {
+                    if (item.Slot == slot && item.Type == Item.GetType(mapleId))
+                    {
+                        return item;
+                    }
+                }
+
+                return null;
+            }
+        }
+
+        public IEnumerable<Item> this[ItemType type]
+        {
+            get
+            {
+                foreach (Item loopItem in this.Items)
+                {
+                    if (loopItem.Type == type && !loopItem.IsEquipped)
+                    {
+                        yield return loopItem;
+                    }
+                }
+            }
+        }
+
+        public IEnumerable<Item> GetEquipped(EquippedQueryMode mode = EquippedQueryMode.Any)
+        {
+            foreach (Item loopItem in this.Items)
+            {
+                if (loopItem.IsEquipped)
+                {
+                    switch (mode)
+                    {
+                        case EquippedQueryMode.Any:
+                            yield return loopItem;
+                            break;
+
+                        case EquippedQueryMode.Normal:
+                            if (loopItem.Slot > -100)
                             {
-                                oPacket.WriteShort(operation.CurrentSlot);
-                                operation.Item.Encode(oPacket);
+                                yield return loopItem;
                             }
                             break;
 
-                        case InventoryOperationType.ModifyQuantity:
+                        case EquippedQueryMode.Cash:
+                            if (loopItem.Slot < -100)
                             {
-                                oPacket
-                                    .WriteShort(operation.CurrentSlot)
-                                    .WriteShort(operation.Item.Quantity);
-                            }
-                            break;
-
-                        case InventoryOperationType.ModifySlot:
-                            {
-                                oPacket
-                                    .WriteShort(operation.OldSlot)
-                                    .WriteShort(operation.CurrentSlot);
-
-                                if (addedByte == -1)
-                                {
-                                    if (operation.OldSlot < 0)
-                                    {
-                                        addedByte = 1;
-                                    }
-                                    else if (operation.CurrentSlot < 0)
-                                    {
-                                        addedByte = 2;
-                                    }
-                                }
-                            }
-                            break;
-
-                        case InventoryOperationType.RemoveItem:
-                            {
-                                oPacket.WriteShort(operation.CurrentSlot);
+                                yield return loopItem;
                             }
                             break;
                     }
                 }
+            }
+        }
 
-                if (addedByte != -1)
+        public int SpaceTakenBy(Item item, bool autoMerge = true)
+        {
+            if (this.Available(item.MapleID) % item.MaxPerStack != 0 && autoMerge)
+            {
+                foreach (Item loopItem in this)
                 {
-                    oPacket.WriteSByte(addedByte);
+                    if (loopItem.MapleID == item.MapleID && loopItem.Quantity < loopItem.MaxPerStack)
+                    {
+                        if (loopItem.Quantity + item.Quantity <= loopItem.MaxPerStack)
+                        {
+                            return 0;
+                        }
+                        else
+                        {
+                            return 1;
+                        }
+                    }
                 }
 
-                this.Parent.Client.Send(oPacket);
+                return 1;
             }
+            else
+            {
+                return 1;
+            }
+        }
+
+        public bool CouldReceive(IEnumerable<Item> items, bool autoMerge = true)
+        {
+            Dictionary<ItemType, int> spaceCount = new Dictionary<ItemType, int>(5);
+            {
+                spaceCount.Add(ItemType.Equipment, 0);
+                spaceCount.Add(ItemType.Usable, 0);
+                spaceCount.Add(ItemType.Setup, 0);
+                spaceCount.Add(ItemType.Etcetera, 0);
+                spaceCount.Add(ItemType.Cash, 0);
+            }
+
+            foreach (Item loopItem in items)
+            {
+                spaceCount[loopItem.Type] += this.SpaceTakenBy(loopItem, autoMerge);
+            }
+
+            foreach (KeyValuePair<ItemType, int> loopSpaceCount in spaceCount)
+            {
+                if (this.RemainingSlots(loopSpaceCount.Key) < loopSpaceCount.Value)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        public void Encode(OutPacket oPacket)
+        {
+            oPacket
+                .WriteByte(this.MaxSlots[ItemType.Equipment])
+                .WriteByte(this.MaxSlots[ItemType.Usable])
+                .WriteByte(this.MaxSlots[ItemType.Setup])
+                .WriteByte(this.MaxSlots[ItemType.Etcetera])
+                .WriteByte(this.MaxSlots[ItemType.Cash])
+                .WriteLong(); // NOTE: Unknown.
+
+            foreach (Item item in this.GetEquipped(EquippedQueryMode.Normal))
+            {
+                item.Encode(oPacket);
+            }
+
+            oPacket.WriteShort();
+
+            foreach (Item item in this.GetEquipped(EquippedQueryMode.Cash))
+            {
+                item.Encode(oPacket);
+            }
+
+            oPacket.WriteShort();
+
+            foreach (Item item in this[ItemType.Equipment])
+            {
+                item.Encode(oPacket);
+            }
+
+            oPacket.WriteShort();
+            oPacket.WriteShort(); // TODO: Evan inventory.
+
+            foreach (Item item in this[ItemType.Usable])
+            {
+                item.Encode(oPacket);
+            }
+
+            oPacket.WriteByte();
+
+            foreach (Item item in this[ItemType.Setup])
+            {
+                item.Encode(oPacket);
+            }
+
+            oPacket.WriteByte();
+
+            foreach (Item item in this[ItemType.Etcetera])
+            {
+                item.Encode(oPacket);
+            }
+
+            oPacket.WriteByte();
+
+            foreach (Item item in this[ItemType.Cash])
+            {
+                item.Encode(oPacket);
+            }
+
+            oPacket.WriteByte();
+        }
+
+        public IEnumerator<Item> GetEnumerator()
+        {
+            return this.Items.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return ((IEnumerable)this.Items).GetEnumerator();
         }
     }
 }

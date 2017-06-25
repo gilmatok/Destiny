@@ -67,11 +67,10 @@ namespace Destiny.Server
 
     public abstract class ServerBase
     {
-        public string Label { get; private set; }
-
         private Acceptor mAcceptor;
-        private List<MapleClient> mClients;
 
+        public string Label { get; private set; }
+        public List<MapleClient> Clients { get; private set; }
         public MigrationRegistery Migrations { get; private set; }
 
         public short Port
@@ -86,19 +85,19 @@ namespace Destiny.Server
         {
             get
             {
-                lock (mClients)
+                lock (this.Clients)
                 {
-                    return mClients.Count;
+                    return this.Clients.Count;
                 }
             }
         }
 
         protected ServerBase(string label, short port)
         {
-            this.Label = label;
             mAcceptor = new Acceptor(port, this.OnClientAccepted);
-            mClients = new List<MapleClient>();
 
+            this.Label = label;
+            this.Clients = new List<MapleClient>();
             this.Migrations = new MigrationRegistery();
         }
 
@@ -116,7 +115,7 @@ namespace Destiny.Server
                 mAcceptor.Stop();
             }
 
-            MapleClient[] remainingClients = mClients.ToArray();
+            MapleClient[] remainingClients = this.Clients.ToArray();
 
             foreach (MapleClient client in remainingClients)
             {
@@ -128,7 +127,7 @@ namespace Destiny.Server
 
         protected virtual void OnClientAccepted(MapleClient client)
         {
-            mClients.Add(client);
+            this.Clients.Add(client);
 
             client.Handshake();
 

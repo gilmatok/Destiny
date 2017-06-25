@@ -1,4 +1,5 @@
-﻿using Destiny.Utility;
+﻿using Destiny.Data;
+using Destiny.Utility;
 using MySql.Data.MySqlClient;
 using System;
 using System.IO;
@@ -16,6 +17,7 @@ namespace Destiny
 
             Log.Inform("If you do not know a value, leave the field blank to apply default.");
 
+            #region Database Setup
             Log.Entitle("Database Setup");
 
             string databaseHost = string.Empty;
@@ -61,90 +63,161 @@ namespace Destiny
 
 							SET FOREIGN_KEY_CHECKS=0;
 
+							DROP TABLE IF EXISTS `accounts`;
                             CREATE TABLE `accounts` (
-                              `account_id` int(10) NOT NULL AUTO_INCREMENT,
-                              `username` varchar(12) NOT NULL,
-                              `password` varchar(128) NOT NULL,
-                              `salt` varchar(32) NOT NULL,
-                              `gm_level` tinyint(3) unsigned NOT NULL,
-                              PRIMARY KEY (`account_id`),
-                              KEY `username` (`username`)
-                            ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+							  `ID` int(10) NOT NULL AUTO_INCREMENT,
+							  `Username` varchar(12) NOT NULL,
+							  `Password` varchar(128) NOT NULL,
+							  `Salt` varchar(32) NOT NULL,
+							  `Pin` varchar(64) NOT NULL DEFAULT '',
+							  `Pic` varchar(64) NOT NULL DEFAULT '',
+							  `IsBanned` tinyint(1) unsigned NOT NULL,
+							  `IsMaster` tinyint(1) unsigned NOT NULL,
+							  `Birthday` date NOT NULL,
+							  `Creation` datetime NOT NULL,
+							  PRIMARY KEY (`ID`),
+							  KEY `username` (`Username`) USING BTREE
+							) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+ 
+							DROP TABLE IF EXISTS `banned_ip`;
+							CREATE TABLE `banned_ip` (
+							  `Address` varchar(15) NOT NULL,
+							  PRIMARY KEY (`Address`)
+							) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-                            CREATE TABLE `characters` (
-                              `character_id` int(11) NOT NULL AUTO_INCREMENT,
-                              `account_id` int(11) NOT NULL,
-                              `name` varchar(13) NOT NULL,
-                              `gender` tinyint(1) unsigned NOT NULL DEFAULT '0',
-                              `skin` tinyint(4) unsigned NOT NULL DEFAULT '0',
-                              `face` int(11) NOT NULL,
-                              `hair` int(11) NOT NULL,
-                              `level` tinyint(3) unsigned NOT NULL DEFAULT '1',
-                              `job` smallint(6) NOT NULL DEFAULT '0',
-                              `strength` smallint(6) NOT NULL DEFAULT '12',
-                              `dexterity` smallint(6) NOT NULL DEFAULT '5',
-                              `intelligence` smallint(6) NOT NULL DEFAULT '4',
-                              `luck` smallint(6) NOT NULL DEFAULT '4',
-                              `health` smallint(6) NOT NULL DEFAULT '50',
-                              `max_health` smallint(6) NOT NULL DEFAULT '50',
-                              `mana` smallint(6) NOT NULL DEFAULT '5',
-                              `max_mana` smallint(6) NOT NULL DEFAULT '5',
-                              `ability_points` smallint(6) NOT NULL DEFAULT '0',
-                              `skill_points` smallint(6) NOT NULL DEFAULT '0',
-                              `experience` int(11) NOT NULL DEFAULT '0',
-                              `fame` smallint(6) NOT NULL DEFAULT '0',
-                              `map` int(11) NOT NULL DEFAULT '0',
-                              `map_spawn` tinyint(3) unsigned NOT NULL DEFAULT '0',
-                              `meso` int(11) NOT NULL DEFAULT '0',
-                              `equipment_slots` tinyint(3) unsigned NOT NULL DEFAULT '24',
-                              `usable_slots` tinyint(3) unsigned NOT NULL DEFAULT '24',
-                              `setup_slots` tinyint(3) unsigned NOT NULL DEFAULT '24',
-                              `etcetera_slots` tinyint(3) unsigned NOT NULL DEFAULT '24',
-                              `cash_slots` tinyint(3) unsigned NOT NULL DEFAULT '48',
-                              `buddylist_size` int(3) NOT NULL DEFAULT '20',
-                              PRIMARY KEY (`character_id`),
-                              KEY `account_id` (`account_id`),
-                              KEY `name` (`name`),
-                              CONSTRAINT `characters_ibfk_1` FOREIGN KEY (`account_id`) REFERENCES `accounts` (`account_id`) ON DELETE CASCADE
-                            ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+							DROP TABLE IF EXISTS `banned_mac`;
+							CREATE TABLE `banned_mac` (
+							  `Address` varchar(17) NOT NULL,
+							  PRIMARY KEY (`Address`)
+							) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-                            CREATE TABLE `items` (
-                              `character_id` int(11) NOT NULL DEFAULT '0',
-                              `inventory` tinyint(3) unsigned NOT NULL DEFAULT '0',
-                              `slot` smallint(6) NOT NULL DEFAULT '0',
-                              `item_identifier` int(11) NOT NULL DEFAULT '0',
-                              `quantity` smallint(6) NOT NULL DEFAULT '1',
-                              `slots` tinyint(4) unsigned DEFAULT NULL,
-                              `scrolls` tinyint(4) unsigned DEFAULT NULL,
-                              `strength` smallint(6) DEFAULT NULL,
-                              `dexterity` smallint(6) DEFAULT NULL,
-                              `intelligence` smallint(6) DEFAULT NULL,
-                              `luck` smallint(6) DEFAULT NULL,
-                              `health` smallint(6) DEFAULT NULL,
-                              `mana` smallint(6) DEFAULT NULL,
-                              `weapon_attack` smallint(6) DEFAULT NULL,
-                              `magic_attack` smallint(6) DEFAULT NULL,
-                              `weapon_defense` smallint(6) DEFAULT NULL,
-                              `magic_defense` smallint(6) DEFAULT NULL,
-                              `accuracy` smallint(6) DEFAULT NULL,
-                              `avoidability` smallint(6) DEFAULT NULL,
-                              `hands` smallint(6) DEFAULT NULL,
-                              `speed` smallint(6) DEFAULT NULL,
-                              `jump` smallint(6) DEFAULT NULL,
-                              `flags` tinyint(3) DEFAULT NULL,
-                              `hammers` tinyint(3) DEFAULT NULL,
-                              `name` varchar(12) DEFAULT NULL,
-                              `expiration` datetime DEFAULT NULL,
-                              PRIMARY KEY (`character_id`,`inventory`,`slot`),
-                              CONSTRAINT `items_ibfk_1` FOREIGN KEY (`character_id`) REFERENCES `characters` (`character_id`) ON DELETE CASCADE
-                            ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+							DROP TABLE IF EXISTS `master_ip`;
+							CREATE TABLE `master_ip` (
+							  `IP` varchar(15) NOT NULL,
+							  PRIMARY KEY (`IP`)
+							) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-                            CREATE TABLE `skills` (
-                              `skill_id` int(11) NOT NULL AUTO_INCREMENT,
-                              `character_id` int(11) NOT NULL DEFAULT '0',
-                              `maple_id` int(11) NOT NULL DEFAULT '0',
-                              PRIMARY KEY (`skill_id`)
-                            ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+							DROP TABLE IF EXISTS `characters`;
+							CREATE TABLE `characters` (
+							  `ID` int(11) NOT NULL AUTO_INCREMENT,
+							  `AccountID` int(11) NOT NULL,
+							  `Name` varchar(13) NOT NULL,
+							  `Level` tinyint(3) unsigned NOT NULL,
+							  `Experience` int(11) NOT NULL DEFAULT '0',
+							  `Job` smallint(6) NOT NULL DEFAULT '0',
+							  `Strength` smallint(6) NOT NULL,
+							  `Dexterity` smallint(6) NOT NULL,
+							  `Luck` smallint(6) NOT NULL,
+							  `Intelligence` smallint(6) NOT NULL,
+							  `CurrentHP` smallint(6) NOT NULL,
+							  `MaxHP` smallint(6) NOT NULL,
+							  `CurrentMP` smallint(6) NOT NULL,
+							  `MaxMP` smallint(6) NOT NULL,
+							  `Meso` int(10) NOT NULL DEFAULT '0',
+							  `Fame` smallint(6) NOT NULL DEFAULT '0',
+							  `Gender` tinyint(3) unsigned NOT NULL DEFAULT '0',
+							  `Hair` int(11) NOT NULL,
+							  `Skin` tinyint(3) unsigned NOT NULL DEFAULT '0',
+							  `Face` int(11) NOT NULL,
+							  `AvailableAP` smallint(6) NOT NULL DEFAULT '0',
+							  `AvailableSP` smallint(6) NOT NULL DEFAULT '0',
+							  `MapID` int(11) NOT NULL DEFAULT '0',
+							  `SpawnPoint` tinyint(3) unsigned NOT NULL DEFAULT '0',
+							  `MaxBuddies` tinyint(3) unsigned NOT NULL DEFAULT '20',
+							  `EquipmentSlots` tinyint(3) unsigned NOT NULL DEFAULT '24',
+							  `UsableSlots` tinyint(3) unsigned NOT NULL DEFAULT '48',
+							  `SetupSlots` tinyint(3) unsigned NOT NULL DEFAULT '24',
+							  `EtceteraSlots` tinyint(3) unsigned NOT NULL DEFAULT '24',
+							  PRIMARY KEY (`ID`),
+							  KEY `account_id` (`AccountID`),
+							  KEY `name` (`Name`) USING BTREE
+							) ENGINE=InnoDB AUTO_INCREMENT=100000 DEFAULT CHARSET=latin1;
+
+							DROP TABLE IF EXISTS `items`;
+							CREATE TABLE `items` (
+							  `ID` int(11) NOT NULL AUTO_INCREMENT,
+							  `CharacterID` int(10) NOT NULL,
+							  `MapleID` int(11) NOT NULL,
+							  `Slot` tinyint(4) NOT NULL,
+							  `Creator` varchar(13) NOT NULL,
+							  `UpgradesAvailable` tinyint(3) unsigned NOT NULL,
+							  `UpgradesApplied` tinyint(3) unsigned NOT NULL,
+							  `Strength` smallint(6) NOT NULL,
+							  `Dexterity` smallint(6) NOT NULL,
+							  `Intelligence` smallint(6) NOT NULL,
+							  `Luck` smallint(6) NOT NULL,
+							  `HP` smallint(6) NOT NULL,
+							  `MP` smallint(6) NOT NULL,
+							  `WeaponAttack` smallint(6) NOT NULL,
+							  `MagicAttack` smallint(6) NOT NULL,
+							  `WeaponDefense` smallint(6) NOT NULL,
+							  `MagicDefense` smallint(6) NOT NULL,
+							  `Accuracy` smallint(6) NOT NULL,
+							  `Avoidability` smallint(6) NOT NULL,
+							  `Agility` smallint(6) NOT NULL,
+							  `Speed` smallint(6) NOT NULL,
+							  `Jump` smallint(6) NOT NULL,
+							  `IsScisored` tinyint(1) unsigned NOT NULL,
+							  `PreventsSlipping` tinyint(1) unsigned NOT NULL,
+							  `PreventsColdness` tinyint(1) unsigned NOT NULL,
+							  `IsStored` tinyint(1) unsigned NOT NULL,
+							  `Quantity` smallint(6) NOT NULL,
+							  PRIMARY KEY (`ID`),
+							  KEY `character_id` (`CharacterID`) USING BTREE
+							) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+							DROP TABLE IF EXISTS `quests_completed`;
+							CREATE TABLE `quests_completed` (
+							  `CharacterID` int(11) NOT NULL,
+							  `QuestID` smallint(6) unsigned NOT NULL,
+							  `CompletionTime` datetime NOT NULL,
+							  UNIQUE KEY `Quest` (`CharacterID`,`QuestID`)
+							) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+							DROP TABLE IF EXISTS `quests_started`;
+							CREATE TABLE `quests_started` (
+							  `CharacterID` int(11) NOT NULL,
+							  `QuestID` smallint(6) unsigned NOT NULL,
+							  `MobID` int(11) DEFAULT NULL,
+							  `Killed` smallint(6) DEFAULT NULL,
+							  UNIQUE KEY `QuestRequirement` (`CharacterID`,`QuestID`,`MobID`) USING BTREE
+							) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+							DROP TABLE IF EXISTS `skills`;
+							CREATE TABLE  `skills` (
+							  `ID` int(11) NOT NULL AUTO_INCREMENT,
+							  `CharacterID` int(11) NOT NULL,
+							  `MapleID` int(11) NOT NULL,
+							  `CurrentLevel` tinyint(3) unsigned NOT NULL,
+							  `MaxLevel` tinyint(3) unsigned NOT NULL,
+							  `CooldownEnd` datetime NOT NULL,
+							  PRIMARY KEY (`ID`),
+							  KEY `character_id` (`CharacterID`) USING BTREE
+							) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+							DROP TABLE IF EXISTS `buffs`;
+							CREATE TABLE  `buffs` (
+							  `ID` int(11) NOT NULL AUTO_INCREMENT,
+							  `CharacterID` int(11) NOT NULL,
+							  `Type` tinyint(3) unsigned NOT NULL,
+							  `MapleID` int(11) NOT NULL,
+							  `SkillLevel` int(11) NOT NULL,
+							  `Value` int(11) NOT NULL,
+							  `End` datetime NOT NULL,
+							  PRIMARY KEY (`id`)
+							) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+                            DROP TABLE IF EXISTS `keymaps`;
+							CREATE TABLE  `keymaps` (
+							  `ID` int(11) NOT NULL AUTO_INCREMENT,
+							  `CharacterID` int(11) NOT NULL,
+							  `KeyID` int(11) NOT NULL,
+							  `Type` tinyint(3) unsigned NOT NULL,
+							  `Action` int(11) NOT NULL,
+							  PRIMARY KEY (`ID`)
+							) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+							INSERT INTO master_ip VALUES ('127.0.0.1');
                             ", databaseSchema);
 
                         Log.Inform("Database '{0}' created.", databaseSchema);
@@ -214,67 +287,53 @@ namespace Destiny
             Log.SkipLine();
 
             Log.Success("Database configured!");
+            #endregion
 
+            #region Server Configuration
             Log.Entitle("Server Configuration");
 
-            bool requireStaffIP = Log.YesNo("Require staff to connect through specific IPs? ", true);
             bool autoRegister = Log.YesNo("Allow players to register in-game? ", true);
             bool requestPin = Log.YesNo("Require players to enter PIN on login? ", false);
             bool requestPic = Log.YesNo("Require players to enter PIC on character selection? ", true);
             int maxCharacters = Log.Input("Maximum characters per account: ", 3);
+            bool requireStaffIP = Log.YesNo("Require staff to connect through specific IPs? ", true);
 
             Log.SkipLine();
+            #endregion
 
+            #region World Configuration
             Log.Entitle("World Configuration");
 
-            bool configuredWorld = true;
-
-            int WorldExperienceRate = 1;
-            int WorldQuestExperienceRate = 1;
-            int WorldPartyQuestExperienceRate = 1;
-            int WorldMesoDropRate = 1;
-            int WorldItemDropRate = 1;
-            string WorldName = string.Empty;
-            WorldFlag WorldFlag = WorldFlag.None;
-            IPAddress WorldIP = IPAddress.Loopback;
-
-            if (Log.YesNo("Skip World configuration (not recommended)? ", false))
-            {
-                configuredWorld = false;
-                goto userProfile;
-            }
-
             Log.SkipLine();
+
             Log.Inform("Please enter the basic details: ");
 
-            WorldName = string.Empty;
-
-            do
-            {
-                WorldName = Log.Input("World name (examples: Bera, Khaini): ", "Scania");
-            }
-            while (!WorldNameResolver.IsValid(WorldName));
-
-            WorldIP = Log.Input("Host IP (external for remote only): ", IPAddress.Loopback);
+            string worldName = Log.Input("Name: ", "Scania");
+            int worldChannels = Log.Input("Channels: ", 1);
+            IPAddress worldIP = Log.Input("Host IP (external for remote only): ", IPAddress.Loopback);
+            string worldEventMessage = Log.Input("Event message: ", string.Empty);
+            string worldTickerMessage = Log.Input("Ticker message: ", string.Empty);
 
             Log.SkipLine();
-            Log.Inform("Please specify the World rates: ");
+            Log.Inform("Please specify the rates: ");
 
-            WorldExperienceRate = Log.Input("Normal experience: ", 1);
-            WorldQuestExperienceRate = Log.Input("Quest experience: ", 1);
-            WorldPartyQuestExperienceRate = Log.Input("Party quest experience: ", 1);
-            WorldMesoDropRate = Log.Input("Meso drop: ", 1);
-            WorldItemDropRate = Log.Input("Item drop: ", 1);
+            int worldExperienceRate = Log.Input("Normal experience: ", 1);
+            int worldQuestExperienceRate = Log.Input("Quest experience: ", 1);
+            int worldPartyQuestExperienceRate = Log.Input("Party quest experience: ", 1);
+            int worldMesoDropRate = Log.Input("Meso drop: ", 1);
+            int worldItemDropRate = Log.Input("Item drop: ", 1);
 
             Log.SkipLine();
 
             Log.Inform("Which flag should be shown with this World?\n  None\n  New\n  Hot\n  Event");
 
+            WorldFlag worldFlag = WorldFlag.None;
+
         inputFlag:
             Log.SkipLine();
             try
             {
-                WorldFlag = (WorldFlag)Enum.Parse(typeof(WorldFlag), Log.Input("World flag: ", "None"));
+                worldFlag = (WorldFlag)Enum.Parse(typeof(WorldFlag), Log.Input("World flag: ", "None"), true);
             }
             catch
             {
@@ -283,8 +342,10 @@ namespace Destiny
 
             Log.SkipLine();
 
-            Log.Success("World '{0}' configured!", WorldName);
+            Log.Success("World '{0}' configured!", worldName);
+        #endregion
 
+        #region User Profile Configuration
         userProfile:
             Log.Inform("Please choose what information to display.\n  A. Hide packets (recommended)\n  B. Show names\n  C. Show content");
             Log.SkipLine();
@@ -312,6 +373,7 @@ namespace Destiny
                 default:
                     goto multipleChoice;
             }
+            #endregion
 
             Log.Entitle("Please wait...");
 
@@ -319,43 +381,42 @@ namespace Destiny
 
             string lines = string.Format(
                 @"[Log]
-				Packets={0}
-				StackTrace=False
-				LoadTime=False
-				
-				[Server]
-				Port=8484
-				AutoRegister={1}
-				RequestPin={2}
-				RequestPic={3}
-				MaxCharacters={4}
-				RequireStaffIP={5}
-				
-				[Database]
-				Host={6}
-				Schema={7}
-				Username={8}
-				Password={9}",
+                Packets={0}
+                StackTrace=False
+                LoadTime=False
+    
+                [Server]
+                Port=8484
+                AutoRegister={1}
+                RequestPin={2}
+                RequestPic={3}
+                MaxCharacters={4}
+                RequireStaffIP={5}
+    
+                [Database]
+                Host={6}
+                Schema={7}
+                Username={8}
+                Password={9}
+
+                [World]
+                Name={10}
+                Channels={11}
+                HostIP={12}
+                Flag={13}
+                EventMessage={14}
+                TickerMessage={15}
+                ExperienceRate={16}
+                QuestExperienceRate={17}
+                PartyQuestExperienceRate={18}
+                MesoDropRate={19}
+                ItemDropRate={20}",
                 logLevel, autoRegister, requestPin, requestPic,
                 maxCharacters, requireStaffIP, databaseHost,
-                databaseSchema, databaseUsername, databasePassword).Replace("	", "");
-
-            if (configuredWorld)
-            {
-                lines += string.Format(@"
-				
-				[World]
-				HostIP={0}
-				StaffOnly=False
-				Flag={1}
-				ExperienceRate={2}
-				QuestExperienceRate={3}
-				PartyQuestExperienceRate={4}
-				MesoDropRate={5}
-				ItemDropRate={6}",
-                WorldIP, WorldFlag, WorldExperienceRate, WorldQuestExperienceRate,
-                WorldPartyQuestExperienceRate, WorldMesoDropRate, WorldItemDropRate).Replace("	", "");
-            }
+                databaseSchema, databaseUsername, databasePassword,
+                worldName, worldChannels, worldIP, worldFlag,
+                worldEventMessage, worldTickerMessage, worldExperienceRate, worldQuestExperienceRate,
+                worldPartyQuestExperienceRate, worldMesoDropRate, worldItemDropRate).Replace("  ", "");
 
             using (StreamWriter file = new StreamWriter(Application.ExecutablePath + "Configuration.ini"))
             {

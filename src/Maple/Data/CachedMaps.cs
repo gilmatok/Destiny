@@ -1,6 +1,6 @@
-﻿using Destiny.Maple.Life;
+﻿using Destiny.Data;
+using Destiny.Maple.Life;
 using Destiny.Maple.Maps;
-using Destiny.Utility;
 using System.Collections.ObjectModel;
 
 namespace Destiny.Maple.Data
@@ -12,36 +12,27 @@ namespace Destiny.Maple.Data
         {
             using (Log.Load("Maps"))
             {
-                using (DatabaseQuery query = Database.Query("SELECT * FROM map_data"))
+                foreach (Datum datum in new Datums("map_data").Populate())
                 {
-                    while (query.NextRow())
-                    {
-                        this.Add(new Map(query));
-                    }
+                    this.Add(new Map(datum));
                 }
 
-                using (DatabaseQuery query = Database.Query("SELECT * FROM map_portals"))
+                foreach (Datum datum in new Datums("map_portals").Populate())
                 {
-                    while (query.NextRow())
-                    {
-                        this[query.GetInt("mapid")].Portals.Add(new Portal(query));
-                    }
+                    this[(int)datum["mapid"]].Portals.Add(new Portal(datum));
                 }
 
-                using (DatabaseQuery query = Database.Query("SELECT * FROM map_life"))
+                foreach (Datum datum in new Datums("map_life").Populate())
                 {
-                    while (query.NextRow())
+                    switch ((string)datum["life_type"])
                     {
-                        switch (query.GetString("life_type"))
-                        {
-                            case "npc":
-                                this[query.GetInt("mapid")].Npcs.Add(new Npc(query));
-                                break;
+                        case "npc":
+                            this[(int)datum["mapid"]].Npcs.Add(new Npc(datum));
+                            break;
 
-                            case "mob":
-                                this[query.GetInt("mapid")].SpawnPoints.Add(new SpawnPoint(query));
-                                break;
-                        }
+                        case "mob":
+                            this[(int)datum["mapid"]].SpawnPoints.Add(new SpawnPoint(datum));
+                            break;
                     }
                 }
             }
