@@ -166,7 +166,9 @@ namespace Destiny
 
         ThunderBreaker1 = 1500,
         ThunderBreaker2 = 1510,
-        ThunderBreaker3 = 1511
+        ThunderBreaker3 = 1511,
+
+        Legend = 2000
     }
 
     [Flags]

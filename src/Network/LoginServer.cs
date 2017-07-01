@@ -1,4 +1,4 @@
-﻿namespace Destiny.Server
+﻿namespace Destiny.Network
 {
     public sealed class LoginServer : ServerBase
     {

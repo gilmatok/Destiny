@@ -1,4 +1,4 @@
-﻿using Destiny.Server;
+﻿using Destiny.Network;
 using Destiny.Core.IO;
 using Destiny.Maple.Maps;
 using System;
@@ -9,6 +9,7 @@ using Destiny.Maple.Commands;
 using Destiny.Maple.Life;
 using System.IO;
 using Destiny.Data;
+using Destiny.Maple.Data;
 
 namespace Destiny.Maple.Characters
 {
@@ -79,6 +80,11 @@ namespace Destiny.Maple.Characters
             }
             set
             {
+                if (!DataProvider.AvailableStyles.Skins.Contains(value))
+                {
+                    throw new StyleUnavailableException();
+                }
+
                 mSkin = value;
 
                 if (this.IsInitialized)
@@ -97,6 +103,12 @@ namespace Destiny.Maple.Characters
             }
             set
             {
+                if ((this.Gender == Gender.Male && !DataProvider.AvailableStyles.MaleFaces.Contains(value)) || 
+                    this.Gender == Gender.Female && !DataProvider.AvailableStyles.FemaleFaces.Contains(value))
+                {
+                    throw new StyleUnavailableException();
+                }
+
                 mFace = value;
 
                 if (this.IsInitialized)
@@ -115,6 +127,12 @@ namespace Destiny.Maple.Characters
             }
             set
             {
+                if ((this.Gender == Gender.Male && !DataProvider.AvailableStyles.MaleHairs.Contains(value)) ||
+                    this.Gender == Gender.Female && !DataProvider.AvailableStyles.FemaleHairs.Contains(value))
+                {
+                    throw new StyleUnavailableException();
+                }
+
                 mHair = value;
 
                 if (this.IsInitialized)

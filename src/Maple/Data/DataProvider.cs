@@ -8,6 +8,7 @@ namespace Destiny.Maple.Data
     {
         public static bool IsInitialized { get; private set; }
 
+        public static AvailableStyles AvailableStyles { get; private set; }
         public static CachedItems CachedItems { get; private set; }
         public static CachedMaps CachedMaps { get; private set; }
 
@@ -23,6 +24,7 @@ namespace Destiny.Maple.Data
 
                 Log.Inform("Loading data...");
 
+                DataProvider.AvailableStyles = new AvailableStyles();
                 DataProvider.CachedItems = new CachedItems();
                 DataProvider.CachedMaps = new CachedMaps();
 

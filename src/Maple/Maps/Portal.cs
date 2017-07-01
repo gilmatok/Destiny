@@ -1,5 +1,5 @@
 ﻿using Destiny.Data;
-using Destiny.Server;
+using Destiny.Network;
 
 namespace Destiny.Maple.Maps
 {

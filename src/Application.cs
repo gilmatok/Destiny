@@ -1,7 +1,7 @@
 ﻿using Destiny.Data;
 using Destiny.IO;
 using Destiny.Maple.Data;
-using Destiny.Server;
+using Destiny.Network;
 using Destiny.Utility;
 using System;
 using System.Globalization;

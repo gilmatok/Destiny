@@ -1,7 +1,7 @@
 ﻿using Destiny.IO;
 using System.Net;
 
-namespace Destiny.Server
+namespace Destiny.Network
 {
     public sealed class WorldServer
     {

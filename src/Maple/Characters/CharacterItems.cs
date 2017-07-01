@@ -93,7 +93,7 @@ namespace Destiny.Maple.Characters
             {
                 item.Parent = this;
 
-                if (this.Parent.IsInitialized && item.Slot == 0)
+                if (/*this.Parent.IsInitialized && */item.Slot == 0)
                 {
                     item.Slot = this.GetNextFreeSlot(item.Type);
                 }

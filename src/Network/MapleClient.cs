@@ -4,7 +4,7 @@ using Destiny.Maple;
 using Destiny.Core.IO;
 using Destiny.Maple.Characters;
 using Destiny.Core.Security;
-using Destiny.Server;
+using Destiny.Network;
 using System.Collections.Generic;
 using Destiny.Data;
 using System;
@@ -651,7 +651,7 @@ namespace Destiny
             character.Face = face;
             character.Hair = hair + hairColor;
             character.Level = 1;
-            character.Job = Job.Beginner;
+            character.Job = jobType == 0 ? Job.Noblesse : jobType == 1 ? Job.Beginner : Job.Legend;
             character.Strength = 12;
             character.Dexterity = 5;
             character.Intelligence = 4;
@@ -664,7 +664,7 @@ namespace Destiny
             character.SkillPoints = 0;
             character.Experience = 0;
             character.Fame = 0;
-            character.Map = MasterServer.Channels[this.Channel].Maps[10000];
+            character.Map = MasterServer.Channels[this.Channel].Maps[jobType == 0 ? 130030000 : jobType == 1 ? 10000 : 914000000];
             character.SpawnPoint = 0;
             character.Meso = 0;
 
@@ -672,6 +672,7 @@ namespace Destiny
             character.Items.Add(new Item(bottomID, equipped: true));
             character.Items.Add(new Item(shoesID, equipped: true));
             character.Items.Add(new Item(weaponID, equipped: true));
+            character.Items.Add(new Item(jobType == 0 ? 4161047 : jobType == 1 ? 4161001 : 4161048));
 
             character.Save();
 
