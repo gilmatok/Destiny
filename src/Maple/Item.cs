@@ -71,6 +71,66 @@ namespace Destiny.Maple
             }
         }
 
+        public WeaponType WeaponType
+        {
+            get
+            {
+                switch (this.MapleID / 10000 % 100)
+                {
+                    case 30:
+                        return WeaponType.Sword1H;
+
+                    case 31:
+                        return WeaponType.Axe1H;
+
+                    case 32:
+                        return WeaponType.Blunt1H;
+
+                    case 33:
+                        return WeaponType.Dagger;
+
+                    case 37:
+                        return WeaponType.Wand;
+
+                    case 38:
+                        return WeaponType.Staff;
+
+                    case 40:
+                        return WeaponType.Sword2H;
+
+                    case 41:
+                        return WeaponType.Axe2H;
+
+                    case 42:
+                        return WeaponType.Blunt2H;
+
+                    case 43:
+                        return WeaponType.Spear;
+
+                    case 44:
+                        return WeaponType.PoleArm;
+
+                    case 45:
+                        return WeaponType.Bow;
+
+                    case 46:
+                        return WeaponType.Crossbow;
+
+                    case 47:
+                        return WeaponType.Claw;
+
+                    case 48:
+                        return WeaponType.Knuckle;
+
+                    case 49:
+                        return WeaponType.Gun;
+
+                    default:
+                        return WeaponType.NotAWeapon;
+                }
+            }
+        }
+
         public Item CachedReference
         {
             get
@@ -213,6 +273,78 @@ namespace Destiny.Maple
             }
         }
 
+        public bool IsOverall
+        {
+            get
+            {
+                return this.MapleID / 10000 == 105;
+            }
+        }
+
+        public bool IsWeapon
+        {
+            get
+            {
+                return this.WeaponType != WeaponType.NotAWeapon;
+            }
+        }
+
+        public bool IsShield
+        {
+            get
+            {
+                return this.MapleID / 10000 % 100 == 9;
+            }
+        }
+
+        public bool IsPet
+        {
+            get
+            {
+                return this.MapleID >= 5000000 && this.MapleID <= 5000100;
+            }
+        }
+
+        public bool IsTownScroll
+        {
+            get
+            {
+                return this.MapleID >= 2030000 && this.MapleID < 2030020;
+            }
+        }
+
+        public bool IsTwoHanded
+        {
+            get
+            {
+                switch (this.WeaponType)
+                {
+                    case WeaponType.Sword2H:
+                    case WeaponType.Axe2H:
+                    case WeaponType.Blunt2H:
+                    case WeaponType.Spear:
+                    case WeaponType.PoleArm:
+                    case WeaponType.Bow:
+                    case WeaponType.Crossbow:
+                    case WeaponType.Claw:
+                    case WeaponType.Knuckle:
+                    case WeaponType.Gun:
+                        return true;
+
+                    default:
+                        return false;
+                }
+            }
+        }
+
+        public bool IsBlocked
+        {
+            get
+            {
+                return this.IsCash || this.IsSealed || (this.IsTradeBlocked && !this.IsScisored);
+            }
+        }
+
         public byte AbsoluteSlot
         {
             get
@@ -254,7 +386,7 @@ namespace Destiny.Maple
             this.MapleID = mapleID;
             this.MaxPerStack = this.CachedReference.MaxPerStack;
             this.Quantity = (this.Type == ItemType.Equipment) ? (short)1 : quantity;
-            if (equipped) this.Slot = this.GetEquippedSlot();
+            if (equipped) this.Slot = (short)this.GetEquippedSlot();
             this.Creator = string.Empty;
 
             this.IsCash = this.CachedReference.IsCash;
@@ -410,27 +542,295 @@ namespace Destiny.Maple
 
         public void Delete()
         {
+            Database.Delete("items", "ID = '{0}'", this.ID);
 
+            this.Assigned = false;
+        }
+
+        public void Update()
+        {
+            using (OutPacket oPacket = new OutPacket(ServerOperationCode.InventoryOperation))
+            {
+                oPacket
+                    .WriteBool(true)
+                    .WriteByte(1)
+                    .WriteByte((byte)InventoryOperationType.ModifyQuantity)
+                    .WriteByte((byte)this.Type)
+                    .WriteShort(this.Slot)
+                    .WriteShort(this.Quantity);
+
+                this.Character.Client.Send(oPacket);
+            }
         }
 
         public void Equip()
         {
+            if (this.Type != ItemType.Equipment)
+            {
+                throw new InvalidOperationException("Can only equip equipment items.");
+            }
 
+            if ((this.Character.Strength < this.RequiredStrength ||
+                this.Character.Dexterity < this.RequiredDexterity ||
+                this.Character.Intelligence < this.RequiredIntelligence ||
+                this.Character.Luck < this.RequiredLuck) &&
+                !this.Character.IsGm)
+            {
+                return;
+            }
+
+            short sourceSlot = this.Slot;
+            EquipmentSlot destinationSlot = this.GetEquippedSlot();
+
+            Item top = this.Parent[EquipmentSlot.Top];
+            Item bottom = this.Parent[EquipmentSlot.Bottom];
+            Item weapon = this.Parent[EquipmentSlot.Weapon];
+            Item shield = this.Parent[EquipmentSlot.Shield];
+
+            Item destination = this.Parent[destinationSlot];
+
+            if (destination != null)
+            {
+                destination.Slot = sourceSlot;
+            }
+
+            this.Slot = (short)destinationSlot;
+
+            using (OutPacket oPacket = new OutPacket(ServerOperationCode.InventoryOperation))
+            {
+                oPacket
+                    .WriteBool(true)
+                    .WriteByte(1)
+                    .WriteByte((byte)InventoryOperationType.ModifySlot)
+                    .WriteByte((byte)this.Type)
+                    .WriteShort(sourceSlot)
+                    .WriteShort((short)destinationSlot)
+                    .WriteByte(1);
+
+                this.Character.Client.Send(oPacket);
+            }
+
+            switch (destinationSlot)
+            {
+                case EquipmentSlot.Bottom:
+                    {
+                        if (top != null && top.IsOverall)
+                        {
+                            top.Unequip();
+                        }
+                    }
+                    break;
+
+                case EquipmentSlot.Top:
+                    {
+                        if (this.IsOverall && bottom != null)
+                        {
+                            bottom.Unequip();
+                        }
+                    }
+                    break;
+
+                case EquipmentSlot.Shield:
+                    {
+                        if (weapon != null && weapon.IsTwoHanded)
+                        {
+                            weapon.Unequip();
+                        }
+                    }
+                    break;
+
+                case EquipmentSlot.Weapon:
+                    {
+                        if (this.IsTwoHanded && shield != null)
+                        {
+                            shield.Unequip();
+                        }
+                    }
+                    break;
+            }
+
+            this.Character.UpdateApperance();
         }
 
         public void Unequip(short destinationSlot = 0)
         {
+            if (this.Type != ItemType.Equipment)
+            {
+                throw new InvalidOperationException("Cna only unequip equipment items.");
+            }
 
-        }
+            short sourceSlot = this.Slot;
 
-        public void Move(short destinationSlot)
-        {
+            if (destinationSlot == 0)
+            {
+                destinationSlot = this.Parent.GetNextFreeSlot(ItemType.Equipment);
+            }
 
+            this.Slot = destinationSlot;
+
+            using (OutPacket oPacket = new OutPacket(ServerOperationCode.InventoryOperation))
+            {
+                oPacket
+                    .WriteBool(true)
+                    .WriteByte(1)
+                    .WriteByte((byte)InventoryOperationType.ModifySlot)
+                    .WriteByte((byte)this.Type)
+                    .WriteShort(sourceSlot)
+                    .WriteShort(destinationSlot)
+                    .WriteByte(1);
+
+                this.Character.Client.Send(oPacket);
+            }
+
+            this.Character.UpdateApperance();
         }
 
         public void Drop(short quantity)
         {
+            if (this.IsRechargeable)
+            {
+                quantity = this.Quantity;
+            }
 
+            if (this.IsBlocked)
+            {
+                return;
+            }
+
+            if (quantity > this.Quantity)
+            {
+                return;
+            }
+
+            if (quantity == this.Quantity)
+            {
+                using (OutPacket oPacket = new OutPacket(ServerOperationCode.InventoryOperation))
+                {
+                    oPacket
+                        .WriteBool(true)
+                        .WriteByte(1)
+                        .WriteByte((byte)InventoryOperationType.RemoveItem)
+                        .WriteByte((byte)this.Type)
+                        .WriteShort(this.Slot);
+
+                    if (this.IsEquipped)
+                    {
+                        oPacket.WriteByte(1);
+                    }
+
+                    this.Character.Client.Send(oPacket);
+                }
+
+                this.Dropper = this.Character;
+                this.Owner = null;
+
+                this.Character.Map.Drops.Add(this);
+
+                this.Parent.Remove(this, false);
+            }
+            else if (quantity < this.Quantity)
+            {
+                this.Quantity -= quantity;
+
+                using (OutPacket oPacket = new OutPacket(ServerOperationCode.InventoryOperation))
+                {
+                    oPacket
+                        .WriteBool(true)
+                        .WriteByte(1)
+                        .WriteByte((byte)InventoryOperationType.ModifyQuantity)
+                        .WriteByte((byte)this.Type)
+                        .WriteShort(this.Slot)
+                        .WriteShort(this.Quantity);
+
+                    this.Character.Client.Send(oPacket);
+                }
+
+                Item dropped = new Item(this.MapleID, quantity)
+                {
+                    Dropper = this.Character,
+                    Owner = null
+                };
+
+                this.Character.Map.Drops.Add(dropped);
+            }
+        }
+
+        public void Move(short destinationSlot)
+        {
+            short sourceSlot = this.Slot;
+
+            Item destination = this.Parent[this.Type, destinationSlot];
+
+            if (destination != null &&
+                this.Type != ItemType.Equipment &&
+                this.MapleID == destination.MapleID &&
+                !this.IsRechargeable &&
+                destination.Quantity < destination.MaxPerStack)
+            {
+                if (this.Quantity + destination.Quantity > destination.MaxPerStack)
+                {
+                    this.Quantity -= (short)(destination.MaxPerStack - destination.Quantity);
+
+                    using (OutPacket oPacket = new OutPacket(ServerOperationCode.InventoryOperation))
+                    {
+                        oPacket
+                            .WriteBool(true)
+                            .WriteByte(2)
+                            .WriteByte((byte)InventoryOperationType.ModifyQuantity)
+                            .WriteByte((byte)this.Type)
+                            .WriteShort(sourceSlot)
+                            .WriteShort(this.Quantity)
+                            .WriteByte((byte)InventoryOperationType.ModifyQuantity)
+                            .WriteByte((byte)destination.Type)
+                            .WriteShort(destinationSlot)
+                            .WriteShort(destination.Quantity);
+
+                        this.Character.Client.Send(oPacket);
+                    }
+                }
+                else
+                {
+                    destination.Quantity += this.Quantity;
+
+                    using (OutPacket oPacket = new OutPacket(ServerOperationCode.InventoryOperation))
+                    {
+                        oPacket
+                            .WriteBool(true)
+                            .WriteByte(2)
+                            .WriteByte((byte)InventoryOperationType.RemoveItem)
+                            .WriteByte((byte)this.Type)
+                            .WriteShort(sourceSlot)
+                            .WriteByte((byte)InventoryOperationType.ModifyQuantity)
+                            .WriteByte((byte)destination.Type)
+                            .WriteShort(destinationSlot)
+                            .WriteShort(destination.Quantity);
+
+                        this.Character.Client.Send(oPacket);
+                    }
+                }
+            }
+            else
+            {
+                if (destination != null)
+                {
+                    destination.Slot = sourceSlot;
+                }
+
+                this.Slot = destinationSlot;
+
+                using (OutPacket oPacket = new OutPacket(ServerOperationCode.InventoryOperation))
+                {
+                    oPacket
+                        .WriteBool(true)
+                        .WriteByte(1)
+                        .WriteByte((byte)InventoryOperationType.ModifySlot)
+                        .WriteByte((byte)this.Type)
+                        .WriteShort(sourceSlot)
+                        .WriteShort(destinationSlot);
+
+                    this.Character.Client.Send(oPacket);
+                }
+            }
         }
 
         public void Encode(OutPacket oPacket, bool zeroPosition = false, bool leaveOut = false)
@@ -516,7 +916,7 @@ namespace Destiny.Maple
             }
         }
 
-        private short GetEquippedSlot()
+        private EquipmentSlot GetEquippedSlot()
         {
             short slot = 0;
 
@@ -582,7 +982,7 @@ namespace Destiny.Maple
                 slot -= 100;
             }
 
-            return slot;
+            return (EquipmentSlot)slot;
         }
 
         public override OutPacket GetShowGainPacket()

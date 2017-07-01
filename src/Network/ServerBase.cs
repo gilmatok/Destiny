@@ -63,7 +63,10 @@ namespace Destiny.Network
 
         protected virtual void OnClientAccepted(MapleClient client)
         {
-            this.Clients.Add(client);
+            lock (this.Clients)
+            {
+                this.Clients.Add(client);
+            }
 
             client.Handshake();
 

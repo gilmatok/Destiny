@@ -1,11 +1,10 @@
 ﻿using Destiny.Maple.Maps;
-using Destiny.Utility;
 using System.Collections.Generic;
 using System;
 using System.Collections;
 using Destiny.Core.IO;
-using MySql.Data.MySqlClient;
 using Destiny.Data;
+using Destiny.Core.Network;
 
 namespace Destiny.Maple.Characters
 {
@@ -66,7 +65,7 @@ namespace Destiny.Maple.Characters
                         if (loopItem.Quantity + item.Quantity <= loopItem.MaxPerStack)
                         {
                             loopItem.Quantity += item.Quantity;
-                            //loopItem.Update();
+                            loopItem.Update();
 
                             item.Quantity = 0;
 
@@ -78,9 +77,10 @@ namespace Destiny.Maple.Characters
                             item.Slot = this.GetNextFreeSlot(item.Type);
 
                             loopItem.Quantity = loopItem.MaxPerStack;
+
                             if (this.Parent.IsInitialized)
                             {
-                                //loopItem.Update();
+                                loopItem.Update();
                             }
 
                             break;
@@ -93,7 +93,7 @@ namespace Destiny.Maple.Characters
             {
                 item.Parent = this;
 
-                if (/*this.Parent.IsInitialized && */item.Slot == 0)
+                if (this.Parent.IsInitialized && item.Slot == 0)
                 {
                     item.Slot = this.GetNextFreeSlot(item.Type);
                 }
@@ -102,16 +102,19 @@ namespace Destiny.Maple.Characters
 
                 if (this.Parent.IsInitialized)
                 {
-                    //using (Packet outPacket = new Packet(MapleServerOperationCode.ModifyInventoryItem))
-                    //{
-                    //    outPacket.WriteBool(fromDrop);
-                    //    outPacket.WriteBytes(1, 0);
-                    //    outPacket.WriteByte((byte)item.Type);
-                    //    outPacket.WriteSByte(item.Slot);
-                    //    outPacket.WriteBytes(item.ToByteArray(true));
+                    using (OutPacket oPacket = new OutPacket(ServerOperationCode.InventoryOperation))
+                    {
+                        oPacket
+                            .WriteBool(fromDrop)
+                            .WriteByte(1)
+                            .WriteByte((byte)InventoryOperationType.AddItem)
+                            .WriteByte((byte)item.Type)
+                            .WriteByte((byte)item.Slot);
 
-                    //    this.Parent.Client.Send(outPacket);
-                    //}
+                        item.Encode(oPacket, true);
+
+                        this.Parent.Client.Send(oPacket);
+                    }
                 }
             }
         }
@@ -137,7 +140,8 @@ namespace Destiny.Maple.Characters
                     if (loopItem.Quantity > leftToRemove)
                     {
                         loopItem.Quantity -= leftToRemove;
-                        //loopItem.Update();
+                        loopItem.Update();
+
                         break;
                     }
                     else
@@ -163,15 +167,17 @@ namespace Destiny.Maple.Characters
 
             if (removeFromSlot)
             {
-                //using (Packet outPacket = new Packet(MapleServerOperationCode.ModifyInventoryItem))
-                //{
-                //    outPacket.WriteBool(fromDrop);
-                //    outPacket.WriteBytes(1, 3);
-                //    outPacket.WriteByte((byte)item.Type);
-                //    outPacket.WriteShort((short)item.Slot);
+                using (OutPacket oPacket = new OutPacket(ServerOperationCode.InventoryOperation))
+                {
+                    oPacket
+                        .WriteBool(fromDrop)
+                        .WriteByte(1)
+                        .WriteByte((byte)InventoryOperationType.RemoveItem)
+                        .WriteByte((byte)item.Type)
+                        .WriteShort(item.Slot);
 
-                //    this.Parent.Client.Send(outPacket);
-                //}
+                    this.Parent.Client.Send(oPacket);
+                }
             }
 
             if (item.Assigned)
@@ -187,7 +193,7 @@ namespace Destiny.Maple.Characters
 
             if (wasEquipped)
             {
-                //this.Parent.UpdateLook();
+                this.Parent.UpdateApperance();
             }
         }
 
@@ -252,19 +258,6 @@ namespace Destiny.Maple.Characters
             return count;
         }
 
-        //public void NotifyStatus(byte status)
-        //{
-        //    using (Packet outPacket = new Packet(MapleServerOperationCode.ShowStatusInfo))
-        //    {
-        //        outPacket.WriteByte();
-        //        outPacket.WriteByte(status);
-        //        outPacket.WriteInt();
-        //        outPacket.WriteInt();
-
-        //        this.Parent.Client.Send(outPacket);
-        //    }
-        //}
-
         public sbyte GetNextFreeSlot(ItemType type)
         {
             for (sbyte i = 1; i <= this.MaxSlots[type]; i++)
@@ -278,17 +271,10 @@ namespace Destiny.Maple.Characters
             throw new InventoryFullException();
         }
 
-        //public void NotifyFull()
-        //{
-        //    using (Packet outPacket = new Packet(MapleServerOperationCode.ModifyInventoryItem))
-        //    {
-        //        outPacket.WriteBytes(1, 0);
+        public void NotifyFull()
+        {
 
-        //        this.Parent.Client.Send(outPacket);
-        //    }
-
-        //    this.NotifyStatus(0xFF);
-        //}
+        }
 
         public bool IsFull(ItemType type)
         {
@@ -352,7 +338,7 @@ namespace Destiny.Maple.Characters
             }
             catch (InventoryFullException)
             {
-                //this.NotifyFull();
+                this.NotifyFull();
             }
         }
 
@@ -383,7 +369,7 @@ namespace Destiny.Maple.Characters
                 }
                 catch (InventoryFullException)
                 {
-                    //this.NotifyFull();
+                    this.NotifyFull();
                 }
             }
         }
