@@ -1,4 +1,6 @@
 ﻿using Destiny.Maple.Characters;
+using Destiny.Network;
+using System;
 
 namespace Destiny.Maple.Commands
 {
@@ -44,7 +46,30 @@ namespace Destiny.Maple.Commands
                 }
                 else
                 {
+                    int mapID = int.TryParse(args[0], out mapID) ? mapID : -1;
+                    byte portalID = 0;
 
+                    if(args.Length >= 2)
+                    {
+                        byte.TryParse(args[1], out portalID);
+                    }
+
+                    if(mapID > -1)
+                    {
+                        //TODO: Add aliases
+                        try
+                        {
+                            caller.ChangeMap(mapID, portalID);
+                        }
+                        catch(Exception)
+                        {
+                            caller.Notify(string.Format("Invalid map ID {0}.", mapID));
+                        }
+                    }
+                    else
+                    {
+                        caller.Notify(string.Format("Invalid map '{0}'.", args[0]));
+                    }
                 }
             }
         }

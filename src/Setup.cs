@@ -70,10 +70,10 @@ namespace Destiny
                               `Salt` varchar(32) NOT NULL,
                               `Pin` varchar(64) NOT NULL DEFAULT '',
                               `Pic` varchar(64) NOT NULL DEFAULT '',
-                              `IsBanned` tinyint(1) unsigned NOT NULL,
-                              `IsMaster` tinyint(1) unsigned NOT NULL,
+                              `IsBanned` tinyint(1) unsigned NOT NULL DEFAULT '0',
+                              `IsMaster` tinyint(1) unsigned NOT NULL DEFAULT '0',
                               `Birthday` date NOT NULL,
-                              `Creation` datetime NOT NULL,
+                              `Creation` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
                               PRIMARY KEY (`ID`),
                               KEY `username` (`Username`) USING BTREE
                             ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
@@ -107,17 +107,17 @@ namespace Destiny
                               `ID` int(11) NOT NULL AUTO_INCREMENT,
                               `AccountID` int(11) NOT NULL,
                               `Name` varchar(13) NOT NULL,
-                              `Level` tinyint(3) unsigned NOT NULL,
+                              `Level` tinyint(3) unsigned NOT NULL DEFAULT '1',
                               `Experience` int(11) NOT NULL DEFAULT '0',
                               `Job` smallint(6) NOT NULL DEFAULT '0',
                               `Strength` smallint(6) NOT NULL,
                               `Dexterity` smallint(6) NOT NULL,
                               `Luck` smallint(6) NOT NULL,
                               `Intelligence` smallint(6) NOT NULL,
-                              `Health` smallint(6) NOT NULL DEFAULT '0',
-                              `MaxHealth` smallint(6) NOT NULL DEFAULT '0',
-                              `Mana` smallint(6) NOT NULL DEFAULT '0',
-                              `MaxMana` smallint(6) NOT NULL DEFAULT '0',
+                              `Health` smallint(6) NOT NULL DEFAULT '50',
+                              `MaxHealth` smallint(6) NOT NULL DEFAULT '50',
+                              `Mana` smallint(6) NOT NULL DEFAULT '5',
+                              `MaxMana` smallint(6) NOT NULL DEFAULT '5',
                               `Meso` int(10) NOT NULL DEFAULT '0',
                               `Fame` smallint(6) NOT NULL DEFAULT '0',
                               `Gender` tinyint(3) unsigned NOT NULL DEFAULT '0',
@@ -145,29 +145,29 @@ namespace Destiny
                               `CharacterID` int(10) NOT NULL,
                               `MapleID` int(11) NOT NULL,
                               `Slot` smallint(6) NOT NULL DEFAULT '0',
-                              `Creator` varchar(13) NOT NULL,
+                              `Creator` varchar(13) DEFAULT NULL,
                               `UpgradesAvailable` tinyint(3) unsigned NOT NULL DEFAULT '0',
-                              `UpgradesApplied` tinyint(3) unsigned NOT NULL,
-                              `Strength` smallint(6) NOT NULL,
-                              `Dexterity` smallint(6) NOT NULL,
-                              `Intelligence` smallint(6) NOT NULL,
-                              `Luck` smallint(6) NOT NULL,
+                              `UpgradesApplied` tinyint(3) unsigned NOT NULL DEFAULT '0',
+                              `Strength` smallint(6) NOT NULL DEFAULT '0',
+                              `Dexterity` smallint(6) NOT NULL DEFALT '0',
+                              `Intelligence` smallint(6) NOT NULL DEFAULT '0',
+                              `Luck` smallint(6) NOT NULL DEFAULT '0',
                               `Health` smallint(6) NOT NULL DEFAULT '0',
                               `Mana` smallint(6) NOT NULL DEFAULT '0',
-                              `WeaponAttack` smallint(6) NOT NULL,
-                              `MagicAttack` smallint(6) NOT NULL,
-                              `WeaponDefense` smallint(6) NOT NULL,
-                              `MagicDefense` smallint(6) NOT NULL,
-                              `Accuracy` smallint(6) NOT NULL,
-                              `Avoidability` smallint(6) NOT NULL,
-                              `Agility` smallint(6) NOT NULL,
-                              `Speed` smallint(6) NOT NULL,
-                              `Jump` smallint(6) NOT NULL,
-                              `IsScisored` tinyint(1) unsigned NOT NULL,
-                              `PreventsSlipping` tinyint(1) unsigned NOT NULL,
-                              `PreventsColdness` tinyint(1) unsigned NOT NULL,
-                              `IsStored` tinyint(1) unsigned NOT NULL,
-                              `Quantity` smallint(6) NOT NULL,
+                              `WeaponAttack` smallint(6) NOT NULL DEFAULT '0',
+                              `MagicAttack` smallint(6) NOT NULL DEFAULT '0',
+                              `WeaponDefense` smallint(6) NOT NULL DEFAULT '0',
+                              `MagicDefense` smallint(6) NOT NULL DEFAULT '0',
+                              `Accuracy` smallint(6) NOT NULL DEFAULT '0',
+                              `Avoidability` smallint(6) NOT NULL DEFAULT '0',
+                              `Agility` smallint(6) NOT NULL DEFAULT '0',
+                              `Speed` smallint(6) NOT NULL DEFAULT '0',
+                              `Jump` smallint(6) NOT NULL DEFAULT '0',
+                              `IsScisored` tinyint(1) unsigned NOT NULL DEFAULT '0',
+                              `PreventsSlipping` tinyint(1) unsigned NOT NULL DEFAULT '0',
+                              `PreventsColdness` tinyint(1) unsigned NOT NULL DEFAULT '0',
+                              `IsStored` tinyint(1) unsigned NOT NULL DEFAULT '0',
+                              `Quantity` smallint(6) NOT NULL DEFAULT '1',
                               PRIMARY KEY (`ID`),
                               KEY `character_id` (`CharacterID`) USING BTREE
                             ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
@@ -192,7 +192,7 @@ namespace Destiny
                             CREATE TABLE  `quests_completed` (
                               `CharacterID` int(11) NOT NULL,
                               `QuestID` smallint(6) unsigned NOT NULL,
-                              `CompletionTime` datetime NOT NULL,
+                              `CompletionTime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
                               UNIQUE KEY `Quest` (`CharacterID`,`QuestID`)
                             ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
@@ -353,7 +353,7 @@ namespace Destiny
             LogLevel logLevel;
 
         multipleChoice:
-            switch (Log.Input("Please enter yours choice: ", "Hide").ToLower())
+            switch (Log.Input("Please enter your choice: ", "Hide").ToLower())
             {
                 case "a":
                 case "hide":

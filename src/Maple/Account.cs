@@ -26,6 +26,22 @@ namespace Destiny.Maple
             this.Client = client;
         }
 
+        public void Load(int accountID)
+        {
+            Datum datum = new Datum("accounts");
+
+            try
+            {
+                datum.Populate("ID = '{0}'", accountID);
+            }
+            catch (RowNotInTableException)
+            {
+                throw new NoAccountException();
+            }
+
+            this.Populate(datum);
+        }
+
         public void Load(string username)
         {
             Datum datum = new Datum("accounts");
@@ -39,6 +55,11 @@ namespace Destiny.Maple
                 throw new NoAccountException();
             }
 
+            this.Populate(datum);
+        }
+
+        private void Populate(Datum datum)
+        {
             this.ID = (int)datum["ID"];
             this.Assigned = true;
 

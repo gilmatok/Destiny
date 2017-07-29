@@ -8,6 +8,8 @@ using Destiny.Network;
 using System.Collections.Generic;
 using Destiny.Data;
 using System;
+using Destiny.IO;
+using System.Linq;
 
 namespace Destiny
 {
@@ -146,8 +148,8 @@ namespace Destiny
                 case ClientOperationCode.HiredMerchant:
                     break;
 
-                case ClientOperationCode.DueyAction:
-                    break;
+                //case ClientOperationCode.DueyAction:
+                //    break;
 
                 case ClientOperationCode.ItemSort:
                     break;
@@ -473,7 +475,7 @@ namespace Destiny
                 }
                 catch (NoAccountException)
                 {
-                    if (true && username == this.LastUsername && password == this.LastPassword)
+                    if (Settings.GetBool("Server/AutoRegister") && username == this.LastUsername && password == this.LastPassword)
                     {
                         this.Account.Username = username;
                         this.Account.Salt = HashGenerator.GenerateMD5();
@@ -534,8 +536,8 @@ namespace Destiny
                     .WriteMapleString(MasterServer.World.Name)
                     .WriteByte((byte)MasterServer.World.Flag)
                     .WriteMapleString(MasterServer.World.EventMessage)
-                    .WriteShort(100)
-                    .WriteShort(100)
+                    .WriteShort(100) //Event EXP rate
+                    .WriteShort(100) //Event Drop rate
                     .WriteByte()
                     .WriteByte((byte)MasterServer.Channels.Length);
 
@@ -545,10 +547,19 @@ namespace Destiny
                         .WriteMapleString(channel.Label)
                         .WriteInt(channel.Load)
                         .WriteByte(1)
-                        .WriteShort(channel.ID);
+                        .WriteByte(channel.ID)
+                        .WriteByte(); //Adult-only channel
                 }
 
-                oPacket.WriteShort();
+                //TODO: Add login balloons. These are chat bubbles shown on the world select screen
+                oPacket.WriteShort(); //balloon count
+                //foreach (var balloon in balloons)
+                //{
+                //    oPacket
+                //        .WriteShort(balloon.X)
+                //        .WriteShort(balloon.Y)
+                //        .WriteString(balloon.Text);
+                //}
 
                 this.Send(oPacket);
             }
@@ -603,7 +614,7 @@ namespace Destiny
 
                 oPacket
                     .WriteByte(2)
-                    .WriteInt(3); // TODO: Account specific character creation slots. For now, use default 3.
+                    .WriteInt(Settings.GetInt("Server/MaxCharacters")); // TODO: Account specific character creation slots. For now, use server-configured value.
 
                 this.Send(oPacket);
             }
@@ -640,7 +651,47 @@ namespace Destiny
 
             bool error = false;
 
-            // TODO: Validate name, beauty and equipment before creating the character.
+            //Name constraints
+            //TODO: Check if name violates forbidden words
+            if (name.Length < 4 || name.Length > 12 || Database.Exists("characters", "Name = '{0}'", name))
+            {
+                error = true;
+            }
+
+            //Gender-specific cosmetic checks
+            if (gender == Gender.Male)
+            {
+                if (!new[] { 20000, 20001, 20002 }.Contains(face)
+                    || !new[] { 30000, 30020, 30030 }.Contains(hair)
+                    || !new[] { 1040002, 1040006, 1040010 }.Contains(topID)
+                    || !new[] { 1060006, 1060002 }.Contains(bottomID))
+                {
+                    error = true;
+                }
+            }
+            else if (gender == Gender.Female)
+            {
+                if (!new[] { 21000, 21001, 21002 }.Contains(face)
+                    || !new[] { 31000, 31040, 31050 }.Contains(hair)
+                    || !new[] { 1041002, 1041006, 1041010, 1041011 }.Contains(topID)
+                    || !new[] { 1061002, 1061008 }.Contains(bottomID))
+                {
+                    error = true;
+                }
+            }
+            else
+            {
+                error = true;
+            }
+
+            //Skin, weapon, and shoes choices are the same regardless of gender
+            if (skin < 0 || skin > 3
+                || !new[] { 0, 2, 3, 7 }.Contains(hairColor)
+                || !new[] { 1302000, 1322005, 1312004 }.Contains(weaponID)
+                || !new[] { 1072001, 1072005, 1072037, 1072038 }.Contains(shoesID))
+            {
+                error = true;
+            }
 
             Character character = new Character();
 
@@ -672,15 +723,21 @@ namespace Destiny
             character.Items.Add(new Item(bottomID, equipped: true));
             character.Items.Add(new Item(shoesID, equipped: true));
             character.Items.Add(new Item(weaponID, equipped: true));
-            character.Items.Add(new Item(jobType == 0 ? 4161047 : jobType == 1 ? 4161001 : 4161048));
+            character.Items.Add(new Item(jobType == 0 ? 4161047 : jobType == 1 ? 4161001 : 4161048), forceGetSlot: true);
 
-            character.Save();
+            if (!error)
+            {
+                character.Save();
+            }
 
             using (OutPacket oPacket = new OutPacket(ServerOperationCode.CreateNewCharacterResult))
             {
                 oPacket.WriteBool(error);
 
-                character.Encode(oPacket);
+                if (!error)
+                {
+                    character.Encode(oPacket);
+                }
 
                 this.Send(oPacket);
             }
@@ -695,6 +752,13 @@ namespace Destiny
         {
             int characterID = iPacket.ReadInt();
             string macAddresses = iPacket.ReadMapleString(); // TODO: Do something with these.
+
+            //Make sure character exists and belongs to this user account.
+            if (!Database.Exists("characters", "ID = {0} AND AccountID = {1}", characterID, this.Account.ID))
+            {
+                Terminate();
+                return;
+            }
 
             MasterServer.Channels[this.Channel].Migrations.Add(this.Host, this.Account.ID, characterID);
 
@@ -717,6 +781,7 @@ namespace Destiny
         {
             int accountID;
             int characterID = iPacket.ReadInt();
+            iPacket.Skip(2); //NOTE: Unknown
 
             if ((accountID = MasterServer.Channels[this.Channel].Migrations.Validate(this.Host, characterID)) == -1)
             {
@@ -724,6 +789,9 @@ namespace Destiny
 
                 return;
             }
+
+            this.Account = new Account(this);
+            this.Account.Load(accountID);
 
             this.Character = new Character(characterID, this);
             this.Character.Load();

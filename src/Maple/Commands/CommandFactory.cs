@@ -40,7 +40,7 @@ namespace Destiny.Maple.Commands
             {
                 Command command = CommandFactory.Commands[commandName];
 
-                if (false)
+                if (!command.IsRestricted || caller.IsGm)
                 {
                     try
                     {

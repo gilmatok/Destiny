@@ -13,10 +13,10 @@
         PinCheck = 9,
         PinUpdate = 10,
         WorldList = 11,
-        //12
-        //13
-        //14
-        //15
+        LeaveCharacterSelect = 12,
+        ViewAllChar = 13,
+        SelectCharacterByVAC = 14,
+        VACFlagSet = 15,
         //16
         //17
         //18
@@ -37,7 +37,8 @@
         //33
         //34
         ClientStart = 35,
-
+        //36
+        //37
         MapChange = 38,
         ChannelChange = 39,
         CashShopMigration = 40,
@@ -54,12 +55,21 @@
         FaceExpression = 51,
         UseItemEffect = 52,
         UseDeathItem = 53,
+        //54
+        //55
+        //56
+        //MonsterBookCover? = 57
         NpcConverse = 58,
+        //RemoteStore? = 59
         NpcResult = 60,
         NpcShop = 61,
         Storage = 62,
         HiredMerchant = 0x3F,
-        DueyAction = 0x40,
+        //DueyAction? FredrickAction? = 0x40,
+        //65
+        //66
+        //67
+        //68
         ItemSort = 0x45,
         ItemSort2 = 0x46,
         ItemMovement = 0x47,
@@ -70,36 +80,59 @@
         UseMountFood = 0x4D,
         UseScriptedItem = 0x4E,
         UseCashItem = 0x4F,
+
+        #region QUESTIONABLE
         UseCatchItem = 0x50,
         UseSkillBook = 0x51,
+        //82
         UseTeleportRock = 0x53,
         UseReturnScroll = 0x54,
         UseUpgradeScroll = 0x55,
         DistributeAP = 0x56,
         AutoDistributeAP = 0x57,
         HealOverTime = 0x58,
+        //89
+        #endregion QUESTIONABLE
+
         DistributeSP = 0x5A,
         SpecialMove = 0x5B,
         CancelBuff = 0x5C,
         SkillEffect = 0x5D,
         MesoDrop = 0x5E,
         GiveFame = 0x5F,
+        //96
         PlayerInformation = 97,
         SpawnPet = 0x62,
         CancelDebuff = 0x63,
         ChangeMapSpecial = 100,
         UseInnerPortal = 101,
         TrockAddMap = 0x66,
+
+        #region QUESTIONABLE
+        //103
+        //104
         Report = 0x69,
-        QuestAction = 0x6A,
+        //106
+        QuestAction = 107,
+        //108
         SkillMacro = 0x6D,
         SpouseChat = 0x6E,
         UseFishingItem = 0x6F,
         MakerSkill = 0x70,
+        //113
+        //114
         UseRemote = 0x73,
         PartyChat = 0x74,
+        //115
         Whisper = 0x76,
+        //117
         Messenger = 0x78,
+        //119
+        //120
+        //121
+        //122
+        #endregion QUESTIONABLE
+
         PlayerInteraction = 123,
         PartyOperation = 124,
         DenyPartyRequest = 125,
@@ -110,7 +143,11 @@
         BuddyListModify = 130,
         NoteAction = 131,
         UseDoor = 132,
+        //133
+        //134
         ChangeKeymap = 135,
+
+        #region QUESTIONABLE
         RingAction = 136,
         OpenFamily = 0x90,
         AddFamily = 0x91,
@@ -149,6 +186,7 @@
         CashShopOperation = 0xDA,
         BuyCashItem = 0xDB,
         CouponCode = 0xDC,
+        Disconnect = 0xDF,
         OpenItemInterface = 0xE1,
         CloseItemInterface = 0xE2,
         UseItemInterface = 0xE3,
@@ -156,6 +194,7 @@
         UseMapleLife = 0xF4,
         UseHammer = 0xF8,
         MapleTV = 0x222,
+        #endregion QUESTIONABLE
     }
 
     public enum ServerOperationCode : short
@@ -177,10 +216,11 @@
         CheckDuplicatedIDResult = 13,
         CreateNewCharacterResult = 14,
         DeleteCharacterResult = 15,
+        /*CClientSocket::ProcessPacket*/
         MigrateCommand = 16,
         Ping = 17,
-        InternetCafeResult = 18,
-        //19
+        AuthenCodeChanged = 18,
+        AuthenMessage = 19,
         ChannelSelected = 20,
         HackshieldRequest = 21,
         RelogResponse = 22,
@@ -216,8 +256,8 @@
         SkillLearnItemResult = 51,
         GatherItemResult = 52,
         SortItemResult = 53,
-        SueCharacterResult = 54,
-        //55
+        //54
+        SueCharacterResult = 55,
         //56
         TradeMoneyLimit = 57,
         SetGender = 58,
@@ -237,7 +277,6 @@
         MarriageRequest = 72,
         MarriageResult = 73,
         WeddingGiftResult = 74,
-        YellowTip = 74, // NOT
         NotifyMarriedPartnerMapTransfer = 75,
         CashPetFoodResult = 76,
         SetWeekEventMessage = 77,
@@ -322,7 +361,7 @@
         SetObjectState = 153,
         DestroyClock = 154,
         AriantArenaShowResult = 155,
-        //156
+        StalkResult = 156,
         PyramidGauge = 157,
         PyramidScore = 158,
         //159
@@ -355,7 +394,7 @@
         //183
         //184
         UserMove = 185,
-        /*CUserRemote::OnAttack*/
+        /*CUserRemote::OnUserRemotePacket*/
         CloseRangeAttack = 186,
         RangedAttack = 187,
         MagicAttack = 188,
@@ -372,21 +411,22 @@
         GiveForeignBuff = 199,
         CancelForeignBuff = 200,
         UpdatePartyMemberHP = 201,
-        //202
-        //203
+        GuildNameChanged = 202,
+        GuildMarkChanged = 203,
         //204
+        /*CUserLocal::OnPacket*/
         CancelChair = 205,
         ShowItemGainInChat = 206,
         DojoWarpUp = 207,
-        LucksackPass = 208,
-        LucksackFail = 209,
-        MesobagMessage = 210,
+        //208
+        MesoGiveSucceeded = 209,
+        MesoGiveFailed = 210,
         UpdateQuestInfo = 211,
-        //212
+        NotifyHPDecByField = 212,
         //213
         PlayerHint = 214,
-        //215
-        //216
+        PlayEventSound = 215,
+        PlayMinigameSound = 216,
         //217
         //218
         KoreanEvent = 219,
@@ -417,8 +457,8 @@
         //241
         MobStatSet = 242,
         MobStatReset = 243,
-        //244
-        //245
+        MobSuspendReset = 244,
+        MobAffected = 245,
         MobDamaged = 246,
         //247
         //248
@@ -428,7 +468,7 @@
         MobCatch = 252,
         MobMagnet = 253,
         //254
-        //255
+        MobAttackedByMob = 255,
         //256
         /*CNpcPool::OnPacket*/
         NpcEnterField = 257,
@@ -448,10 +488,10 @@
         /*CDropPool::OnPacket*/
         DropEnterField = 268,
         DropLeaveField = 269,
-        /*Kites*/
-        KiteMessage = 270,
-        Kite = 271,
-        // 272
+        /*CMessageBoxPool::OnPacket*/
+        MessageBoxCreateFailed = 270,
+        MessageBoxEnterField = 271,
+        MessageBoxLeaveField = 272,
         /*CAffectedAreaPool::OnPacket*/
         SpawnMist = 273,
         RemoveMist = 274,
@@ -471,14 +511,14 @@
         CoconutScore = 286,
         GuildBossHealerMove = 287,
         GuildBossPulleyStateChange = 288,
-        MCStart = 289,
-        MCObtainedCP = 290,
-        MCPartyCP = 291,
-        MCSummon = 292,
-        MCMessage = 293,
-        MCDied = 294,
-        MCLeave = 295,
-        //296
+        MonsterCarnivalEnter = 289,
+        MonsterCarnivalPersonalCP = 290,
+        MonsterCarnivalTeamCP = 291,
+        MonsterCarnivalRequestResult1 = 292,
+        MonsterCarnivalRequestResult0 = 293,
+        MonsterCarnivalProcessForDeath = 294,
+        MonsterCarnivalShowMemberOutMsg = 295,
+        MonsterCarnivalShowGameResult = 296,
         AriantAreaUserScore = 297,
         //298
         SheepRanchInfo = 299,
