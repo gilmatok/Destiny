@@ -54,7 +54,7 @@ namespace Destiny.Maple.Characters
             }
         }
 
-        public void Add(Item item, bool fromDrop = false, bool autoMerge = true)
+        public void Add(Item item, bool fromDrop = false, bool autoMerge = true, bool forceGetSlot = false)
         {
             if (this.Available(item.MapleID) % item.MaxPerStack != 0 && autoMerge)
             {
@@ -93,7 +93,7 @@ namespace Destiny.Maple.Characters
             {
                 item.Parent = this;
 
-                if (this.Parent.IsInitialized && item.Slot == 0)
+                if ((this.Parent.IsInitialized && item.Slot == 0) || forceGetSlot)
                 {
                     item.Slot = this.GetNextFreeSlot(item.Type);
                 }

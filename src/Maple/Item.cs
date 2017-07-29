@@ -861,8 +861,14 @@ namespace Destiny.Maple
             oPacket
                 .WriteByte((byte)(this.Type == ItemType.Equipment ? 1 : 2))
                 .WriteInt(this.MapleID)
-                .WriteBool(false)
-                .WriteLong(); // TODO: Expiration.
+                .WriteBool(this.IsCash);
+
+            if(this.IsCash)
+            {
+                oPacket.WriteLong(); // TODO: Unique ID for certain cash items
+            }
+
+            oPacket.WriteLong(); // TODO: Expiration.
 
             if (this.Type == ItemType.Equipment)
             {
@@ -900,6 +906,10 @@ namespace Destiny.Maple
                         .WriteLong()
                         .WriteInt(-1);
                 }
+            }
+            else if (this.Type == ItemType.Cash)
+            {
+                //TODO
             }
             else
             {

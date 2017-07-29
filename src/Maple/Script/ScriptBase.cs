@@ -34,7 +34,14 @@ namespace Destiny.Maple.Script
 
         private void ChangeMap(int mapID, byte portalID = 0)
         {
-            mCharacter.ChangeMap(mapID, portalID);
+            try
+            {
+                mCharacter.ChangeMap(mapID, portalID);
+            }
+            catch(Exception e)
+            {
+                Log.Error(e);
+            }
         }
     }
 }

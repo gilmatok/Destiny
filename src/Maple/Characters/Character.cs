@@ -433,7 +433,8 @@ namespace Destiny.Maple.Characters
         {
             get
             {
-                return true;
+                //TODO: Add GM levels and/or character-specific GM rank
+                return Client.Account != null ? Client.Account.IsMaster : false;
             }
         }
 
@@ -797,13 +798,12 @@ namespace Destiny.Maple.Characters
                         try
                         {
                             portal = this.Map.Portals[label];
+                            this.ChangeMap(portal.DestinationMap, portal.Link.ID);
                         }
                         catch (KeyNotFoundException)
                         {
                             return;
                         }
-
-                        this.ChangeMap(portal.DestinationMap, portal.Link.ID);
                     }
                     break;
             }
@@ -811,6 +811,9 @@ namespace Destiny.Maple.Characters
 
         public void ChangeMap(int mapID, byte portalID = 0)
         {
+            //If the map doesn't exist, this line will throw an exception. Calling method needs to catch and handle that situation.
+            Map newMap = MasterServer.Channels[this.Client.Channel].Maps[mapID];
+
             this.Map.Characters.Remove(this);
 
             this.SpawnPoint = portalID;
@@ -832,7 +835,7 @@ namespace Destiny.Maple.Characters
                 this.Client.Send(oPacket);
             }
 
-            MasterServer.Channels[this.Client.Channel].Maps[mapID].Characters.Add(this);
+            newMap.Characters.Add(this);
         }
 
         public void Move(InPacket iPacket)
