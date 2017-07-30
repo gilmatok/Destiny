@@ -109,7 +109,7 @@ namespace Destiny.Maple.Characters
                             .WriteByte(1)
                             .WriteByte((byte)InventoryOperationType.AddItem)
                             .WriteByte((byte)item.Type)
-                            .WriteByte((byte)item.Slot);
+                            .WriteShort(item.Slot);
 
                         item.Encode(oPacket, true);
 

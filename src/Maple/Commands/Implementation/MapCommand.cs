@@ -1,4 +1,5 @@
 ﻿using Destiny.Maple.Characters;
+using Destiny.Maple.Data;
 using Destiny.Network;
 using System;
 
@@ -54,21 +55,17 @@ namespace Destiny.Maple.Commands
                         byte.TryParse(args[1], out portalID);
                     }
 
-                    if(mapID > -1)
+                    //TODO: Add aliases
+                    if (mapID > -1)
                     {
-                        //TODO: Add aliases
-                        try
-                        {
+                        if(DataProvider.CachedMaps.Contains(mapID))
                             caller.ChangeMap(mapID, portalID);
-                        }
-                        catch(Exception)
-                        {
-                            caller.Notify(string.Format("Invalid map ID {0}.", mapID));
-                        }
+                        else
+                            caller.Notify(string.Format("[Command] Invalid map ID {0}.", mapID));
                     }
                     else
                     {
-                        caller.Notify(string.Format("Invalid map '{0}'.", args[0]));
+                        caller.Notify(string.Format("[Command] Invalid map '{0}'.", args[0]));
                     }
                 }
             }
