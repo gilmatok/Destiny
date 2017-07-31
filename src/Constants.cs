@@ -178,7 +178,7 @@ namespace Destiny
         AddPreventSlipping = 0x02,
         AddPreventColdness = 0x04,
         Untradeable = 0x08,
-        Scisored = 0x10
+        Scissored = 0x10
     }
 
     public enum ItemType : byte
@@ -189,6 +189,32 @@ namespace Destiny
         Etcetera = 4,
         Cash = 5,
         Count = 6
+    }
+
+    public enum QuestAction : byte
+    {
+        RestoreLostItem,
+        Start,
+        Complete,
+        Forfeit,
+        ScriptStart,
+        ScriptEnd
+    }
+
+    [Flags]
+    public enum QuestFlags : short
+    {
+        //TODO: Test this; I'm just guessing
+        AutoStart = 0x01,
+        SelectedMob = 0x02
+    }
+
+    public enum QuestStatus : short
+    {
+        Forfeited = -1,
+        NotStarted = 0,
+        InProgress = 1,
+        Complete = 2
     }
 
     public enum Gender : byte

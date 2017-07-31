@@ -163,7 +163,7 @@ namespace Destiny
                               `Agility` smallint(6) NOT NULL DEFAULT '0',
                               `Speed` smallint(6) NOT NULL DEFAULT '0',
                               `Jump` smallint(6) NOT NULL DEFAULT '0',
-                              `IsScisored` tinyint(1) unsigned NOT NULL DEFAULT '0',
+                              `IsScissored` tinyint(1) unsigned NOT NULL DEFAULT '0',
                               `PreventsSlipping` tinyint(1) unsigned NOT NULL DEFAULT '0',
                               `PreventsColdness` tinyint(1) unsigned NOT NULL DEFAULT '0',
                               `IsStored` tinyint(1) unsigned NOT NULL DEFAULT '0',

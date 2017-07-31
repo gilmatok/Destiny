@@ -38,15 +38,10 @@ namespace Destiny.Maple.Commands
             else
             {
                 short quantity = 0;
-                bool isQuantitySpecified;
 
                 if (args.Length > 1)
                 {
-                    isQuantitySpecified = short.TryParse(args[args.Length - 1], out quantity);
-                }
-                else
-                {
-                    isQuantitySpecified = false;
+                    short.TryParse(args[args.Length - 1], out quantity);
                 }
 
                 if (quantity < 1)

@@ -16,12 +16,12 @@ namespace Destiny.Maple
         Unknown7,
         Unknown8,
         Unknown9,
-        Unknown10,
-        Unknown11,
+        Equipment,
+        Chair,
         Unknown12,
         Unknown13,
         Unknown14,
-        Unknown15,
+        JumpDown,
         Unknown16,
         Unknown17,
         Unknown18,
@@ -72,7 +72,7 @@ namespace Destiny.Maple
                 {
                     case MovementType.Normal:
                     case MovementType.Unknown5:
-                    case MovementType.Unknown15:
+                    case MovementType.JumpDown:
                     case MovementType.Unknown17:
                         {
                             movement.Position = iPacket.ReadPoint();
@@ -80,7 +80,7 @@ namespace Destiny.Maple
                             movement.Foothold = iPacket.ReadShort();
                             this.LastFoothold = movement.Foothold;
 
-                            if (movement.Type != MovementType.Unknown15)
+                            if (movement.Type != MovementType.JumpDown)
                             {
                                 movement.Stance = iPacket.ReadByte();
                                 movement.Duration = iPacket.ReadShort();
@@ -110,7 +110,7 @@ namespace Destiny.Maple
                     case MovementType.Unknown7:
                     case MovementType.Unknown8:
                     case MovementType.Unknown9:
-                    case MovementType.Unknown11:
+                    case MovementType.Chair:
                         {
                             movement.Position = iPacket.ReadPoint();
                             movement.Foothold = iPacket.ReadShort();
@@ -126,7 +126,7 @@ namespace Destiny.Maple
                         }
                         break;
 
-                    case MovementType.Unknown10:
+                    case MovementType.Equipment:
                         {
                             movement.Statistic = iPacket.ReadByte();
                         }
@@ -151,7 +151,7 @@ namespace Destiny.Maple
                 {
                     case MovementType.Normal:
                     case MovementType.Unknown5:
-                    case MovementType.Unknown15:
+                    case MovementType.JumpDown:
                     case MovementType.Unknown17:
                         {
                             oPacket
@@ -159,7 +159,7 @@ namespace Destiny.Maple
                                 .WritePoint(movement.Velocity)
                                 .WriteShort(movement.Foothold);
 
-                            if (movement.Type != MovementType.Unknown15)
+                            if (movement.Type != MovementType.JumpDown)
                             {
                                 oPacket
                                     .WriteByte(movement.Stance)
@@ -191,7 +191,7 @@ namespace Destiny.Maple
                     case MovementType.Unknown7:
                     case MovementType.Unknown8:
                     case MovementType.Unknown9:
-                    case MovementType.Unknown11:
+                    case MovementType.Chair:
                         {
                             oPacket
                                 .WritePoint(movement.Position)
@@ -207,7 +207,7 @@ namespace Destiny.Maple
                         }
                         break;
 
-                    case MovementType.Unknown10:
+                    case MovementType.Equipment:
                         {
                             oPacket.WriteByte(movement.Statistic);
                         }

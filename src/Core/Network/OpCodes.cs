@@ -186,7 +186,7 @@
         CashShopOperation = 0xDA,
         BuyCashItem = 0xDB,
         CouponCode = 0xDC,
-        Disconnect = 0xDF,
+        LeaveField = 0xDF,
         OpenItemInterface = 0xE1,
         CloseItemInterface = 0xE2,
         UseItemInterface = 0xE3,
