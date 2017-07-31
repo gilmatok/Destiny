@@ -11,6 +11,7 @@ namespace Destiny.Maple.Data
         public static AvailableStyles AvailableStyles { get; private set; }
         public static CachedItems CachedItems { get; private set; }
         public static CachedMaps CachedMaps { get; private set; }
+        public static CachedQuests CachedQuests { get; private set; }
 
         public static void Initialize()
         {
@@ -27,6 +28,7 @@ namespace Destiny.Maple.Data
                 DataProvider.AvailableStyles = new AvailableStyles();
                 DataProvider.CachedItems = new CachedItems();
                 DataProvider.CachedMaps = new CachedMaps();
+                DataProvider.CachedQuests = new CachedQuests();
 
                 CommandFactory.Initialize();
 

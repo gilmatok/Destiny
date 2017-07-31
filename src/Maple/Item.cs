@@ -30,7 +30,7 @@ namespace Destiny.Maple
         public bool PreventsSlipping { get; private set; }
         public bool PreventsColdness { get; private set; }
         public bool IsTradeBlocked { get; private set; }
-        public bool IsScisored { get; private set; }
+        public bool IsScissored { get; private set; }
         public int SalePrice { get; private set; }
 
         public byte UpgradesAvailable { get; private set; }
@@ -202,7 +202,7 @@ namespace Destiny.Maple
                 if (this.IsSealed) flags |= (byte)ItemFlags.Sealed;
                 if (this.PreventsSlipping) flags |= (byte)ItemFlags.AddPreventSlipping;
                 if (this.PreventsColdness) flags |= (byte)ItemFlags.AddPreventColdness;
-                if (this.IsScisored) flags |= (byte)ItemFlags.Scisored;
+                if (this.IsScissored) flags |= (byte)ItemFlags.Scissored;
                 if (this.IsTradeBlocked) flags |= (byte)ItemFlags.Untradeable;
 
                 return flags;
@@ -341,7 +341,7 @@ namespace Destiny.Maple
         {
             get
             {
-                return this.IsCash || this.IsSealed || (this.IsTradeBlocked && !this.IsScisored);
+                return this.IsCash || this.IsSealed || (this.IsTradeBlocked && !this.IsScissored);
             }
         }
 
@@ -392,7 +392,7 @@ namespace Destiny.Maple
             this.IsCash = this.CachedReference.IsCash;
             this.OnlyOne = this.CachedReference.OnlyOne;
             this.IsTradeBlocked = this.CachedReference.IsTradeBlocked;
-            this.IsScisored = this.CachedReference.IsScisored;
+            this.IsScissored = this.CachedReference.IsScissored;
             this.SalePrice = this.CachedReference.SalePrice;
             this.RequiredLevel = this.CachedReference.RequiredLevel;
 
@@ -448,7 +448,7 @@ namespace Destiny.Maple
                 this.IsCash = this.CachedReference.IsCash;
                 this.OnlyOne = this.CachedReference.OnlyOne;
                 this.IsTradeBlocked = this.CachedReference.IsTradeBlocked;
-                this.IsScisored = false;
+                this.IsScissored = false;
                 this.SalePrice = this.CachedReference.SalePrice;
                 this.RequiredLevel = this.CachedReference.RequiredLevel;
 
@@ -492,7 +492,7 @@ namespace Destiny.Maple
                 this.IsCash = ((string)datum["flags"]).Contains("cash_item");
                 this.OnlyOne = (sbyte)datum["max_possession_count"] > 0;
                 this.IsTradeBlocked = ((string)datum["flags"]).Contains("no_trade");
-                this.IsScisored = false;
+                this.IsScissored = false;
                 this.SalePrice = (int)datum["price"];
                 this.RequiredLevel = (byte)datum["min_level"];
             }
@@ -524,7 +524,7 @@ namespace Destiny.Maple
             datum["Agility"] = this.Agility;
             datum["Speed"] = this.Speed;
             datum["Jump"] = this.Jump;
-            datum["IsScisored"] = this.IsScisored;
+            datum["IsScissored"] = this.IsScissored;
             datum["PreventsSlipping"] = this.PreventsSlipping;
             datum["PreventsColdness"] = this.PreventsColdness;
             datum["IsStored"] = false;

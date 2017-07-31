@@ -650,6 +650,8 @@ namespace Destiny
             Gender gender = (Gender)iPacket.ReadByte();
 
             bool error = false;
+            
+            //TODO: Validate against data in MCDB instead of hard-coding it all here
 
             //Name constraints
             //TODO: Check if name violates forbidden words
