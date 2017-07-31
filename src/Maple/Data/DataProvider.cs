@@ -12,6 +12,7 @@ namespace Destiny.Maple.Data
         public static CachedItems CachedItems { get; private set; }
         public static CachedMaps CachedMaps { get; private set; }
         public static CachedQuests CachedQuests { get; private set; }
+        public static CreationData CharacterCreationData { get; private set; }
 
         public static void Initialize()
         {
@@ -29,6 +30,7 @@ namespace Destiny.Maple.Data
                 DataProvider.CachedItems = new CachedItems();
                 DataProvider.CachedMaps = new CachedMaps();
                 DataProvider.CachedQuests = new CachedQuests();
+                DataProvider.CharacterCreationData = new CreationData();
 
                 CommandFactory.Initialize();
 

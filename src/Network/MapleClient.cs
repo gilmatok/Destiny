@@ -10,6 +10,7 @@ using Destiny.Data;
 using System;
 using Destiny.IO;
 using System.Linq;
+using Destiny.Maple.Data;
 
 namespace Destiny
 {
@@ -638,7 +639,7 @@ namespace Destiny
         private void CreateCharacter(InPacket iPacket)
         {
             string name = iPacket.ReadMapleString();
-            int jobType = iPacket.ReadInt();
+            JobType jobType = (JobType)iPacket.ReadInt();
             int face = iPacket.ReadInt();
             int hair = iPacket.ReadInt();
             int hairColor = iPacket.ReadInt();
@@ -650,48 +651,47 @@ namespace Destiny
             Gender gender = (Gender)iPacket.ReadByte();
 
             bool error = false;
-            
-            //TODO: Validate against data in MCDB instead of hard-coding it all here
 
             //Name constraints
-            //TODO: Check if name violates forbidden words
-            if (name.Length < 4 || name.Length > 12 || Database.Exists("characters", "Name = '{0}'", name))
+            if (name.Length < 4 || name.Length > 12
+                || Database.Exists("characters", "Name = '{0}'", name)
+                || DataProvider.CharacterCreationData.ForbiddenNames.Any(forbiddenWord => name.ToLowerInvariant().Contains(forbiddenWord)))
             {
                 error = true;
             }
-
-            //Gender-specific cosmetic checks
+            
+            //Gender-specific cosmetic/item checks
             if (gender == Gender.Male)
             {
-                if (!new[] { 20000, 20001, 20002 }.Contains(face)
-                    || !new[] { 30000, 30020, 30030 }.Contains(hair)
-                    || !new[] { 1040002, 1040006, 1040010 }.Contains(topID)
-                    || !new[] { 1060006, 1060002 }.Contains(bottomID))
+                if (!DataProvider.CharacterCreationData.MaleSkins.Any(x => x.Item1 == jobType && x.Item2 == skin)
+                    || !DataProvider.CharacterCreationData.MaleFaces.Any(x => x.Item1 == jobType && x.Item2 == face)
+                    || !DataProvider.CharacterCreationData.MaleHairs.Any(x => x.Item1 == jobType && x.Item2 == hair)
+                    || !DataProvider.CharacterCreationData.MaleHairColors.Any(x => x.Item1 == jobType && x.Item2 == hairColor)
+                    || !DataProvider.CharacterCreationData.MaleTops.Any(x => x.Item1 == jobType && x.Item2 == topID)
+                    || !DataProvider.CharacterCreationData.MaleBottoms.Any(x => x.Item1 == jobType && x.Item2 == bottomID)
+                    || !DataProvider.CharacterCreationData.MaleShoes.Any(x => x.Item1 == jobType && x.Item2 == shoesID)
+                    || !DataProvider.CharacterCreationData.MaleWeapons.Any(x => x.Item1 == jobType && x.Item2 == weaponID))
                 {
                     error = true;
                 }
             }
             else if (gender == Gender.Female)
             {
-                if (!new[] { 21000, 21001, 21002 }.Contains(face)
-                    || !new[] { 31000, 31040, 31050 }.Contains(hair)
-                    || !new[] { 1041002, 1041006, 1041010, 1041011 }.Contains(topID)
-                    || !new[] { 1061002, 1061008 }.Contains(bottomID))
+                if (!DataProvider.CharacterCreationData.FemaleSkins.Any(x => x.Item1 == jobType && x.Item2 == skin)
+                    || !DataProvider.CharacterCreationData.FemaleFaces.Any(x => x.Item1 == jobType && x.Item2 == face)
+                    || !DataProvider.CharacterCreationData.FemaleHairs.Any(x => x.Item1 == jobType && x.Item2 == hair)
+                    || !DataProvider.CharacterCreationData.FemaleHairColors.Any(x => x.Item1 == jobType && x.Item2 == hairColor)
+                    || !DataProvider.CharacterCreationData.FemaleTops.Any(x => x.Item1 == jobType && x.Item2 == topID)
+                    || !DataProvider.CharacterCreationData.FemaleBottoms.Any(x => x.Item1 == jobType && x.Item2 == bottomID)
+                    || !DataProvider.CharacterCreationData.FemaleShoes.Any(x => x.Item1 == jobType && x.Item2 == shoesID)
+                    || !DataProvider.CharacterCreationData.FemaleWeapons.Any(x => x.Item1 == jobType && x.Item2 == weaponID))
                 {
                     error = true;
                 }
             }
             else
             {
-                error = true;
-            }
-
-            //Skin, weapon, and shoes choices are the same regardless of gender
-            if (skin < 0 || skin > 3
-                || !new[] { 0, 2, 3, 7 }.Contains(hairColor)
-                || !new[] { 1302000, 1322005, 1312004 }.Contains(weaponID)
-                || !new[] { 1072001, 1072005, 1072037, 1072038 }.Contains(shoesID))
-            {
+                //Not allowed to choose "both" genders at character creation
                 error = true;
             }
 
@@ -704,7 +704,7 @@ namespace Destiny
             character.Face = face;
             character.Hair = hair + hairColor;
             character.Level = 1;
-            character.Job = jobType == 0 ? Job.Noblesse : jobType == 1 ? Job.Beginner : Job.Legend;
+            character.Job = jobType == JobType.Cygnus ? Job.Noblesse : jobType == JobType.Explorer ? Job.Beginner : Job.Legend;
             character.Strength = 12;
             character.Dexterity = 5;
             character.Intelligence = 4;
@@ -717,7 +717,7 @@ namespace Destiny
             character.SkillPoints = 0;
             character.Experience = 0;
             character.Fame = 0;
-            character.Map = MasterServer.Channels[this.Channel].Maps[jobType == 0 ? 130030000 : jobType == 1 ? 10000 : 914000000];
+            character.Map = MasterServer.Channels[this.Channel].Maps[jobType == JobType.Cygnus ? 130030000 : jobType == JobType.Explorer ? 10000 : 914000000];
             character.SpawnPoint = 0;
             character.Meso = 0;
 
@@ -725,7 +725,7 @@ namespace Destiny
             character.Items.Add(new Item(bottomID, equipped: true));
             character.Items.Add(new Item(shoesID, equipped: true));
             character.Items.Add(new Item(weaponID, equipped: true));
-            character.Items.Add(new Item(jobType == 0 ? 4161047 : jobType == 1 ? 4161001 : 4161048), forceGetSlot: true);
+            character.Items.Add(new Item(jobType == JobType.Cygnus ? 4161047 : jobType == JobType.Explorer ? 4161001 : 4161048), forceGetSlot: true);
 
             if (!error)
             {

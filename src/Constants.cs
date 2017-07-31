@@ -171,6 +171,13 @@ namespace Destiny
         Legend = 2000
     }
 
+    public enum JobType
+    {
+        Cygnus = 0,
+        Explorer = 1,
+        Aran = 2
+    }
+
     [Flags]
     public enum ItemFlags : short
     {
