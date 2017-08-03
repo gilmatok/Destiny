@@ -13,6 +13,14 @@ namespace Destiny.Core.IO
 
         public ClientOperationCode OperationCode { get; private set; }
 
+        public int Remaining
+        {
+            get
+            {
+                return this.mBuffer.Length - this.mIndex;
+            }
+        }
+
         public InPacket(byte[] buffer)
         {
             mIndex = 0;

@@ -250,6 +250,7 @@ namespace Destiny
                     break;
 
                 case ClientOperationCode.QuestAction:
+                    this.Character.Quests.Handle(iPacket);
                     break;
 
                 case ClientOperationCode.SkillMacro:

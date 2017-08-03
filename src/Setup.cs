@@ -200,8 +200,8 @@ namespace Destiny
                             CREATE TABLE  `quests_started` (
                               `CharacterID` int(11) NOT NULL,
                               `QuestID` smallint(6) unsigned NOT NULL,
-                              `MobID` int(11) DEFAULT NULL,
-                              `Killed` smallint(6) DEFAULT NULL,
+                              `MobID` int(11) NOT NULL DEFAULT 0,
+                              `Killed` smallint(6) NOT NULL DEFAULT 0,
                               UNIQUE KEY `QuestRequirement` (`CharacterID`,`QuestID`,`MobID`) USING BTREE
                             ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 

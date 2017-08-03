@@ -26,7 +26,7 @@ namespace Destiny.Maple
         public Dictionary<int, short> PreRequiredItems { get; private set; }
         public Dictionary<int, short> PostRequiredItems { get; private set; }
         public Dictionary<int, short> PostRequiredKills { get; private set; }
-        public List<short> ValidJobs { get; private set; }
+        public List<Job> ValidJobs { get; private set; }
 
         // Rewards (Start, End)
         public Tuple<int, int> ExperienceReward { get; private set; }
@@ -161,6 +161,8 @@ namespace Destiny.Maple
                                              .Select(x => new Tuple<int, short, Gender>((int)x["rewardid"], (short)x["quantity"], (Gender)Enum.Parse(typeof(Gender), ((string)x["gender"]).ToCamel())))
                                              .ToList();
             //TODO: Add a constructor on Skill so we can create instances here
+            this.PreSkillRewards    = new Dictionary<Skill, Job>();
+            this.PostSkillRewards   = new Dictionary<Skill, Job>();
             //this.PreSkillRewards    = rewards.Where(x => (string)x["reward_type"] == "skill" && (string)x["quest_state"] == "start")
             //                                 .Select(x => new { rewardid = (int)x["rewardid"], quantity = (short)x["quantity"], master_level = (short)x["master_level"], job = (short)x["job"] })
             //                                 .ToDictionary(x => new Skill(x.rewardid, x.quantity, x.master_level), x => (Job)x.job);
@@ -168,7 +170,7 @@ namespace Destiny.Maple
             //                                 .Select(x => new { rewardid = (int)x["rewardid"], quantity = (short)x["quantity"], master_level = (short)x["master_level"], job = (short)x["job"] })
             //                                 .ToDictionary(x => new Skill(x.rewardid, x.quantity, x.master_level), x => (Job)x.job);
 
-            this.ValidJobs = jobs.Select(x => (short)x["valid_jobid"]).ToList();
+            this.ValidJobs = jobs.Select(x => (Job)x["valid_jobid"]).ToList();
         }
     }
 }
