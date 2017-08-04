@@ -149,7 +149,7 @@ namespace Destiny
                               `UpgradesAvailable` tinyint(3) unsigned NOT NULL DEFAULT '0',
                               `UpgradesApplied` tinyint(3) unsigned NOT NULL DEFAULT '0',
                               `Strength` smallint(6) NOT NULL DEFAULT '0',
-                              `Dexterity` smallint(6) NOT NULL DEFALT '0',
+                              `Dexterity` smallint(6) NOT NULL DEFAULT '0',
                               `Intelligence` smallint(6) NOT NULL DEFAULT '0',
                               `Luck` smallint(6) NOT NULL DEFAULT '0',
                               `Health` smallint(6) NOT NULL DEFAULT '0',
