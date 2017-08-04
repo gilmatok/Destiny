@@ -88,9 +88,9 @@
         UseTeleportRock = 0x53,
         UseReturnScroll = 0x54,
         UseUpgradeScroll = 0x55,
-        DistributeAP = 0x56,
-        AutoDistributeAP = 0x57,
-        HealOverTime = 0x58,
+        DistributeAP = 0x57,
+        AutoDistributeAP = 0x58,
+        HealOverTime = 0x59,
         //89
         #endregion QUESTIONABLE
 

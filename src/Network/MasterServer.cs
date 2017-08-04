@@ -25,6 +25,11 @@
 
         public static void Start()
         {
+            if (MasterServer.IsAlive)
+            {
+                return;
+            }
+
             MasterServer.Login.Start();
 
             foreach (ChannelServer channel in MasterServer.Channels)
@@ -41,6 +46,11 @@
 
         public static void Stop()
         {
+            if (!MasterServer.IsAlive)
+            {
+                return;
+            }
+
             MasterServer.Login.Stop();
 
             foreach (ChannelServer channel in MasterServer.Channels)

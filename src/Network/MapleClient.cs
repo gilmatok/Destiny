@@ -199,9 +199,11 @@ namespace Destiny
                     break;
 
                 case ClientOperationCode.DistributeAP:
+                    this.Character.DistributeAP(iPacket);
                     break;
 
                 case ClientOperationCode.AutoDistributeAP:
+                    this.Character.AutoDistributeAP(iPacket);
                     break;
 
                 case ClientOperationCode.HealOverTime:

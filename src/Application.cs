@@ -30,6 +30,8 @@ namespace Destiny
 
         private static void Main(string[] args)
         {
+            AppDomain.CurrentDomain.ProcessExit += new EventHandler(CurrentDomain_ProcessExit);
+
             if (args.Length == 1 && args[0].ToLower() == "setup" || !File.Exists(Application.ExecutablePath + "Configuration.ini"))
             {
                 Setup.Run();
@@ -101,6 +103,11 @@ namespace Destiny
         public static string ClearFormatters(this string value)
         {
             return value.Replace("{", "{{").Replace("}", "}}");
+        }
+
+        private static void CurrentDomain_ProcessExit(object sender, EventArgs e)
+        {
+            MasterServer.Stop();
         }
     }
 }

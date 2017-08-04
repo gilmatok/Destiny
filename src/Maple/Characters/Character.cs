@@ -103,7 +103,7 @@ namespace Destiny.Maple.Characters
             }
             set
             {
-                if ((this.Gender == Gender.Male && !DataProvider.AvailableStyles.MaleFaces.Contains(value)) || 
+                if ((this.Gender == Gender.Male && !DataProvider.AvailableStyles.MaleFaces.Contains(value)) ||
                     this.Gender == Gender.Female && !DataProvider.AvailableStyles.FemaleFaces.Contains(value))
                 {
                     throw new StyleUnavailableException();
@@ -940,6 +940,75 @@ namespace Destiny.Maple.Characters
                     this.NpcScript = null;
                 }
             }
+        }
+
+        public void DistributeAP(StatisticType type, short amount = 1)
+        {
+            switch (type)
+            {
+                case StatisticType.Strength:
+                    this.Strength += amount;
+                    break;
+
+                case StatisticType.Dexterity:
+                    this.Dexterity += amount;
+                    break;
+
+                case StatisticType.Intelligence:
+                    this.Intelligence += amount;
+                    break;
+
+                case StatisticType.Luck:
+                    this.Luck += amount;
+                    break;
+
+                case StatisticType.MaxHealth:
+                    // TODO: Get addition based on other factors.
+                    break;
+
+                case StatisticType.MaxMana:
+                    // TODO: Get addition based on other factors.
+                    break;
+            }
+        }
+
+        public void DistributeAP(InPacket iPacket)
+        {
+            if (this.AbilityPoints == 0)
+            {
+                return;
+            }
+
+            iPacket.ReadInt(); // NOTE: Ticks.
+            StatisticType type = (StatisticType)iPacket.ReadInt();
+
+            this.DistributeAP(type);
+            this.AbilityPoints--;
+        }
+
+        public void AutoDistributeAP(InPacket iPacket)
+        {
+            iPacket.ReadInt(); // NOTE: Ticks.
+            int count = iPacket.ReadInt(); // NOTE: There are always 2 primary stats for each job, but still.
+
+            int total = 0;
+
+            for (int i = 0; i < count; i++)
+            {
+                StatisticType type = (StatisticType)iPacket.ReadInt();
+                int amount = iPacket.ReadInt();
+
+                if (amount > this.AbilityPoints || amount < 0)
+                {
+                    return;
+                }
+
+                this.DistributeAP(type, (short)amount);
+
+                total += amount;
+            }
+
+            this.AbilityPoints -= (short)total;
         }
 
         public void DropMeso(InPacket iPacket)
