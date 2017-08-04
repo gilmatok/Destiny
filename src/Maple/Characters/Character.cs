@@ -979,7 +979,7 @@ namespace Destiny.Maple.Characters
                 return;
             }
 
-            if (target.IsGm)
+            if (target.IsGm && !this.IsGm)
             {
                 return;
             }
