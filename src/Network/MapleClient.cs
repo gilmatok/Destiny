@@ -35,8 +35,13 @@ namespace Destiny
 
                 this.Character.Map.Characters.Remove(this.Character);
             }
-
-            // TODO: Remove client from server.
+            
+            if (this.IsInCashShop)
+                MasterServer.CashShop.Clients.Remove(this);
+            else if (this.Channel >= 0)
+                MasterServer.Channels[this.Channel].Clients.Remove(this);
+            
+            MasterServer.Login.Clients.Remove(this);
         }
 
         protected override void Dispatch(InPacket iPacket)
