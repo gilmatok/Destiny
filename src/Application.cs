@@ -47,6 +47,16 @@ namespace Destiny
                 DataProvider.Initialize();
 
                 MasterServer.Start();
+
+#if DEBUG
+                string linkPath = Path.Combine(Application.ExecutablePath, "LaunchClient.lnk");
+                if (File.Exists(linkPath))
+                {
+                    System.Diagnostics.Process proc = new System.Diagnostics.Process();
+                    proc.StartInfo.FileName = linkPath;
+                    proc.Start();
+                }
+#endif
             }
             catch (Exception ex)
             {
