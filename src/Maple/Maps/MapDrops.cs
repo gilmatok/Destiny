@@ -31,24 +31,11 @@ namespace Destiny.Maple.Maps
 
             lock (this.Map.Characters)
             {
-                if (item.Owner == null)
+                foreach (Character character in this.Map.Characters)
                 {
-                    foreach (Character character in this.Map.Characters)
+                    using (OutPacket oPacket = item.GetCreatePacket(item.Owner == null ? character : null))
                     {
-                        using (OutPacket oPacket = item.GetCreatePacket(character))
-                        {
-                            character.Client.Send(oPacket);
-                        }
-                    }
-                }
-                else
-                {
-                    foreach (Character character in this.Map.Characters)
-                    {
-                        using (OutPacket oPacket = item.GetCreatePacket())
-                        {
-                            character.Client.Send(oPacket);
-                        }
+                        character.Client.Send(oPacket);
                     }
                 }
             }

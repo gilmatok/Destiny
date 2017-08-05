@@ -125,10 +125,10 @@ namespace Destiny.Maple
 
             this.PreRequiredQuests  = requests.Where(x => (string)x["request_type"] == "quest" && (string)x["quest_state"] == "start")
                                               .Select(x => new { objectid = (int)x["objectid"], quantity = (short)x["quantity"] })
-                                              .ToDictionary(x => (ushort)x.objectid, x => (QuestStatus)x.quantity);
+                                              .ToDictionary(x => (ushort)x.objectid, x => (QuestStatus)(byte)x.quantity);
             this.PostRequiredQuests = requests.Where(x => (string)x["request_type"] == "quest" && (string)x["quest_state"] == "end")
                                               .Select(x => new { objectid = (int)x["objectid"], quantity = (short)x["quantity"] })
-                                              .ToDictionary(x => (ushort)x.objectid, x => (QuestStatus)x.quantity);
+                                              .ToDictionary(x => (ushort)x.objectid, x => (QuestStatus)(byte)x.quantity);
             this.PreRequiredItems   = requests.Where(x => (string)x["request_type"] == "item" && (string)x["quest_state"] == "start")
                                               .Select(x => new { objectid = (int)x["objectid"], quantity = (short)x["quantity"] })
                                               .ToDictionary(x => x.objectid, x => x.quantity);

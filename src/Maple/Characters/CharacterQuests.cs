@@ -1,4 +1,5 @@
 ﻿using Destiny.Core.IO;
+using Destiny.Core.Network;
 using Destiny.Data;
 using Destiny.Maple.Data;
 using System;
@@ -75,6 +76,7 @@ namespace Destiny.Maple.Characters
                         {
                             Datum datum = new Datum("quests_completed");
                             datum["CharacterID"] = this.Parent.ID;
+                            datum["QuestID"] = quest.Value.QuestID;
                             datum["CompletionTime"] = quest.Value.CompletionTime;
                             datum.Insert();
 
@@ -116,22 +118,24 @@ namespace Destiny.Maple.Characters
 
                 if (!silent)
                 {
-                    //TODO: Send forfeit quest packet
+                    this.SetQuestRecord(questID, QuestStatus.NotStarted);
                 }
             }
         }
 
-        public bool Start(ushort questID, int? npcID = null)
+        public void Start(ushort questID, int npcID = 0)
         {
-            var newQuest = new Maple.Quest(questID);
-            return Start(newQuest, npcID);
+            Start(new Maple.Quest(questID), npcID);
         }
 
-        public bool Start(Quest reference, int? npcID = null)
+        public void Start(Quest reference, int npcID = 0)
         {
             //Validate pre-start requirements are met
             if (reference.ValidJobs.Count > 0 && !reference.ValidJobs.Contains(this.Parent.Job) && this.Parent.Job != Job.GM && this.Parent.Job != Job.SuperGM)
-                return false;
+            {
+                this.SendQuestResult(QuestResult.GenericError, reference);
+                return;
+            }
 
             foreach (var requiredQuest in reference.PreRequiredQuests)
             {
@@ -139,51 +143,79 @@ namespace Destiny.Maple.Characters
                 {
                     case QuestStatus.Complete:
                         if (!this.Completed.ContainsKey(requiredQuest.Key))
-                            return false;
+                        {
+                            this.SendQuestResult(QuestResult.GenericError, reference);
+                            return;
+                        }
                         break;
                     case QuestStatus.InProgress:
                         if (!this.Started.ContainsKey(requiredQuest.Key))
-                            return false;
+                        {
+                            this.SendQuestResult(QuestResult.GenericError, reference);
+                            return;
+                        }
                         break;
                     case QuestStatus.NotStarted:
                         if (this.Completed.ContainsKey(requiredQuest.Key) || this.Started.ContainsKey(requiredQuest.Key))
-                            return false;
+                        {
+                            this.SendQuestResult(QuestResult.GenericError, reference);
+                            return;
+                        }
                         break;
                 }
+            }
+
+            if (this.Parent.Meso + reference.MesoReward.Item1 < 0)
+            {
+                this.SendQuestResult(QuestResult.NotEnoughMesos, reference);
+                return;
             }
 
             foreach (var requiredItem in reference.PreRequiredItems)
             {
                 if (!this.Parent.Items.Contains(requiredItem.Key, requiredItem.Value))
-                    return false;
-            }
-            
-            var itemRewards = reference.PreItemRewards.Where(x => x.Item3 == this.Parent.Gender || this.Parent.Gender == Gender.Both).Select(x => new Item(x.Item1, x.Item2));
-            if (!this.Parent.Items.CouldReceive(itemRewards))
-            {
-                this.Parent.Items.NotifyFull();
-                return false;
-            }
-            else //Finished validation; start handing out pre-rewards
-            {
-                //Remove the required items before giving out rewards; previously we only checked if the character had them
-                foreach (var requiredItem in reference.PreRequiredItems)
                 {
-                    this.Parent.Items.Remove(requiredItem.Key, requiredItem.Value);
+                    this.SendQuestResult(QuestResult.GenericError, reference);
+                    return;
                 }
 
-                foreach (var item in itemRewards)
+                //If any of the required items are currently equipped, throw an error
+                if (this.Parent.Items.Any(x => x.MapleID == requiredItem.Key && x.IsEquipped))
                 {
-                    this.Parent.Items.Add(item, false);
+                    this.SendQuestResult(QuestResult.ItemWornByChar, reference);
+                    return;
                 }
+            }
+
+            var itemRewards = reference.PreItemRewards.Where(x => x.Item3 == this.Parent.Gender || x.Item3 == Gender.Both || this.Parent.Gender == Gender.Both)
+                .Select(x => new Item(x.Item1, x.Item2));
+            if (!this.Parent.Items.CouldReceive(itemRewards))
+            {
+                this.SendQuestResult(QuestResult.NoInventorySpace, new Maple.Quest(reference.MapleID));
+                return;
+            }
+            foreach (var item in itemRewards)
+            {
+                if (item.OnlyOne && this.Parent.Items.Contains(item.MapleID))
+                {
+                    this.SendQuestResult(QuestResult.OnlyOneOfItemAllowed, reference);
+                    return;
+                }
+
+                //Finished validation; start handing out rewards
+
+                //Technically, some "rewards" are actually a cost that's part of the requirements, so we have to check if they have a negative quantity
+                if (item.Quantity >= 0)
+                    this.Parent.Items.Add(item, false);
+                else
+                    this.Parent.Items.Remove(item.MapleID, Math.Abs(item.Quantity));
             }
 
             foreach (var skillReward in reference.PreSkillRewards.Where(x => x.Value == this.Parent.Job))
             {
                 this.Parent.Skills.Add(skillReward.Key);
             }
-
-            //TODO: Probably should add methods for these rather than adding directly to them
+            
             this.Parent.Experience += reference.ExperienceReward.Item1;
             this.Parent.Meso += reference.MesoReward.Item1;
             this.Parent.Fame += (short)reference.FameReward.Item1;
@@ -204,25 +236,32 @@ namespace Destiny.Maple.Characters
             }
 
             this.Started.Add(reference.MapleID, entries);
-            return true;
+
+            this.SetQuestRecord(reference.MapleID, QuestStatus.InProgress);
         }
 
-        public bool Complete(ushort questID, short? selection = null)
+        public void Complete(ushort questID, int selection = 0)
         {
-            return Complete(new Maple.Quest(questID), selection);
+            Complete(new Maple.Quest(questID), selection);
         }
 
-        public bool Complete(Quest reference, short? selection = null)
+        public void Complete(Quest reference, int selection = 0)
         {
             //Verify that quest requirements have been completed and character has space for rewards
-            if (this.Started.ContainsKey(reference.MapleID))
-                return false;
+            if (!this.Started.ContainsKey(reference.MapleID))
+            {
+                this.SendQuestResult(QuestResult.GenericError, reference);
+                return;
+            }
 
             foreach (var requiredKill in reference.PostRequiredKills)
             {
                 var startedQuestInfo = this.Started[reference.MapleID].FirstOrDefault(x => x.MobID == requiredKill.Key);
                 if (startedQuestInfo == null || startedQuestInfo.Killed < requiredKill.Value)
-                    return false;
+                {
+                    this.SendQuestResult(QuestResult.GenericError, reference);
+                    return;
+                }
             }
 
             foreach (var requiredQuest in reference.PostRequiredQuests)
@@ -231,51 +270,79 @@ namespace Destiny.Maple.Characters
                 {
                     case QuestStatus.Complete:
                         if (!this.Completed.ContainsKey(requiredQuest.Key))
-                            return false;
+                        {
+                            this.SendQuestResult(QuestResult.GenericError, reference);
+                            return;
+                        }
                         break;
                     case QuestStatus.InProgress:
                         if (!this.Started.ContainsKey(requiredQuest.Key))
-                            return false;
+                        {
+                            this.SendQuestResult(QuestResult.GenericError, reference);
+                            return;
+                        }
                         break;
                     case QuestStatus.NotStarted:
                         if (this.Completed.ContainsKey(requiredQuest.Key) || this.Started.ContainsKey(requiredQuest.Key))
-                            return false;
+                        {
+                            this.SendQuestResult(QuestResult.GenericError, reference);
+                            return;
+                        }
                         break;
                 }
+            }
+
+            if (this.Parent.Meso + reference.MesoReward.Item2 < 0)
+            {
+                this.SendQuestResult(QuestResult.NotEnoughMesos, reference);
+                return;
             }
 
             foreach (var requiredItem in reference.PostRequiredItems)
             {
                 if (!this.Parent.Items.Contains(requiredItem.Key, requiredItem.Value))
-                    return false;
+                {
+                    this.SendQuestResult(QuestResult.GenericError, reference);
+                    return;
+                }
+                
+                //If any of the required items are currently equipped, throw an error
+                if (this.Parent.Items.Any(x => x.MapleID == requiredItem.Key && x.IsEquipped))
+                {
+                    this.SendQuestResult(QuestResult.ItemWornByChar, reference);
+                    return;
+                }
             }
 
-            var itemRewards = reference.PostItemRewards.Where(x => x.Item3 == this.Parent.Gender || this.Parent.Gender == Gender.Both).Select(x => new Item(x.Item1, x.Item2));
+            var itemRewards = reference.PostItemRewards.Where(x => x.Item3 == this.Parent.Gender || x.Item3 == Gender.Both || this.Parent.Gender == Gender.Both)
+                .Select(x => new Item(x.Item1, x.Item2));
             if (!this.Parent.Items.CouldReceive(itemRewards))
             {
-                this.Parent.Items.NotifyFull();
-                return false;
+                this.SendQuestResult(QuestResult.NoInventorySpace, reference);
+                return;
             }
-            else //Finished validation; start handing out rewards
+            foreach (var item in itemRewards)
             {
-                //Remove the required items before giving out rewards; previously we only checked if the character had them
-                foreach (var requiredItem in reference.PostRequiredItems)
+                if (item.OnlyOne && this.Parent.Items.Contains(item.MapleID))
                 {
-                    this.Parent.Items.Remove(requiredItem.Key, requiredItem.Value);
+                    this.SendQuestResult(QuestResult.OnlyOneOfItemAllowed, reference);
+                    return;
                 }
 
-                foreach (var item in itemRewards)
-                {
+                //Finished validation; start handing out rewards
+                
+                //Technically, some "rewards" are actually a cost that's part of the requirements, so we have to check if they have a negative quantity
+                if (item.Quantity >= 0)
                     this.Parent.Items.Add(item, false);
-                }
+                else
+                    this.Parent.Items.Remove(item.MapleID, Math.Abs(item.Quantity));
             }
 
             foreach (var skillReward in reference.PostSkillRewards.Where(x => x.Value == this.Parent.Job))
             {
                 this.Parent.Skills.Add(skillReward.Key);
             }
-
-            //TODO: Probably should add methods for these rather than adding directly to them
+            
             this.Parent.Experience += reference.ExperienceReward.Item2;
             this.Parent.Meso += reference.MesoReward.Item2;
             this.Parent.Fame += (short)reference.FameReward.Item2;
@@ -283,44 +350,113 @@ namespace Destiny.Maple.Characters
 
             this.Forfeit(reference.MapleID, true); //"Forfeit" the quest to remove it from the quests_started table
             this.Completed.Add(reference.MapleID, new CompletedQuest(reference.MapleID, DateTime.Now));
-            return true;
+
+            this.SetQuestRecord(reference.MapleID, QuestStatus.Complete);
+        }
+
+        private void SetQuestRecord(ushort questID, QuestStatus status, string progress = "")
+        {
+            using (OutPacket oPacket = new OutPacket(ServerOperationCode.Message))
+            {
+                oPacket
+                    .WriteByte((byte)MessageType.QuestRecord)
+                    .WriteShort((short)questID)
+                    .WriteByte((byte)status);
+
+                if (status == QuestStatus.InProgress)
+                    oPacket.WriteMapleString(progress);
+
+                if (status == QuestStatus.Complete)
+                    oPacket.WriteLong(DateTime.Now.Ticks);
+
+                this.Parent.Client.Send(oPacket);
+            }
         }
 
         public void Handle(InPacket iPacket)
         {
             QuestAction action = (QuestAction)iPacket.ReadByte();
-            ushort questId = (ushort)iPacket.ReadShort();
+            ushort questID = (ushort)iPacket.ReadShort();
 
-            if (!DataProvider.CachedQuests.Contains(questId))
+            if (!DataProvider.CachedQuests.Contains(questID))
                 return;
 
-            if (action == QuestAction.Forfeit)
+            Quest quest = new Maple.Quest(questID);
+
+            int npcId;
+            switch (action)
             {
-                this.Forfeit(questId);
-                return;
+                case QuestAction.RestoreLostItem:
+                    int quantity = iPacket.ReadInt();
+                    int itemId = iPacket.ReadInt();
+                    Item item = new Item(itemId, (short)(quantity - this.Parent.Items.Available(itemId)));
+                    this.Parent.Items.Add(item);
+                    break;
+                case QuestAction.Start:
+                    npcId = iPacket.ReadInt();
+                    this.Start(quest, npcId);
+                    break;
+                case QuestAction.Complete:
+                    npcId = iPacket.ReadInt();
+                    iPacket.ReadInt(); //NOTE: Unknown
+                    int selection = iPacket.Remaining >= 4 ? iPacket.ReadInt() : 0;
+                    this.Complete(quest, selection);
+                    break;
+                case QuestAction.Forfeit:
+                    this.Forfeit(quest.MapleID);
+                    break;
+                case QuestAction.ScriptStart:
+                    npcId = iPacket.ReadInt();
+                    break;
+                case QuestAction.ScriptEnd:
+                    npcId = iPacket.ReadInt();
+                    break;
             }
-            else
+        }
+
+        private void SendQuestResult(QuestResult operation, Quest quest, int mapleID = 0)
+        {
+            using (OutPacket oPacket = new OutPacket(ServerOperationCode.UpdateQuestInfo))
             {
-                int npcId = iPacket.ReadInt();
-                if (iPacket.Remaining >= 4)
+                oPacket.WriteByte((byte)operation);
+
+                switch (operation)
                 {
-                    var test = iPacket.ReadInt(); //NOTE: Unknown
+                    case QuestResult.AddTimeLimit:
+                        oPacket
+                            .WriteShort(1) //NOTE: Count
+                            .WriteShort((short)quest.MapleID)
+                            .WriteInt(quest.TimeLimit);
+                        break;
+                    case QuestResult.RemoveTimeLimit:
+                        oPacket
+                            .WriteShort(1) //NOTE: Count
+                            .WriteShort((short)quest.MapleID);
+                        break;
+                    case QuestResult.Complete:
+                        oPacket
+                            .WriteShort((short)quest.MapleID)
+                            .WriteInt(Math.Max(mapleID, 0)) //NOTE: NpcID or selection ID
+                            .WriteShort((short)quest.NextQuestID);
+                        break;
+                    case QuestResult.GenericError:
+                    case QuestResult.NotEnoughMesos:
+                    case QuestResult.ItemWornByChar:
+                    case QuestResult.OnlyOneOfItemAllowed:
+                        //These don't require any additional bytes
+                        break;
+                    case QuestResult.NoInventorySpace:
+                        oPacket.WriteShort((short)quest.MapleID);
+                        break;
+                    case QuestResult.Expire:
+                        oPacket.WriteShort((short)quest.MapleID);
+                        break;
+                    case QuestResult.ResetTimeLimit:
+                        oPacket.WriteShort((short)quest.MapleID);
+                        break;
                 }
 
-                switch (action)
-                {
-                    case QuestAction.Start:
-                        this.Start(questId, npcId);
-                        break;
-                    case QuestAction.Complete:
-                        short? selection = iPacket.Remaining >= 2 ? (short?)iPacket.ReadShort() : null;
-                        this.Complete(questId, selection);
-                        break;
-                    case QuestAction.ScriptStart:
-                        break;
-                    case QuestAction.ScriptEnd:
-                        break;
-                }
+                this.Parent.Client.Send(oPacket);
             }
         }
 
@@ -337,15 +473,14 @@ namespace Destiny.Maple.Characters
                         oPacket.WriteShort((short)record.Key);
 
                         StringBuilder mobKills = new StringBuilder();
-                        foreach (var quest in record.Value)
+                        //NOTE: These must be in order since the packet does not include a Mob ID.
+                        foreach (var quest in record.Value.OrderBy(x => x.MobID)) 
                         {
                             if (quest.MobID > 0)
                                 mobKills.Append(quest.Killed.ToString().PadLeft(3, '\u0030'));
                         }
-
-                        var str = mobKills.ToString();
-                        oPacket.WriteString(str.Trim());
-                        oPacket.WriteShort();
+                        
+                        oPacket.WriteMapleString(mobKills.ToString());
                     }
                     
                     oPacket.WriteShort((short)this.Completed.Count);

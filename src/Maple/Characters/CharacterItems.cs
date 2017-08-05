@@ -5,6 +5,7 @@ using System.Collections;
 using Destiny.Core.IO;
 using Destiny.Data;
 using Destiny.Core.Network;
+using System.Linq;
 
 namespace Destiny.Maple.Characters
 {
@@ -58,33 +59,30 @@ namespace Destiny.Maple.Characters
         {
             if (this.Available(item.MapleID) % item.MaxPerStack != 0 && autoMerge)
             {
-                foreach (Item loopItem in this)
+                foreach (Item loopItem in this.Where(x => x.MapleID == item.MapleID && x.Quantity < x.MaxPerStack))
                 {
-                    if (loopItem.MapleID == item.MapleID && loopItem.Quantity < loopItem.MaxPerStack)
+                    if (loopItem.Quantity + item.Quantity <= loopItem.MaxPerStack)
                     {
-                        if (loopItem.Quantity + item.Quantity <= loopItem.MaxPerStack)
+                        loopItem.Quantity += item.Quantity;
+                        loopItem.Update();
+
+                        item.Quantity = 0;
+
+                        break;
+                    }
+                    else
+                    {
+                        item.Quantity -= (short)(loopItem.MaxPerStack - loopItem.Quantity);
+                        item.Slot = this.GetNextFreeSlot(item.Type);
+
+                        loopItem.Quantity = loopItem.MaxPerStack;
+
+                        if (this.Parent.IsInitialized)
                         {
-                            loopItem.Quantity += item.Quantity;
                             loopItem.Update();
-
-                            item.Quantity = 0;
-
-                            break;
                         }
-                        else
-                        {
-                            item.Quantity -= (short)(loopItem.MaxPerStack - loopItem.Quantity);
-                            item.Slot = this.GetNextFreeSlot(item.Type);
 
-                            loopItem.Quantity = loopItem.MaxPerStack;
-
-                            if (this.Parent.IsInitialized)
-                            {
-                                loopItem.Update();
-                            }
-
-                            break;
-                        }
+                        break;
                     }
                 }
             }
@@ -487,20 +485,20 @@ namespace Destiny.Maple.Characters
 
         public int SpaceTakenBy(Item item, bool autoMerge = true)
         {
+            if (item.Quantity < 0)
+                return 0;
+
             if (this.Available(item.MapleID) % item.MaxPerStack != 0 && autoMerge)
             {
-                foreach (Item loopItem in this)
+                foreach (Item loopItem in this.Where(x => x.MapleID == item.MapleID && x.Quantity < x.MaxPerStack))
                 {
-                    if (loopItem.MapleID == item.MapleID && loopItem.Quantity < loopItem.MaxPerStack)
+                    if (loopItem.Quantity + item.Quantity <= loopItem.MaxPerStack)
                     {
-                        if (loopItem.Quantity + item.Quantity <= loopItem.MaxPerStack)
-                        {
-                            return 0;
-                        }
-                        else
-                        {
-                            return 1;
-                        }
+                        return 0;
+                    }
+                    else
+                    {
+                        return 1;
                     }
                 }
 

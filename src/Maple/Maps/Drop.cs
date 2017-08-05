@@ -58,7 +58,7 @@ namespace Destiny.Maple.Maps
             OutPacket oPacket = new OutPacket(ServerOperationCode.DropEnterField);
 
             oPacket
-                .WriteByte((byte)(dropped ? 1 : 2))
+                .WriteByte((byte)(dropped ? 1 : 2)) // TODO: Other types; 3 = disappearing, and 0 probably is something as well.
                 .WriteInt(this.ObjectID)
                 .WriteBool(this is Meso);
 

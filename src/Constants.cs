@@ -208,6 +208,20 @@ namespace Destiny
         ScriptEnd
     }
 
+    public enum QuestResult : byte
+    {
+        AddTimeLimit = 0x06,
+        RemoveTimeLimit = 0x07,
+        Complete = 0x08,
+        GenericError = 0x09,
+        NoInventorySpace = 0x0A,
+        NotEnoughMesos = 0x0B,
+        ItemWornByChar = 0x0D,
+        OnlyOneOfItemAllowed = 0x0E,
+        Expire = 0x0F,
+        ResetTimeLimit = 0x10
+    }
+
     [Flags]
     public enum QuestFlags : short
     {
@@ -216,12 +230,29 @@ namespace Destiny
         SelectedMob = 0x02
     }
 
-    public enum QuestStatus : short
+    public enum QuestStatus : byte
     {
-        Forfeited = -1,
         NotStarted = 0,
         InProgress = 1,
         Complete = 2
+    }
+
+    public enum MessageType : byte
+    {
+        DropPickup,
+        QuestRecord,
+        CashItemExpire,
+        IncreaseEXP,
+        IncreaseFame,
+        IncreaseMeso,
+        IncreaseGP,
+        GiveBuff,
+        GeneralItemExpire,
+        System,
+        QuestRecordEx,
+        ItemProtectExpire,
+        ItemExpireReplace,
+        SkillExpire
     }
 
     public enum Gender : byte
