@@ -126,7 +126,8 @@ namespace Destiny
                     this.Character.Move(iPacket);
                     break;
 
-                case ClientOperationCode.CancelChair:
+                case ClientOperationCode.Sit:
+                    this.Character.Sit(iPacket);
                     break;
 
                 case ClientOperationCode.UseChair:

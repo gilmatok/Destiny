@@ -43,7 +43,7 @@
         ChannelChange = 39,
         CashShopMigration = 40,
         PlayerMovement = 41,
-        CancelChair = 42,
+        Sit = 42,
         UseChair = 43,
         CloseRangeAttack = 44,
         RangedAttack = 45,
@@ -415,7 +415,7 @@
         GuildMarkChanged = 203,
         //204
         /*CUserLocal::OnPacket*/
-        CancelChair = 205,
+        Sit = 205,
         ShowItemGainInChat = 206,
         DojoWarpUp = 207,
         //208

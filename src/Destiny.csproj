@@ -87,7 +87,9 @@
     <Compile Include="Maple\Maps\MapDrops.cs" />
     <Compile Include="Maple\Maps\MapFactory.cs" />
     <Compile Include="Maple\Life\SpawnPoint.cs" />
+    <Compile Include="Maple\Maps\MapSeats.cs" />
     <Compile Include="Maple\Maps\MapSpawnPoints.cs" />
+    <Compile Include="Maple\Maps\Seat.cs" />
     <Compile Include="Maple\Meso.cs" />
     <Compile Include="Maple\NoAccountException.cs" />
     <Compile Include="Maple\Quest.cs" />

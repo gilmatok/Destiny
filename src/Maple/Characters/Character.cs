@@ -1110,6 +1110,23 @@ namespace Destiny.Maple.Characters
             }
         }
 
+        public void Sit(InPacket iPacket)
+        {
+            short seatID = iPacket.ReadShort();
+
+            using (OutPacket oPacket = new OutPacket(ServerOperationCode.Sit))
+            {
+                oPacket.WriteBool(seatID != -1);
+
+                if (seatID != -1)
+                {
+                    oPacket.WriteShort(seatID);
+                }
+
+                this.Client.Send(oPacket);
+            }
+        }
+
         public void Talk(InPacket iPacket)
         {
             string text = iPacket.ReadMapleString();

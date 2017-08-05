@@ -17,6 +17,11 @@ namespace Destiny.Maple.Data
                     this.Add(new Map(datum));
                 }
 
+                foreach(Datum datum in new Datums("map_seats").Populate())
+                {
+                    this[(int)datum["mapid"]].Seats.Add(new Seat(datum));
+                }
+
                 foreach (Datum datum in new Datums("map_portals").Populate())
                 {
                     this[(int)datum["mapid"]].Portals.Add(new Portal(datum));
