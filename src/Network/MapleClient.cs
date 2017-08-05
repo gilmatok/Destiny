@@ -131,6 +131,7 @@ namespace Destiny
                     break;
 
                 case ClientOperationCode.UseChair:
+                    this.Character.SitChair(iPacket);
                     break;
 
                 case ClientOperationCode.CloseRangeAttack:

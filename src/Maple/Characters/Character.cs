@@ -26,6 +26,7 @@ namespace Destiny.Maple.Characters
         public byte Stance { get; set; }
         public short Foothold { get; set; }
         public byte Portals { get; set; }
+        public int Chair { get; set; }
 
         public CharacterItems Items { get; private set; }
         public CharacterSkills Skills { get; private set; }
@@ -1118,6 +1119,24 @@ namespace Destiny.Maple.Characters
         {
             short seatID = iPacket.ReadShort();
 
+            if (seatID == -1)
+            {
+                this.Chair = 0;
+
+                using (OutPacket oPacket = new OutPacket(ServerOperationCode.ShowChair))
+                {
+                    oPacket
+                        .WriteInt(this.ID)
+                        .WriteInt();
+
+                    this.Map.Broadcast(oPacket, this);
+                }
+            }
+            else
+            {
+                this.Chair = seatID;
+            }
+            
             using (OutPacket oPacket = new OutPacket(ServerOperationCode.Sit))
             {
                 oPacket.WriteBool(seatID != -1);
@@ -1128,6 +1147,27 @@ namespace Destiny.Maple.Characters
                 }
 
                 this.Client.Send(oPacket);
+            }
+        }
+
+        public void SitChair(InPacket iPacket)
+        {
+            int mapleID = iPacket.ReadInt();
+
+            if (!this.Items.Contains(mapleID))
+            {
+                return;
+            }
+
+            this.Chair = mapleID;
+
+            using (OutPacket oPacket = new OutPacket(ServerOperationCode.ShowChair))
+            {
+                oPacket
+                    .WriteInt(this.ID)
+                    .WriteInt(mapleID);
+
+                this.Map.Broadcast(oPacket, this);
             }
         }
 
@@ -1631,9 +1671,9 @@ namespace Destiny.Maple.Characters
             this.EncodeApperance(oPacket);
 
             oPacket
-                .WriteInt()
-                .WriteInt()
-                .WriteInt()
+                .WriteInt(this.Items.Available(5110000))
+                .WriteInt() // NOTE: Item effect.
+                .WriteInt((int)(Item.GetType(this.Chair) == ItemType.Setup ? this.Chair : 0))
                 .WritePoint(this.Position)
                 .WriteByte(this.Stance)
                 .WriteShort(this.Foothold)
