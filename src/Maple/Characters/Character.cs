@@ -1015,6 +1015,11 @@ namespace Destiny.Maple.Characters
             }
         }
 
+        public void Release()
+        {
+            this.Update();
+        }
+
         public void Notify(string message, NoticeType type = NoticeType.Pink)
         {
             using (OutPacket oPacket = new OutPacket(ServerOperationCode.BroadcastMsg))
@@ -1136,7 +1141,7 @@ namespace Destiny.Maple.Characters
             {
                 this.Chair = seatID;
             }
-            
+
             using (OutPacket oPacket = new OutPacket(ServerOperationCode.Sit))
             {
                 oPacket.WriteBool(seatID != -1);
@@ -1353,6 +1358,43 @@ namespace Destiny.Maple.Characters
                     this.Mana += manaAmount;
                     this.LastManaHealOverTime = DateTime.Now;
                 }
+            }
+        }
+
+        public void DistributeSP(InPacket iPacket)
+        {
+            if (this.SkillPoints == 0)
+            {
+                return;
+            }
+
+            iPacket.ReadInt(); // NOTE: Ticks.
+            int mapleID = iPacket.ReadInt();
+
+            if (!this.Skills.Contains(mapleID))
+            {
+                this.Skills.Add(new Skill(mapleID));
+            }
+
+            Skill skill = this.Skills[mapleID];
+
+            // TODO: Check for skill requirements.
+
+            if (skill.IsFromBeginner)
+            {
+                // TODO: Handle beginner skills.
+            }
+
+            if (skill.CurrentLevel + 1 <= skill.MaxLevel)
+            {
+                if (!skill.IsFromBeginner)
+                {
+                    this.SkillPoints--;
+                }
+
+                this.Release();
+
+                skill.CurrentLevel++;
             }
         }
 

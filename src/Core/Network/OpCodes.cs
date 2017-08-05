@@ -95,7 +95,7 @@
         AutoDistributeAP = 88,
         HealOverTime = 89,
         DistributeSP = 0x5A,
-        SpecialMove = 0x5B,
+        UseSkill = 0x5B,
         CancelBuff = 0x5C,
         SkillEffect = 0x5D,
         MesoDrop = 0x5E,

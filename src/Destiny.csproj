@@ -80,6 +80,7 @@
     <Compile Include="Maple\Data\CachedItems.cs" />
     <Compile Include="Maple\Data\CachedMaps.cs" />
     <Compile Include="Maple\Data\CachedQuests.cs" />
+    <Compile Include="Maple\Data\CachedSkills.cs" />
     <Compile Include="Maple\Data\CreationData.cs" />
     <Compile Include="Maple\Data\DataProvider.cs" />
     <Compile Include="Maple\InventoryOperation.cs" />

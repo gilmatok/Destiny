@@ -246,9 +246,11 @@ namespace Destiny
                     break;
 
                 case ClientOperationCode.DistributeSP:
+                    this.Character.DistributeSP(iPacket);
                     break;
 
-                case ClientOperationCode.SpecialMove:
+                case ClientOperationCode.UseSkill:
+                    this.Character.Skills.Cast(iPacket);
                     break;
 
                 case ClientOperationCode.CancelBuff:
