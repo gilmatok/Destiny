@@ -35,6 +35,9 @@ namespace Destiny.Maple.Characters
 
         public NpcScript NpcScript { get; set; }
 
+        private DateTime LastHealthHealOverTime = new DateTime();
+        private DateTime LastManaHealOverTime = new DateTime();
+
         private Gender mGender;
         private byte mSkin;
         private int mFace;
@@ -59,11 +62,11 @@ namespace Destiny.Maple.Characters
         {
             get
             {
-                return mGender;
+                return MGender;
             }
             set
             {
-                mGender = value;
+                MGender = value;
 
                 if (this.IsInitialized)
                 {
@@ -76,7 +79,7 @@ namespace Destiny.Maple.Characters
         {
             get
             {
-                return mSkin;
+                return MSkin;
             }
             set
             {
@@ -85,7 +88,7 @@ namespace Destiny.Maple.Characters
                     throw new StyleUnavailableException();
                 }
 
-                mSkin = value;
+                MSkin = value;
 
                 if (this.IsInitialized)
                 {
@@ -99,7 +102,7 @@ namespace Destiny.Maple.Characters
         {
             get
             {
-                return mFace;
+                return MFace;
             }
             set
             {
@@ -109,7 +112,7 @@ namespace Destiny.Maple.Characters
                     throw new StyleUnavailableException();
                 }
 
-                mFace = value;
+                MFace = value;
 
                 if (this.IsInitialized)
                 {
@@ -123,7 +126,7 @@ namespace Destiny.Maple.Characters
         {
             get
             {
-                return mHair;
+                return MHair;
             }
             set
             {
@@ -133,7 +136,7 @@ namespace Destiny.Maple.Characters
                     throw new StyleUnavailableException();
                 }
 
-                mHair = value;
+                MHair = value;
 
                 if (this.IsInitialized)
                 {
@@ -147,12 +150,12 @@ namespace Destiny.Maple.Characters
         {
             get
             {
-                return mLevel;
+                return MLevel;
             }
 
             set
             {
-                mLevel = value;
+                MLevel = value;
 
                 if (this.IsInitialized)
                 {
@@ -174,11 +177,11 @@ namespace Destiny.Maple.Characters
         {
             get
             {
-                return mJob;
+                return MJob;
             }
             set
             {
-                mJob = value;
+                MJob = value;
 
                 if (this.IsInitialized)
                 {
@@ -200,12 +203,12 @@ namespace Destiny.Maple.Characters
         {
             get
             {
-                return mStrength;
+                return MStrength;
             }
 
             set
             {
-                mStrength = value;
+                MStrength = value;
 
                 if (this.IsInitialized)
                 {
@@ -218,12 +221,12 @@ namespace Destiny.Maple.Characters
         {
             get
             {
-                return mDexterity;
+                return MDexterity;
             }
 
             set
             {
-                mDexterity = value;
+                MDexterity = value;
 
                 if (this.IsInitialized)
                 {
@@ -236,12 +239,12 @@ namespace Destiny.Maple.Characters
         {
             get
             {
-                return mIntelligence;
+                return MIntelligence;
             }
 
             set
             {
-                mIntelligence = value;
+                MIntelligence = value;
 
                 if (this.IsInitialized)
                 {
@@ -254,12 +257,12 @@ namespace Destiny.Maple.Characters
         {
             get
             {
-                return mLuck;
+                return MLuck;
             }
 
             set
             {
-                mLuck = value;
+                MLuck = value;
 
                 if (this.IsInitialized)
                 {
@@ -272,12 +275,12 @@ namespace Destiny.Maple.Characters
         {
             get
             {
-                return mHealth;
+                return MHealth;
             }
 
             set
             {
-                mHealth = value;
+                MHealth = value;
 
                 if (this.IsInitialized)
                 {
@@ -290,12 +293,12 @@ namespace Destiny.Maple.Characters
         {
             get
             {
-                return mMaxHealth;
+                return MMaxHealth;
             }
 
             set
             {
-                mMaxHealth = value;
+                MMaxHealth = value;
 
                 if (this.IsInitialized)
                 {
@@ -308,12 +311,12 @@ namespace Destiny.Maple.Characters
         {
             get
             {
-                return mMana;
+                return MMana;
             }
 
             set
             {
-                mMana = value;
+                MMana = value;
 
                 if (this.IsInitialized)
                 {
@@ -326,12 +329,12 @@ namespace Destiny.Maple.Characters
         {
             get
             {
-                return mMaxMana;
+                return MMaxMana;
             }
 
             set
             {
-                mMaxMana = value;
+                MMaxMana = value;
 
                 if (this.IsInitialized)
                 {
@@ -344,12 +347,12 @@ namespace Destiny.Maple.Characters
         {
             get
             {
-                return mAbilityPoints;
+                return MAbilityPoints;
             }
 
             set
             {
-                mAbilityPoints = value;
+                MAbilityPoints = value;
 
                 if (this.IsInitialized)
                 {
@@ -362,12 +365,12 @@ namespace Destiny.Maple.Characters
         {
             get
             {
-                return mSkillPoints;
+                return MSkillPoints;
             }
 
             set
             {
-                mSkillPoints = value;
+                MSkillPoints = value;
 
                 if (this.IsInitialized)
                 {
@@ -380,12 +383,12 @@ namespace Destiny.Maple.Characters
         {
             get
             {
-                return mExperience;
+                return MExperience;
             }
 
             set
             {
-                mExperience = value;
+                MExperience = value;
 
                 if (this.IsInitialized)
                 {
@@ -398,12 +401,12 @@ namespace Destiny.Maple.Characters
         {
             get
             {
-                return mFame;
+                return MFame;
             }
 
             set
             {
-                mFame = value;
+                MFame = value;
 
                 if (this.IsInitialized)
                 {
@@ -416,11 +419,11 @@ namespace Destiny.Maple.Characters
         {
             get
             {
-                return mMeso;
+                return MMeso;
             }
             set
             {
-                mMeso = value;
+                MMeso = value;
 
                 if (this.IsInitialized)
                 {
@@ -455,6 +458,253 @@ namespace Destiny.Maple.Characters
         }
 
         private bool Assigned { get; set; }
+
+        public Gender MGender
+        {
+            get
+            {
+                return this.mGender;
+            }
+
+            set
+            {
+                this.mGender = value;
+            }
+        }
+
+        public byte MSkin
+        {
+            get
+            {
+                return this.mSkin;
+            }
+
+            set
+            {
+                this.mSkin = value;
+            }
+        }
+
+        public int MFace
+        {
+            get
+            {
+                return this.mFace;
+            }
+
+            set
+            {
+                this.mFace = value;
+            }
+        }
+
+        public int MHair
+        {
+            get
+            {
+                return this.mHair;
+            }
+
+            set
+            {
+                this.mHair = value;
+            }
+        }
+
+        public byte MLevel
+        {
+            get
+            {
+                return this.mLevel;
+            }
+
+            set
+            {
+                this.mLevel = value;
+            }
+        }
+
+        public Job MJob
+        {
+            get
+            {
+                return this.mJob;
+            }
+
+            set
+            {
+                this.mJob = value;
+            }
+        }
+
+        public short MStrength
+        {
+            get
+            {
+                return this.mStrength;
+            }
+
+            set
+            {
+                this.mStrength = value;
+            }
+        }
+
+        public short MDexterity
+        {
+            get
+            {
+                return this.mDexterity;
+            }
+
+            set
+            {
+                this.mDexterity = value;
+            }
+        }
+
+        public short MIntelligence
+        {
+            get
+            {
+                return this.mIntelligence;
+            }
+
+            set
+            {
+                this.mIntelligence = value;
+            }
+        }
+
+        public short MLuck
+        {
+            get
+            {
+                return this.mLuck;
+            }
+
+            set
+            {
+                this.mLuck = value;
+            }
+        }
+
+        public short MHealth
+        {
+            get
+            {
+                return this.mHealth;
+            }
+
+            set
+            {
+                this.mHealth = value;
+            }
+        }
+
+        public short MMaxHealth
+        {
+            get
+            {
+                return this.mMaxHealth;
+            }
+
+            set
+            {
+                this.mMaxHealth = value;
+            }
+        }
+
+        public short MMana
+        {
+            get
+            {
+                return this.mMana;
+            }
+
+            set
+            {
+                this.mMana = value;
+            }
+        }
+
+        public short MMaxMana
+        {
+            get
+            {
+                return this.mMaxMana;
+            }
+
+            set
+            {
+                this.mMaxMana = value;
+            }
+        }
+
+        public short MAbilityPoints
+        {
+            get
+            {
+                return this.mAbilityPoints;
+            }
+
+            set
+            {
+                this.mAbilityPoints = value;
+            }
+        }
+
+        public short MSkillPoints
+        {
+            get
+            {
+                return this.mSkillPoints;
+            }
+
+            set
+            {
+                this.mSkillPoints = value;
+            }
+        }
+
+        public int MExperience
+        {
+            get
+            {
+                return this.mExperience;
+            }
+
+            set
+            {
+                this.mExperience = value;
+            }
+        }
+
+        public short MFame
+        {
+            get
+            {
+                return this.mFame;
+            }
+
+            set
+            {
+                this.mFame = value;
+            }
+        }
+
+        public int MMeso
+        {
+            get
+            {
+                return this.mMeso;
+            }
+
+            set
+            {
+                this.mMeso = value;
+            }
+        }
 
         public Character(int id = 0, MapleClient client = null)
         {
@@ -1009,6 +1259,40 @@ namespace Destiny.Maple.Characters
             }
 
             this.AbilityPoints -= (short)total;
+        }
+
+        public void HealOverTime(InPacket iPacket)
+        {
+            iPacket.ReadInt(); // NOTE: Ticks.
+            iPacket.ReadInt(); // NOTE: Unknown.
+            short healthAmount = iPacket.ReadShort();
+            short manaAmount = iPacket.ReadShort();
+
+            if (healthAmount != 0)
+            {
+                if ((DateTime.Now - this.LastHealthHealOverTime).Seconds < 2)
+                {
+                    return;
+                }
+                else
+                {
+                    this.Health += healthAmount;
+                    this.LastHealthHealOverTime = DateTime.Now;
+                }
+            }
+
+            if (manaAmount != 0)
+            {
+                if ((DateTime.Now - this.LastManaHealOverTime).Seconds < 2)
+                {
+                    return;
+                }
+                else
+                {
+                    this.Mana += manaAmount;
+                    this.LastManaHealOverTime = DateTime.Now;
+                }
+            }
         }
 
         public void DropMeso(InPacket iPacket)

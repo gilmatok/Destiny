@@ -86,14 +86,14 @@
         UseSkillBook = 0x51,
         //82
         UseTeleportRock = 0x53,
-        UseReturnScroll = 0x54,
-        UseUpgradeScroll = 0x55,
-        DistributeAP = 0x57,
-        AutoDistributeAP = 0x58,
-        HealOverTime = 0x59,
         //89
         #endregion QUESTIONABLE
 
+        UseReturnScroll = 85,
+        UseUpgradeScroll = 86,
+        DistributeAP = 87,
+        AutoDistributeAP = 88,
+        HealOverTime = 89,
         DistributeSP = 0x5A,
         SpecialMove = 0x5B,
         CancelBuff = 0x5C,

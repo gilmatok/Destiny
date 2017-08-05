@@ -19,6 +19,22 @@ namespace Destiny.Maple.Data
                 }
             }
 
+            using (Log.Load("Consumables"))
+            {
+                foreach (Datum datum in new Datums("item_consume_data").Populate())
+                {
+                    this[(int)datum["itemid"]].LoadConsumeData(datum);
+                }
+            }
+
+            using (Log.Load("Equips"))
+            {
+                foreach (Datum datum in new Datums("item_equip_data").Populate())
+                {
+                    this[(int)datum["itemid"]].LoadEquipmentData(datum);
+                }
+            }
+
             this.WizetItemIDs = new List<int>(4);
 
             this.WizetItemIDs.Add(1002140);

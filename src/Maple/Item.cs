@@ -63,6 +63,11 @@ namespace Destiny.Maple
         public short RequiredFame { get; private set; }
         public Job RequiredJob { get; private set; }
 
+        // NOTE: Properties prefixed with 'C' are consume data.
+        public short CHealth { get; private set; }
+        public short CMana { get; private set; }
+        public int CMoveTo { get; private set; }
+
         public ItemType Type
         {
             get
@@ -222,6 +227,14 @@ namespace Destiny.Maple
             get
             {
                 return this.Slot < -100;
+            }
+        }
+
+        public bool IsConsumable
+        {
+            get
+            {
+                return this.MapleID / 10000 >= 200 && this.MapleID / 10000 < 204;
             }
         }
 
@@ -430,6 +443,12 @@ namespace Destiny.Maple
                 this.Speed = this.CachedReference.Speed;
                 this.Jump = this.CachedReference.Jump;
             }
+            else if (this.IsConsumable)
+            {
+                this.CHealth = this.CachedReference.CHealth;
+                this.CMana = this.CachedReference.CMana;
+                this.CMoveTo = this.CachedReference.CMoveTo;
+            }
         }
 
         public Item(Datum datum)
@@ -483,6 +502,12 @@ namespace Destiny.Maple
                     this.Speed = (short)datum["Speed"];
                     this.Jump = (short)datum["Jump"];
                 }
+                else if (this.IsConsumable)
+                {
+                    this.CHealth = this.CachedReference.CHealth;
+                    this.CMana = this.CachedReference.CMana;
+                    this.CMoveTo = this.CachedReference.CMoveTo;
+                }
             }
             else
             {
@@ -496,6 +521,18 @@ namespace Destiny.Maple
                 this.SalePrice = (int)datum["price"];
                 this.RequiredLevel = (byte)datum["min_level"];
             }
+        }
+
+        public void LoadConsumeData(Datum datum)
+        {
+            this.CHealth = (short)datum["hp"];
+            this.CMana = (short)datum["mp"];
+            this.CMoveTo = (int)datum["move_to"];
+        }
+
+        public void LoadEquipmentData(Datum datum)
+        {
+
         }
 
         public void Save()
@@ -863,7 +900,7 @@ namespace Destiny.Maple
                 .WriteInt(this.MapleID)
                 .WriteBool(this.IsCash);
 
-            if(this.IsCash)
+            if (this.IsCash)
             {
                 oPacket.WriteLong(); // TODO: Unique ID for certain cash items
             }

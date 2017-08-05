@@ -225,6 +225,7 @@ namespace Destiny
                     break;
 
                 case ClientOperationCode.UseReturnScroll:
+                    this.Character.Items.UseReturnScroll(iPacket);
                     break;
 
                 case ClientOperationCode.UseUpgradeScroll:
@@ -239,6 +240,7 @@ namespace Destiny
                     break;
 
                 case ClientOperationCode.HealOverTime:
+                    this.Character.HealOverTime(iPacket);
                     break;
 
                 case ClientOperationCode.DistributeSP:

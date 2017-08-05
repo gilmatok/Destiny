@@ -340,6 +340,24 @@ namespace Destiny.Maple.Characters
             }
         }
 
+        public void UseReturnScroll(InPacket iPacket)
+        {
+            iPacket.ReadInt(); // NOTE: Ticks.
+            short slot = iPacket.ReadShort();
+            int mapleID = iPacket.ReadInt();
+
+            Item item = this[mapleID, slot];
+
+            if (item == null)
+            {
+                return;
+            }
+
+            this.Remove(item, true);
+
+            this.Parent.ChangeMap(item.CMoveTo); // TODO: A random spawn point when using a return scroll.
+        }
+
         public void Pickup(Drop drop)
         {
             if (drop.Picker == null)
