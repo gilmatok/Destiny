@@ -97,6 +97,8 @@
     <Compile Include="Maple\Script\NpcScript.cs" />
     <Compile Include="Maple\Script\PortalScript.cs" />
     <Compile Include="Maple\Script\ScriptBase.cs" />
+    <Compile Include="Maple\Shops\Shop.cs" />
+    <Compile Include="Maple\Shops\ShopItem.cs" />
     <Compile Include="Maple\StyleUnavailableException.cs" />
     <Compile Include="Network\MigrationRegistery.cs" />
     <Compile Include="Network\WorldServer.cs" />
@@ -170,7 +172,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Maple\Interaction\" />
-    <Folder Include="Maple\Shops\" />
     <Folder Include="Maple\Social\" />
   </ItemGroup>
   <ItemGroup>

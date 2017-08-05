@@ -2,6 +2,7 @@
 using Destiny.Maple.Characters;
 using Destiny.Core.Network;
 using Destiny.Data;
+using Destiny.Maple.Shops;
 
 namespace Destiny.Maple.Life
 {
@@ -10,6 +11,8 @@ namespace Destiny.Maple.Life
         public Npc(Datum datum) : base(datum) { }
 
         public Character Controller { get; set; }
+
+        public Shop Shop { get; set; }
 
         public string ScriptPath
         {

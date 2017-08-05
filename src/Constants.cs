@@ -336,6 +336,16 @@ namespace Destiny
     }
     #endregion
 
+    #region NPCs
+    public enum ShopAction : byte
+    {
+        Buy,
+        Sell,
+        Recharge,
+        Leave
+    }
+    #endregion
+
     #region World
     public enum WorldFlag : byte
     {

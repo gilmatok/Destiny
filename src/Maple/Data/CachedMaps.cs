@@ -1,6 +1,7 @@
 ﻿using Destiny.Data;
 using Destiny.Maple.Life;
 using Destiny.Maple.Maps;
+using Destiny.Maple.Shops;
 using System.Collections.ObjectModel;
 
 namespace Destiny.Maple.Data
@@ -16,17 +17,26 @@ namespace Destiny.Maple.Data
                 {
                     this.Add(new Map(datum));
                 }
+            }
 
-                foreach(Datum datum in new Datums("map_seats").Populate())
+            using (Log.Load("Seats"))
+            {
+                foreach (Datum datum in new Datums("map_seats").Populate())
                 {
                     this[(int)datum["mapid"]].Seats.Add(new Seat(datum));
                 }
+            }
 
+            using (Log.Load("Portals"))
+            {
                 foreach (Datum datum in new Datums("map_portals").Populate())
                 {
                     this[(int)datum["mapid"]].Portals.Add(new Portal(datum));
                 }
+            }
 
+            using (Log.Load("Life"))
+            {
                 foreach (Datum datum in new Datums("map_life").Populate())
                 {
                     switch ((string)datum["life_type"])
@@ -38,6 +48,23 @@ namespace Destiny.Maple.Data
                         case "mob":
                             this[(int)datum["mapid"]].SpawnPoints.Add(new SpawnPoint(datum));
                             break;
+                    }
+                }
+            }
+
+            using (Log.Load("Shops"))
+            {
+                foreach (Datum datum in new Datums("shop_data").Populate())
+                {
+                    foreach (Map map in this)
+                    {
+                        foreach (Npc npc in map.Npcs)
+                        {
+                            if (npc.MapleID == (int)datum["npcid"])
+                            {
+                                npc.Shop = new Shop(npc, datum);
+                            }
+                        }
                     }
                 }
             }
