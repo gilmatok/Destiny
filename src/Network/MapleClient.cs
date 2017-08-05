@@ -63,6 +63,14 @@ namespace Destiny
                     this.SetGender(iPacket);
                     break;
 
+                case ClientOperationCode.PinCheck:
+                    this.CheckPin(iPacket);
+                    break;
+
+                case ClientOperationCode.PinUpdate:
+                    this.UpdatePin(iPacket);
+                    break;
+
                 case ClientOperationCode.WorldList:
                 case ClientOperationCode.WorldRelist:
                     this.ListWorlds();
@@ -90,6 +98,14 @@ namespace Destiny
 
                 case ClientOperationCode.CharacterSelect:
                     this.SelectCharacter(iPacket);
+                    break;
+
+                case ClientOperationCode.CharacterSelectRegisterPic:
+                    this.SelectCharacter(iPacket, registerPic: true);
+                    break;
+
+                case ClientOperationCode.CharacterSelectRequestPic:
+                    this.SelectCharacter(iPacket, requestPic: true);
                     break;
 
                 case ClientOperationCode.CharacterLoad:
@@ -463,6 +479,7 @@ namespace Destiny
             }
         }
 
+        // TODO: Merge all the login packets into one.
         private void Login(InPacket iPacket)
         {
             string username = iPacket.ReadMapleString();
@@ -544,7 +561,7 @@ namespace Destiny
                         .WriteLong()
                         .WriteLong()
                         .WriteInt()
-                        .WriteShort(2);
+                        .WriteShort((short)(MasterServer.Login.RequestPin ? 0 : 2)); // NOTE: 1 seems to not do anything.
                 }
 
                 this.Send(oPacket);
@@ -577,7 +594,7 @@ namespace Destiny
                         .WriteLong()
                         .WriteLong()
                         .WriteInt()
-                        .WriteShort(2);
+                        .WriteShort((short)(MasterServer.Login.RequestPin ? 0 : 2)); // NOTE: 1 seems to not do anything.
 
                     this.Send(oPacket);
                 }
@@ -621,7 +638,81 @@ namespace Destiny
                         .WriteLong()
                         .WriteLong()
                         .WriteInt()
-                        .WriteShort(2);
+                        .WriteShort((short)(MasterServer.Login.RequestPin ? 0 : 2)); // NOTE: 1 seems to not do anything.
+
+                    this.Send(oPacket);
+                }
+            }
+        }
+
+        private void CheckPin(InPacket iPacket)
+        {
+            byte a = iPacket.ReadByte();
+            byte b = iPacket.ReadByte();
+
+            PinResult result;
+
+            if (b == 0)
+            {
+                string pin = iPacket.ReadMapleString();
+
+                if (SHACryptograph.Encrypt(SHAMode.SHA256, pin) != this.Account.Pin)
+                {
+                    result = PinResult.Invalid;
+                }
+                else
+                {
+                    if (a == 1)
+                    {
+                        result = PinResult.Valid;
+                    }
+                    else if (a == 2)
+                    {
+                        result = PinResult.Register;
+                    }
+                    else
+                    {
+                        result = PinResult.Error;
+                    }
+                }
+            }
+            else if (b == 1)
+            {
+                if (string.IsNullOrEmpty(this.Account.Pin))
+                {
+                    result = PinResult.Register;
+                }
+                else
+                {
+                    result = PinResult.Request;
+                }
+            }
+            else
+            {
+                result = PinResult.Error;
+            }
+
+            using (OutPacket oPacket = new OutPacket(ServerOperationCode.CheckPinCodeResult))
+            {
+                oPacket.WriteByte((byte)result);
+
+                this.Send(oPacket);
+            }
+        }
+
+        private void UpdatePin(InPacket iPacket)
+        {
+            bool procceed = iPacket.ReadBool();
+            string pin = iPacket.ReadMapleString();
+
+            if (procceed)
+            {
+                this.Account.Pin = SHACryptograph.Encrypt(SHAMode.SHA256, pin);
+                this.Account.Save();
+
+                using (OutPacket oPacket = new OutPacket(ServerOperationCode.UpdatePinCodeResult))
+                {
+                    oPacket.WriteByte(); // NOTE: All the other result types end up in a "trouble logging into the game" message.
 
                     this.Send(oPacket);
                 }
@@ -714,7 +805,7 @@ namespace Destiny
                 }
 
                 oPacket
-                    .WriteByte(2)
+                    .WriteByte((byte)(MasterServer.Login.RequestPic ? (string.IsNullOrEmpty(this.Account.Pic) ? 0 : 1) : 2))
                     .WriteInt(MasterServer.Login.MaxCharacters); // TODO: Account specific character creation slots. For now, use server-configured value.
 
                 this.Send(oPacket);
@@ -845,37 +936,116 @@ namespace Destiny
             }
         }
 
+        // TODO: Proper character deletion with all the necessary checks (cash items, guilds, etcetera). 
         private void DeleteCharacter(InPacket iPacket)
         {
-
-        }
-
-        private void SelectCharacter(InPacket iPacket)
-        {
+            string pic = iPacket.ReadMapleString();
             int characterID = iPacket.ReadInt();
-            string macAddresses = iPacket.ReadMapleString(); // TODO: Do something with these.
 
-            //Make sure character exists and belongs to this user account.
             if (!Database.Exists("characters", "ID = {0} AND AccountID = {1}", characterID, this.Account.ID))
             {
-                Terminate();
+                this.Terminate();
+
                 return;
             }
 
-            MasterServer.Channels[this.Channel].Migrations.Add(this.Host, this.Account.ID, characterID);
+            CharacterDeletionResult result;
 
-            using (OutPacket oPacket = new OutPacket(ServerOperationCode.SelectCharacterResult))
+            if (SHACryptograph.Encrypt(SHAMode.SHA256, pic) == this.Account.Pic)
+            {
+                Database.Delete("characters", "ID = '{0}'", characterID);
+                Database.Delete("buffs", "CharacterID = '{0}'", characterID);
+                Database.Delete("items", "CharacterID = '{0}'", characterID);
+                Database.Delete("keymaps", "CharacterID = '{0}'", characterID);
+                Database.Delete("quests_completed", "CharacterID = '{0}'", characterID);
+                Database.Delete("quests_started", "CharacterID = '{0}'", characterID);
+                Database.Delete("skills", "CharacterID = '{0}'", characterID);
+
+                result = CharacterDeletionResult.Valid;
+            }
+            else
+            {
+                result = CharacterDeletionResult.InvalidPic;
+            }
+
+            using (OutPacket oPacket = new OutPacket(ServerOperationCode.DeleteCharacterResult))
             {
                 oPacket
-                    .WriteByte()
-                    .WriteByte()
-                    .WriteBytes(MasterServer.World.HostIP.GetAddressBytes())
-                    .WriteShort(MasterServer.Channels[this.Channel].Port)
                     .WriteInt(characterID)
-                    .WriteInt()
-                    .WriteByte();
+                    .WriteByte((byte)result);
 
                 this.Send(oPacket);
+            }
+        }
+
+        private void SelectCharacter(InPacket iPacket, bool fromViewAll = false, bool requestPic = false, bool registerPic = false)
+        {
+            string pic = string.Empty;
+
+            if (requestPic)
+            {
+                pic = iPacket.ReadMapleString();
+            }
+            else if (registerPic)
+            {
+                iPacket.ReadByte();
+            }
+
+            int characterID = iPacket.ReadInt();
+
+            if (!Database.Exists("characters", "ID = {0} AND AccountID = {1}", characterID, this.Account.ID))
+            {
+                this.Terminate();
+
+                return;
+            }
+
+            if (fromViewAll)
+            {
+                iPacket.ReadInt(); // NOTE: World ID.
+                this.Channel = 0; // TODO: Least loaded channel.
+            }
+
+            string macAddresses = iPacket.ReadMapleString(); // TODO: Do something with these.
+
+            if (registerPic)
+            {
+                iPacket.ReadMapleString();
+                pic = iPacket.ReadMapleString();
+
+                if (string.IsNullOrEmpty(this.Account.Pic))
+                {
+                    this.Account.Pic = SHACryptograph.Encrypt(SHAMode.SHA256, pic);
+                    this.Account.Save();
+                }
+            }
+
+            if (!requestPic || SHACryptograph.Encrypt(SHAMode.SHA256, pic) == this.Account.Pic)
+            {
+                MasterServer.Channels[this.Channel].Migrations.Add(this.Host, this.Account.ID, characterID);
+
+                using (OutPacket oPacket = new OutPacket(ServerOperationCode.SelectCharacterResult))
+                {
+                    oPacket
+                        .WriteByte()
+                        .WriteByte()
+                        .WriteBytes(MasterServer.World.HostIP.GetAddressBytes())
+                        .WriteShort(MasterServer.Channels[this.Channel].Port)
+                        .WriteInt(characterID)
+                        .WriteInt()
+                        .WriteByte();
+
+                    this.Send(oPacket);
+                }
+            }
+            else
+            {
+                using (OutPacket oPacket = new OutPacket(ServerOperationCode.CheckSPWResult))
+                {
+                    oPacket.WriteByte();
+
+                    this.Send(oPacket);
+                }
             }
         }
 

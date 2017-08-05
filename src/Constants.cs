@@ -94,6 +94,22 @@ namespace Destiny
         EULA = 23
     }
 
+    public enum PinResult : byte
+    {
+        Valid = 0,
+        Register = 1,
+        Invalid = 2,
+        Error = 3,
+        Request = 4,
+        Cancel = 5
+    }
+
+    public enum CharacterDeletionResult : byte
+    {
+        Valid = 0,
+        InvalidPic = 20
+    }
+
     public enum Job : short
     {
         Beginner,

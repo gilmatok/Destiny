@@ -24,14 +24,14 @@
         CharacterLoad = 20,
         CharacterNameCheck = 21,
         CharacterCreate = 22,
-        //23
-        CharacterDelete = 24,
+        CharacterDelete = 23,
+        //24
         ClientError = 25,
         Pong = 26,
         //27
         //28
-        //29
-        //30
+        CharacterSelectRegisterPic = 29,
+        CharacterSelectRequestPic = 30,
         //31
         //32
         //33
