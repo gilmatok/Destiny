@@ -27,51 +27,22 @@ namespace Destiny
         Administrator
     }
 
-    public enum WorldFlag : byte
+    public enum MessageType : byte
     {
-        None,
-        Event,
-        New,
-        Hot
-    }
-
-    public enum WorldStatus : short
-    {
-        Normal,
-        HighlyPopulated,
-        Full
-    }
-
-    [Flags]
-    public enum StatisticType : int
-    {
-        Skin = 0x1,
-        Face = 0x2,
-        Hair = 0x4,
-        Level = 0x10,
-        Job = 0x20,
-        Strength = 0x40,
-        Dexterity = 0x80,
-        Intelligence = 0x100,
-        Luck = 0x200,
-        Health = 0x400,
-        MaxHealth = 0x800,
-        Mana = 0x1000,
-        MaxMana = 0x2000,
-        AbilityPoints = 0x4000,
-        SkillPoints = 0x8000,
-        Experience = 0x10000,
-        Fame = 0x20000,
-        Mesos = 0x40000,
-        Pet = 0x180000,
-        GachaponExperience = 0x200000
-    }
-    public enum ServerType
-    {
-        Login,
-        Channel,
-        Shop,
-        ITC
+        DropPickup,
+        QuestRecord,
+        CashItemExpire,
+        IncreaseEXP,
+        IncreaseFame,
+        IncreaseMeso,
+        IncreaseGP,
+        GiveBuff,
+        GeneralItemExpire,
+        System,
+        QuestRecordEx,
+        ItemProtectExpire,
+        ItemExpireReplace,
+        SkillExpire
     }
 
     public enum NoticeType : byte
@@ -84,30 +55,21 @@ namespace Destiny
         Blue
     }
 
-    public enum LoginResult : int
+    public enum ServerType
     {
-        Valid = 0,
-        Banned = 3,
-        InvalidPassword = 4,
-        InvalidUsername = 5,
-        LoggedIn = 7,
-        EULA = 23
+        Login,
+        Channel,
+        Shop,
+        ITC
     }
 
-    public enum PinResult : byte
+    #region Character
+    public enum Gender : byte
     {
-        Valid = 0,
-        Register = 1,
-        Invalid = 2,
-        Error = 3,
-        Request = 4,
-        Cancel = 5
-    }
-
-    public enum CharacterDeletionResult : byte
-    {
-        Valid = 0,
-        InvalidPic = 20
+        Male,
+        Female,
+        Both,
+        Unset = 10
     }
 
     public enum Job : short
@@ -196,97 +158,32 @@ namespace Destiny
     }
 
     [Flags]
-    public enum ItemFlags : short
+    public enum StatisticType : int
     {
-        Sealed = 0x01,
-        AddPreventSlipping = 0x02,
-        AddPreventColdness = 0x04,
-        Untradeable = 0x08,
-        Scissored = 0x10
+        Skin = 0x1,
+        Face = 0x2,
+        Hair = 0x4,
+        Level = 0x10,
+        Job = 0x20,
+        Strength = 0x40,
+        Dexterity = 0x80,
+        Intelligence = 0x100,
+        Luck = 0x200,
+        Health = 0x400,
+        MaxHealth = 0x800,
+        Mana = 0x1000,
+        MaxMana = 0x2000,
+        AbilityPoints = 0x4000,
+        SkillPoints = 0x8000,
+        Experience = 0x10000,
+        Fame = 0x20000,
+        Mesos = 0x40000,
+        Pet = 0x180000,
+        GachaponExperience = 0x200000
     }
+    #endregion
 
-    public enum ItemType : byte
-    {
-        Equipment = 1,
-        Usable = 2,
-        Setup = 3,
-        Etcetera = 4,
-        Cash = 5,
-        Count = 6
-    }
-
-    public enum QuestAction : byte
-    {
-        RestoreLostItem,
-        Start,
-        Complete,
-        Forfeit,
-        ScriptStart,
-        ScriptEnd
-    }
-
-    public enum QuestResult : byte
-    {
-        AddTimeLimit = 0x06,
-        RemoveTimeLimit = 0x07,
-        Complete = 0x08,
-        GenericError = 0x09,
-        NoInventorySpace = 0x0A,
-        NotEnoughMesos = 0x0B,
-        ItemWornByChar = 0x0D,
-        OnlyOneOfItemAllowed = 0x0E,
-        Expire = 0x0F,
-        ResetTimeLimit = 0x10
-    }
-
-    [Flags]
-    public enum QuestFlags : short
-    {
-        //TODO: Test this; I'm just guessing
-        AutoStart = 0x01,
-        SelectedMob = 0x02
-    }
-
-    public enum QuestStatus : byte
-    {
-        NotStarted = 0,
-        InProgress = 1,
-        Complete = 2
-    }
-
-    public enum MessageType : byte
-    {
-        DropPickup,
-        QuestRecord,
-        CashItemExpire,
-        IncreaseEXP,
-        IncreaseFame,
-        IncreaseMeso,
-        IncreaseGP,
-        GiveBuff,
-        GeneralItemExpire,
-        System,
-        QuestRecordEx,
-        ItemProtectExpire,
-        ItemExpireReplace,
-        SkillExpire
-    }
-
-    public enum Gender : byte
-    {
-        Male,
-        Female,
-        Both,
-        Unset = 10
-    }
-
-    public enum EquippedQueryMode
-    {
-        Any,
-        Cash,
-        Normal
-    }
-
+    #region Equipment
     public enum EquipmentSlot : sbyte
     {
         Hat = -1,
@@ -319,6 +216,13 @@ namespace Destiny
         CashMount = -118
     }
 
+    public enum EquippedQueryMode
+    {
+        Any,
+        Cash,
+        Normal
+    }
+
     public enum WeaponType
     {
         NotAWeapon,
@@ -338,6 +242,107 @@ namespace Destiny
         Wand,
         Knuckle,
         Gun
+    }
+    #endregion
+
+    #region Items
+    [Flags]
+    public enum ItemFlags : short
+    {
+        Sealed = 0x01,
+        AddPreventSlipping = 0x02,
+        AddPreventColdness = 0x04,
+        Untradeable = 0x08,
+        Scissored = 0x10
+    }
+
+    public enum ItemType : byte
+    {
+        Equipment = 1,
+        Usable = 2,
+        Setup = 3,
+        Etcetera = 4,
+        Cash = 5,
+        Count = 6
+    }
+    #endregion
+
+    #region Login
+    public enum CharacterDeletionResult : byte
+    {
+        Valid = 0,
+        InvalidPic = 20
+    }
+
+    public enum LoginResult : int
+    {
+        Valid = 0,
+        Banned = 3,
+        InvalidPassword = 4,
+        InvalidUsername = 5,
+        LoggedIn = 7,
+        EULA = 23
+    }
+
+    public enum PinResult : byte
+    {
+        Valid = 0,
+        Register = 1,
+        Invalid = 2,
+        Error = 3,
+        Request = 4,
+        Cancel = 5
+    }
+    #endregion
+
+    #region Quests
+    public enum QuestAction : byte
+    {
+        RestoreLostItem,
+        Start,
+        Complete,
+        Forfeit,
+        ScriptStart,
+        ScriptEnd
+    }
+
+    [Flags]
+    public enum QuestFlags : short
+    {
+        //TODO: Test this; I'm just guessing
+        AutoStart = 0x01,
+        SelectedMob = 0x02
+    }
+
+    public enum QuestResult : byte
+    {
+        AddTimeLimit = 0x06,
+        RemoveTimeLimit = 0x07,
+        Complete = 0x08,
+        GenericError = 0x09,
+        NoInventorySpace = 0x0A,
+        NotEnoughMesos = 0x0B,
+        ItemWornByChar = 0x0D,
+        OnlyOneOfItemAllowed = 0x0E,
+        Expire = 0x0F,
+        ResetTimeLimit = 0x10
+    }
+
+    public enum QuestStatus : byte
+    {
+        NotStarted = 0,
+        InProgress = 1,
+        Complete = 2
+    }
+    #endregion
+
+    #region World
+    public enum WorldFlag : byte
+    {
+        None,
+        Event,
+        New,
+        Hot
     }
 
     public enum WorldNames : byte
@@ -363,6 +368,13 @@ namespace Destiny
         Croa,
         Zenith,
         Medere
+    }
+
+    public enum WorldStatus : short
+    {
+        Normal,
+        HighlyPopulated,
+        Full
     }
 
     public static class WorldNameResolver
@@ -409,4 +421,5 @@ namespace Destiny
             }
         }
     }
+    #endregion
 }

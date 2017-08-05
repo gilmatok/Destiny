@@ -70,7 +70,11 @@ namespace Destiny.Maple.Characters
 
                 if (this.IsInitialized)
                 {
-                    // TODO: Is there a gender set packet?
+                    using (OutPacket oPacket = new OutPacket(ServerOperationCode.SetGender))
+                    {
+                        oPacket.WriteByte((byte)mGender);
+                        this.Client.Send(oPacket);
+                    }
                 }
             }
         }
