@@ -68,6 +68,8 @@ namespace Destiny
                               `Username` varchar(12) NOT NULL,
                               `Password` varchar(128) NOT NULL,
                               `Salt` varchar(32) NOT NULL,
+                              `EULA` tinyint(1) unsigned NOT NULL DEFAULT '0',
+                              `Gender` tinyint(3) unsigned NOT NULL DEFAULT '10',
                               `Pin` varchar(64) NOT NULL DEFAULT '',
                               `Pic` varchar(64) NOT NULL DEFAULT '',
                               `IsBanned` tinyint(1) unsigned NOT NULL DEFAULT '0',
