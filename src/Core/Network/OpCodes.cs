@@ -8,7 +8,7 @@
         WorldRelist = 4,
         WorldSelect = 5,
         WorldStatus = 6,
-        //7
+        EULA = 7,
         AccountGender = 8,
         PinCheck = 9,
         PinUpdate = 10,

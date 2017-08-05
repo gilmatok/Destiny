@@ -1,16 +1,15 @@
-﻿using Destiny.Core.Network;
-using System.Net.Sockets;
-using Destiny.Maple;
-using Destiny.Core.IO;
-using Destiny.Maple.Characters;
+﻿using Destiny.Core.IO;
+using Destiny.Core.Network;
 using Destiny.Core.Security;
-using Destiny.Network;
-using System.Collections.Generic;
 using Destiny.Data;
-using System;
-using Destiny.IO;
-using System.Linq;
+using Destiny.Maple;
+using Destiny.Maple.Characters;
 using Destiny.Maple.Data;
+using Destiny.Network;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Sockets;
 
 namespace Destiny
 {
@@ -35,12 +34,16 @@ namespace Destiny
 
                 this.Character.Map.Characters.Remove(this.Character);
             }
-            
+
             if (this.IsInCashShop)
+            {
                 MasterServer.CashShop.Clients.Remove(this);
+            }
             else if (this.Channel >= 0)
+            {
                 MasterServer.Channels[this.Channel].Clients.Remove(this);
-            
+            }
+
             MasterServer.Login.Clients.Remove(this);
         }
 
@@ -50,6 +53,14 @@ namespace Destiny
             {
                 case ClientOperationCode.AccountLogin:
                     this.Login(iPacket);
+                    break;
+
+                case ClientOperationCode.EULA:
+                    this.EULA(iPacket);
+                    break;
+
+                case ClientOperationCode.AccountGender:
+                    this.SetGender(iPacket);
                     break;
 
                 case ClientOperationCode.WorldList:
@@ -479,12 +490,16 @@ namespace Destiny
                     {
                         result = LoginResult.Banned;
                     }
+                    else if (!this.Account.EULA)
+                    {
+                        result = LoginResult.EULA;
+                    }
 
                     // TODO: Add more scenarios (require master IP, check banned IP, check logged in).
                 }
                 catch (NoAccountException)
                 {
-                    if (Settings.GetBool("Server/AutoRegister") && username == this.LastUsername && password == this.LastPassword)
+                    if (MasterServer.Login.AutoRegister && username == this.LastUsername && password == this.LastPassword)
                     {
                         this.Account.Username = username;
                         this.Account.Salt = HashGenerator.GenerateMD5();
@@ -519,7 +534,7 @@ namespace Destiny
                 {
                     oPacket
                         .WriteInt(this.Account.ID)
-                        .WriteByte()
+                        .WriteByte((byte)this.Account.Gender)
                         .WriteBool()
                         .WriteByte()
                         .WriteByte()
@@ -533,6 +548,83 @@ namespace Destiny
                 }
 
                 this.Send(oPacket);
+            }
+        }
+
+        private void EULA(InPacket iPacket)
+        {
+            bool accepted = iPacket.ReadBool();
+
+            if (accepted)
+            {
+                this.Account.EULA = true;
+                this.Account.Save();
+
+                using (OutPacket oPacket = new OutPacket(ServerOperationCode.CheckPasswordResult))
+                {
+                    oPacket
+                        .WriteInt()
+                        .WriteByte()
+                        .WriteByte()
+                        .WriteInt(this.Account.ID)
+                        .WriteByte((byte)this.Account.Gender)
+                        .WriteBool()
+                        .WriteByte()
+                        .WriteByte()
+                        .WriteMapleString(this.Account.Username)
+                        .WriteByte()
+                        .WriteBool()
+                        .WriteLong()
+                        .WriteLong()
+                        .WriteInt()
+                        .WriteShort(2);
+
+                    this.Send(oPacket);
+                }
+            }
+            else
+            {
+                this.Close(); // NOTE: I'm pretty sure in the real client it disconnects you if you refuse to accept the EULA.
+            }
+        }
+
+        private void SetGender(InPacket iPacket)
+        {
+            if (this.Account.Gender != Gender.Unset)
+            {
+                return;
+            }
+
+            bool valid = iPacket.ReadBool();
+
+            if (valid)
+            {
+                Gender gender = (Gender)iPacket.ReadByte();
+
+                this.Account.Gender = gender;
+                this.Account.Save();
+
+                using (OutPacket oPacket = new OutPacket(ServerOperationCode.CheckPasswordResult))
+                {
+                    oPacket
+                        .WriteInt()
+                        .WriteByte()
+                        .WriteByte()
+                        .WriteInt(this.Account.ID)
+                        .WriteByte((byte)this.Account.Gender)
+                        .WriteBool()
+                        .WriteByte()
+                        .WriteByte()
+                        .WriteMapleString(this.Account.Username)
+                        .WriteByte()
+                        .WriteBool()
+                        .WriteLong()
+                        .WriteLong()
+                        .WriteInt()
+                        .WriteShort(2);
+
+                    this.Send(oPacket);
+                }
             }
         }
 
@@ -562,13 +654,13 @@ namespace Destiny
 
                 //TODO: Add login balloons. These are chat bubbles shown on the world select screen
                 oPacket.WriteShort(); //balloon count
-                //foreach (var balloon in balloons)
-                //{
-                //    oPacket
-                //        .WriteShort(balloon.X)
-                //        .WriteShort(balloon.Y)
-                //        .WriteString(balloon.Text);
-                //}
+                                      //foreach (var balloon in balloons)
+                                      //{
+                                      //    oPacket
+                                      //        .WriteShort(balloon.X)
+                                      //        .WriteShort(balloon.Y)
+                                      //        .WriteString(balloon.Text);
+                                      //}
 
                 this.Send(oPacket);
             }
@@ -623,7 +715,7 @@ namespace Destiny
 
                 oPacket
                     .WriteByte(2)
-                    .WriteInt(Settings.GetInt("Server/MaxCharacters")); // TODO: Account specific character creation slots. For now, use server-configured value.
+                    .WriteInt(MasterServer.Login.MaxCharacters); // TODO: Account specific character creation slots. For now, use server-configured value.
 
                 this.Send(oPacket);
             }
@@ -667,7 +759,7 @@ namespace Destiny
             {
                 error = true;
             }
-            
+
             //Gender-specific cosmetic/item checks
             if (gender == Gender.Male)
             {

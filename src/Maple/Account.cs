@@ -12,6 +12,8 @@ namespace Destiny.Maple
         public string Username { get; set; }
         public string Password { get; set; }
         public string Salt { get; set; }
+        public bool EULA { get; set; }
+        public Gender Gender { get; set; }
         public string Pin { get; set; }
         public string Pic { get; set; }
         public bool IsBanned { get; set; }
@@ -66,6 +68,8 @@ namespace Destiny.Maple
             this.Username = (string)datum["Username"];
             this.Password = (string)datum["Password"];
             this.Salt = (string)datum["Salt"];
+            this.EULA = (bool)datum["EULA"];
+            this.Gender = (Gender)datum["Gender"];
             this.Pin = (string)datum["Pin"];
             this.Pic = (string)datum["Pic"];
             this.IsBanned = (bool)datum["IsBanned"];
@@ -73,8 +77,7 @@ namespace Destiny.Maple
             this.Birthday = (DateTime)datum["Birthday"];
             this.Creation = (DateTime)datum["Creation"];
         }
-
-
+        
         public void Save()
         {
             Datum datum = new Datum("accounts");
@@ -82,6 +85,8 @@ namespace Destiny.Maple
             datum["Username"] = this.Username;
             datum["Password"] = this.Password;
             datum["Salt"] = this.Salt;
+            datum["EULA"] = this.EULA;
+            datum["Gender"] = (byte)this.Gender;
             datum["Pin"] = this.Pin;
             datum["Pic"] = this.Pic;
             datum["IsBanned"] = this.IsBanned;

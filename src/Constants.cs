@@ -90,7 +90,8 @@ namespace Destiny
         Banned = 3,
         InvalidPassword = 4,
         InvalidUsername = 5,
-        LoggedIn = 7
+        LoggedIn = 7,
+        EULA = 23
     }
 
     public enum Job : short
@@ -259,7 +260,8 @@ namespace Destiny
     {
         Male,
         Female,
-        Both
+        Both,
+        Unset = 10
     }
 
     public enum EquippedQueryMode
