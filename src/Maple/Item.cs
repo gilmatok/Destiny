@@ -4,7 +4,6 @@ using Destiny.Data;
 using Destiny.Maple.Characters;
 using Destiny.Maple.Data;
 using Destiny.Maple.Maps;
-using Destiny.Utility;
 using System;
 
 namespace Destiny.Maple

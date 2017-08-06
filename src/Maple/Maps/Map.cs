@@ -2,7 +2,6 @@
 using Destiny.Data;
 using Destiny.Maple.Characters;
 using Destiny.Maple.Data;
-using Destiny.Utility;
 
 namespace Destiny.Maple.Maps
 {

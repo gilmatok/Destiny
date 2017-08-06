@@ -166,8 +166,6 @@
     <Compile Include="Network\CashShopServer.cs" />
     <Compile Include="Threading\Delay.cs" />
     <Compile Include="Data\Database.cs" />
-    <Compile Include="Utility\DatabaseQuery.cs" />
-    <Compile Include="Utility\Extensions.cs" />
     <Compile Include="IO\Log.cs" />
   </ItemGroup>
   <ItemGroup>
