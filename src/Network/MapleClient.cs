@@ -438,7 +438,12 @@ namespace Destiny
                 case ClientOperationCode.NpcMovement:
                     break;
 
-                case ClientOperationCode.TouchingReactor:
+                case ClientOperationCode.HitReactor:
+                    this.Character.Map.Reactors.Hit(iPacket, this.Character);
+                    break;
+
+                case ClientOperationCode.TouchReactor:
+                    this.Character.Map.Reactors.Touch(iPacket, this.Character);
                     break;
 
                 case ClientOperationCode.MonsterCarnival:

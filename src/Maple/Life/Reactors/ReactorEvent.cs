@@ -24,8 +24,8 @@ namespace Destiny.Maple.Life.Reactors
 
             this.State = (byte)(sbyte)datum["state"];
             this.NextState = (byte)(sbyte)datum["next_state"];
-            this.EventType = (ReactorEventType)Enum.Parse(typeof(ReactorEventType), datum["event_type"].ToString().ToCamel().Replace("_", ""));
             this.Timeout = (int)datum["timeout"];
+            this.EventType = this.Timeout > 0 ? ReactorEventType.Timeout : (ReactorEventType)Enum.Parse(typeof(ReactorEventType), datum["event_type"].ToString().ToCamel().Replace("_", ""));
             this.ItemId = (int)datum["itemid"];
             this.Quantity = (short)datum["quantity"];
             this.Boundaries = new Rectangle(new Point((short)datum["ltx"], (short)datum["lty"]), new Point((short)datum["ltx"], (short)datum["lty"]));

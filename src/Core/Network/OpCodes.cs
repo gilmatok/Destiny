@@ -178,7 +178,6 @@
         DamageReactor = 0xC3,
         ChangedMap = 0xC4,
         NpcMovement = 0xC5,
-        TouchingReactor = 0xC6,
         MonsterCarnival = 0xD0,
         PartySearchRegister = 0xD2,
         PartySearchStart = 0xD4,
@@ -195,6 +194,10 @@
         UseHammer = 0xF8,
         MapleTV = 0x222,
         #endregion QUESTIONABLE
+        
+        HitReactor = 205,
+        TouchReactor = 206,
+        //207
     }
 
     public enum ServerOperationCode : short

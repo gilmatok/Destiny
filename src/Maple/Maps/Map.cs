@@ -79,15 +79,7 @@ namespace Destiny.Maple.Maps
             this.SpawnPoints = new MapSpawnPoints(this);
         }
 
-        public void Broadcast(OutPacket oPacket)
-        {
-            foreach (Character character in this.Characters)
-            {
-                character.Client.Send(oPacket);
-            }
-        }
-
-        public void Broadcast(OutPacket oPacket, Character ignored)
+        public void Broadcast(OutPacket oPacket, Character ignored = null)
         {
             foreach (Character character in this.Characters)
             {

@@ -1,6 +1,7 @@
 ﻿using Destiny.Core.IO;
 using Destiny.Maple.Characters;
 using Destiny.Maple.Life;
+using Destiny.Maple.Life.Reactors;
 using System.Collections.Generic;
 
 namespace Destiny.Maple.Maps
@@ -98,6 +99,17 @@ namespace Destiny.Maple.Maps
                 foreach (Npc npc in this.Map.Npcs)
                 {
                     npc.AssignController();
+                }
+            }
+
+            lock (this.Map.Reactors)
+            {
+                foreach (Reactor reactor in this.Map.Reactors)
+                {
+                    using (OutPacket oPacket = reactor.GetSpawnPacket())
+                    {
+                        item.Client.Send(oPacket);
+                    }
                 }
             }
 

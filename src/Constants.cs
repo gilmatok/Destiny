@@ -349,14 +349,14 @@ namespace Destiny
     #region Reactors
     public enum ReactorEventType
     {
-        //TODO: Figure out order of these
         PlainAdvanceState,
         HitFromLeft,
         HitFromRight,
         HitBySkill,
-        NoClue,
-        NoClue2,
-        HitByItem
+        NoClue, //NOTE: Applies to activate_by_touch reactors
+        NoClue2, //NOTE: Applies to activate_by_touch reactors
+        HitByItem,
+        Timeout = 101
     }
 
     [Flags]

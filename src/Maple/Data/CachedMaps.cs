@@ -51,7 +51,7 @@ namespace Destiny.Maple.Data
                             break;
 
                         case "reactor":
-                            this[(int)datum["mapid"]].Reactors.Add(new Reactor(this[(int)datum["mapid"]], datum));
+                            this[(int)datum["mapid"]].Reactors.Add(new Reactor(datum));
                             break;
                     }
                 }
