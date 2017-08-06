@@ -9,11 +9,35 @@ namespace Destiny.Maple.Shops
 {
     public sealed class Shop
     {
+        public static void LoadRechargeTiers()
+        {
+            Shop.RechargeTiers = new Dictionary<byte, Dictionary<int, double>>();
+
+            foreach (Datum datum in new Datums("shop_recharge_data").Populate())
+            {
+                if (!Shop.RechargeTiers.ContainsKey((byte)(int)datum["tierid"]))
+                {
+                    Shop.RechargeTiers.Add((byte)(int)datum["tierid"], new Dictionary<int, double>());
+                }
+
+                Shop.RechargeTiers[(byte)(int)datum["tierid"]].Add((int)datum["itemid"], (double)datum["price"]);
+            }
+        }
+
+        private byte RechargeTierID { get; set; }
+
         public int ID { get; private set; }
         public Npc Parent { get; private set; }
         public List<ShopItem> Items { get; private set; }
+        public static Dictionary<byte, Dictionary<int, double>> RechargeTiers { get; set; }
 
-        private byte RechargeTierID { get; set; }
+        public Dictionary<int, double> UnitPrices
+        {
+            get
+            {
+                return Shop.RechargeTiers[this.RechargeTierID];
+            }
+        }
 
         public Shop(Npc parent, Datum datum)
         {
@@ -31,7 +55,10 @@ namespace Destiny.Maple.Shops
 
             if (this.RechargeTierID > 0)
             {
-
+                foreach (KeyValuePair<int, double> rechargeable in this.UnitPrices)
+                {
+                    this.Items.Add(new ShopItem(this, rechargeable.Key));
+                }
             }
         }
 
@@ -111,19 +138,81 @@ namespace Destiny.Maple.Shops
 
                 case ShopAction.Sell:
                     {
+                        short slot = iPacket.ReadShort();
+                        int mapleID = iPacket.ReadInt();
+                        short quantity = iPacket.ReadShort();
 
+                        Item item = customer.Items[mapleID, slot];
+
+                        if (item.IsRechargeable)
+                        {
+                            quantity = item.Quantity;
+                        }
+
+                        if (quantity > item.Quantity)
+                        {
+                            return;
+                        }
+                        else if (quantity == item.Quantity)
+                        {
+                            customer.Items.Remove(item, true);
+                        }
+                        else if (quantity < item.Quantity)
+                        {
+                            item.Quantity -= quantity;
+                            item.Update();
+                        }
+
+                        if (item.IsRechargeable)
+                        {
+                            customer.Meso += item.SalePrice + (int)(this.UnitPrices[item.MapleID] * item.Quantity);
+                        }
+                        else
+                        {
+                            customer.Meso += item.SalePrice * quantity;
+                        }
+
+                        using (OutPacket oPacket = new OutPacket(ServerOperationCode.ConfirmShopTransaction))
+                        {
+                            oPacket.WriteByte(8);
+
+                            customer.Client.Send(oPacket);
+                        }
                     }
                     break;
 
                 case ShopAction.Recharge:
                     {
+                        short slot = iPacket.ReadShort();
 
+                        Item item = customer.Items[ItemType.Usable, slot];
+
+                        int price = (int)(this.UnitPrices[item.MapleID] * (item.MaxPerStack - item.Quantity));
+
+                        if (customer.Meso < price)
+                        {
+                            customer.Notify("You do not have enough mesos.", NoticeType.Popup);
+                        }
+                        else
+                        {
+                            customer.Meso -= price;
+
+                            item.Quantity = item.MaxPerStack;
+                            item.Update();
+                        }
+
+                        using (OutPacket oPacket = new OutPacket(ServerOperationCode.ConfirmShopTransaction))
+                        {
+                            oPacket.WriteByte(8);
+
+                            customer.Client.Send(oPacket);
+                        }
                     }
                     break;
 
                 case ShopAction.Leave:
                     {
-
+                        customer.LastNpc = null;
                     }
                     break;
             }

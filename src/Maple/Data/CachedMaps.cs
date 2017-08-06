@@ -59,6 +59,8 @@ namespace Destiny.Maple.Data
 
             using (Log.Load("Shops"))
             {
+                Shop.LoadRechargeTiers();
+
                 foreach (Datum datum in new Datums("shop_data").Populate())
                 {
                     foreach (Map map in this)

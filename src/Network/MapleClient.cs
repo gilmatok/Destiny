@@ -174,6 +174,7 @@ namespace Destiny
                     break;
 
                 case ClientOperationCode.NpcShop:
+                    this.Character.LastNpc.Shop.Handle(this.Character, iPacket);
                     break;
 
                 case ClientOperationCode.Storage:

@@ -1,6 +1,7 @@
 ﻿using Destiny.Core.IO;
 using Destiny.Data;
 using Destiny.Maple.Data;
+using System;
 
 namespace Destiny.Maple.Shops
 {
@@ -26,6 +27,14 @@ namespace Destiny.Maple.Shops
             get
             {
                 return DataProvider.CachedItems[this.MapleID].SalePrice;
+            }
+        }
+
+        public double UnitPrice
+        {
+            get
+            {
+                return this.Parent.UnitPrices[this.MapleID];
             }
         }
 
@@ -60,11 +69,18 @@ namespace Destiny.Maple.Shops
         {
             oPacket
                 .WriteInt(this.MapleID)
-                .WriteInt(this.PurchasePrice);
+                .WriteInt(this.PurchasePrice)
+                .WriteInt() // NOTE: Perfect Pitch.
+                .WriteInt() // NOTE: Time limit.
+                .WriteInt(); // NOTE: Unknown.
 
             if (this.IsRecharageable)
             {
-
+                oPacket
+                    .WriteShort()
+                    .WriteInt()
+                    .WriteShort((short)(BitConverter.DoubleToInt64Bits(this.UnitPrice) >> 48))
+                    .WriteShort(this.MaxPerStack);
             }
             else
             {
