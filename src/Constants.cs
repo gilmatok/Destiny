@@ -295,6 +295,16 @@ namespace Destiny
     }
     #endregion
 
+    #region NPCs
+    public enum ShopAction : byte
+    {
+        Buy,
+        Sell,
+        Recharge,
+        Leave
+    }
+    #endregion
+
     #region Quests
     public enum QuestAction : byte
     {
@@ -336,13 +346,26 @@ namespace Destiny
     }
     #endregion
 
-    #region NPCs
-    public enum ShopAction : byte
+    #region Reactors
+    public enum ReactorEventType
     {
-        Buy,
-        Sell,
-        Recharge,
-        Leave
+        //TODO: Figure out order of these
+        PlainAdvanceState,
+        HitFromLeft,
+        HitFromRight,
+        HitBySkill,
+        NoClue,
+        NoClue2,
+        HitByItem
+    }
+
+    [Flags]
+    public enum ReactorFlags : byte
+    {
+        //TODO: Test this; I'm just guessing
+        FacesLeft = 0x01,
+        ActivateByTouch = 0x02,
+        RemoveInFieldSet = 0x04
     }
     #endregion
 

@@ -1,5 +1,6 @@
 ﻿using Destiny.Data;
 using Destiny.Maple.Life;
+using Destiny.Maple.Life.Reactors;
 using Destiny.Maple.Maps;
 using Destiny.Maple.Shops;
 using System.Collections.ObjectModel;
@@ -47,6 +48,10 @@ namespace Destiny.Maple.Data
 
                         case "mob":
                             this[(int)datum["mapid"]].SpawnPoints.Add(new SpawnPoint(datum));
+                            break;
+
+                        case "reactor":
+                            this[(int)datum["mapid"]].Reactors.Add(new Reactor(this[(int)datum["mapid"]], datum));
                             break;
                     }
                 }

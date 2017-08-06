@@ -498,11 +498,11 @@
         /*Doors*/
         SpawnDoor = 275,
         RemoveDoor = 276,
-        /*Reactors*/
-        ReactorHit = 277,
-        // 278
-        ReactorSpawn = 279,
-        ReactorDestroy = 280,
+        /*CReactorPool::OnPacket*/
+        ReactorChangeState = 277,
+        ReactorMove = 278, //NOTE: May not be implemented in v83 client
+        ReactorEnterField = 279,
+        ReactorLeaveField = 280,
         SnowballState = 281,
         HitSnowball = 282,
         SnowballMejssage = 283,

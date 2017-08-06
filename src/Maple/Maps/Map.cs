@@ -33,6 +33,7 @@ namespace Destiny.Maple.Maps
         public MapDrops Drops { get; private set; }
         public MapMobs Mobs { get; private set; }
         public MapNpcs Npcs { get; private set; }
+        public MapReactors Reactors { get; private set; }
         public MapSeats Seats { get; private set; }
         public MapPortals Portals { get; private set; }
         public MapSpawnPoints SpawnPoints { get; private set; }
@@ -56,6 +57,7 @@ namespace Destiny.Maple.Maps
             this.Drops = this.CachedReference.Drops;
             this.Mobs = this.CachedReference.Mobs;
             this.Npcs = this.CachedReference.Npcs;
+            this.Reactors = this.CachedReference.Reactors;
             this.Seats = this.CachedReference.Seats;
             this.Portals = this.CachedReference.Portals;
             this.SpawnPoints = this.CachedReference.SpawnPoints;
@@ -72,6 +74,7 @@ namespace Destiny.Maple.Maps
             this.Mobs = new MapMobs(this);
             this.Npcs = new MapNpcs(this);
             this.Seats = new MapSeats(this);
+            this.Reactors = new MapReactors(this);
             this.Portals = new MapPortals(this);
             this.SpawnPoints = new MapSpawnPoints(this);
         }

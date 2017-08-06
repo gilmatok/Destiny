@@ -73,7 +73,7 @@ namespace Destiny
 
             Log.Inform("Press any key to quit.");
 
-            Console.Read();
+            Console.ReadKey();
         }
 
         public static string ToCamel(this string value)
