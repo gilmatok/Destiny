@@ -171,7 +171,6 @@ namespace Destiny
                     break;
 
                 case ClientOperationCode.NpcResult:
-                    this.Character.NpcScript.Handle(iPacket);
                     break;
 
                 case ClientOperationCode.NpcShop:

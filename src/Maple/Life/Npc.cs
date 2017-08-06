@@ -22,6 +22,18 @@ namespace Destiny.Maple.Life
             }
         }
 
+        public void Converse(Character talker)
+        {
+            if (this.Shop != null)
+            {
+                this.Shop.Show(talker);
+            }
+            else
+            {
+
+            }
+        }
+
         public void AssignController()
         {
             if (this.Controller == null)

@@ -3,7 +3,6 @@ using Destiny.Core.IO;
 using Destiny.Maple.Maps;
 using System;
 using Destiny.Core.Network;
-using Destiny.Maple.Script;
 using System.Collections.Generic;
 using Destiny.Maple.Commands;
 using Destiny.Maple.Life;
@@ -34,8 +33,6 @@ namespace Destiny.Maple.Characters
         public ControlledMobs ControlledMobs { get; private set; }
         public ControlledNpcs ControlledNpcs { get; private set; }
 
-        public NpcScript NpcScript { get; set; }
-
         private DateTime LastHealthHealOverTime = new DateTime();
         private DateTime LastManaHealOverTime = new DateTime();
 
@@ -58,6 +55,7 @@ namespace Destiny.Maple.Characters
         private int mExperience;
         private short mFame;
         private int mMeso;
+        private Npc lastNpc;
 
         public Gender Gender
         {
@@ -459,6 +457,18 @@ namespace Destiny.Maple.Characters
             get
             {
                 return this.Level >= 30;
+            }
+        }
+
+        public Npc LastNpc
+        {
+            get
+            {
+                return lastNpc;
+            }
+            set
+            {
+                lastNpc = value;
             }
         }
 
@@ -1230,32 +1240,8 @@ namespace Destiny.Maple.Characters
 
         public void Converse(Npc npc)
         {
-            if (this.NpcScript != null)
-            {
-                return;
-            }
-
-            if (!File.Exists(npc.ScriptPath))
-            {
-                Log.Warn("'{0}' tried to converse with an unimplemented npc {1}.", this.Name, npc.MapleID);
-            }
-            else
-            {
-                this.NpcScript = new NpcScript(npc, this);
-
-                try
-                {
-                    this.NpcScript.Execute();
-                }
-                catch (Exception ex)
-                {
-                    Log.Error(ex);
-                }
-                finally
-                {
-                    this.NpcScript = null;
-                }
-            }
+            this.LastNpc = npc;
+            this.LastNpc.Converse(this);
         }
 
         public void DistributeAP(StatisticType type, short amount = 1)
@@ -1485,22 +1471,6 @@ namespace Destiny.Maple.Characters
             catch (KeyNotFoundException)
             {
                 return;
-            }
-
-            if (!File.Exists(portal.ScriptPath))
-            {
-                Log.Warn("'{0}' tried to enter an unimplemented portal '{1}'.", this.Name, portal.Script);
-            }
-            else
-            {
-                try
-                {
-                    new PortalScript(portal, this).Execute();
-                }
-                catch (Exception ex)
-                {
-                    Log.Error(ex);
-                }
             }
         }
 
