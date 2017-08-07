@@ -2,6 +2,7 @@
 using Destiny.Maple.Characters;
 using Destiny.Maple.Data;
 using Destiny.Maple.Life.Reactors;
+using Destiny.Threading;
 
 namespace Destiny.Maple.Maps
 {
@@ -11,61 +12,70 @@ namespace Destiny.Maple.Maps
 
         protected override void InsertItem(int index, Reactor item)
         {
-            base.InsertItem(index, item);
-
-            if (DataProvider.IsInitialized)
+            lock (this)
             {
-                using (OutPacket oPacket = item.GetCreatePacket())
+                base.InsertItem(index, item);
+
+                if (DataProvider.IsInitialized)
                 {
-                    this.Map.Broadcast(oPacket);
+                    using (OutPacket oPacket = item.GetCreatePacket())
+                    {
+                        this.Map.Broadcast(oPacket);
+                    }
                 }
             }
         }
 
         protected override void RemoveItem(int index)
         {
-            if (DataProvider.IsInitialized)
+            lock (this)
             {
                 Reactor item = base.Items[index];
 
-                using (OutPacket oPacket = item.GetDestroyPacket())
+                if (DataProvider.IsInitialized)
                 {
-                    this.Map.Broadcast(oPacket);
+                    using (OutPacket oPacket = item.GetDestroyPacket())
+                    {
+                        this.Map.Broadcast(oPacket);
+                    }
+                }
+
+                base.RemoveItem(index);
+
+                if (item.SpawnPoint != null)
+                {
+                    Delay.Execute((item.SpawnPoint.RespawnTime <= 0 ? 30 : item.SpawnPoint.RespawnTime) * 100, () => item.SpawnPoint.Spawn());
                 }
             }
-
-            base.RemoveItem(index);
         }
 
         public void Hit(InPacket iPacket, Character character)
         {
             int objectID = iPacket.ReadInt();
-            int characterPos = iPacket.ReadInt();
+
+            if (!this.Contains(objectID))
+            {
+                return;
+            }
+
+            Point characterPosition = iPacket.ReadPoint();
             short actionDelay = iPacket.ReadShort();
-            iPacket.ReadInt(); //NOTE: Unknown
+            iPacket.ReadInt(); // NOTE: Unknown
             int skillID = iPacket.ReadInt();
 
             Reactor reactor = this.Map.Reactors[objectID];
 
-            //TODO: Validate that char was in a valid position to hit
-            bool valid = true;
+            bool valid = true; // TODO: Validate position between attacker and reactor.
+
             if (valid)
             {
-                reactor.Hit(actionDelay, skillID, character);
+                reactor.Hit(character, actionDelay, skillID);
             }
         }
 
         public void Touch(InPacket iPacket, Character character)
         {
-            //NOTE: This packet is used only on map 610030400, "The Test of Wit"
-            int objectID = iPacket.ReadInt();
-            byte state = iPacket.ReadByte();
-
-            Reactor reactor = this.Map.Reactors[objectID];
-            if (reactor != null && reactor.ActivateByTouch)
-            {
-                //TODO
-            }
+            
         }
     }
 }

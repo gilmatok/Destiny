@@ -51,7 +51,7 @@ namespace Destiny.Maple.Commands
 
                 int itemID = int.Parse(args[0]);
 
-                if (DataProvider.CachedItems.Contains(itemID))
+                if (DataProvider.Items.Contains(itemID))
                 {
                     caller.Items.Add(new Item(itemID, quantity));
                 }

@@ -378,7 +378,7 @@ namespace Destiny.Maple.Characters
             QuestAction action = (QuestAction)iPacket.ReadByte();
             ushort questID = (ushort)iPacket.ReadShort();
 
-            if (!DataProvider.CachedQuests.Contains(questID))
+            if (!DataProvider.Quests.Contains(questID))
                 return;
 
             Quest quest = new Maple.Quest(questID);

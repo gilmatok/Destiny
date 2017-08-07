@@ -1,14 +1,27 @@
 ﻿using Destiny.Data;
+using Destiny.Maple.Life.Reactors;
 
 namespace Destiny.Maple.Life
 {
     public sealed class SpawnPoint : LifeObject
     {
-        public SpawnPoint(Datum datum) : base(datum) { }
+        public bool IsMob { get; private set; }
+
+        public SpawnPoint(Datum datum, bool isMob)
+            : base(datum)
+        {
+            this.IsMob = isMob;
+        }
 
         public void Spawn()
         {
-            this.Map.Mobs.Add(new Mob(this));
+            if (this.IsMob)
+            {
+                this.Map.Mobs.Add(new Mob(this));
+             } else
+            {
+                this.Map.Reactors.Add(new Reactor(this));
+            }
         }
     }
 }

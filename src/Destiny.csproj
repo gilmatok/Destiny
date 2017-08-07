@@ -69,13 +69,14 @@
     <Compile Include="Maple\Data\CachedItems.cs" />
     <Compile Include="Maple\Data\CachedMaps.cs" />
     <Compile Include="Maple\Data\CachedQuests.cs" />
+    <Compile Include="Maple\Data\CachedReactors.cs" />
     <Compile Include="Maple\Data\CachedSkills.cs" />
     <Compile Include="Maple\Data\CreationData.cs" />
     <Compile Include="Maple\Data\DataProvider.cs" />
     <Compile Include="Maple\InventoryOperation.cs" />
     <Compile Include="Maple\Life\LifeObject.cs" />
-    <Compile Include="Maple\Life\Reactors\ReactorDrop.cs" />
-    <Compile Include="Maple\Life\Reactors\ReactorEvent.cs" />
+    <Compile Include="Maple\Life\ReactorDrop.cs" />
+    <Compile Include="Maple\Life\ReactorState.cs" />
     <Compile Include="Maple\Maps\MapDrops.cs" />
     <Compile Include="Maple\Maps\MapFactory.cs" />
     <Compile Include="Maple\Life\SpawnPoint.cs" />
@@ -121,7 +122,7 @@
     <Compile Include="Maple\Movements.cs" />
     <Compile Include="Maple\Point.cs" />
     <Compile Include="Maple\Maps\Portal.cs" />
-    <Compile Include="Maple\Life\Reactors\Reactor.cs" />
+    <Compile Include="Maple\Life\Reactor.cs" />
     <Compile Include="Core\Network\Acceptor.cs" />
     <Compile Include="Core\Network\Session.cs" />
     <Compile Include="Core\IO\InPacket.cs" />

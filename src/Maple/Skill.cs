@@ -103,7 +103,7 @@ namespace Destiny.Maple
         {
             get
             {
-                return DataProvider.CachedSkills[this.MapleID][this.CurrentLevel];
+                return DataProvider.Skills[this.MapleID][this.CurrentLevel];
             }
         }
 
@@ -187,7 +187,7 @@ namespace Destiny.Maple
         {
             this.MapleID = mapleID;
             this.CurrentLevel = 0;
-            this.MaxLevel = (byte)DataProvider.CachedSkills[this.MapleID].Count;
+            this.MaxLevel = (byte)DataProvider.Skills[this.MapleID].Count;
         }
 
         public Skill(int mapleID, byte currentLevel, byte maxLevel)

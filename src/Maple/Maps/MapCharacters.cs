@@ -85,6 +85,17 @@ namespace Destiny.Maple.Maps
                     }
                 }
             }
+            
+            lock (this.Map.Reactors)
+            {
+                foreach (Reactor reactor in this.Map.Reactors)
+                {
+                    using (OutPacket oPacket = reactor.GetSpawnPacket())
+                    {
+                        item.Client.Send(oPacket);
+                    }
+                }
+            }
 
             lock (this.Map.Mobs)
             {
@@ -99,20 +110,6 @@ namespace Destiny.Maple.Maps
                 foreach (Npc npc in this.Map.Npcs)
                 {
                     npc.AssignController();
-                }
-            }
-
-            lock (this.Map.Reactors)
-            {
-                foreach (Reactor reactor in this.Map.Reactors)
-                {
-                    if (reactor.IsAlive)
-                    {
-                        using (OutPacket oPacket = reactor.GetSpawnPacket())
-                        {
-                            item.Client.Send(oPacket);
-                        }
-                    }
                 }
             }
 

@@ -10,6 +10,7 @@ namespace Destiny.Maple.Life
         public short MinimumClickX { get; private set; }
         public short MaximumClickX { get; private set; }
         public bool FacesLeft { get; private set; }
+        public int RespawnTime { get; private set; }
 
         public LifeObject(Datum datum)
         {
@@ -19,6 +20,7 @@ namespace Destiny.Maple.Life
             this.MinimumClickX = (short)datum["min_click_pos"];
             this.MaximumClickX = (short)datum["max_click_pos"];
             this.FacesLeft = ((string)datum["flags"]).Contains("faces_left");
+            this.RespawnTime = (int)datum["respawn_time"];
         }
     }
 }

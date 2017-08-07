@@ -18,7 +18,7 @@ namespace Destiny.Maple.Shops
         {
             get
             {
-                return DataProvider.CachedItems[this.MapleID].MaxPerStack;
+                return DataProvider.Items[this.MapleID].MaxPerStack;
             }
         }
 
@@ -26,7 +26,7 @@ namespace Destiny.Maple.Shops
         {
             get
             {
-                return DataProvider.CachedItems[this.MapleID].SalePrice;
+                return DataProvider.Items[this.MapleID].SalePrice;
             }
         }
 
@@ -42,7 +42,7 @@ namespace Destiny.Maple.Shops
         {
             get
             {
-                return DataProvider.CachedItems[this.MapleID].IsRechargeable;
+                return DataProvider.Items[this.MapleID].IsRechargeable;
             }
         }
 

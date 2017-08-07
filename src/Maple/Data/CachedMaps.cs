@@ -47,11 +47,11 @@ namespace Destiny.Maple.Data
                             break;
 
                         case "mob":
-                            this[(int)datum["mapid"]].SpawnPoints.Add(new SpawnPoint(datum));
+                            this[(int)datum["mapid"]].SpawnPoints.Add(new SpawnPoint(datum, true));
                             break;
 
                         case "reactor":
-                            this[(int)datum["mapid"]].Reactors.Add(new Reactor(datum));
+                            this[(int)datum["mapid"]].SpawnPoints.Add(new SpawnPoint(datum, false));
                             break;
                     }
                 }

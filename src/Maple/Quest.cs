@@ -46,7 +46,7 @@ namespace Destiny.Maple
         {
             get
             {
-                return DataProvider.CachedQuests[this.MapleID];
+                return DataProvider.Quests[this.MapleID];
             }
         }
 
@@ -54,7 +54,7 @@ namespace Destiny.Maple
         {
             get
             {
-                return this.NextQuestID > 0 ? DataProvider.CachedQuests[this.NextQuestID] : null;
+                return this.NextQuestID > 0 ? DataProvider.Quests[this.NextQuestID] : null;
             }
         }
 

@@ -65,7 +65,7 @@ namespace Destiny.Maple.Commands
                     
                     if (mapID > -1)
                     {
-                        if(DataProvider.CachedMaps.Contains(mapID))
+                        if(DataProvider.Maps.Contains(mapID))
                             caller.ChangeMap(mapID, portalID);
                         else
                             caller.Notify(string.Format("[Command] Invalid map ID {0}.", mapID));

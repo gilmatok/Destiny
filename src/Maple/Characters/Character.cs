@@ -86,7 +86,7 @@ namespace Destiny.Maple.Characters
             }
             set
             {
-                if (!DataProvider.AvailableStyles.Skins.Contains(value))
+                if (!DataProvider.Styles.Skins.Contains(value))
                 {
                     throw new StyleUnavailableException();
                 }
@@ -109,8 +109,8 @@ namespace Destiny.Maple.Characters
             }
             set
             {
-                if ((this.Gender == Gender.Male && !DataProvider.AvailableStyles.MaleFaces.Contains(value)) ||
-                    this.Gender == Gender.Female && !DataProvider.AvailableStyles.FemaleFaces.Contains(value))
+                if ((this.Gender == Gender.Male && !DataProvider.Styles.MaleFaces.Contains(value)) ||
+                    this.Gender == Gender.Female && !DataProvider.Styles.FemaleFaces.Contains(value))
                 {
                     throw new StyleUnavailableException();
                 }
@@ -133,8 +133,8 @@ namespace Destiny.Maple.Characters
             }
             set
             {
-                if ((this.Gender == Gender.Male && !DataProvider.AvailableStyles.MaleHairs.Contains(value)) ||
-                    this.Gender == Gender.Female && !DataProvider.AvailableStyles.FemaleHairs.Contains(value))
+                if ((this.Gender == Gender.Male && !DataProvider.Styles.MaleHairs.Contains(value)) ||
+                    this.Gender == Gender.Female && !DataProvider.Styles.FemaleHairs.Contains(value))
                 {
                     throw new StyleUnavailableException();
                 }

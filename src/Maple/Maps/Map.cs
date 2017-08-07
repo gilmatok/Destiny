@@ -42,7 +42,7 @@ namespace Destiny.Maple.Maps
         {
             get
             {
-                return DataProvider.CachedMaps[this.MapleID];
+                return DataProvider.Maps[this.MapleID];
             }
         }
 
@@ -61,6 +61,8 @@ namespace Destiny.Maple.Maps
             this.Seats = this.CachedReference.Seats;
             this.Portals = this.CachedReference.Portals;
             this.SpawnPoints = this.CachedReference.SpawnPoints;
+
+            this.SpawnPoints.Spawn(); // TODO: Move to MapFactory.
         }
 
         public Map(Datum datum)

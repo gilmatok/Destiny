@@ -857,7 +857,7 @@ namespace Destiny
             //Name constraints
             if (name.Length < 4 || name.Length > 12
                 || Database.Exists("characters", "Name = '{0}'", name)
-                || DataProvider.CharacterCreationData.ForbiddenNames.Any(forbiddenWord => name.ToLowerInvariant().Contains(forbiddenWord)))
+                || DataProvider.CreationData.ForbiddenNames.Any(forbiddenWord => name.ToLowerInvariant().Contains(forbiddenWord)))
             {
                 error = true;
             }
@@ -865,28 +865,28 @@ namespace Destiny
             //Gender-specific cosmetic/item checks
             if (gender == Gender.Male)
             {
-                if (!DataProvider.CharacterCreationData.MaleSkins.Any(x => x.Item1 == jobType && x.Item2 == skin)
-                    || !DataProvider.CharacterCreationData.MaleFaces.Any(x => x.Item1 == jobType && x.Item2 == face)
-                    || !DataProvider.CharacterCreationData.MaleHairs.Any(x => x.Item1 == jobType && x.Item2 == hair)
-                    || !DataProvider.CharacterCreationData.MaleHairColors.Any(x => x.Item1 == jobType && x.Item2 == hairColor)
-                    || !DataProvider.CharacterCreationData.MaleTops.Any(x => x.Item1 == jobType && x.Item2 == topID)
-                    || !DataProvider.CharacterCreationData.MaleBottoms.Any(x => x.Item1 == jobType && x.Item2 == bottomID)
-                    || !DataProvider.CharacterCreationData.MaleShoes.Any(x => x.Item1 == jobType && x.Item2 == shoesID)
-                    || !DataProvider.CharacterCreationData.MaleWeapons.Any(x => x.Item1 == jobType && x.Item2 == weaponID))
+                if (!DataProvider.CreationData.MaleSkins.Any(x => x.Item1 == jobType && x.Item2 == skin)
+                    || !DataProvider.CreationData.MaleFaces.Any(x => x.Item1 == jobType && x.Item2 == face)
+                    || !DataProvider.CreationData.MaleHairs.Any(x => x.Item1 == jobType && x.Item2 == hair)
+                    || !DataProvider.CreationData.MaleHairColors.Any(x => x.Item1 == jobType && x.Item2 == hairColor)
+                    || !DataProvider.CreationData.MaleTops.Any(x => x.Item1 == jobType && x.Item2 == topID)
+                    || !DataProvider.CreationData.MaleBottoms.Any(x => x.Item1 == jobType && x.Item2 == bottomID)
+                    || !DataProvider.CreationData.MaleShoes.Any(x => x.Item1 == jobType && x.Item2 == shoesID)
+                    || !DataProvider.CreationData.MaleWeapons.Any(x => x.Item1 == jobType && x.Item2 == weaponID))
                 {
                     error = true;
                 }
             }
             else if (gender == Gender.Female)
             {
-                if (!DataProvider.CharacterCreationData.FemaleSkins.Any(x => x.Item1 == jobType && x.Item2 == skin)
-                    || !DataProvider.CharacterCreationData.FemaleFaces.Any(x => x.Item1 == jobType && x.Item2 == face)
-                    || !DataProvider.CharacterCreationData.FemaleHairs.Any(x => x.Item1 == jobType && x.Item2 == hair)
-                    || !DataProvider.CharacterCreationData.FemaleHairColors.Any(x => x.Item1 == jobType && x.Item2 == hairColor)
-                    || !DataProvider.CharacterCreationData.FemaleTops.Any(x => x.Item1 == jobType && x.Item2 == topID)
-                    || !DataProvider.CharacterCreationData.FemaleBottoms.Any(x => x.Item1 == jobType && x.Item2 == bottomID)
-                    || !DataProvider.CharacterCreationData.FemaleShoes.Any(x => x.Item1 == jobType && x.Item2 == shoesID)
-                    || !DataProvider.CharacterCreationData.FemaleWeapons.Any(x => x.Item1 == jobType && x.Item2 == weaponID))
+                if (!DataProvider.CreationData.FemaleSkins.Any(x => x.Item1 == jobType && x.Item2 == skin)
+                    || !DataProvider.CreationData.FemaleFaces.Any(x => x.Item1 == jobType && x.Item2 == face)
+                    || !DataProvider.CreationData.FemaleHairs.Any(x => x.Item1 == jobType && x.Item2 == hair)
+                    || !DataProvider.CreationData.FemaleHairColors.Any(x => x.Item1 == jobType && x.Item2 == hairColor)
+                    || !DataProvider.CreationData.FemaleTops.Any(x => x.Item1 == jobType && x.Item2 == topID)
+                    || !DataProvider.CreationData.FemaleBottoms.Any(x => x.Item1 == jobType && x.Item2 == bottomID)
+                    || !DataProvider.CreationData.FemaleShoes.Any(x => x.Item1 == jobType && x.Item2 == shoesID)
+                    || !DataProvider.CreationData.FemaleWeapons.Any(x => x.Item1 == jobType && x.Item2 == weaponID))
                 {
                     error = true;
                 }

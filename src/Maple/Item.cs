@@ -139,7 +139,7 @@ namespace Destiny.Maple
         {
             get
             {
-                return DataProvider.CachedItems[this.MapleID];
+                return DataProvider.Items[this.MapleID];
             }
         }
 
@@ -193,7 +193,7 @@ namespace Destiny.Maple
         {
             get
             {
-                return DataProvider.CachedItems.WizetItemIDs.Contains(this.MapleID);
+                return DataProvider.Items.WizetItemIDs.Contains(this.MapleID);
             }
         }
 
