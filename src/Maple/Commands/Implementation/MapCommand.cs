@@ -55,7 +55,14 @@ namespace Destiny.Maple.Commands
                         byte.TryParse(args[1], out portalID);
                     }
 
-                    //TODO: Add aliases
+                    if (mapID == -1)
+                    {
+                        CommandMaps val;
+                        Enum.TryParse<CommandMaps>(args[0].Replace(" ", ""), true, out val);
+                        if (val > 0)
+                            mapID = (int)val;
+                    }
+                    
                     if (mapID > -1)
                     {
                         if(DataProvider.CachedMaps.Contains(mapID))
@@ -69,6 +76,14 @@ namespace Destiny.Maple.Commands
                     }
                 }
             }
+        }
+
+        private enum CommandMaps
+        {
+            //TODO: Add more of these - Proof of concept only
+            Amherst = 1000000,
+            Southperry = 2000000,
+            Sleepywood = 105040300
         }
     }
 }

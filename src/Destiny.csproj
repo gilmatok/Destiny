@@ -74,6 +74,7 @@
     <Compile Include="Maple\Data\DataProvider.cs" />
     <Compile Include="Maple\InventoryOperation.cs" />
     <Compile Include="Maple\Life\LifeObject.cs" />
+    <Compile Include="Maple\Life\Reactors\ReactorDrop.cs" />
     <Compile Include="Maple\Life\Reactors\ReactorEvent.cs" />
     <Compile Include="Maple\Maps\MapDrops.cs" />
     <Compile Include="Maple\Maps\MapFactory.cs" />

@@ -106,9 +106,12 @@ namespace Destiny.Maple.Maps
             {
                 foreach (Reactor reactor in this.Map.Reactors)
                 {
-                    using (OutPacket oPacket = reactor.GetSpawnPacket())
+                    if (reactor.IsAlive)
                     {
-                        item.Client.Send(oPacket);
+                        using (OutPacket oPacket = reactor.GetSpawnPacket())
+                        {
+                            item.Client.Send(oPacket);
+                        }
                     }
                 }
             }

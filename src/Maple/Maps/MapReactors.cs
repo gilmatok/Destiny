@@ -51,7 +51,7 @@ namespace Destiny.Maple.Maps
             bool valid = true;
             if (valid)
             {
-                reactor.Hit(actionDelay, skillID);
+                reactor.Hit(actionDelay, skillID, character);
             }
         }
 

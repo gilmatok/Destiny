@@ -1,8 +1,10 @@
 ﻿using Destiny.Core.IO;
 using Destiny.Core.Network;
 using Destiny.Data;
+using Destiny.Maple.Characters;
 using Destiny.Maple.Data;
 using Destiny.Maple.Maps;
+using Destiny.Network;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,6 +26,7 @@ namespace Destiny.Maple.Life.Reactors
         public bool RemoveInFieldSet { get; private set; }
         
         private ReactorEvent[] Events { get; set; }
+        private List<ReactorDrop> Drops { get; set; }
         private byte _state;
 
         public Reactor CachedReference
@@ -103,10 +106,11 @@ namespace Destiny.Maple.Life.Reactors
                 ReactorEvent newEvent = new ReactorEvent(this, reactorEvent);
                 this.Events[newEvent.State] = newEvent;
             }
-
+            
+            this.Drops = new List<ReactorDrop>();
             foreach (Datum drop in new Datums("drop_data").Populate("dropperid = '{0}'", this.MapleID))
             {
-                //TODO
+                this.Drops.Add(new ReactorDrop(drop));
             }
 
             this.IsAlive = true;
@@ -145,7 +149,7 @@ namespace Destiny.Maple.Life.Reactors
             return oPacket;
         }
 
-        public void Hit(short actionDelay, int skillID)
+        public void Hit(short actionDelay, int skillID, Character character)
         {
             if (!this.IsAlive)
                 return;
@@ -183,6 +187,8 @@ namespace Destiny.Maple.Life.Reactors
                     }
                     this.IsAlive = false;
 
+                    this.SpawnDrops(character);
+
                     if (RespawnTime == 0)
                     {
                         Spawn();
@@ -210,6 +216,23 @@ namespace Destiny.Maple.Life.Reactors
 
             RespawnTimer.Enabled = false;
             this.IsAlive = true;
+        }
+
+        public void SpawnDrops(Character owner)
+        {
+            Random rand = new Random();
+            foreach (var drop in this.Drops)
+            {
+                if (rand.Next(1000000) >= 1000000 - (drop.Chance * MasterServer.World.DropRate)
+                    && (drop.QuestID <= 0 || owner.Quests.Started.ContainsKey(drop.QuestID)))
+                {
+                    short quantity = (short)rand.Next(drop.MinQuantity, drop.MaxQuantity);
+                    Item item = new Item(drop.ItemID, quantity);
+                    item.Dropper = this;
+                    item.Position = this.Position; //TODO: Set this better
+                    this.Map.Drops.Add(item);
+                }
+            }
         }
     }
 }
