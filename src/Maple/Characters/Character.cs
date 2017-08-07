@@ -6,7 +6,6 @@ using Destiny.Core.Network;
 using System.Collections.Generic;
 using Destiny.Maple.Commands;
 using Destiny.Maple.Life;
-using System.IO;
 using Destiny.Data;
 using Destiny.Maple.Data;
 
@@ -30,6 +29,7 @@ namespace Destiny.Maple.Characters
         public CharacterItems Items { get; private set; }
         public CharacterSkills Skills { get; private set; }
         public CharacterQuests Quests { get; private set; }
+        public CharacterStorage Storage { get; private set; }
         public ControlledMobs ControlledMobs { get; private set; }
         public ControlledNpcs ControlledNpcs { get; private set; }
 
@@ -729,6 +729,7 @@ namespace Destiny.Maple.Characters
             this.Items = new CharacterItems(this, 24, 24, 24, 24, 48);
             this.Skills = new CharacterSkills(this);
             this.Quests = new CharacterQuests(this);
+            this.Storage = new CharacterStorage(this);
 
             this.Position = new Point(0, 0);
             this.ControlledMobs = new ControlledMobs(this);

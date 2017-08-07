@@ -64,6 +64,7 @@
     <Compile Include="IO\LogLevel.cs" />
     <Compile Include="IO\SettingReadException.cs" />
     <Compile Include="IO\Settings.cs" />
+    <Compile Include="Maple\Characters\CharacterStorage.cs" />
     <Compile Include="Maple\Commands\Commands.cs" />
     <Compile Include="Maple\Data\AvailableStyles.cs" />
     <Compile Include="Maple\Data\CachedItems.cs" />

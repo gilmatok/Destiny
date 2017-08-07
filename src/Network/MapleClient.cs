@@ -178,6 +178,7 @@ namespace Destiny
                     break;
 
                 case ClientOperationCode.Storage:
+                    this.Character.Storage.Handle(iPacket);
                     break;
 
                 case ClientOperationCode.HiredMerchant:

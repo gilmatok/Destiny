@@ -303,6 +303,15 @@ namespace Destiny
         Recharge,
         Leave
     }
+
+    public enum StorageAction : byte
+    {
+        Deposit = 4,
+        Withdraw,
+        Unknown,
+        ModifyMeso,
+        Leave
+    }
     #endregion
 
     #region Quests

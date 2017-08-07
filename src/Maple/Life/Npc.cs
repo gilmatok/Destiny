@@ -28,9 +28,9 @@ namespace Destiny.Maple.Life
             {
                 this.Shop.Show(talker);
             }
-            else
+            else // TODO: Check if this Npc is a storage (usually by checking if it's storage deposit cost variable is not 0).
             {
-
+                talker.Storage.Show(this);
             }
         }
 

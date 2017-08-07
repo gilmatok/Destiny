@@ -30,6 +30,7 @@ namespace Destiny.Maple
         public bool PreventsColdness { get; private set; }
         public bool IsTradeBlocked { get; private set; }
         public bool IsScissored { get; private set; }
+        public bool IsStored { get; private set; }
         public int SalePrice { get; private set; }
 
         public byte UpgradesAvailable { get; private set; }
@@ -467,6 +468,7 @@ namespace Destiny.Maple
                 this.OnlyOne = this.CachedReference.OnlyOne;
                 this.IsTradeBlocked = this.CachedReference.IsTradeBlocked;
                 this.IsScissored = false;
+                this.IsStored = (bool)datum["IsStored"];
                 this.SalePrice = this.CachedReference.SalePrice;
                 this.RequiredLevel = this.CachedReference.RequiredLevel;
 
@@ -561,6 +563,7 @@ namespace Destiny.Maple
             datum["Speed"] = this.Speed;
             datum["Jump"] = this.Jump;
             datum["IsScissored"] = this.IsScissored;
+            datum["IsStored"] = this.IsStored;
             datum["PreventsSlipping"] = this.PreventsSlipping;
             datum["PreventsColdness"] = this.PreventsColdness;
             datum["IsStored"] = false;

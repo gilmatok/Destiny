@@ -471,6 +471,17 @@ namespace Destiny.Maple.Characters
             }
         }
 
+        public IEnumerable<Item> GetStored()
+        {
+            foreach(Item loopItem in this.Items)
+            {
+                if (loopItem.IsStored)
+                {
+                    yield return loopItem;
+                }
+            }
+        }
+
         public IEnumerable<Item> GetEquipped(EquippedQueryMode mode = EquippedQueryMode.Any)
         {
             foreach (Item loopItem in this.Items)
