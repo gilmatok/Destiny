@@ -306,8 +306,8 @@ namespace Destiny
 
     public enum StorageAction : byte
     {
-        Deposit = 4,
-        Withdraw,
+        Withdraw = 4,
+        Deposit,
         Unknown,
         ModifyMeso,
         Leave

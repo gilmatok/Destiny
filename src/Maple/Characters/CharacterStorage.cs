@@ -113,6 +113,40 @@ namespace Destiny.Maple.Characters
                         {
                             return;
                         }
+
+                        this.Items.Remove(item);
+
+                        // TODO: Add the item to the inventory.
+                        // TODO: Set the item's slot to the next available slot.
+                        // TODO: Set the item's IsStored value to false.
+
+                        List<Item> itemsByType = new List<Item>();
+
+                        foreach (Item loopItem in this.Items)
+                        {
+                            if (loopItem.Type == item.Type)
+                            {
+                                itemsByType.Add(loopItem);
+                            }
+                        }
+
+                        using (OutPacket oPacket = new OutPacket(ServerOperationCode.Storage))
+                        {
+                            oPacket
+                                .WriteByte(13)
+                                .WriteByte(this.Slots)
+                                .WriteShort((short)(2 << (byte)item.Type))
+                                .WriteShort()
+                                .WriteInt()
+                                .WriteByte((byte)itemsByType.Count);
+
+                            foreach (Item loopItem in itemsByType)
+                            {
+                                loopItem.Encode(oPacket, true, true);
+                            }
+
+                            this.Parent.Client.Send(oPacket);
+                        }
                     }
                     break;
 
@@ -143,13 +177,38 @@ namespace Destiny.Maple.Characters
                             return;
                         }
 
-                        if (item.Quantity != quantity)
+                        // TODO: Remove the item from the inventory.
+                        // TODO: Set the item's slot to the proper storage index.
+                        // TODO: Set the item's IsStored value to true.
+
+                        this.Items.Add(item);
+
+                        List<Item> itemsByType = new List<Item>();
+
+                        foreach (Item loopItem in this.Items)
                         {
-                            this.Parent.Items.Remove(item.MapleID, quantity);
+                            if (loopItem.Type == item.Type)
+                            {
+                                itemsByType.Add(loopItem);
+                            }
                         }
-                        else
+
+                        using (OutPacket oPacket = new OutPacket(ServerOperationCode.Storage))
                         {
-                            this.Parent.Items.Remove(item, true);
+                            oPacket
+                                .WriteByte(13)
+                                .WriteByte(this.Slots)
+                                .WriteShort((short)(2 << (byte)item.Type))
+                                .WriteShort()
+                                .WriteInt()
+                                .WriteByte((byte)itemsByType.Count);
+
+                            foreach (Item loopItem in itemsByType)
+                            {
+                                loopItem.Encode(oPacket, true, true);
+                            }
+
+                            this.Parent.Client.Send(oPacket);
                         }
                     }
                     break;
