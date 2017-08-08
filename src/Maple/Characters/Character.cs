@@ -1480,9 +1480,12 @@ namespace Destiny.Maple.Characters
             this.EncodeStatistics(oPacket);
             this.EncodeApperance(oPacket);
 
-            oPacket
-                .WriteByte()
-                .WriteBool(this.IsRanked);
+            if (!this.Client.IsInViewAllChar)
+            {
+                oPacket.WriteByte(); //NOTE: Family
+            }
+
+            oPacket.WriteBool(this.IsRanked);
 
             if (this.IsRanked)
             {

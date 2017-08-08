@@ -24,6 +24,8 @@ namespace Destiny
         public byte Channel { get; set; }
         public bool IsInCashShop { get; set; }
 
+        public bool IsInViewAllChar { get; set; }
+
         public MapleClient(Socket socket) : base(socket) { }
 
         protected override void Terminate()
@@ -84,6 +86,14 @@ namespace Destiny
                     this.SelectWorld(iPacket);
                     break;
 
+                case ClientOperationCode.ViewAllChar:
+                    this.ViewAllChar(iPacket);
+                    break;
+
+                case ClientOperationCode.VACFlagSet:
+                    this.SetViewAllChar(iPacket);
+                    break;
+
                 case ClientOperationCode.CharacterNameCheck:
                     this.CheckCharacterName(iPacket);
                     break;
@@ -97,10 +107,12 @@ namespace Destiny
                     break;
 
                 case ClientOperationCode.CharacterSelect:
+                case ClientOperationCode.SelectCharacterByVAC:
                     this.SelectCharacter(iPacket);
                     break;
 
                 case ClientOperationCode.CharacterSelectRegisterPic:
+                case ClientOperationCode.RegisterPicFromVAC:
                     this.SelectCharacter(iPacket, registerPic: true);
                     break;
 
@@ -505,6 +517,7 @@ namespace Destiny
             }
             else
             {
+                this.IsInViewAllChar = false;
                 this.Account = new Account(this);
 
                 try
@@ -564,16 +577,17 @@ namespace Destiny
                     oPacket
                         .WriteInt(this.Account.ID)
                         .WriteByte((byte)this.Account.Gender)
+                        .WriteBool(this.Account.IsMaster)
+                        .WriteByte((byte)(this.Account.IsMaster ? 0x80 : 0x00))
                         .WriteBool()
-                        .WriteByte()
-                        .WriteByte()
                         .WriteMapleString(this.Account.Username)
                         .WriteByte()
                         .WriteBool()
                         .WriteLong()
                         .WriteLong()
                         .WriteInt()
-                        .WriteShort((short)(MasterServer.Login.RequestPin ? 0 : 2)); // NOTE: 1 seems to not do anything.
+                        .WriteByte((byte)(MasterServer.Login.RequestPin ? 0 : 2)) // NOTE: 1 seems to not do anything.
+                        .WriteByte((byte)(MasterServer.Login.RequestPic ? (string.IsNullOrEmpty(this.Account.Pic) ? 0 : 1) : 2));
                 }
 
                 this.Send(oPacket);
@@ -606,7 +620,8 @@ namespace Destiny
                         .WriteLong()
                         .WriteLong()
                         .WriteInt()
-                        .WriteShort((short)(MasterServer.Login.RequestPin ? 0 : 2)); // NOTE: 1 seems to not do anything.
+                        .WriteByte((byte)(MasterServer.Login.RequestPin ? 0 : 2)) // NOTE: 1 seems to not do anything.
+                        .WriteByte((byte)(MasterServer.Login.RequestPic ? (string.IsNullOrEmpty(this.Account.Pic) ? 0 : 1) : 2));
 
                     this.Send(oPacket);
                 }
@@ -650,7 +665,8 @@ namespace Destiny
                         .WriteLong()
                         .WriteLong()
                         .WriteInt()
-                        .WriteShort((short)(MasterServer.Login.RequestPin ? 0 : 2)); // NOTE: 1 seems to not do anything.
+                        .WriteByte((byte)(MasterServer.Login.RequestPin ? 0 : 2)) // NOTE: 1 seems to not do anything.
+                        .WriteByte((byte)(MasterServer.Login.RequestPic ? (string.IsNullOrEmpty(this.Account.Pic) ? 0 : 1) : 2));
 
                     this.Send(oPacket);
                 }
@@ -963,7 +979,7 @@ namespace Destiny
 
             CharacterDeletionResult result;
 
-            if (SHACryptograph.Encrypt(SHAMode.SHA256, pic) == this.Account.Pic)
+            if (SHACryptograph.Encrypt(SHAMode.SHA256, pic) == this.Account.Pic || !MasterServer.Login.RequestPic)
             {
                 Database.Delete("characters", "ID = '{0}'", characterID);
                 Database.Delete("buffs", "CharacterID = '{0}'", characterID);
@@ -1012,7 +1028,7 @@ namespace Destiny
                 return;
             }
 
-            if (fromViewAll)
+            if (this.IsInViewAllChar)
             {
                 iPacket.ReadInt(); // NOTE: World ID.
                 this.Channel = 0; // TODO: Least loaded channel.
@@ -1080,6 +1096,73 @@ namespace Destiny
             this.Character = new Character(characterID, this);
             this.Character.Load();
             this.Character.Initialize();
+        }
+
+        private void ViewAllChar(InPacket iPacket)
+        {
+            if (this.IsInViewAllChar)
+            {
+                using (OutPacket oPacket = new OutPacket(ServerOperationCode.ViewAllCharResult))
+                {
+                    oPacket
+                        .WriteByte((byte)VACResult.UnknownError)
+                        .WriteByte();
+
+                    this.Send(oPacket);
+                }
+                
+                return;
+            }
+
+            this.IsInViewAllChar = true;
+            
+            List<Character> characters = new List<Character>();
+            foreach (Datum datum in new Datums("characters").PopulateWith("ID", "AccountID = '{0}'", this.Account.ID))
+            {
+                int characterID = (int)datum["ID"];
+                Character tempChar = new Character(characterID, this);
+                tempChar.Load();
+                characters.Add(tempChar);
+            }
+
+            using (OutPacket oPacket = new OutPacket(ServerOperationCode.ViewAllCharResult))
+            {
+                if (characters.Count == 0)
+                {
+                    oPacket
+                        .WriteByte((byte)VACResult.NoCharacters);
+                }
+                else
+                {
+                    oPacket
+                        .WriteByte((byte)VACResult.SendCount)
+                        .WriteInt(1) //NOTE: World count
+                        .WriteInt(characters.Count);
+                        //.WriteInt(Math.Max(1, (int)Math.Ceiling(characters.Count / 3d))); //NOTE: Row count
+                }
+
+                this.Send(oPacket);
+            }
+
+            using (OutPacket oPacket = new OutPacket(ServerOperationCode.ViewAllCharResult))
+            {
+                oPacket
+                    .WriteByte((byte)VACResult.CharInfo)
+                    .WriteByte() //NOTE: World id
+                    .WriteByte((byte)characters.Count);
+
+                foreach (Character c in characters)
+                {
+                    c.Encode(oPacket);
+                }
+
+                this.Send(oPacket);
+            }
+        }
+
+        private void SetViewAllChar(InPacket iPacket)
+        {
+            this.IsInViewAllChar = iPacket.ReadBool();
         }
     }
 }

@@ -293,6 +293,15 @@ namespace Destiny
         Request = 4,
         Cancel = 5
     }
+
+    public enum VACResult : byte
+    {
+        CharInfo = 0,
+        SendCount = 1,
+        AlreadyLoggedIn = 2,
+        UnknownError = 3,
+        NoCharacters = 4
+    }
     #endregion
 
     #region NPCs
