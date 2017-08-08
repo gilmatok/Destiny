@@ -30,7 +30,7 @@ namespace Destiny.Maple
         public bool PreventsColdness { get; private set; }
         public bool IsTradeBlocked { get; private set; }
         public bool IsScissored { get; private set; }
-        public bool IsStored { get; private set; }
+        public bool IsStored { get; set; }
         public int SalePrice { get; private set; }
 
         public byte UpgradesAvailable { get; private set; }
@@ -566,7 +566,6 @@ namespace Destiny.Maple
             datum["IsStored"] = this.IsStored;
             datum["PreventsSlipping"] = this.PreventsSlipping;
             datum["PreventsColdness"] = this.PreventsColdness;
-            datum["IsStored"] = false;
 
             if (this.Assigned)
             {

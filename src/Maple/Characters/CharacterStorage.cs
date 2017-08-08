@@ -50,9 +50,9 @@ namespace Destiny.Maple.Characters
 
             this.Items = new List<Item>();
 
-            foreach (Item item in this.Parent.Items.GetStored())
+            foreach (Datum itemDatum in new Datums("items").Populate("CharacterID = '{0}' AND IsStored = True", this.Parent.ID))
             {
-                this.Items.Add(item);
+                this.Items.Add(new Item(itemDatum));
             }
         }
 
@@ -64,6 +64,11 @@ namespace Destiny.Maple.Characters
             datum["Meso"] = this.Meso;
 
             datum.Update("AccountID = '{0}'", this.Parent.AccountID);
+
+            foreach (Item item in this.Items)
+            {
+                item.Save();
+            }
         }
 
         public void Show(Npc npc)
@@ -115,6 +120,11 @@ namespace Destiny.Maple.Characters
                         }
 
                         this.Items.Remove(item);
+                        item.Delete();
+
+                        item.IsStored = false;
+
+                        this.Parent.Items.Add(item, forceGetSlot: true);
 
                         // TODO: Add the item to the inventory.
                         // TODO: Set the item's slot to the next available slot.
@@ -177,9 +187,11 @@ namespace Destiny.Maple.Characters
                             return;
                         }
 
-                        // TODO: Remove the item from the inventory.
-                        // TODO: Set the item's slot to the proper storage index.
-                        // TODO: Set the item's IsStored value to true.
+                        this.Parent.Items.Remove(item, true);
+
+                        item.Parent = this.Parent.Items; // NOTE: This is needed because when we remove the item is sets parent to none.
+                        item.Slot = (short)this.Items.Count;
+                        item.IsStored = true;
 
                         this.Items.Add(item);
 
