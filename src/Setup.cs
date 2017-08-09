@@ -57,59 +57,52 @@ namespace Destiny
                         Log.Inform("Please wait...");
 
                         Database.ExecuteScript(databaseHost, databaseUsername, databasePassword, @"
-							CREATE DATABASE {0};
-							USE {0};
+							CREATE DATABASE IF NOT EXISTS {0} DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
+                            USE {0};
 
-							SET FOREIGN_KEY_CHECKS=0;
-
-							DROP TABLE IF EXISTS `accounts`;
-                            CREATE TABLE  `accounts` (
-                              `ID` int(10) NOT NULL AUTO_INCREMENT,
+                            DROP TABLE IF EXISTS `accounts`;
+                            CREATE TABLE `accounts` (
+                              `ID` int(10) NOT NULL,
                               `Username` varchar(12) NOT NULL,
                               `Password` varchar(128) NOT NULL,
                               `Salt` varchar(32) NOT NULL,
-                              `EULA` tinyint(1) unsigned NOT NULL DEFAULT '0',
-                              `Gender` tinyint(3) unsigned NOT NULL DEFAULT '10',
+                              `EULA` tinyint(1) UNSIGNED NOT NULL DEFAULT '0',
+                              `Gender` tinyint(3) UNSIGNED NOT NULL DEFAULT '10',
                               `Pin` varchar(64) NOT NULL DEFAULT '',
                               `Pic` varchar(64) NOT NULL DEFAULT '',
-                              `IsBanned` tinyint(1) unsigned NOT NULL DEFAULT '0',
-                              `IsMaster` tinyint(1) unsigned NOT NULL DEFAULT '0',
+                              `IsBanned` tinyint(1) UNSIGNED NOT NULL DEFAULT '0',
+                              `IsMaster` tinyint(1) UNSIGNED NOT NULL DEFAULT '0',
                               `Birthday` date NOT NULL,
-                              `Creation` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                              PRIMARY KEY (`ID`),
-                              KEY `username` (`Username`) USING BTREE
-                            ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
- 
-							DROP TABLE IF EXISTS `banned_ip`;
-							CREATE TABLE `banned_ip` (
-							  `Address` varchar(15) NOT NULL,
-							  PRIMARY KEY (`Address`)
-							) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+                              `Creation` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP
+                            ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-							DROP TABLE IF EXISTS `banned_mac`;
-							CREATE TABLE `banned_mac` (
-							  `Address` varchar(17) NOT NULL,
-							  PRIMARY KEY (`Address`)
-							) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+                            DROP TABLE IF EXISTS `banned_ip`;
+                            CREATE TABLE `banned_ip` (
+                              `Address` varchar(15) NOT NULL
+                            ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+                            DROP TABLE IF EXISTS `banned_mac`;
+                            CREATE TABLE `banned_mac` (
+                              `Address` varchar(17) NOT NULL
+                            ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
                             DROP TABLE IF EXISTS `buffs`;
-                            CREATE TABLE  `buffs` (
-                              `ID` int(11) NOT NULL AUTO_INCREMENT,
+                            CREATE TABLE `buffs` (
+                              `ID` int(11) NOT NULL,
                               `CharacterID` int(11) NOT NULL,
-                              `Type` tinyint(3) unsigned NOT NULL,
+                              `Type` tinyint(3) UNSIGNED NOT NULL,
                               `MapleID` int(11) NOT NULL,
                               `SkillLevel` int(11) NOT NULL,
                               `Value` int(11) NOT NULL,
-                              `End` datetime NOT NULL,
-                              PRIMARY KEY (`ID`)
+                              `End` datetime NOT NULL
                             ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-							DROP TABLE IF EXISTS `characters`;
-                            CREATE TABLE  `characters` (
-                              `ID` int(11) NOT NULL AUTO_INCREMENT,
+                            DROP TABLE IF EXISTS `characters`;
+                            CREATE TABLE `characters` (
+                              `ID` int(11) NOT NULL,
                               `AccountID` int(11) NOT NULL,
                               `Name` varchar(13) NOT NULL,
-                              `Level` tinyint(3) unsigned NOT NULL DEFAULT '1',
+                              `Level` tinyint(3) UNSIGNED NOT NULL DEFAULT '1',
                               `Experience` int(11) NOT NULL DEFAULT '0',
                               `Job` smallint(6) NOT NULL DEFAULT '0',
                               `Strength` smallint(6) NOT NULL,
@@ -122,35 +115,32 @@ namespace Destiny
                               `MaxMana` smallint(6) NOT NULL DEFAULT '5',
                               `Meso` int(10) NOT NULL DEFAULT '0',
                               `Fame` smallint(6) NOT NULL DEFAULT '0',
-                              `Gender` tinyint(3) unsigned NOT NULL DEFAULT '0',
+                              `Gender` tinyint(3) UNSIGNED NOT NULL DEFAULT '0',
                               `Hair` int(11) NOT NULL,
-                              `Skin` tinyint(3) unsigned NOT NULL DEFAULT '0',
+                              `Skin` tinyint(3) UNSIGNED NOT NULL DEFAULT '0',
                               `Face` int(11) NOT NULL,
                               `AbilityPoints` smallint(6) NOT NULL DEFAULT '0',
                               `SkillPoints` smallint(6) NOT NULL DEFAULT '0',
                               `Map` int(11) NOT NULL DEFAULT '0',
-                              `SpawnPoint` tinyint(3) unsigned NOT NULL DEFAULT '0',
-                              `MaxBuddies` tinyint(3) unsigned NOT NULL DEFAULT '20',
-                              `EquipmentSlots` tinyint(3) unsigned NOT NULL DEFAULT '24',
-                              `UsableSlots` tinyint(3) unsigned NOT NULL DEFAULT '24',
-                              `SetupSlots` tinyint(3) unsigned NOT NULL DEFAULT '24',
-                              `EtceteraSlots` tinyint(3) unsigned NOT NULL DEFAULT '24',
-                              `CashSlots` tinyint(3) unsigned NOT NULL DEFAULT '48',
-                              PRIMARY KEY (`ID`),
-                              KEY `account_id` (`AccountID`),
-                              KEY `name` (`Name`) USING BTREE
-                            ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
+                              `SpawnPoint` tinyint(3) UNSIGNED NOT NULL DEFAULT '0',
+                              `MaxBuddies` tinyint(3) UNSIGNED NOT NULL DEFAULT '20',
+                              `EquipmentSlots` tinyint(3) UNSIGNED NOT NULL DEFAULT '24',
+                              `UsableSlots` tinyint(3) UNSIGNED NOT NULL DEFAULT '24',
+                              `SetupSlots` tinyint(3) UNSIGNED NOT NULL DEFAULT '24',
+                              `EtceteraSlots` tinyint(3) UNSIGNED NOT NULL DEFAULT '24',
+                              `CashSlots` tinyint(3) UNSIGNED NOT NULL DEFAULT '48'
+                            ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-							DROP TABLE IF EXISTS `items`;
-                            CREATE TABLE  `items` (
-                              `ID` int(11) NOT NULL AUTO_INCREMENT,
+                            DROP TABLE IF EXISTS `items`;
+                            CREATE TABLE `items` (
+                              `ID` int(11) NOT NULL,
                               `AccountID` int(10) NOT NULL,
                               `CharacterID` int(10) NOT NULL,
                               `MapleID` int(11) NOT NULL,
                               `Slot` smallint(6) NOT NULL DEFAULT '0',
                               `Creator` varchar(13) DEFAULT NULL,
-                              `UpgradesAvailable` tinyint(3) unsigned NOT NULL DEFAULT '0',
-                              `UpgradesApplied` tinyint(3) unsigned NOT NULL DEFAULT '0',
+                              `UpgradesAvailable` tinyint(3) UNSIGNED NOT NULL DEFAULT '0',
+                              `UpgradesApplied` tinyint(3) UNSIGNED NOT NULL DEFAULT '0',
                               `Strength` smallint(6) NOT NULL DEFAULT '0',
                               `Dexterity` smallint(6) NOT NULL DEFAULT '0',
                               `Intelligence` smallint(6) NOT NULL DEFAULT '0',
@@ -166,61 +156,129 @@ namespace Destiny
                               `Agility` smallint(6) NOT NULL DEFAULT '0',
                               `Speed` smallint(6) NOT NULL DEFAULT '0',
                               `Jump` smallint(6) NOT NULL DEFAULT '0',
-                              `IsScissored` tinyint(1) unsigned NOT NULL DEFAULT '0',
-                              `PreventsSlipping` tinyint(1) unsigned NOT NULL DEFAULT '0',
-                              `PreventsColdness` tinyint(1) unsigned NOT NULL DEFAULT '0',
-                              `IsStored` tinyint(1) unsigned NOT NULL DEFAULT '0',
-                              `Quantity` smallint(6) NOT NULL DEFAULT '1',
-                              PRIMARY KEY (`ID`),
-                              KEY `character_id` (`CharacterID`) USING BTREE
-                            ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
+                              `IsScissored` tinyint(1) UNSIGNED NOT NULL DEFAULT '0',
+                              `PreventsSlipping` tinyint(1) UNSIGNED NOT NULL DEFAULT '0',
+                              `PreventsColdness` tinyint(1) UNSIGNED NOT NULL DEFAULT '0',
+                              `IsStored` tinyint(1) UNSIGNED NOT NULL DEFAULT '0',
+                              `Quantity` smallint(6) NOT NULL DEFAULT '1'
+                            ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
                             DROP TABLE IF EXISTS `keymaps`;
-                            CREATE TABLE  `keymaps` (
-                              `ID` int(11) NOT NULL AUTO_INCREMENT,
+                            CREATE TABLE `keymaps` (
+                              `ID` int(11) NOT NULL,
                               `CharacterID` int(11) NOT NULL,
                               `KeyID` int(11) NOT NULL,
-                              `Type` tinyint(3) unsigned NOT NULL,
-                              `Action` int(11) NOT NULL,
-                              PRIMARY KEY (`ID`)
+                              `Type` tinyint(3) UNSIGNED NOT NULL,
+                              `Action` int(11) NOT NULL
                             ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
                             DROP TABLE IF EXISTS `master_ip`;
-                            CREATE TABLE  `master_ip` (
-                              `IP` varchar(15) NOT NULL,
-                              PRIMARY KEY (`IP`)
+                            CREATE TABLE `master_ip` (
+                              `IP` varchar(15) NOT NULL
                             ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
                             DROP TABLE IF EXISTS `quests_completed`;
-                            CREATE TABLE  `quests_completed` (
+                            CREATE TABLE `quests_completed` (
                               `CharacterID` int(11) NOT NULL,
-                              `QuestID` smallint(6) unsigned NOT NULL,
-                              `CompletionTime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                              UNIQUE KEY `Quest` (`CharacterID`,`QuestID`)
+                              `QuestID` smallint(6) UNSIGNED NOT NULL,
+                              `CompletionTime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP
                             ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
                             DROP TABLE IF EXISTS `quests_started`;
-                            CREATE TABLE  `quests_started` (
+                            CREATE TABLE `quests_started` (
                               `CharacterID` int(11) NOT NULL,
-                              `QuestID` smallint(6) unsigned NOT NULL,
-                              `MobID` int(11) NOT NULL DEFAULT 0,
-                              `Killed` smallint(6) NOT NULL DEFAULT 0,
-                              UNIQUE KEY `QuestRequirement` (`CharacterID`,`QuestID`,`MobID`) USING BTREE
+                              `QuestID` smallint(6) UNSIGNED NOT NULL,
+                              `MobID` int(11) NOT NULL DEFAULT '0',
+                              `Killed` smallint(6) NOT NULL DEFAULT '0'
                             ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
                             DROP TABLE IF EXISTS `skills`;
-                            CREATE TABLE  `skills` (
-                              `ID` int(11) NOT NULL AUTO_INCREMENT,
+                            CREATE TABLE `skills` (
+                              `ID` int(11) NOT NULL,
                               `CharacterID` int(11) NOT NULL,
                               `MapleID` int(11) NOT NULL,
-                              `CurrentLevel` tinyint(3) unsigned NOT NULL,
-                              `MaxLevel` tinyint(3) unsigned NOT NULL,
-                              `CooldownEnd` datetime NOT NULL,
-                              PRIMARY KEY (`ID`),
-                              KEY `character_id` (`CharacterID`) USING BTREE
+                              `CurrentLevel` tinyint(3) UNSIGNED NOT NULL,
+                              `MaxLevel` tinyint(3) UNSIGNED NOT NULL,
+                              `CooldownEnd` datetime NOT NULL
                             ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-							INSERT INTO master_ip VALUES ('127.0.0.1');
+
+                            ALTER TABLE `accounts`
+                              ADD PRIMARY KEY (`ID`),
+                              ADD KEY `username` (`Username`) USING BTREE;
+
+                            ALTER TABLE `banned_ip`
+                              ADD PRIMARY KEY (`Address`);
+
+                            ALTER TABLE `banned_mac`
+                              ADD PRIMARY KEY (`Address`);
+
+                            ALTER TABLE `buffs`
+                              ADD PRIMARY KEY (`ID`),
+                              ADD KEY `CharacterID` (`CharacterID`);
+
+                            ALTER TABLE `characters`
+                              ADD PRIMARY KEY (`ID`),
+                              ADD KEY `account_id` (`AccountID`),
+                              ADD KEY `name` (`Name`) USING BTREE;
+
+                            ALTER TABLE `items`
+                              ADD PRIMARY KEY (`ID`),
+                              ADD KEY `character_id` (`CharacterID`) USING BTREE,
+                              ADD KEY `AccountID` (`AccountID`);
+
+                            ALTER TABLE `keymaps`
+                              ADD PRIMARY KEY (`ID`),
+                              ADD KEY `CharacterID` (`CharacterID`);
+
+                            ALTER TABLE `master_ip`
+                              ADD PRIMARY KEY (`IP`);
+
+                            ALTER TABLE `quests_completed`
+                              ADD UNIQUE KEY `Quest` (`CharacterID`,`QuestID`);
+
+                            ALTER TABLE `quests_started`
+                              ADD UNIQUE KEY `QuestRequirement` (`CharacterID`,`QuestID`,`MobID`) USING BTREE;
+
+                            ALTER TABLE `skills`
+                              ADD PRIMARY KEY (`ID`),
+                              ADD KEY `character_id` (`CharacterID`) USING BTREE;
+
+
+                            ALTER TABLE `accounts`
+                              MODIFY `ID` int(10) NOT NULL AUTO_INCREMENT;
+                            ALTER TABLE `buffs`
+                              MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
+                            ALTER TABLE `characters`
+                              MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
+                            ALTER TABLE `items`
+                              MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
+                            ALTER TABLE `keymaps`
+                              MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
+                            ALTER TABLE `skills`
+                              MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
+
+                            ALTER TABLE `buffs`
+                              ADD CONSTRAINT `buffs_ibfk_1` FOREIGN KEY (`CharacterID`) REFERENCES `characters` (`ID`);
+
+                            ALTER TABLE `characters`
+                              ADD CONSTRAINT `characters_ibfk_1` FOREIGN KEY (`AccountID`) REFERENCES `accounts` (`ID`);
+
+                            ALTER TABLE `items`
+                              ADD CONSTRAINT `items_ibfk_1` FOREIGN KEY (`AccountID`) REFERENCES `accounts` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE,
+                              ADD CONSTRAINT `items_ibfk_2` FOREIGN KEY (`CharacterID`) REFERENCES `characters` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+                            ALTER TABLE `keymaps`
+                              ADD CONSTRAINT `keymaps_ibfk_1` FOREIGN KEY (`CharacterID`) REFERENCES `characters` (`ID`);
+
+                            ALTER TABLE `quests_completed`
+                              ADD CONSTRAINT `quests_completed_ibfk_1` FOREIGN KEY (`CharacterID`) REFERENCES `characters` (`ID`);
+
+                            ALTER TABLE `quests_started`
+                              ADD CONSTRAINT `quests_started_ibfk_1` FOREIGN KEY (`CharacterID`) REFERENCES `characters` (`ID`);
+
+                            ALTER TABLE `skills`
+                              ADD CONSTRAINT `skills_ibfk_1` FOREIGN KEY (`CharacterID`) REFERENCES `characters` (`ID`);
                             ", databaseSchema);
 
                         Log.Inform("Database '{0}' created.", databaseSchema);
