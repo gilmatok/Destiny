@@ -144,6 +144,7 @@ namespace Destiny
 							DROP TABLE IF EXISTS `items`;
                             CREATE TABLE  `items` (
                               `ID` int(11) NOT NULL AUTO_INCREMENT,
+                              `AccountID` int(10) NOT NULL,
                               `CharacterID` int(10) NOT NULL,
                               `MapleID` int(11) NOT NULL,
                               `Slot` smallint(6) NOT NULL DEFAULT '0',

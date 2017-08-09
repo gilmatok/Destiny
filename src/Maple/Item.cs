@@ -18,6 +18,7 @@ namespace Destiny.Maple
         public CharacterItems Parent { get; set; }
 
         public int ID { get; private set; }
+        public int AccountID { get; private set; }
         public int MapleID { get; private set; }
         public short Slot { get; set; }
         private short maxPerStack;
@@ -458,6 +459,7 @@ namespace Destiny.Maple
                 this.ID = (int)datum["ID"];
                 this.Assigned = true;
 
+                this.AccountID = (int)datum["AccountID"];
                 this.MapleID = (int)datum["MapleID"];
                 this.MaxPerStack = this.CachedReference.MaxPerStack;
                 this.Quantity = (short)datum["Quantity"];
@@ -540,6 +542,7 @@ namespace Destiny.Maple
         {
             Datum datum = new Datum("items");
 
+            datum["AccountID"] = this.Character.AccountID;
             datum["CharacterID"] = this.Character.ID;
             datum["MapleID"] = this.MapleID;
             datum["Quantity"] = this.Quantity;

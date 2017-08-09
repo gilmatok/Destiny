@@ -28,7 +28,7 @@ namespace Destiny.Maple.Characters
             this.Parent = parent;
         }
 
-        public void Load() // TODO: Refactor loading code, kinda hackish.
+        public void Load()
         {
             Datum datum = new Datum("storages");
 
@@ -50,7 +50,7 @@ namespace Destiny.Maple.Characters
 
             this.Items = new List<Item>();
 
-            foreach (Datum itemDatum in new Datums("items").Populate("CharacterID = '{0}' AND IsStored = True", this.Parent.ID))
+            foreach (Datum itemDatum in new Datums("items").Populate("AccountID = '{0}' AND IsStored = True", this.Parent.AccountID))
             {
                 this.Items.Add(new Item(itemDatum));
             }
@@ -126,10 +126,6 @@ namespace Destiny.Maple.Characters
 
                         this.Parent.Items.Add(item, forceGetSlot: true);
 
-                        // TODO: Add the item to the inventory.
-                        // TODO: Set the item's slot to the next available slot.
-                        // TODO: Set the item's IsStored value to false.
-
                         List<Item> itemsByType = new List<Item>();
 
                         foreach (Item loopItem in this.Items)
@@ -182,7 +178,7 @@ namespace Destiny.Maple.Characters
 
                         if (this.Parent.Meso <= 500) // TODO: Actual storage cost.
                         {
-                            this.Parent.Notify("You don't have enough meso to store the item.", NoticeType.Popup);
+                            this.Parent.Notify("You don't have enough meso to store the item.", NoticeType.Popup); // TOOD: Is there a packet for this?
 
                             return;
                         }
