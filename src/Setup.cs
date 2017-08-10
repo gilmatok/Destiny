@@ -202,6 +202,13 @@ namespace Destiny
                               `CooldownEnd` datetime NOT NULL
                             ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+                            DROP TABLE IF EXISTS `storages`;
+                            CREATE TABLE  `storages` (
+                              `AccountID` int(11) NOT NULL,
+                              `Slots` tinyint(3) UNSIGNED NOT NULL DEFAULT '4',
+                              `Meso` int(11) NOT NULL DEFAULT '0',
+                              `Characters` int(11) NOT NULL DEFAULT '3'
+                            ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
 
                             ALTER TABLE `accounts`
                               ADD PRIMARY KEY (`ID`),
@@ -244,6 +251,8 @@ namespace Destiny
                               ADD PRIMARY KEY (`ID`),
                               ADD KEY `character_id` (`CharacterID`) USING BTREE;
 
+                            ALTER TABLE `storages`
+                              ADD KEY `account_id` (`AccountID`) USING BTREE;
 
                             ALTER TABLE `accounts`
                               MODIFY `ID` int(10) NOT NULL AUTO_INCREMENT;
@@ -279,6 +288,9 @@ namespace Destiny
 
                             ALTER TABLE `skills`
                               ADD CONSTRAINT `skills_ibfk_1` FOREIGN KEY (`CharacterID`) REFERENCES `characters` (`ID`);
+
+                            ALTER TABLE `storages`
+                              ADD CONSTRAINT `storages_ibfk_1` FOREIGN KEY (`AccountID`) REFERENCES `accounts` (`ID`);
                             ", databaseSchema);
 
                         Log.Inform("Database '{0}' created.", databaseSchema);

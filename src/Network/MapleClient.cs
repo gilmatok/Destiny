@@ -832,9 +832,24 @@ namespace Destiny
                     character.Encode(oPacket);
                 }
 
-                oPacket
-                    .WriteByte((byte)(MasterServer.Login.RequestPic ? (string.IsNullOrEmpty(this.Account.Pic) ? 0 : 1) : 2))
-                    .WriteInt(MasterServer.Login.MaxCharacters); // TODO: Account specific character creation slots. For now, use server-configured value.
+                oPacket.WriteByte((byte)(MasterServer.Login.RequestPic ? (string.IsNullOrEmpty(this.Account.Pic) ? 0 : 1) : 2));
+
+                int maxCharacters;
+
+                Datum datum = new Datum("storages");
+
+                try
+                {
+                    datum.PopulateWith("Characters", "AccountID = '{0}'", this.Account.ID);
+
+                    maxCharacters = (byte)datum["Characters"];
+                }
+                catch
+                {
+                    maxCharacters = MasterServer.Login.MaxCharacters;
+                }
+
+                oPacket.WriteInt(maxCharacters);
 
                 this.Send(oPacket);
             }
@@ -914,7 +929,7 @@ namespace Destiny
                 error = true;
             }
 
-            Character character = new Character();
+            Character character = new Character(client: this); // NOTE: Client is passed because it is needed for ViewAllChar.
 
             character.AccountID = this.Account.ID;
             character.Name = name;
@@ -1110,12 +1125,12 @@ namespace Destiny
 
                     this.Send(oPacket);
                 }
-                
+
                 return;
             }
 
             this.IsInViewAllChar = true;
-            
+
             List<Character> characters = new List<Character>();
             foreach (Datum datum in new Datums("characters").PopulateWith("ID", "AccountID = '{0}'", this.Account.ID))
             {
@@ -1138,7 +1153,7 @@ namespace Destiny
                         .WriteByte((byte)VACResult.SendCount)
                         .WriteInt(1) //NOTE: World count
                         .WriteInt(characters.Count);
-                        //.WriteInt(Math.Max(1, (int)Math.Ceiling(characters.Count / 3d))); //NOTE: Row count
+                    //.WriteInt(Math.Max(1, (int)Math.Ceiling(characters.Count / 3d))); //NOTE: Row count
                 }
 
                 this.Send(oPacket);
