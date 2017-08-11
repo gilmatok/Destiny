@@ -1,34 +1,31 @@
 ﻿using Destiny.Core.IO;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Destiny.Maple
 {
     public enum MovementType : byte
     {
-        Normal,
-        Unknown1,
-        Unknown2,
-        Unknown3,
-        Unknown4,
-        Unknown5,
-        Unknown6,
-        Unknown7,
-        Unknown8,
-        Unknown9,
-        Equipment,
-        Chair,
-        Unknown12,
-        Unknown13,
-        Unknown14,
-        JumpDown,
-        Unknown16,
-        Unknown17,
-        Unknown18,
-        Unknown19,
-        Unknown20,
-        Unknown21,
-        Unknown22
+        Normal = 0,
+        Jump = 1,
+        JumpKnockback = 2,
+        Immediate = 3,
+        Teleport = 4,
+        Normal2 = 5,
+        FlashJump = 6,
+        Assaulter = 7,
+        Assassinate = 8,
+        Rush = 9,
+        Falling = 10,
+        Chair = 11,
+        ExcessiveKnockback = 12,
+        RecoilShot = 13,
+        Unknown = 14,
+        JumpDown = 15,
+        Wings = 16,
+        WingsFalling = 17,
+        Unknown2 = 18,
+        Unknown3 = 19,
+        Aran = 20,
     }
 
     public sealed class Movement
@@ -71,9 +68,9 @@ namespace Destiny.Maple
                 switch (movement.Type)
                 {
                     case MovementType.Normal:
-                    case MovementType.Unknown5:
+                    case MovementType.Normal2:
                     case MovementType.JumpDown:
-                    case MovementType.Unknown17:
+                    case MovementType.WingsFalling:
                         {
                             movement.Position = iPacket.ReadPoint();
                             movement.Velocity = iPacket.ReadPoint();
@@ -88,16 +85,12 @@ namespace Destiny.Maple
                         }
                         break;
 
-                    case MovementType.Unknown1:
-                    case MovementType.Unknown2:
-                    case MovementType.Unknown6:
-                    case MovementType.Unknown12:
-                    case MovementType.Unknown13:
-                    case MovementType.Unknown16:
-                    case MovementType.Unknown18:
-                    case MovementType.Unknown19:
-                    case MovementType.Unknown20:
-                    case MovementType.Unknown22:
+                    case MovementType.Jump:
+                    case MovementType.JumpKnockback:
+                    case MovementType.FlashJump:
+                    case MovementType.ExcessiveKnockback:
+                    case MovementType.RecoilShot:
+                    case MovementType.Aran:
                         {
                             movement.Velocity = iPacket.ReadPoint();
                             movement.Stance = iPacket.ReadByte();
@@ -105,11 +98,11 @@ namespace Destiny.Maple
                         }
                         break;
 
-                    case MovementType.Unknown3:
-                    case MovementType.Unknown4:
-                    case MovementType.Unknown7:
-                    case MovementType.Unknown8:
-                    case MovementType.Unknown9:
+                    case MovementType.Immediate:
+                    case MovementType.Teleport:
+                    case MovementType.Assaulter:
+                    case MovementType.Assassinate:
+                    case MovementType.Rush:
                     case MovementType.Chair:
                         {
                             movement.Position = iPacket.ReadPoint();
@@ -120,15 +113,19 @@ namespace Destiny.Maple
                         }
                         break;
 
-                    case MovementType.Unknown14:
+                    case MovementType.Falling:
                         {
-                            // TODO: Jump down or equipment, not sure.
+                            movement.Statistic = iPacket.ReadByte();
                         }
                         break;
 
-                    case MovementType.Equipment:
+                    case MovementType.Unknown:
                         {
-                            movement.Statistic = iPacket.ReadByte();
+                            movement.Velocity = iPacket.ReadPoint();
+                            movement.Foothold = iPacket.ReadShort();
+                            this.LastFoothold = movement.Foothold;
+                            movement.Stance = iPacket.ReadByte();
+                            movement.Duration = iPacket.ReadShort();
                         }
                         break;
                 }
@@ -150,9 +147,9 @@ namespace Destiny.Maple
                 switch (movement.Type)
                 {
                     case MovementType.Normal:
-                    case MovementType.Unknown5:
+                    case MovementType.Normal2:
                     case MovementType.JumpDown:
-                    case MovementType.Unknown17:
+                    case MovementType.WingsFalling:
                         {
                             oPacket
                                 .WritePoint(movement.Position)
@@ -168,16 +165,12 @@ namespace Destiny.Maple
                         }
                         break;
 
-                    case MovementType.Unknown1:
-                    case MovementType.Unknown2:
-                    case MovementType.Unknown6:
-                    case MovementType.Unknown12:
-                    case MovementType.Unknown13:
-                    case MovementType.Unknown16:
-                    case MovementType.Unknown18:
-                    case MovementType.Unknown19:
-                    case MovementType.Unknown20:
-                    case MovementType.Unknown22:
+                    case MovementType.Jump:
+                    case MovementType.JumpKnockback:
+                    case MovementType.FlashJump:
+                    case MovementType.ExcessiveKnockback:
+                    case MovementType.RecoilShot:
+                    case MovementType.Aran:
                         {
                             oPacket
                                 .WritePoint(movement.Velocity)
@@ -186,11 +179,11 @@ namespace Destiny.Maple
                         }
                         break;
 
-                    case MovementType.Unknown3:
-                    case MovementType.Unknown4:
-                    case MovementType.Unknown7:
-                    case MovementType.Unknown8:
-                    case MovementType.Unknown9:
+                    case MovementType.Immediate:
+                    case MovementType.Teleport:
+                    case MovementType.Assaulter:
+                    case MovementType.Assassinate:
+                    case MovementType.Rush:
                     case MovementType.Chair:
                         {
                             oPacket
@@ -201,15 +194,19 @@ namespace Destiny.Maple
                         }
                         break;
 
-                    case MovementType.Unknown14:
+                    case MovementType.Falling:
                         {
-                            // TODO: Jump down or equipment, not sure.
+                            oPacket.WriteByte(movement.Statistic);
                         }
                         break;
 
-                    case MovementType.Equipment:
+                    case MovementType.Unknown:
                         {
-                            oPacket.WriteByte(movement.Statistic);
+                            oPacket
+                                .WritePoint(movement.Velocity)
+                                .WriteShort(movement.Foothold)
+                                .WriteByte(movement.Stance)
+                                .WriteShort(movement.Duration);
                         }
                         break;
                 }

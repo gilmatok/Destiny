@@ -78,11 +78,9 @@ namespace Destiny.Maple.Maps
                     }
                 }
 
-                double i = drops.Count / 2.0 * -1;
-
                 foreach (Drop loopDrop in drops)
                 {
-                    i++;
+                    // TODO: Space out drops.
 
                     this.Map.Drops.Add(loopDrop);
                 }

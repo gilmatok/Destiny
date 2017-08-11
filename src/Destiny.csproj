@@ -67,6 +67,7 @@
     <Compile Include="Maple\Characters\CharacterStorage.cs" />
     <Compile Include="Maple\Commands\Commands.cs" />
     <Compile Include="Maple\Commands\Implementation\KillMobsCommand.cs" />
+    <Compile Include="Maple\Commands\Implementation\ReleaseCommand.cs" />
     <Compile Include="Maple\Commands\Implementation\SpawnCommand.cs" />
     <Compile Include="Maple\Data\AvailableStyles.cs" />
     <Compile Include="Maple\Data\CachedItems.cs" />
