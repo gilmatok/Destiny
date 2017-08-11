@@ -216,46 +216,46 @@ namespace Destiny.Maple.Life
 
         public void Move(InPacket iPacket)
         {
-            short moveAction = iPacket.ReadShort();
-            bool cheatResult = (iPacket.ReadByte() & 0xF) != 0;
-            byte centerSplit = iPacket.ReadByte();
-            int illegalVelocity = iPacket.ReadInt();
-            byte unknown = iPacket.ReadByte();
-            iPacket.ReadInt();
+            //short moveAction = iPacket.ReadShort();
+            //bool cheatResult = (iPacket.ReadByte() & 0xF) != 0;
+            //byte centerSplit = iPacket.ReadByte();
+            //int illegalVelocity = iPacket.ReadInt();
+            //byte unknown = iPacket.ReadByte();
+            //iPacket.ReadInt();
 
-            Movements movements = Movements.Decode(iPacket);
+            //Movements movements = Movements.Decode(iPacket);
 
-            Movement lastMovement = movements[movements.Count - 1];
+            //Movement lastMovement = movements[movements.Count - 1];
 
-            this.Position = lastMovement.Position;
-            this.Foothold = lastMovement.Foothold;
-            this.Stance = lastMovement.Stance;
+            //this.Position = lastMovement.Position;
+            //this.Foothold = lastMovement.Foothold;
+            //this.Stance = lastMovement.Stance;
 
-            using (OutPacket oPacket = new OutPacket(ServerOperationCode.MobCtrlAck))
-            {
-                oPacket
-                    .WriteInt(this.ObjectID)
-                    .WriteShort(moveAction)
-                    .WriteBool(cheatResult)
-                    .WriteShort((short)this.Mana)
-                    .WriteByte() // NOTE: Ability ID.
-                    .WriteByte(); // NOTE: Ability level.
+            //using (OutPacket oPacket = new OutPacket(ServerOperationCode.MobCtrlAck))
+            //{
+            //    oPacket
+            //        .WriteInt(this.ObjectID)
+            //        .WriteShort(moveAction)
+            //        .WriteBool(cheatResult)
+            //        .WriteShort((short)this.Mana)
+            //        .WriteByte() // NOTE: Ability ID.
+            //        .WriteByte(); // NOTE: Ability level.
 
-                this.Controller.Client.Send(oPacket);
-            }
+            //    this.Controller.Client.Send(oPacket);
+            //}
 
-            using (OutPacket oPacket = new OutPacket(ServerOperationCode.MobMove))
-            {
-                oPacket
-                    .WriteInt(this.ObjectID)
-                    .WriteBool(cheatResult)
-                    .WriteByte(centerSplit)
-                    .WriteInt(illegalVelocity);
+            //using (OutPacket oPacket = new OutPacket(ServerOperationCode.MobMove))
+            //{
+            //    oPacket
+            //        .WriteInt(this.ObjectID)
+            //        .WriteBool(cheatResult)
+            //        .WriteByte(centerSplit)
+            //        .WriteInt(illegalVelocity);
 
-                movements.Encode(oPacket);
+            //    movements.Encode(oPacket);
 
-                this.Map.Broadcast(oPacket, this.Controller);
-            }
+            //    this.Map.Broadcast(oPacket, this.Controller);
+            //}
         }
 
         public void Die()
@@ -359,8 +359,9 @@ namespace Destiny.Maple.Life
             OutPacket oPacket = new OutPacket(ServerOperationCode.MobLeaveField);
 
             oPacket
-                .WriteByte(1) // TODO: Death effect.
-                .WriteInt(this.ObjectID);
+                .WriteInt(this.ObjectID)
+                .WriteByte(1)
+                .WriteByte(1); // TODO: Death effects.
 
             return oPacket;
         }

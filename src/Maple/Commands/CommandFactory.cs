@@ -49,6 +49,7 @@ namespace Destiny.Maple.Commands
                     catch (Exception e)
                     {
                         caller.Notify("[Command] Unknown error: " + e.Message);
+                        Log.Error("{0} error by {1}: ", e, command.GetType().Name, caller.Name);
                     }
                 }
                 else
