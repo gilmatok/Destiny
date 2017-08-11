@@ -11,6 +11,7 @@ namespace Destiny.Maple.Data
         public static AvailableStyles Styles { get; private set; }
         public static CachedItems Items { get; private set; }
         public static CachedSkills Skills { get; private set; }
+        public static CachedMobs Mobs { get; private set; }
         public static CachedReactors Reactors { get; private set; }
         public static CachedMaps Maps { get; private set; }
         public static CachedQuests Quests { get; private set; }
@@ -31,6 +32,7 @@ namespace Destiny.Maple.Data
                 DataProvider.Styles = new AvailableStyles();
                 DataProvider.Items = new CachedItems();
                 DataProvider.Skills = new CachedSkills();
+                DataProvider.Mobs = new CachedMobs();
                 DataProvider.Reactors = new CachedReactors();
                 DataProvider.Maps = new CachedMaps();
                 DataProvider.Quests = new CachedQuests();

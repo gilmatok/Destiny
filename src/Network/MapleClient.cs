@@ -421,6 +421,7 @@ namespace Destiny
                     break;
 
                 case ClientOperationCode.MobMovement:
+                    this.Character.ControlledMobs.Move(iPacket);
                     break;
 
                 case ClientOperationCode.AutoAggro:

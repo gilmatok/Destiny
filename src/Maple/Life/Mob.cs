@@ -2,7 +2,10 @@
 using Destiny.Core.Network;
 using Destiny.Data;
 using Destiny.Maple.Characters;
+using Destiny.Maple.Data;
 using Destiny.Maple.Maps;
+using System;
+using System.Collections.Generic;
 
 namespace Destiny.Maple.Life
 {
@@ -10,11 +13,47 @@ namespace Destiny.Maple.Life
     {
         public int MapleID { get; private set; }
         public Character Controller { get; set; }
+        public Dictionary<Character, uint> Attackers { get; private set; }
         public SpawnPoint SpawnPoint { get; private set; }
         public byte Stance { get; set; }
+        public bool IsProvoked { get; set; }
+        public bool CanDrop { get; set; }
+        public List<Loot> Loots { get; private set; }
         public short Foothold { get; set; }
+        public List<int> DeathSummons { get; private set; }
 
-        public bool FacesLeft
+        public short Level { get; private set; }
+        public uint Health { get; set; }
+        public uint Mana { get; set; }
+        public uint MaxHealth { get; private set; }
+        public uint MaxMana { get; private set; }
+        public uint HealthRecovery { get; private set; }
+        public uint ManaRecovery { get; private set; }
+        public int ExplodeHealth { get; private set; }
+        public uint Experience { get; private set; }
+        public int Link { get; private set; }
+        public short SummonType { get; private set; }
+        public int KnockBack { get; private set; }
+        public int FixedDamage { get; private set; }
+        public int DeathBuff { get; private set; }
+        public int DeathAfter { get; private set; }
+        public double Traction { get; private set; }
+        public int DamagedBySkillOnly { get; private set; }
+        public int DamagedByMobOnly { get; private set; }
+        public int DropItemPeriod { get; private set; }
+        public byte HpBarForeColor { get; private set; }
+        public byte HpBarBackColor { get; private set; }
+        public byte CarnivalPoints { get; private set; }
+        public int WeaponAttack { get; private set; }
+        public int WeaponDefense { get; private set; }
+        public int MagicAttack { get; private set; }
+        public int MagicDefense { get; private set; }
+        public short Accuracy { get; private set; }
+        public short Avoidability { get; private set; }
+        public short Speed { get; private set; }
+        public short ChaseSpeed { get; private set; }
+
+        public bool IsFacingLeft
         {
             get
             {
@@ -22,14 +61,101 @@ namespace Destiny.Maple.Life
             }
         }
 
+        public bool CanRespawn
+        {
+            get
+            {
+                return true; // TODO.
+            }
+        }
+
+        public Mob CachedReference
+        {
+            get
+            {
+                return DataProvider.Mobs[this.MapleID];
+            }
+        }
+
         public Mob(Datum datum)
+            : base()
         {
             this.MapleID = (int)datum["mobid"];
+
+            this.Level = (short)datum["mob_level"];
+            this.Health = this.MaxHealth = (uint)datum["hp"];
+            this.Mana = this.MaxMana = (uint)datum["mp"];
+            this.HealthRecovery = (uint)datum["hp_recovery"];
+            this.ManaRecovery = (uint)datum["mp_recovery"];
+            this.ExplodeHealth = (int)datum["explode_hp"];
+            this.Experience = (uint)datum["experience"];
+            this.Link = (int)datum["link"];
+            this.SummonType = (short)datum["summon_type"];
+            this.KnockBack = (int)datum["knockback"];
+            this.FixedDamage = (int)datum["fixed_damage"];
+            this.DeathBuff = (int)datum["death_buff"];
+            this.DeathAfter = (int)datum["death_after"];
+            this.Traction = (double)datum["traction"];
+            this.DamagedBySkillOnly = (int)datum["damaged_by_skill_only"];
+            this.DamagedByMobOnly = (int)datum["damaged_by_mob_only"];
+            this.DropItemPeriod = (int)datum["drop_item_period"];
+            this.HpBarForeColor = (byte)(sbyte)datum["hp_bar_color"];
+            this.HpBarBackColor = (byte)(sbyte)datum["hp_bar_bg_color"];
+            this.CarnivalPoints = (byte)(sbyte)datum["carnival_points"];
+            this.WeaponAttack = (int)datum["physical_attack"];
+            this.WeaponDefense = (int)datum["physical_defense"];
+            this.MagicAttack = (int)datum["magical_attack"];
+            this.MagicDefense = (int)datum["magical_defense"];
+            this.Accuracy = (short)datum["accuracy"];
+            this.Avoidability = (short)datum["avoidability"];
+            this.Speed = (short)datum["speed"];
+            this.ChaseSpeed = (short)datum["chase_speed"];
+
+            this.Loots = new List<Loot>();
+            this.DeathSummons = new List<int>();
         }
 
         public Mob(int mapleID)
         {
             this.MapleID = mapleID;
+
+            this.Level = this.CachedReference.Level;
+            this.Health = this.CachedReference.Health;
+            this.Mana = this.CachedReference.Mana;
+            this.MaxHealth = this.CachedReference.MaxHealth;
+            this.MaxMana = this.CachedReference.MaxMana;
+            this.HealthRecovery = this.CachedReference.HealthRecovery;
+            this.ManaRecovery = this.CachedReference.ManaRecovery;
+            this.ExplodeHealth = this.CachedReference.ExplodeHealth;
+            this.Experience = this.CachedReference.Experience;
+            this.Link = this.CachedReference.Link;
+            this.SummonType = this.CachedReference.SummonType;
+            this.KnockBack = this.CachedReference.KnockBack;
+            this.FixedDamage = this.CachedReference.FixedDamage;
+            this.DeathBuff = this.CachedReference.DeathBuff;
+            this.DeathAfter = this.CachedReference.DeathAfter;
+            this.Traction = this.CachedReference.Traction;
+            this.DamagedBySkillOnly = this.CachedReference.DamagedBySkillOnly;
+            this.DamagedByMobOnly = this.CachedReference.DamagedByMobOnly;
+            this.DropItemPeriod = this.CachedReference.DropItemPeriod;
+            this.HpBarForeColor = this.CachedReference.HpBarForeColor;
+            this.HpBarBackColor = this.CachedReference.HpBarBackColor;
+            this.CarnivalPoints = this.CachedReference.CarnivalPoints;
+            this.WeaponAttack = this.CachedReference.WeaponAttack;
+            this.WeaponDefense = this.CachedReference.WeaponDefense;
+            this.MagicAttack = this.CachedReference.MagicAttack;
+            this.MagicDefense = this.CachedReference.MagicDefense;
+            this.Accuracy = this.CachedReference.Accuracy;
+            this.Avoidability = this.CachedReference.Avoidability;
+            this.Speed = this.CachedReference.Speed;
+            this.ChaseSpeed = this.CachedReference.ChaseSpeed;
+
+            this.Loots = this.CachedReference.Loots;
+            this.DeathSummons = this.CachedReference.DeathSummons;
+
+            this.Attackers = new Dictionary<Character, uint>();
+            this.Stance = 5;
+            this.CanDrop = true;
         }
 
         public Mob(SpawnPoint spawnPoint)
@@ -38,50 +164,15 @@ namespace Destiny.Maple.Life
             this.SpawnPoint = spawnPoint;
             this.Foothold = this.SpawnPoint.Foothold;
             this.Position = this.SpawnPoint.Position;
+            this.Position.Y -= 1; // TODO: Is this needed?
         }
 
-        public void Move(InPacket iPacket)
+        public Mob(int mapleID, Point position)
+            : this(mapleID)
         {
-            short moveAction = iPacket.ReadShort();
-            bool cheatResult = (iPacket.ReadByte() & 0xF) != 0;
-            byte centerSplit = iPacket.ReadByte();
-            int illegalVelocity = iPacket.ReadInt();
-            byte unknown = iPacket.ReadByte();
-            iPacket.ReadInt();
-
-            Movements movements = Movements.Decode(iPacket);
-
-            Movement lastMovement = movements[movements.Count - 1];
-
-            this.Position = lastMovement.Position;
-            this.Foothold = lastMovement.Foothold;
-            this.Stance = lastMovement.Stance;
-
-            using (OutPacket oPacket = new OutPacket(ServerOperationCode.MobCtrlAck))
-            {
-                oPacket
-                    .WriteInt(this.ObjectID)
-                    .WriteShort(moveAction)
-                    .WriteBool(cheatResult)
-                    .WriteShort() // NOTE: Mob mana.
-                    .WriteByte() // NOTE: Ability ID.
-                    .WriteByte(); // NOTE: Ability level.
-
-                this.Controller.Client.Send(oPacket);
-            }
-
-            using (OutPacket oPacket = new OutPacket(ServerOperationCode.MobMove))
-            {
-                oPacket
-                    .WriteInt(this.ObjectID)
-                    .WriteBool(cheatResult)
-                    .WriteByte(centerSplit)
-                    .WriteInt(illegalVelocity);
-
-                movements.Encode(oPacket);
-
-                this.Map.Broadcast(oPacket, this.Controller);
-            }
+            this.Foothold = 0; // TODO.
+            this.Position = position;
+            this.Position.Y -= 5; // TODO: Is this needed?
         }
 
         public void AssignController()
@@ -107,6 +198,105 @@ namespace Destiny.Maple.Life
                 {
                     newController.ControlledMobs.Add(this);
                 }
+            }
+        }
+
+        public void SwitchController(Character newController)
+        {
+            lock (this)
+            {
+                if (this.Controller != newController)
+                {
+                    this.Controller.ControlledMobs.Remove(this);
+
+                    newController.ControlledMobs.Add(this);
+                }
+            }
+        }
+
+        public void Move(InPacket iPacket)
+        {
+            short moveAction = iPacket.ReadShort();
+            bool cheatResult = (iPacket.ReadByte() & 0xF) != 0;
+            byte centerSplit = iPacket.ReadByte();
+            int illegalVelocity = iPacket.ReadInt();
+            byte unknown = iPacket.ReadByte();
+            iPacket.ReadInt();
+
+            Movements movements = Movements.Decode(iPacket);
+
+            Movement lastMovement = movements[movements.Count - 1];
+
+            this.Position = lastMovement.Position;
+            this.Foothold = lastMovement.Foothold;
+            this.Stance = lastMovement.Stance;
+
+            using (OutPacket oPacket = new OutPacket(ServerOperationCode.MobCtrlAck))
+            {
+                oPacket
+                    .WriteInt(this.ObjectID)
+                    .WriteShort(moveAction)
+                    .WriteBool(cheatResult)
+                    .WriteShort((short)this.Mana)
+                    .WriteByte() // NOTE: Ability ID.
+                    .WriteByte(); // NOTE: Ability level.
+
+                this.Controller.Client.Send(oPacket);
+            }
+
+            using (OutPacket oPacket = new OutPacket(ServerOperationCode.MobMove))
+            {
+                oPacket
+                    .WriteInt(this.ObjectID)
+                    .WriteBool(cheatResult)
+                    .WriteByte(centerSplit)
+                    .WriteInt(illegalVelocity);
+
+                movements.Encode(oPacket);
+
+                this.Map.Broadcast(oPacket, this.Controller);
+            }
+        }
+
+        public void Die()
+        {
+            this.Map.Mobs.Remove(this);
+        }
+
+        public bool Damage(Character attacker, uint amount)
+        {
+            lock (this)
+            {
+                uint originalAmount = amount;
+
+                amount = Math.Min(amount, this.Health);
+
+                if (this.Attackers.ContainsKey(attacker))
+                {
+                    this.Attackers[attacker] += amount;
+                }
+                else
+                {
+                    this.Attackers.Add(attacker, amount);
+                }
+
+                this.Health -= amount;
+
+                using (OutPacket oPacket = new OutPacket(ServerOperationCode.MobHPIndicator))
+                {
+                    oPacket
+                        .WriteInt(this.ObjectID)
+                        .WriteByte((byte)((this.Health * 100) / this.MaxHealth));
+
+                    attacker.Client.Send(oPacket);
+                }
+
+                if (this.Health <= 0)
+                {
+                    return true;
+                }
+
+                return false;
             }
         }
 
@@ -142,7 +332,7 @@ namespace Destiny.Maple.Life
                 .WriteByte(0x88) // NOTE: Unknown.
                 .WriteZero(6) // NOTE: Unknown.
                 .WritePoint(this.Position)
-                .WriteByte((byte)(0x02 | (this.FacesLeft ? 0x01 : 0x00)))
+                .WriteByte((byte)(0x02 | (this.IsFacingLeft ? 0x01 : 0x00)))
                 .WriteShort(this.Foothold)
                 .WriteShort(this.Foothold)
                 .WriteByte((byte)(newSpawn ? -2 : -1))
@@ -169,7 +359,7 @@ namespace Destiny.Maple.Life
             OutPacket oPacket = new OutPacket(ServerOperationCode.MobLeaveField);
 
             oPacket
-                .WriteByte() // TODO: Death effect.
+                .WriteByte(1) // TODO: Death effect.
                 .WriteInt(this.ObjectID);
 
             return oPacket;
