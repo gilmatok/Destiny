@@ -55,6 +55,13 @@ namespace Destiny.Core.IO
             return this;
         }
 
+        public OutPacket WriteUShort(ushort value = 0)
+        {
+            mWriter.Write(value);
+
+            return this;
+        }
+
         public OutPacket WriteInt(int value = 0)
         {
             mWriter.Write(value);

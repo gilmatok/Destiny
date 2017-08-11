@@ -4,8 +4,6 @@ using Destiny.Data;
 using Destiny.Maple.Data;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Destiny.Maple.Characters
 {
@@ -13,517 +11,305 @@ namespace Destiny.Maple.Characters
     {
         public Character Parent { get; private set; }
 
-        public Dictionary<ushort, List<StartedQuest>> Started { get; private set; }
-        public Dictionary<ushort, CompletedQuest> Completed { get; private set; }
+        public Dictionary<ushort, Dictionary<int, short>> Started { get; private set; }
+        public Dictionary<ushort, DateTime> Completed { get; private set; }
 
         public CharacterQuests(Character parent)
         {
             this.Parent = parent;
 
-            this.Started = new Dictionary<ushort, List<StartedQuest>>();
-            this.Completed = new Dictionary<ushort, CompletedQuest>();
+            this.Started = new Dictionary<ushort, Dictionary<int, short>>();
+            this.Completed = new Dictionary<ushort, DateTime>();
         }
 
         public void Load()
         {
-            this.Started = new Datums("quests_started").Populate("CharacterID = '{0}'", this.Parent.ID)
-                .GroupBy(x => (ushort)x["QuestID"])
-                .ToDictionary(
-                    group => group.Key,
-                    group => group.Select(row => new StartedQuest(group.Key, (int)row["MobID"], (short)row["Killed"], true)).ToList()
-                );
-
-            this.Completed.Clear();
-            foreach (Datum datum in new Datums("quests_completed").Populate("CharacterID = '{0}'", this.Parent.ID))
+            foreach (Datum datum in new Datums("quests_started").Populate("CharacterID = '{0}'", this.Parent.ID))
             {
-                this.Completed.Add((ushort)datum["QuestID"], new CompletedQuest((ushort)datum["QuestID"], (DateTime)datum["CompletionTime"], true));
+                if (!this.Started.ContainsKey((ushort)datum["QuestID"]))
+                {
+                    this.Started.Add((ushort)datum["QuestID"], new Dictionary<int, short>());
+                }
+
+                if (datum["MobID"] != null && datum["Killed"] != null)
+                {
+                    this.Started[(ushort)datum["QuestID"]].Add((int)datum["MobID"], ((short)datum["Killed"]));
+                }
             }
         }
 
         public void Save()
         {
-            lock (this.Started)
+            foreach (KeyValuePair<ushort, Dictionary<int, short>> loopStarted in this.Started)
             {
-                lock (this.Completed)
+                if (loopStarted.Value == null || loopStarted.Value.Count == 0)
                 {
-                    foreach (var record in this.Started)
+                    Datum datum = new Datum("quests_started");
+
+                    datum["CharacterID"] = this.Parent.ID;
+                    datum["QuestID"] = loopStarted.Key;
+
+                    if (!Database.Exists("quests_started", "CharacterID = '{0}' && QuestID = '{1}'", this.Parent.ID, loopStarted.Key))
                     {
-                        foreach (var quest in record.Value)
-                        {
-                            Datum datum = new Datum("quests_started");
-
-                            datum["CharacterID"] = this.Parent.ID;
-                            datum["QuestID"] = quest.QuestID;
-                            datum["MobID"] = quest.MobID;
-                            datum["Killed"] = quest.Killed;
-
-                            if (quest.IsAssigned)
-                            {
-                                datum.Update("CharacterID = '{0}' AND QuestID = '{1}' AND MobID = '{2}'", datum["CharacterID"], datum["QuestID"], datum["MobID"]);
-                            }
-                            else
-                            {
-                                datum.Insert();
-                                quest.IsAssigned = true;
-                            }
-                        }
+                        datum.Insert();
                     }
-
-                    foreach (var quest in this.Completed)
+                }
+                else
+                {
+                    foreach (KeyValuePair<int, short> mobKills in loopStarted.Value)
                     {
-                        //There is no reason to update a quest already marked as complete; Only insert if it wasn't already in the database
-                        if (!quest.Value.IsAssigned)
-                        {
-                            Datum datum = new Datum("quests_completed");
-                            datum["CharacterID"] = this.Parent.ID;
-                            datum["QuestID"] = quest.Value.QuestID;
-                            datum["CompletionTime"] = quest.Value.CompletionTime;
-                            datum.Insert();
+                        Datum datum = new Datum("quests_started");
 
-                            quest.Value.IsAssigned = true;
+                        datum["CharacterID"] = this.Parent.ID;
+                        datum["QuestID"] = loopStarted.Key;
+                        datum["MobID"] = mobKills.Key;
+                        datum["Killed"] = mobKills.Value;
+
+                        if (Database.Exists("quests_started", "CharacterID = '{0}' && QuestID = '{1}' && MobID = '{2}'", this.Parent.ID, loopStarted.Key, mobKills.Key))
+                        {
+                            datum.Update("CharacterID = '{0}' && QuestID = '{1}' && MobID = '{2}'", this.Parent.ID, loopStarted.Key, mobKills.Key);
+                        }
+                        else
+                        {
+                            datum.Insert();
                         }
                     }
                 }
+            }
+
+            foreach (KeyValuePair<ushort, DateTime> loopCompleted in this.Completed)
+            {
+                Datum datum = new Datum("quests_completed");
+
+                datum["CharacterID"] = this.Parent.ID;
+                datum["QuestID"] = loopCompleted.Key;
+                datum["CompletionTime"] = loopCompleted.Value;
+
+                if (Database.Exists("quests_completed", "CharacterID ='{0}' && QuestID = '{1}'", this.Parent.ID, loopCompleted.Key))
+                {
+                    datum.Update("CharacterID = '{0}' && QuestID = '{1}'", this.Parent.ID, loopCompleted.Key);
+                }
+                else
+                {
+                    datum.Insert();
+                }
+            }
+        }
+
+        public void Delete(ushort questID)
+        {
+            if (this.Started.ContainsKey(questID))
+            {
+                this.Started.Remove(questID);
+            }
+
+            if (Database.Exists("quests_started", "QuestID = '{0}'", questID))
+            {
+                Database.Delete("quests_started", "QuestID = '{0}'", questID);
             }
         }
 
         public void Delete()
         {
-            lock (this.Started)
-            {
-                lock (this.Completed)
-                {
-                    foreach (var record in this.Started)
-                    {
-                        Database.Delete("quests_started", "CharacterID = '{0}' AND QuestID = '{1}'", this.Parent.ID, record.Key);
-                    }
 
-                    foreach (var record in this.Completed)
-                    {
-                        Database.Delete("quests_completed", "CharacterID = '{0}' AND QuestID = '{1}'", this.Parent.ID, record.Key);
-                    }
-                }
-            }
-            this.Started.Clear();
-            this.Completed.Clear();
-        }
-
-        public void Forfeit(ushort questID, bool silent = false)
-        {
-            Database.Delete("quests_started", "CharacterID = '{0}' AND QuestID = '{1}'", this.Parent.ID, questID);
-
-            if (this.Started.ContainsKey(questID))
-            {
-                this.Started.Remove(questID);
-
-                if (!silent)
-                {
-                    this.SetQuestRecord(questID, QuestStatus.NotStarted);
-                }
-            }
-        }
-
-        public void Start(ushort questID, int npcID = 0)
-        {
-            Start(new Maple.Quest(questID), npcID);
-        }
-
-        public void Start(Quest reference, int npcID = 0)
-        {
-            //Validate pre-start requirements are met
-            if (reference.ValidJobs.Count > 0 && !reference.ValidJobs.Contains(this.Parent.Job) && this.Parent.Job != Job.GM && this.Parent.Job != Job.SuperGM)
-            {
-                this.SendQuestResult(QuestResult.GenericError, reference);
-                return;
-            }
-
-            foreach (var requiredQuest in reference.PreRequiredQuests)
-            {
-                switch (requiredQuest.Value)
-                {
-                    case QuestStatus.Complete:
-                        if (!this.Completed.ContainsKey(requiredQuest.Key))
-                        {
-                            this.SendQuestResult(QuestResult.GenericError, reference);
-                            return;
-                        }
-                        break;
-                    case QuestStatus.InProgress:
-                        if (!this.Started.ContainsKey(requiredQuest.Key))
-                        {
-                            this.SendQuestResult(QuestResult.GenericError, reference);
-                            return;
-                        }
-                        break;
-                    case QuestStatus.NotStarted:
-                        if (this.Completed.ContainsKey(requiredQuest.Key) || this.Started.ContainsKey(requiredQuest.Key))
-                        {
-                            this.SendQuestResult(QuestResult.GenericError, reference);
-                            return;
-                        }
-                        break;
-                }
-            }
-
-            if (this.Parent.Meso + reference.MesoReward.Item1 < 0)
-            {
-                this.SendQuestResult(QuestResult.NotEnoughMesos, reference);
-                return;
-            }
-
-            foreach (var requiredItem in reference.PreRequiredItems)
-            {
-                if (!this.Parent.Items.Contains(requiredItem.Key, requiredItem.Value))
-                {
-                    this.SendQuestResult(QuestResult.GenericError, reference);
-                    return;
-                }
-
-                //If any of the required items are currently equipped, throw an error
-                if (this.Parent.Items.Any(x => x.MapleID == requiredItem.Key && x.IsEquipped))
-                {
-                    this.SendQuestResult(QuestResult.ItemWornByChar, reference);
-                    return;
-                }
-            }
-
-            var itemRewards = reference.PreItemRewards.Where(x => x.Item3 == this.Parent.Gender || x.Item3 == Gender.Both || this.Parent.Gender == Gender.Both)
-                .Select(x => new Item(x.Item1, x.Item2));
-            if (!this.Parent.Items.CouldReceive(itemRewards))
-            {
-                this.SendQuestResult(QuestResult.NoInventorySpace, new Maple.Quest(reference.MapleID));
-                return;
-            }
-            foreach (var item in itemRewards)
-            {
-                if (item.OnlyOne && this.Parent.Items.Contains(item.MapleID))
-                {
-                    this.SendQuestResult(QuestResult.OnlyOneOfItemAllowed, reference);
-                    return;
-                }
-
-                //Finished validation; start handing out rewards
-
-                //Technically, some "rewards" are actually a cost that's part of the requirements, so we have to check if they have a negative quantity
-                if (item.Quantity >= 0)
-                    this.Parent.Items.Add(item, false);
-                else
-                    this.Parent.Items.Remove(item.MapleID, Math.Abs(item.Quantity));
-            }
-
-            foreach (var skillReward in reference.PreSkillRewards.Where(x => x.Value == this.Parent.Job))
-            {
-                this.Parent.Skills.Add(skillReward.Key);
-            }
-            
-            this.Parent.Experience += reference.ExperienceReward.Item1;
-            this.Parent.Meso += reference.MesoReward.Item1;
-            this.Parent.Fame += (short)reference.FameReward.Item1;
-            //TODO: Pet and buff rewards
-
-            //Create a new entry for each mob, or just 1 if this quest doesn't require mob kills
-            List<StartedQuest> entries = new List<StartedQuest>();
-            if (reference.PostRequiredKills.Count > 0)
-            {
-                foreach(var record in reference.PostRequiredKills)
-                {
-                    entries.Add(new StartedQuest(reference.MapleID, record.Key, 0));
-                }
-            }
-            else
-            {
-                entries.Add(new StartedQuest(reference.MapleID));
-            }
-
-            this.Started.Add(reference.MapleID, entries);
-
-            this.SetQuestRecord(reference.MapleID, QuestStatus.InProgress);
-        }
-
-        public void Complete(ushort questID, int selection = 0)
-        {
-            Complete(new Maple.Quest(questID), selection);
-        }
-
-        public void Complete(Quest reference, int selection = 0)
-        {
-            //Verify that quest requirements have been completed and character has space for rewards
-            if (!this.Started.ContainsKey(reference.MapleID))
-            {
-                this.SendQuestResult(QuestResult.GenericError, reference);
-                return;
-            }
-
-            foreach (var requiredKill in reference.PostRequiredKills)
-            {
-                var startedQuestInfo = this.Started[reference.MapleID].FirstOrDefault(x => x.MobID == requiredKill.Key);
-                if (startedQuestInfo == null || startedQuestInfo.Killed < requiredKill.Value)
-                {
-                    this.SendQuestResult(QuestResult.GenericError, reference);
-                    return;
-                }
-            }
-
-            foreach (var requiredQuest in reference.PostRequiredQuests)
-            {
-                switch (requiredQuest.Value)
-                {
-                    case QuestStatus.Complete:
-                        if (!this.Completed.ContainsKey(requiredQuest.Key))
-                        {
-                            this.SendQuestResult(QuestResult.GenericError, reference);
-                            return;
-                        }
-                        break;
-                    case QuestStatus.InProgress:
-                        if (!this.Started.ContainsKey(requiredQuest.Key))
-                        {
-                            this.SendQuestResult(QuestResult.GenericError, reference);
-                            return;
-                        }
-                        break;
-                    case QuestStatus.NotStarted:
-                        if (this.Completed.ContainsKey(requiredQuest.Key) || this.Started.ContainsKey(requiredQuest.Key))
-                        {
-                            this.SendQuestResult(QuestResult.GenericError, reference);
-                            return;
-                        }
-                        break;
-                }
-            }
-
-            if (this.Parent.Meso + reference.MesoReward.Item2 < 0)
-            {
-                this.SendQuestResult(QuestResult.NotEnoughMesos, reference);
-                return;
-            }
-
-            foreach (var requiredItem in reference.PostRequiredItems)
-            {
-                if (!this.Parent.Items.Contains(requiredItem.Key, requiredItem.Value))
-                {
-                    this.SendQuestResult(QuestResult.GenericError, reference);
-                    return;
-                }
-                
-                //If any of the required items are currently equipped, throw an error
-                if (this.Parent.Items.Any(x => x.MapleID == requiredItem.Key && x.IsEquipped))
-                {
-                    this.SendQuestResult(QuestResult.ItemWornByChar, reference);
-                    return;
-                }
-            }
-
-            var itemRewards = reference.PostItemRewards.Where(x => x.Item3 == this.Parent.Gender || x.Item3 == Gender.Both || this.Parent.Gender == Gender.Both)
-                .Select(x => new Item(x.Item1, x.Item2));
-            if (!this.Parent.Items.CouldReceive(itemRewards))
-            {
-                this.SendQuestResult(QuestResult.NoInventorySpace, reference);
-                return;
-            }
-            foreach (var item in itemRewards)
-            {
-                if (item.OnlyOne && this.Parent.Items.Contains(item.MapleID))
-                {
-                    this.SendQuestResult(QuestResult.OnlyOneOfItemAllowed, reference);
-                    return;
-                }
-
-                //Finished validation; start handing out rewards
-                
-                //Technically, some "rewards" are actually a cost that's part of the requirements, so we have to check if they have a negative quantity
-                if (item.Quantity >= 0)
-                    this.Parent.Items.Add(item, false);
-                else
-                    this.Parent.Items.Remove(item.MapleID, Math.Abs(item.Quantity));
-            }
-
-            foreach (var skillReward in reference.PostSkillRewards.Where(x => x.Value == this.Parent.Job))
-            {
-                this.Parent.Skills.Add(skillReward.Key);
-            }
-            
-            this.Parent.Experience += reference.ExperienceReward.Item2;
-            this.Parent.Meso += reference.MesoReward.Item2;
-            this.Parent.Fame += (short)reference.FameReward.Item2;
-            //TODO: Pet and buff rewards
-
-            this.Forfeit(reference.MapleID, true); //"Forfeit" the quest to remove it from the quests_started table
-            this.Completed.Add(reference.MapleID, new CompletedQuest(reference.MapleID, DateTime.Now));
-
-            this.SetQuestRecord(reference.MapleID, QuestStatus.Complete);
-        }
-
-        private void SetQuestRecord(ushort questID, QuestStatus status, string progress = "")
-        {
-            using (OutPacket oPacket = new OutPacket(ServerOperationCode.Message))
-            {
-                oPacket
-                    .WriteByte((byte)MessageType.QuestRecord)
-                    .WriteShort((short)questID)
-                    .WriteByte((byte)status);
-
-                if (status == QuestStatus.InProgress)
-                    oPacket.WriteMapleString(progress);
-
-                if (status == QuestStatus.Complete)
-                    oPacket.WriteLong(DateTime.Now.Ticks);
-
-                this.Parent.Client.Send(oPacket);
-            }
         }
 
         public void Handle(InPacket iPacket)
         {
             QuestAction action = (QuestAction)iPacket.ReadByte();
-            ushort questID = (ushort)iPacket.ReadShort();
+            ushort questID = iPacket.ReadUShort();
 
             if (!DataProvider.Quests.Contains(questID))
+            {
                 return;
+            }
 
-            Quest quest = new Maple.Quest(questID);
+            Quest quest = DataProvider.Quests[questID];
 
             int npcId;
+
             switch (action)
             {
-                case QuestAction.RestoreLostItem:
-                    int quantity = iPacket.ReadInt();
-                    int itemId = iPacket.ReadInt();
-                    Item item = new Item(itemId, (short)(quantity - this.Parent.Items.Available(itemId)));
-                    this.Parent.Items.Add(item);
+                case QuestAction.RestoreLostItem: // TODO: Validate.
+                    {
+                        int quantity = iPacket.ReadInt();
+                        int itemID = iPacket.ReadInt();
+
+                        quantity -= this.Parent.Items.Available(itemID);
+
+                        Item item = new Item(itemID, (short)quantity);
+
+                        this.Parent.Items.Add(item);
+                    }
                     break;
+
                 case QuestAction.Start:
-                    npcId = iPacket.ReadInt();
-                    this.Start(quest, npcId);
+                    {
+                        npcId = iPacket.ReadInt();
+
+                        this.Start(quest, npcId);
+                    }
                     break;
+
                 case QuestAction.Complete:
-                    npcId = iPacket.ReadInt();
-                    iPacket.ReadInt(); //NOTE: Unknown
-                    int selection = iPacket.Remaining >= 4 ? iPacket.ReadInt() : 0;
-                    this.Complete(quest, selection);
+                    {
+                        npcId = iPacket.ReadInt();
+                        iPacket.ReadInt(); // NOTE: Unknown
+                        int selection = iPacket.Remaining >= 4 ? iPacket.ReadInt() : 0;
+
+                        this.Complete(quest, selection);
+                    }
                     break;
+
                 case QuestAction.Forfeit:
-                    this.Forfeit(quest.MapleID);
+                    {
+                        this.Forfeit(quest.MapleID);
+                    }
                     break;
+
                 case QuestAction.ScriptStart:
-                    npcId = iPacket.ReadInt();
-                    break;
                 case QuestAction.ScriptEnd:
-                    npcId = iPacket.ReadInt();
+                    {
+                        npcId = iPacket.ReadInt();
+                    }
                     break;
             }
         }
 
-        private void SendQuestResult(QuestResult operation, Quest quest, int mapleID = 0)
+        public void Start(Quest quest, int npcID)
         {
-            using (OutPacket oPacket = new OutPacket(ServerOperationCode.UpdateQuestInfo))
-            {
-                oPacket.WriteByte((byte)operation);
+            this.Started.Add(quest.MapleID, new Dictionary<int, short>());
 
-                switch (operation)
+            foreach (KeyValuePair<int, short> requiredKills in quest.PostRequiredKills)
+            {
+                this.Started[quest.MapleID].Add(requiredKills.Key, 0);
+            }
+
+            // TODO: Gain start experience rewards.
+            // TODO: Gain start fame rewards.
+            // TODO: Gain start meso rewards.
+            // TODO: Gain start skill rewards.
+            // TODO: Gain start pet rewards.
+
+            foreach (KeyValuePair<int, short> item in quest.PreItemRewards)
+            {
+                if (item.Value > 0)
                 {
-                    case QuestResult.AddTimeLimit:
-                        oPacket
-                            .WriteShort(1) //NOTE: Count
-                            .WriteShort((short)quest.MapleID)
-                            .WriteInt(quest.TimeLimit);
-                        break;
-                    case QuestResult.RemoveTimeLimit:
-                        oPacket
-                            .WriteShort(1) //NOTE: Count
-                            .WriteShort((short)quest.MapleID);
-                        break;
-                    case QuestResult.Complete:
-                        oPacket
-                            .WriteShort((short)quest.MapleID)
-                            .WriteInt(Math.Max(mapleID, 0)) //NOTE: NpcID or selection ID
-                            .WriteShort((short)quest.NextQuestID);
-                        break;
-                    case QuestResult.GenericError:
-                    case QuestResult.NotEnoughMesos:
-                    case QuestResult.ItemWornByChar:
-                    case QuestResult.OnlyOneOfItemAllowed:
-                        //These don't require any additional bytes
-                        break;
-                    case QuestResult.NoInventorySpace:
-                        oPacket.WriteShort((short)quest.MapleID);
-                        break;
-                    case QuestResult.Expire:
-                        oPacket.WriteShort((short)quest.MapleID);
-                        break;
-                    case QuestResult.ResetTimeLimit:
-                        oPacket.WriteShort((short)quest.MapleID);
-                        break;
+                    this.Parent.Items.Add(new Item(item.Key, item.Value)); // TODO: Quest items rewards are displayed in chat.
+                }
+                else if (item.Value < 0)
+                {
+                    this.Parent.Items.Remove(item.Key, Math.Abs(item.Value));
+                }
+            }
+
+            this.Update(quest.MapleID, QuestStatus.InProgress);
+        }
+
+        public void Complete(Quest quest, int selection)
+        {
+            foreach (KeyValuePair<int, short> item in quest.PostRequiredItems)
+            {
+                this.Parent.Items.Remove(item.Key, item.Value);
+            }
+
+            // TODO: Gain end experience rewards.
+            // TODO: Gain end fame rewards.
+            // TODO: Gain end meso rewards.
+            // TODO: Gain end skill rewards.
+            // TODO: Gain end pet rewards.
+
+            foreach (KeyValuePair<int, short> item in quest.PostItemRewards)
+            {
+                if (item.Value > 0)
+                {
+                    this.Parent.Items.Add(new Item(item.Key, item.Value)); // TODO: Quest items rewards are displayed in chat.
+                }
+                else if (item.Value < 0)
+                {
+                    this.Parent.Items.Remove(item.Key, Math.Abs(item.Value));
+                }
+            }
+
+            if (selection != 0)
+            {
+
+            }
+
+            this.Update(quest.MapleID, QuestStatus.Complete);
+
+            this.Delete(quest.MapleID);
+
+            this.Completed.Add(quest.MapleID, DateTime.UtcNow);
+
+            // TODO: Broadcast quest completion effect to map.
+        }
+
+        public void Forfeit(ushort questID)
+        {
+            this.Delete(questID);
+
+            using (OutPacket oPacket = new OutPacket(ServerOperationCode.Message))
+            {
+                oPacket
+                    .WriteByte(1)
+                    .WriteUShort(questID)
+                    .WriteByte()
+                    .WriteByte();
+
+                this.Parent.Client.Send(oPacket);
+            }
+        }
+
+        private void Update(ushort questID, QuestStatus status, string progress = "")
+        {
+            using (OutPacket oPacket = new OutPacket(ServerOperationCode.Message))
+            {
+                oPacket
+                    .WriteByte((byte)MessageType.QuestRecord)
+                    .WriteUShort(questID)
+                    .WriteByte((byte)status);
+
+                if (status == QuestStatus.InProgress)
+                {
+                    oPacket.WriteMapleString(progress);
+                }
+                else if (status == QuestStatus.Complete)
+                {
+                    oPacket.WriteDateTime(DateTime.Now);
                 }
 
                 this.Parent.Client.Send(oPacket);
             }
         }
 
-        public void Encode(OutPacket oPacket)
-        {
-            lock (this.Started)
+            public void Encode(OutPacket oPacket)
             {
-                lock (this.Completed)
+                oPacket.WriteShort((short)this.Started.Count);
+
+                foreach (KeyValuePair<ushort, Dictionary<int, short>> quest in this.Started)
                 {
-                    oPacket.WriteShort((short)this.Started.Count);
+                    oPacket.WriteUShort(quest.Key);
 
-                    foreach (var record in this.Started)
+                    string kills = string.Empty;
+
+                    foreach (int kill in quest.Value.Values)
                     {
-                        oPacket.WriteShort((short)record.Key);
-
-                        StringBuilder mobKills = new StringBuilder();
-                        //NOTE: These must be in order since the packet does not include a Mob ID.
-                        foreach (var quest in record.Value.OrderBy(x => x.MobID)) 
-                        {
-                            if (quest.MobID > 0)
-                                mobKills.Append(quest.Killed.ToString().PadLeft(3, '\u0030'));
-                        }
-                        
-                        oPacket.WriteMapleString(mobKills.ToString());
+                        kills += kill.ToString().PadLeft(3, '\u0030');
                     }
-                    
-                    oPacket.WriteShort((short)this.Completed.Count);
 
-                    foreach (var quest in this.Completed.Values)
-                    {
-                        oPacket
-                            .WriteShort((short)quest.QuestID)
-                            .WriteDateTime(quest.CompletionTime);
-                    }
+                    oPacket.WriteMapleString(kills);
+                }
+
+                oPacket.WriteShort((short)this.Completed.Count);
+
+                foreach (KeyValuePair<ushort, DateTime> quest in this.Completed)
+                {
+                    oPacket
+                        .WriteUShort(quest.Key)
+                        .WriteDateTime(quest.Value);
                 }
             }
         }
     }
-
-    public class StartedQuest
-    {
-        public ushort QuestID { get; set; }
-        public int MobID { get; set; }
-        public short Killed { get; set; }
-        public bool IsAssigned { get; set; }
-
-        public StartedQuest(ushort questID, int mobID = 0, short killed = 0, bool isAssigned = false)
-        {
-            this.QuestID = questID;
-            this.MobID = mobID;
-            this.Killed = killed;
-            this.IsAssigned = isAssigned;
-        }
-    }
-
-    public class CompletedQuest
-    {
-        public ushort QuestID { get; set; }
-        public DateTime CompletionTime { get; set; }
-        public bool IsAssigned { get; set; }
-
-        public CompletedQuest(ushort questID, DateTime completionTime, bool isAssigned = false)
-        {
-            this.QuestID = questID;
-            this.CompletionTime = completionTime;
-            this.IsAssigned = isAssigned;
-        }
-    }
-}
 

@@ -83,6 +83,22 @@ namespace Destiny.Core.IO
             return value;
         }
 
+        public unsafe ushort ReadUShort()
+        {
+            CheckLength(2);
+
+            ushort value;
+
+            fixed (byte* ptr = mBuffer)
+            {
+                value = *(ushort*)(ptr + mIndex);
+            }
+
+            mIndex += 2;
+
+            return value;
+        }
+
         public unsafe int ReadInt()
         {
             CheckLength(4);
