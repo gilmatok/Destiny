@@ -283,33 +283,84 @@ namespace Destiny.Maple.Characters
             }
         }
 
-            public void Encode(OutPacket oPacket)
+        public bool CanComplete(ushort questID, bool onlyOnFinalKill = false)
+        {
+            Quest quest = DataProvider.Quests[questID];
+
+            foreach (KeyValuePair<int, short> requiredItem in quest.PostRequiredItems)
             {
-                oPacket.WriteShort((short)this.Started.Count);
-
-                foreach (KeyValuePair<ushort, Dictionary<int, short>> quest in this.Started)
+                if (!this.Parent.Items.Contains(requiredItem.Key, requiredItem.Value))
                 {
-                    oPacket.WriteUShort(quest.Key);
+                    return false;
+                }
+            }
 
-                    string kills = string.Empty;
+            foreach (ushort requiredQuest in quest.PostRequiredQuests)
+            {
+                if (!this.Completed.ContainsKey(requiredQuest))
+                {
+                    return false;
+                }
+            }
 
-                    foreach (int kill in quest.Value.Values)
+            foreach (KeyValuePair<int, short> requiredKill in quest.PostRequiredKills)
+            {
+                if (onlyOnFinalKill)
+                {
+                    if (this.Started[questID][requiredKill.Key] != requiredKill.Value)
                     {
-                        kills += kill.ToString().PadLeft(3, '\u0030');
+                        return false;
                     }
-
-                    oPacket.WriteMapleString(kills);
                 }
-
-                oPacket.WriteShort((short)this.Completed.Count);
-
-                foreach (KeyValuePair<ushort, DateTime> quest in this.Completed)
+                else
                 {
-                    oPacket
-                        .WriteUShort(quest.Key)
-                        .WriteDateTime(quest.Value);
+                    if (this.Started[questID][requiredKill.Key] < requiredKill.Value)
+                    {
+                        return false;
+                    }
                 }
+            }
+
+            return true;
+        }
+
+        public void NotifyComplete(ushort questID)
+        {
+            using (OutPacket oPacket = new OutPacket(ServerOperationCode.QuestClear))
+            {
+                oPacket.WriteUShort(questID);
+
+                this.Parent.Client.Send(oPacket);
+            }
+        }
+
+        public void Encode(OutPacket oPacket)
+        {
+            oPacket.WriteShort((short)this.Started.Count);
+
+            foreach (KeyValuePair<ushort, Dictionary<int, short>> quest in this.Started)
+            {
+                oPacket.WriteUShort(quest.Key);
+
+                string kills = string.Empty;
+
+                foreach (int kill in quest.Value.Values)
+                {
+                    kills += kill.ToString().PadLeft(3, '\u0030');
+                }
+
+                oPacket.WriteMapleString(kills);
+            }
+
+            oPacket.WriteShort((short)this.Completed.Count);
+
+            foreach (KeyValuePair<ushort, DateTime> quest in this.Completed)
+            {
+                oPacket
+                    .WriteUShort(quest.Key)
+                    .WriteDateTime(quest.Value);
             }
         }
     }
+}
 

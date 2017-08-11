@@ -1,4 +1,5 @@
 ﻿using Destiny.Core.IO;
+using Destiny.Core.Network;
 using Destiny.Maple.Characters;
 using Destiny.Maple.Data;
 using Destiny.Maple.Life;
@@ -89,8 +90,43 @@ namespace Destiny.Maple.Maps
 
             if (owner != null)
             {
-                // TODO: Update quest kills if quest is started.
-                // TODO: Check if owner can complete quest.                
+                foreach (KeyValuePair<ushort, Dictionary<int, short>> loopStarted in owner.Quests.Started)
+                {
+                    if (loopStarted.Value.ContainsKey(item.MapleID))
+                    {
+                        if (loopStarted.Value[item.MapleID] < DataProvider.Quests[loopStarted.Key].PostRequiredKills[item.MapleID])
+                        {
+                            loopStarted.Value[item.MapleID]++;
+
+                            using (OutPacket oPacket = new OutPacket(ServerOperationCode.Message))
+                            {
+                                oPacket
+                                    .WriteByte((byte)MessageType.QuestRecord)
+                                    .WriteUShort(loopStarted.Key)
+                                    .WriteByte(1);
+
+                                string kills = string.Empty;
+
+                                foreach (int kill in loopStarted.Value.Values)
+                                {
+                                    kills += kill.ToString().PadLeft(3, '0');
+                                }
+
+                                oPacket
+                                    .WriteMapleString(kills)
+                                    .WriteInt()
+                                    .WriteInt();
+
+                                owner.Client.Send(oPacket);
+
+                                if (owner.Quests.CanComplete(loopStarted.Key, true))
+                                {
+                                    owner.Quests.NotifyComplete(loopStarted.Key);
+                                }
+                            }
+                        }
+                    }
+                }
             }
 
             if (DataProvider.IsInitialized)
