@@ -115,6 +115,22 @@ namespace Destiny.Core.IO
             return value;
         }
 
+        public unsafe uint ReadUInt()
+        {
+            CheckLength(4);
+
+            uint value;
+
+            fixed (byte* ptr = mBuffer)
+            {
+                value = *(uint*)(ptr + mIndex);
+            }
+
+            mIndex += 4;
+
+            return value;
+        }
+
         public unsafe long ReadLong()
         {
             this.CheckLength(8);

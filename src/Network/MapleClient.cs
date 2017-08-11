@@ -147,12 +147,15 @@ namespace Destiny
                     break;
 
                 case ClientOperationCode.CloseRangeAttack:
+                    this.Character.Attack(iPacket, AttackType.Melee);
                     break;
 
                 case ClientOperationCode.RangedAttack:
+                    this.Character.Attack(iPacket, AttackType.Range);
                     break;
 
                 case ClientOperationCode.MagicAttack:
+                    this.Character.Attack(iPacket, AttackType.Magic);
                     break;
 
                 case ClientOperationCode.EnergyOrbAttack:

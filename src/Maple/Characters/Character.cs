@@ -1187,6 +1187,75 @@ namespace Destiny.Maple.Characters
             }
         }
 
+        public void Attack(InPacket iPacket, AttackType type)
+        {
+            Attack attack = new Attack(iPacket, type);
+
+            if (attack.Portals != this.Portals)
+            {
+                return;
+            }
+
+            // TODO: Modify packet based on type.
+            using (OutPacket oPacket = new OutPacket(ServerOperationCode.CloseRangeAttack))
+            {
+                oPacket
+                    .WriteInt(this.ID)
+                    .WriteByte((byte)((attack.Targets * 0x10) + attack.Hits))
+                    .WriteByte() // NOTE: Unknown.
+                    .WriteByte(); // NOTE: Skill level.
+
+                if (attack.SkillID != 0)
+                {
+                    oPacket.WriteInt(attack.SkillID);
+                }
+
+                oPacket
+                    .WriteByte() // NOTE: Unknown.
+                    .WriteByte(attack.Display)
+                    .WriteByte(attack.Animation)
+                    .WriteByte(attack.WeaponSpeed)
+                    .WriteByte() // NOTE: Skill mastery.
+                    .WriteInt(); // NOTE: Unknown.
+
+                foreach (var target in attack.Damages)
+                {
+                    oPacket
+                        .WriteInt(target.Key)
+                        .WriteByte(6);
+
+                    foreach (uint hit in target.Value)
+                    {
+                        oPacket.WriteUInt(hit);
+                    }
+                }
+
+                this.Map.Broadcast(oPacket);
+            }
+            
+            foreach (KeyValuePair<int, List<uint>> target in attack.Damages)
+            {
+                Mob mob;
+
+                try
+                {
+                    mob = this.Map.Mobs[target.Key];
+                }
+                catch (KeyNotFoundException)
+                {
+                    continue;
+                }
+
+                foreach (uint hit in target.Value)
+                {
+                    if (mob.Damage(this, hit))
+                    {
+                        mob.Die();
+                    }
+                }
+            }
+        }
+
         public void Talk(InPacket iPacket)
         {
             string text = iPacket.ReadMapleString();
