@@ -535,7 +535,30 @@ namespace Destiny.Maple
 
         public void LoadEquipmentData(Datum datum)
         {
+            this.RequiredStrength = (short)datum["req_str"];
+            this.RequiredDexterity = (short)datum["req_dex"];
+            this.RequiredIntelligence = (short)datum["req_int"];
+            this.RequiredLuck = (short)datum["req_luk"];
+            this.RequiredFame = (short)datum["req_fame"];
 
+            this.UpgradesAvailable = (byte)(ushort)datum["scroll_slots"];
+            this.UpgradesApplied = 0;
+
+            this.Health = (short)datum["hp"];
+            this.Mana = (short)datum["mp"];
+            this.Strength = (short)datum["strength"];
+            this.Strength = (short)datum["dexterity"];
+            this.Strength = (short)datum["intelligence"];
+            this.Strength = (short)datum["luck"];
+            this.WeaponAttack = (short)datum["weapon_attack"];
+            this.WeaponDefense = (short)datum["weapon_defense"];
+            this.MagicAttack = (short)datum["magic_attack"];
+            this.MagicDefense = (short)datum["magic_defense"];
+            this.Accuracy = (short)datum["accuracy"];
+            this.Avoidability = (short)datum["avoid"];
+            this.Speed = (short)datum["speed"];
+            this.Jump = (short)datum["jump"];
+            this.Agility = (short)datum["hands"];
         }
 
         public void Save()
