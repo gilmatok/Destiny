@@ -27,7 +27,7 @@ namespace Destiny.Maple.Maps
                 mDropper = value;
 
                 this.Origin = mDropper.Position;
-                this.Position = mDropper.Position; // TODO: Find using footholds.
+                this.Position = mDropper.Map.Footholds.FindFloor(mDropper.Position);
             }
         }
 

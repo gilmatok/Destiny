@@ -20,6 +20,14 @@ namespace Destiny.Maple.Data
                 }
             }
 
+            using (Log.Load("Footholds"))
+            {
+                foreach (Datum datum in new Datums("map_footholds").Populate())
+                {
+                    this[(int)datum["mapid"]].Footholds.Add(new Foothold(datum));
+                }
+            }
+
             using (Log.Load("Seats"))
             {
                 foreach (Datum datum in new Datums("map_seats").Populate())
