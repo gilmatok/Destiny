@@ -832,24 +832,9 @@ namespace Destiny
                     character.Encode(oPacket);
                 }
 
-                oPacket.WriteByte((byte)(MasterServer.Login.RequestPic ? (string.IsNullOrEmpty(this.Account.Pic) ? 0 : 1) : 2));
-
-                int maxCharacters;
-
-                Datum datum = new Datum("storages");
-
-                try
-                {
-                    datum.PopulateWith("Characters", "AccountID = '{0}'", this.Account.ID);
-
-                    maxCharacters = (byte)datum["Characters"];
-                }
-                catch
-                {
-                    maxCharacters = MasterServer.Login.MaxCharacters;
-                }
-
-                oPacket.WriteInt(maxCharacters);
+                oPacket
+                    .WriteByte((byte)(MasterServer.Login.RequestPic ? (string.IsNullOrEmpty(this.Account.Pic) ? 0 : 1) : 2))
+                    .WriteInt(this.Account.MaxCharacters);
 
                 this.Send(oPacket);
             }

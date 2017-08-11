@@ -20,6 +20,7 @@ namespace Destiny.Maple
         public bool IsMaster { get; set; }
         public DateTime Birthday { get; set; }
         public DateTime Creation { get; set; }
+        public short MaxCharacters { get; set; }
 
         private bool Assigned { get; set; }
 
@@ -76,6 +77,7 @@ namespace Destiny.Maple
             this.IsMaster = (bool)datum["IsMaster"];
             this.Birthday = (DateTime)datum["Birthday"];
             this.Creation = (DateTime)datum["Creation"];
+            this.MaxCharacters = (short)datum["MaxCharacters"];
         }
         
         public void Save()
@@ -93,6 +95,7 @@ namespace Destiny.Maple
             datum["IsMaster"] = this.IsMaster;
             datum["Birthday"] = this.Birthday;
             datum["Creation"] = this.Creation;
+            datum["MaxCharacters"] = this.MaxCharacters;
 
             if (this.Assigned)
             {

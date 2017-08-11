@@ -73,8 +73,14 @@ namespace Destiny
                               `IsBanned` tinyint(1) UNSIGNED NOT NULL DEFAULT '0',
                               `IsMaster` tinyint(1) UNSIGNED NOT NULL DEFAULT '0',
                               `Birthday` date NOT NULL,
-                              `Creation` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP
+                              `Creation` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                              `MaxCharacters` smallint(3) NOT NULL DEFAULT '3'
                             ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+                            DROP TRIGGER IF EXISTS `TR_accounts_CreateStorage`;
+                            DELIMITER $$
+                            CREATE TRIGGER `TR_accounts_CreateStorage` AFTER INSERT ON `accounts` FOR EACH ROW INSERT INTO storages (AccountID) VALUES (NEW.ID)
+                            $$
+                            DELIMITER ;
 
                             DROP TABLE IF EXISTS `banned_ip`;
                             CREATE TABLE `banned_ip` (
@@ -203,12 +209,11 @@ namespace Destiny
                             ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
                             DROP TABLE IF EXISTS `storages`;
-                            CREATE TABLE  `storages` (
+                            CREATE TABLE `storages` (
                               `AccountID` int(11) NOT NULL,
                               `Slots` tinyint(3) UNSIGNED NOT NULL DEFAULT '4',
-                              `Meso` int(11) NOT NULL DEFAULT '0',
-                              `Characters` int(11) NOT NULL DEFAULT '3'
-                            ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+                              `Meso` int(11) NOT NULL DEFAULT '0'
+                            ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
                             ALTER TABLE `accounts`
                               ADD PRIMARY KEY (`ID`),
@@ -252,6 +257,7 @@ namespace Destiny
                               ADD KEY `character_id` (`CharacterID`) USING BTREE;
 
                             ALTER TABLE `storages`
+                              ADD PRIMARY KEY (`AccountID`),
                               ADD KEY `account_id` (`AccountID`) USING BTREE;
 
                             ALTER TABLE `accounts`
@@ -290,7 +296,7 @@ namespace Destiny
                               ADD CONSTRAINT `skills_ibfk_1` FOREIGN KEY (`CharacterID`) REFERENCES `characters` (`ID`);
 
                             ALTER TABLE `storages`
-                              ADD CONSTRAINT `storages_ibfk_1` FOREIGN KEY (`AccountID`) REFERENCES `accounts` (`ID`);
+                              ADD CONSTRAINT `storages_ibfk_1` FOREIGN KEY (`AccountID`) REFERENCES `accounts` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
                             ", databaseSchema);
 
                         Log.Inform("Database '{0}' created.", databaseSchema);
