@@ -355,7 +355,7 @@ namespace Destiny.Maple.Characters
 
             this.Remove(item, true);
 
-            this.Parent.ChangeMap(item.CMoveTo); // TODO: A random spawn point when using a return scroll.
+            this.Parent.ChangeMap(item.CMoveTo);
         }
 
         public void Pickup(Drop drop)

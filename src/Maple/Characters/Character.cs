@@ -969,12 +969,30 @@ namespace Destiny.Maple.Characters
 
         public void ChangeMap(int mapID, byte portalID = 0)
         {
-            //If the map doesn't exist, this line will throw an exception. Calling method needs to catch and handle that situation.
+            // NOTE: If the map doesn't exist, this line will throw an exception. Calling method needs to catch and handle that situation.
             Map newMap = MasterServer.Channels[this.Client.Channel].Maps[mapID];
 
             this.Map.Characters.Remove(this);
 
-            this.SpawnPoint = portalID;
+            // NOTE: If a portal isn't specified, a random spawn point will be chosen.
+            if (portalID == 0)
+            {
+                List<Portal> spawnPoints = new List<Portal>();
+
+                foreach (Portal loopPortal in newMap.Portals)
+                {
+                    if (loopPortal.IsSpawnPoint)
+                    {
+                        spawnPoints.Add(loopPortal);
+                    }
+                }
+
+                this.SpawnPoint = spawnPoints[Constants.Random.Next(0, spawnPoints.Count - 1)].ID;
+            }
+            else
+            {
+                this.SpawnPoint = portalID;
+            }
 
             using (OutPacket oPacket = new OutPacket(ServerOperationCode.SetField))
             {
