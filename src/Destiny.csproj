@@ -65,6 +65,7 @@
     <Compile Include="IO\SettingReadException.cs" />
     <Compile Include="IO\Settings.cs" />
     <Compile Include="Maple\Attack.cs" />
+    <Compile Include="Maple\Characters\CharacterKeymap.cs" />
     <Compile Include="Maple\Characters\CharacterStorage.cs" />
     <Compile Include="Maple\Commands\Commands.cs" />
     <Compile Include="Maple\Commands\Implementation\KillMobsCommand.cs" />
@@ -101,6 +102,7 @@
     <Compile Include="Maple\Quest.cs" />
     <Compile Include="Maple\Shops\Shop.cs" />
     <Compile Include="Maple\Shops\ShopItem.cs" />
+    <Compile Include="Maple\Shortcut.cs" />
     <Compile Include="Maple\StyleUnavailableException.cs" />
     <Compile Include="Network\MigrationRegistery.cs" />
     <Compile Include="Network\WorldServer.cs" />

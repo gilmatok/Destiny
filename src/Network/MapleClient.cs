@@ -952,6 +952,8 @@ namespace Destiny
             character.Items.Add(new Item(weaponID, equipped: true));
             character.Items.Add(new Item(jobType == JobType.Cygnus ? 4161047 : jobType == JobType.Explorer ? 4161001 : 4161048), forceGetSlot: true);
 
+            character.Keymap.AddDefault();
+
             if (!error)
             {
                 character.Save();
