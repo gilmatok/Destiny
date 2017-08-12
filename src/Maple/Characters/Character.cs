@@ -1213,6 +1213,9 @@ namespace Destiny.Maple.Characters
                     continue;
                 }
 
+                mob.IsProvoked = true;
+                mob.SwitchController(this);
+
                 foreach (uint hit in target.Value)
                 {
                     if (mob.Damage(this, hit))
