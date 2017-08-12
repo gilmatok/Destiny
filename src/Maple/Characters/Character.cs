@@ -1111,15 +1111,20 @@ namespace Destiny.Maple.Characters
 
         public void Move(InPacket iPacket)
         {
+            byte portals = iPacket.ReadByte();
+
+            if (portals != this.Portals)
+            {
+                return;
+            }
+
+            iPacket.ReadInt(); // NOE: Unknown.
+
             Movements movements = Movements.Decode(iPacket);
 
-            // TODO: Validate movements.
-
-            Movement lastMovement = movements[movements.Count - 1];
-
-            this.Position = lastMovement.Position;
-            this.Foothold = lastMovement.Foothold;
-            this.Stance = lastMovement.Stance;
+            this.Position = movements.Position;
+            this.Foothold = movements.Foothold;
+            this.Stance = movements.Stance;
 
             using (OutPacket oPacket = new OutPacket(ServerOperationCode.UserMove))
             {
@@ -1128,6 +1133,17 @@ namespace Destiny.Maple.Characters
                 movements.Encode(oPacket);
 
                 this.Map.Broadcast(oPacket, this);
+            }
+
+            if (this.Foothold == 0)
+            {
+                // NOTE: Player is floating in the air.
+                // GMs might be legitmately in this state due to GM fly.
+                // We shouldn't mess with them because they have the tools toget out of falling off the map anyway.
+
+                // TODO: Attempt to find foothold.
+                // If none found, check the player fall counter.
+                // If it's over 3, reset the player's map.
             }
         }
 
@@ -1196,14 +1212,23 @@ namespace Destiny.Maple.Characters
                 return;
             }
 
-            // TODO: Modify packet based on type.
+            Skill skill = null;
+
+            if (attack.SkillID > 0)
+            {
+                skill = this.Skills[attack.SkillID];
+
+                skill.Cast();
+            }
+
+            // TODO: Modify packet based on attack type.
             using (OutPacket oPacket = new OutPacket(ServerOperationCode.CloseRangeAttack))
             {
                 oPacket
                     .WriteInt(this.ID)
                     .WriteByte((byte)((attack.Targets * 0x10) + attack.Hits))
                     .WriteByte() // NOTE: Unknown.
-                    .WriteByte(); // NOTE: Skill level.
+                    .WriteByte((byte)(attack.SkillID != 0 ? skill.CurrentLevel : 0)); // NOTE: Skill level.
 
                 if (attack.SkillID != 0)
                 {
@@ -1230,9 +1255,9 @@ namespace Destiny.Maple.Characters
                     }
                 }
 
-                this.Map.Broadcast(oPacket);
+                this.Map.Broadcast(oPacket, this);
             }
-            
+
             foreach (KeyValuePair<int, List<uint>> target in attack.Damages)
             {
                 Mob mob;

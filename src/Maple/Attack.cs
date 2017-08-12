@@ -3,14 +3,6 @@ using System.Collections.Generic;
 
 namespace Destiny.Maple
 {
-    public enum AttackType
-    {
-        Melee,
-        Range,
-        Magic,
-        Summon
-    }
-
     public sealed class Attack
     {
         public AttackType Type { get; private set; }

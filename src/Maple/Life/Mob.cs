@@ -216,46 +216,52 @@ namespace Destiny.Maple.Life
 
         public void Move(InPacket iPacket)
         {
-            //short moveAction = iPacket.ReadShort();
-            //bool cheatResult = (iPacket.ReadByte() & 0xF) != 0;
-            //byte centerSplit = iPacket.ReadByte();
-            //int illegalVelocity = iPacket.ReadInt();
-            //byte unknown = iPacket.ReadByte();
-            //iPacket.ReadInt();
+            short moveAction = iPacket.ReadShort();
+            byte skilByte = iPacket.ReadByte();
+            byte skill = iPacket.ReadByte();
+            byte skill1 = (byte)(iPacket.ReadByte() & 0xFF);
+            byte skill2 = iPacket.ReadByte();
+            byte skill3 = iPacket.ReadByte();
+            byte skill4 = iPacket.ReadByte();
+            iPacket.Skip(8);
+            iPacket.ReadByte();
+            iPacket.ReadInt();
+            
+            Movements movements = Movements.Decode(iPacket);
 
-            //Movements movements = Movements.Decode(iPacket);
+            this.Position = movements.Position;
+            this.Foothold = movements.Foothold;
+            this.Stance = movements.Stance;
 
-            //Movement lastMovement = movements[movements.Count - 1];
+            using (OutPacket oPacket = new OutPacket(ServerOperationCode.MobCtrlAck))
+            {
+                oPacket
+                    .WriteInt(this.ObjectID)
+                    .WriteShort(moveAction)
+                    .WriteBool() // NOTE: Is using ability.
+                    .WriteShort((short)this.Mana)
+                    .WriteByte() // NOTE: Ability ID.
+                    .WriteByte(); // NOTE: Ability level.
 
-            //this.Position = lastMovement.Position;
-            //this.Foothold = lastMovement.Foothold;
-            //this.Stance = lastMovement.Stance;
+                this.Controller.Client.Send(oPacket);
+            }
 
-            //using (OutPacket oPacket = new OutPacket(ServerOperationCode.MobCtrlAck))
-            //{
-            //    oPacket
-            //        .WriteInt(this.ObjectID)
-            //        .WriteShort(moveAction)
-            //        .WriteBool(cheatResult)
-            //        .WriteShort((short)this.Mana)
-            //        .WriteByte() // NOTE: Ability ID.
-            //        .WriteByte(); // NOTE: Ability level.
+            using (OutPacket oPacket = new OutPacket(ServerOperationCode.MobMove))
+            {
+                oPacket
+                    .WriteInt(this.ObjectID)
+                    .WriteBool()
+                    .WriteBool() // NOTE: Is using ability.
+                    .WriteByte(skill)
+                    .WriteByte(skill1)
+                    .WriteByte(skill2)
+                    .WriteByte(skill3)
+                    .WriteByte(skill4);
 
-            //    this.Controller.Client.Send(oPacket);
-            //}
+                movements.Encode(oPacket);
 
-            //using (OutPacket oPacket = new OutPacket(ServerOperationCode.MobMove))
-            //{
-            //    oPacket
-            //        .WriteInt(this.ObjectID)
-            //        .WriteBool(cheatResult)
-            //        .WriteByte(centerSplit)
-            //        .WriteInt(illegalVelocity);
-
-            //    movements.Encode(oPacket);
-
-            //    this.Map.Broadcast(oPacket, this.Controller);
-            //}
+                this.Map.Broadcast(oPacket, this.Controller);
+            }
         }
 
         public void Die()

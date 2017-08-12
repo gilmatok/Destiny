@@ -3,39 +3,16 @@ using System.Collections.Generic;
 
 namespace Destiny.Maple
 {
-    public enum MovementType : byte
-    {
-        Normal = 0,
-        Jump = 1,
-        JumpKnockback = 2,
-        Immediate = 3,
-        Teleport = 4,
-        Normal2 = 5,
-        FlashJump = 6,
-        Assaulter = 7,
-        Assassinate = 8,
-        Rush = 9,
-        Falling = 10,
-        Chair = 11,
-        ExcessiveKnockback = 12,
-        RecoilShot = 13,
-        Unknown = 14,
-        JumpDown = 15,
-        Wings = 16,
-        WingsFalling = 17,
-        Unknown2 = 18,
-        Unknown3 = 19,
-        Aran = 20,
-    }
 
     public sealed class Movement
     {
         public MovementType Type { get; set; }
         public Point Position { get; set; }
         public Point Velocity { get; set; }
+        public short FallStart { get; set; }
         public short Foothold { get; set; }
-        public byte Stance { get; set; }
         public short Duration { get; set; }
+        public byte Stance { get; set; }
         public byte Statistic { get; set; }
     }
 
@@ -46,26 +23,34 @@ namespace Destiny.Maple
             return new Movements(iPacket);
         }
 
+        public Point Origin { get; private set; }
         public Point Position { get; private set; }
-        public Point Velocity { get; private set; }
-        public short LastFoothold { get; private set; }
+        public short Foothold { get; private set; }
+        public byte Stance { get; private set; }
 
         public Movements(InPacket iPacket)
             : base()
         {
-            this.Position = iPacket.ReadPoint();
-            this.Velocity = iPacket.ReadPoint();
-            iPacket.Skip(1); // NOTE: Unknown.
+            short foothold = 0;
+            byte stance = 0;
+            Point position = iPacket.ReadPoint();
+
+            this.Origin = position;
 
             byte count = iPacket.ReadByte();
 
             while (count-- > 0)
             {
+                MovementType type = (MovementType)iPacket.ReadByte();
+
                 Movement movement = new Movement();
 
-                movement.Type = (MovementType)iPacket.ReadByte();
+                movement.Type = type;
+                movement.Foothold = foothold;
+                movement.Position = position;
+                movement.Stance = stance;
 
-                switch (movement.Type)
+                switch (type)
                 {
                     case MovementType.Normal:
                     case MovementType.Normal2:
@@ -75,13 +60,14 @@ namespace Destiny.Maple
                             movement.Position = iPacket.ReadPoint();
                             movement.Velocity = iPacket.ReadPoint();
                             movement.Foothold = iPacket.ReadShort();
-                            this.LastFoothold = movement.Foothold;
 
-                            if (movement.Type != MovementType.JumpDown)
+                            if (movement.Type == MovementType.JumpDown)
                             {
-                                movement.Stance = iPacket.ReadByte();
-                                movement.Duration = iPacket.ReadShort();
+                                movement.FallStart = iPacket.ReadShort();
                             }
+
+                            movement.Stance = iPacket.ReadByte();
+                            movement.Duration = iPacket.ReadShort();
                         }
                         break;
 
@@ -107,7 +93,6 @@ namespace Destiny.Maple
                         {
                             movement.Position = iPacket.ReadPoint();
                             movement.Foothold = iPacket.ReadShort();
-                            this.LastFoothold = movement.Foothold;
                             movement.Stance = iPacket.ReadByte();
                             movement.Duration = iPacket.ReadShort();
                         }
@@ -122,22 +107,52 @@ namespace Destiny.Maple
                     case MovementType.Unknown:
                         {
                             movement.Velocity = iPacket.ReadPoint();
-                            movement.Foothold = iPacket.ReadShort();
-                            this.LastFoothold = movement.Foothold;
+                            movement.FallStart = iPacket.ReadShort();
+                            movement.Stance = iPacket.ReadByte();
+                            movement.Duration = iPacket.ReadShort();
+                        }
+                        break;
+
+                    default:
+                        {
                             movement.Stance = iPacket.ReadByte();
                             movement.Duration = iPacket.ReadShort();
                         }
                         break;
                 }
 
+                position = movement.Position;
+                foothold = movement.Foothold;
+                stance = movement.Stance;
+
                 this.Add(movement);
             }
+
+            byte keypadStates = iPacket.ReadByte();
+
+            for (byte i = 0; i < keypadStates; i++)
+            {
+                if (i % 2 == 0)
+                {
+                    iPacket.ReadByte(); // NOTE: Unknown.
+                }
+            }
+
+            // NOTE: Rectangle for bounds checking.
+            iPacket.ReadShort(); // NOTE: Left.
+            iPacket.ReadShort(); // NOTE: Top.
+            iPacket.ReadShort(); // NOTE: Right.
+            iPacket.ReadShort(); // NOTE: Bottom.
+
+            this.Position = position;
+            this.Stance = stance;
+            this.Foothold = foothold;
         }
 
         public void Encode(OutPacket oPacket)
         {
             oPacket
-                .WritePoint(this.Position)
+                .WritePoint(this.Origin)
                 .WriteByte((byte)this.Count);
 
             foreach (Movement movement in this)
@@ -156,12 +171,14 @@ namespace Destiny.Maple
                                 .WritePoint(movement.Velocity)
                                 .WriteShort(movement.Foothold);
 
-                            if (movement.Type != MovementType.JumpDown)
+                            if (movement.Type == MovementType.JumpDown)
                             {
-                                oPacket
-                                    .WriteByte(movement.Stance)
-                                    .WriteShort(movement.Duration);
+                                oPacket.WriteShort(movement.FallStart);
                             }
+
+                            oPacket
+                                .WriteByte(movement.Stance)
+                                .WriteShort(movement.Duration);
                         }
                         break;
 
@@ -204,13 +221,23 @@ namespace Destiny.Maple
                         {
                             oPacket
                                 .WritePoint(movement.Velocity)
-                                .WriteShort(movement.Foothold)
+                                .WriteShort(movement.FallStart)
+                                .WriteByte(movement.Stance)
+                                .WriteShort(movement.Duration);
+                        }
+                        break;
+
+                    default:
+                        {
+                            oPacket
                                 .WriteByte(movement.Stance)
                                 .WriteShort(movement.Duration);
                         }
                         break;
                 }
             }
+
+            // NOTE: Keypad and boundary values are not read on the client side.
         }
     }
 }
