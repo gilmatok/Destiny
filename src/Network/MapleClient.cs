@@ -327,7 +327,8 @@ namespace Destiny
                 case ClientOperationCode.PartyChat:
                     break;
 
-                case ClientOperationCode.Whisper:
+                case ClientOperationCode.Command:
+                    this.Character.UseCommand(iPacket);
                     break;
 
                 case ClientOperationCode.Messenger:

@@ -1455,6 +1455,96 @@ namespace Destiny.Maple.Characters
             }
         }
 
+        public void UseCommand(InPacket iPacket)
+        {
+            CommandType type = (CommandType)iPacket.ReadByte();
+            string targetName = iPacket.ReadMapleString();
+
+            // TODO: Target should be obtained from the whole world, not just the map.
+            // We don't have a player storage collection yet, so for tests I'll be using map.
+            Character target;
+
+            try
+            {
+                target = this.Map.Characters[targetName];
+            }
+            catch (KeyNotFoundException)
+            {
+                target = null;
+            }
+
+            switch (type)
+            {
+                case CommandType.Find:
+                    {
+                        if (target == null)
+                        {
+                            using (OutPacket oPacket = new OutPacket(ServerOperationCode.Command))
+                            {
+                                oPacket
+                                    .WriteByte(0x0A)
+                                    .WriteMapleString(targetName)
+                                    .WriteBool(false);
+
+                                this.Client.Send(oPacket);
+                            }
+                        }
+                        else
+                        {
+                            using (OutPacket oPacket = new OutPacket(ServerOperationCode.Command))
+                            {
+                                oPacket
+                                    .WriteByte(0x09)
+                                    .WriteMapleString(targetName)
+                                    .WriteByte(1) // NOTE: 0 - MTS, 1 - Map, 2 - Cash Shop.
+                                    .WriteInt(target.Map.MapleID); // NOTE: -1 if MTS/Cash Shop.
+
+                                if (true) // NOTE: Does not apply if MTS/Cash Shop.
+                                {
+                                    oPacket
+                                        .WriteInt() // NOTE: Unknown.
+                                        .WriteInt(); // NOTE: Unknown.
+                                }
+
+                                this.Client.Send(oPacket);
+                            }
+                        }
+                    }
+                    break;
+
+                case CommandType.Whisper:
+                    {
+                        string text = iPacket.ReadMapleString();
+
+                        using (OutPacket oPacket = new OutPacket(ServerOperationCode.Command))
+                        {
+                            oPacket
+                                .WriteByte(10)
+                                .WriteMapleString(targetName)
+                                .WriteBool(target != null);
+
+                            this.Client.Send(oPacket);
+                        }
+
+                        if (target != null)
+                        {
+                            using (OutPacket oPacket = new OutPacket(ServerOperationCode.Command))
+                            {
+                                oPacket
+                                    .WriteByte(18)
+                                    .WriteMapleString(this.Name)
+                                    .WriteByte(this.Client.Channel)
+                                    .WriteByte() // NOTE: Unknown.
+                                    .WriteMapleString(text);
+
+                                target.Client.Send(oPacket);
+                            }
+                        }
+                    }
+                    break;
+            }
+        }
+
         public void Interact(InPacket iPacket)
         {
             InteractionCode code = (InteractionCode)iPacket.ReadByte();

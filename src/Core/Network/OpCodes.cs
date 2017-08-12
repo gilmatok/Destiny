@@ -124,15 +124,15 @@
         UseRemote = 0x73,
         PartyChat = 0x74,
         //115
-        Whisper = 0x76,
         //117
-        Messenger = 0x78,
         //119
         //120
         //121
         //122
         #endregion QUESTIONABLE
 
+        Command = 120,
+        Messenger = 122,
         PlayerInteraction = 123,
         PartyOperation = 124,
         DenyPartyRequest = 125,
@@ -343,7 +343,7 @@
         TransferChannelReqIgnored = 132,
         FieldSpecificData = 133,
         GroupMessage = 134,
-        Whisper = 135,
+        Command = 135,
         CoupleMessage = 136,
         SummonItemInavailable = 137,
         FieldEffect = 138,

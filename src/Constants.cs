@@ -103,6 +103,12 @@ namespace Destiny
         HiredMerchant = 5
     }
 
+    public enum CommandType : byte
+    {
+        Find = 5,
+        Whisper = 6
+    }
+
     #region Character
     public enum Gender : byte
     {
