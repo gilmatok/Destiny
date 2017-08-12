@@ -595,7 +595,7 @@ namespace Destiny.Maple
 
             if (this.Assigned)
             {
-                datum.Update("ID = '{0}'", this.ID);
+                datum.Update("ID = {0}", this.ID);
             }
             else
             {
@@ -606,7 +606,7 @@ namespace Destiny.Maple
 
         public void Delete()
         {
-            Database.Delete("items", "ID = '{0}'", this.ID);
+            Database.Delete("items", "ID = {0}", this.ID);
 
             this.Assigned = false;
         }

@@ -24,7 +24,7 @@ namespace Destiny.Maple.Characters
 
         public void Load()
         {
-            foreach (Datum datum in new Datums("quests_started").Populate("CharacterID = '{0}'", this.Parent.ID))
+            foreach (Datum datum in new Datums("quests_started").Populate("CharacterID = {0}", this.Parent.ID))
             {
                 if (!this.Started.ContainsKey((ushort)datum["QuestID"]))
                 {
@@ -49,7 +49,7 @@ namespace Destiny.Maple.Characters
                     datum["CharacterID"] = this.Parent.ID;
                     datum["QuestID"] = loopStarted.Key;
 
-                    if (!Database.Exists("quests_started", "CharacterID = '{0}' && QuestID = '{1}'", this.Parent.ID, loopStarted.Key))
+                    if (!Database.Exists("quests_started", "CharacterID = {0} && QuestID = {1}", this.Parent.ID, loopStarted.Key))
                     {
                         datum.Insert();
                     }
@@ -65,9 +65,9 @@ namespace Destiny.Maple.Characters
                         datum["MobID"] = mobKills.Key;
                         datum["Killed"] = mobKills.Value;
 
-                        if (Database.Exists("quests_started", "CharacterID = '{0}' && QuestID = '{1}' && MobID = '{2}'", this.Parent.ID, loopStarted.Key, mobKills.Key))
+                        if (Database.Exists("quests_started", "CharacterID = {0} && QuestID = {1} && MobID = {2}", this.Parent.ID, loopStarted.Key, mobKills.Key))
                         {
-                            datum.Update("CharacterID = '{0}' && QuestID = '{1}' && MobID = '{2}'", this.Parent.ID, loopStarted.Key, mobKills.Key);
+                            datum.Update("CharacterID = {0} && QuestID = {1} && MobID = {2}", this.Parent.ID, loopStarted.Key, mobKills.Key);
                         }
                         else
                         {
@@ -85,9 +85,9 @@ namespace Destiny.Maple.Characters
                 datum["QuestID"] = loopCompleted.Key;
                 datum["CompletionTime"] = loopCompleted.Value;
 
-                if (Database.Exists("quests_completed", "CharacterID ='{0}' && QuestID = '{1}'", this.Parent.ID, loopCompleted.Key))
+                if (Database.Exists("quests_completed", "CharacterID = {0} && QuestID = {1}", this.Parent.ID, loopCompleted.Key))
                 {
-                    datum.Update("CharacterID = '{0}' && QuestID = '{1}'", this.Parent.ID, loopCompleted.Key);
+                    datum.Update("CharacterID = {0} && QuestID = {1}", this.Parent.ID, loopCompleted.Key);
                 }
                 else
                 {
@@ -103,9 +103,9 @@ namespace Destiny.Maple.Characters
                 this.Started.Remove(questID);
             }
 
-            if (Database.Exists("quests_started", "QuestID = '{0}'", questID))
+            if (Database.Exists("quests_started", "QuestID = {0}", questID))
             {
-                Database.Delete("quests_started", "QuestID = '{0}'", questID);
+                Database.Delete("quests_started", "QuestID = {0}", questID);
             }
         }
 

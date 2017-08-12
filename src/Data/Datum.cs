@@ -16,52 +16,60 @@ namespace Destiny.Data
             this.Table = table;
         }
 
-        private void PopulateInternal(string fields, string constraints)
+        private void PopulateInternal(string fields, string constraints, params object[] args)
         {
             this.Values = new List<Datum>();
 
-            string query = string.Format("SELECT {0} FROM {1}{2}", fields == null ? "*" : Database.CorrectFields(fields), this.Table, constraints != null ? " WHERE " + constraints : string.Empty);
-
-            using (MySqlDataReader reader = MySqlHelper.ExecuteReader(Database.ConnectionString, query))
+            using (MySqlConnection connection = new MySqlConnection(Database.ConnectionString))
             {
-                while (reader.Read())
+                connection.Open();
+                using (MySqlCommand command = Database.GetCommand(connection, constraints, args))
                 {
-                    Dictionary<string, object> dictionary = new Dictionary<string, object>();
+                    string whereClause = constraints != null ? " WHERE " + command.CommandText : string.Empty;
+                    command.CommandText = string.Format("SELECT {0} FROM {1}{2}", fields == null ? "*" : Database.CorrectFields(fields), this.Table, whereClause);
 
-                    for (int i = 0; i < reader.FieldCount; i++)
+                    using (MySqlDataReader reader = command.ExecuteReader())
                     {
-                        dictionary.Add(reader.GetName(i), reader.GetValue(i));
-                    }
+                        while (reader.Read())
+                        {
+                            Dictionary<string, object> dictionary = new Dictionary<string, object>();
 
-                    this.Values.Add(new Datum(this.Table, dictionary));
+                            for (int i = 0; i < reader.FieldCount; i++)
+                            {
+                                dictionary.Add(reader.GetName(i), reader.GetValue(i));
+                            }
+
+                            this.Values.Add(new Datum(this.Table, dictionary));
+                        }
+                    }
                 }
             }
         }
 
         public Datums Populate()
         {
-            this.PopulateInternal(null, null);
+            this.PopulateInternal(null, null, null);
 
             return this;
         }
 
         public Datums Populate(string constraints, params object[] args)
         {
-            this.PopulateInternal(null, string.Format(constraints, args));
+            this.PopulateInternal(null, constraints, args);
 
             return this;
         }
 
         public Datums PopulateWith(string fields)
         {
-            this.PopulateInternal(fields, null);
+            this.PopulateInternal(fields, null, null);
 
             return this;
         }
 
         public Datums PopulateWith(string fields, string constraints, params object[] args)
         {
-            this.PopulateInternal(fields, string.Format(constraints, args));
+            this.PopulateInternal(fields, constraints, args);
 
             return this;
         }
@@ -130,42 +138,46 @@ namespace Destiny.Data
             this.Dictionary = dictionary;
         }
 
-        public void Populate(string query)
-        {
-            using (MySqlDataReader reader = MySqlHelper.ExecuteReader(Database.ConnectionString, query))
-            {
-                if (reader.RecordsAffected > 1)
-                {
-                    throw new RowNotUniqueException();
-                }
-
-                if (!reader.HasRows)
-                {
-                    throw new RowNotInTableException();
-                }
-
-                reader.Read();
-
-                for (int i = 0; i < reader.FieldCount; i++)
-                {
-                    string name = reader.GetName(i);
-                    object value = reader.GetValue(i);
-
-                    this.Dictionary[name] = value;
-                }
-            }
-        }
-
         public Datum Populate(string constraints, params object[] args)
         {
-            this.Populate(string.Format("SELECT * FROM {0} WHERE {1}", this.Table, string.Format(constraints, args)));
+            this.PopulateWith("*", constraints, args);
 
             return this;
         }
 
         public Datum PopulateWith(string fields, string constraints, params object[] args)
         {
-            this.Populate(string.Format("SELECT {0} FROM {1} WHERE {2}", Database.CorrectFields(fields), this.Table, string.Format(constraints, args)));
+            using (MySqlConnection connection = new MySqlConnection(Database.ConnectionString))
+            {
+                connection.Open();
+                using (MySqlCommand command = Database.GetCommand(connection, constraints, args))
+                {
+                    command.CommandText = string.Format("SELECT {0} FROM {1} WHERE ", Database.CorrectFields(fields), this.Table) + command.CommandText;
+
+                    using (MySqlDataReader reader = command.ExecuteReader())
+                    {
+                        if (reader.RecordsAffected > 1)
+                        {
+                            throw new RowNotUniqueException();
+                        }
+
+                        if (!reader.HasRows)
+                        {
+                            throw new RowNotInTableException();
+                        }
+
+                        reader.Read();
+
+                        for (int i = 0; i < reader.FieldCount; i++)
+                        {
+                            string name = reader.GetName(i);
+                            object value = reader.GetValue(i);
+
+                            this.Dictionary[name] = value;
+                        }
+                    }
+                }
+            }
 
             return this;
         }
@@ -191,12 +203,13 @@ namespace Destiny.Data
 
             processed = 0;
 
-            foreach (KeyValuePair<string, object> loopPair in this.Dictionary)
+            object[] valueArr = new object[this.Dictionary.Count];
+            this.Dictionary.Values.CopyTo(valueArr, 0);
+            for (int i = 0; i < valueArr.Length; i++)
             {
-                fields += string.Format("'{0}'", loopPair.Value is bool ? (((bool)loopPair.Value) ? 1 : 0) : loopPair.Value);
-                processed++;
+                fields += "{" + i + "}";
 
-                if (processed < this.Dictionary.Count)
+                if (i < this.Dictionary.Count)
                 {
                     fields += ", ";
                 }
@@ -204,7 +217,7 @@ namespace Destiny.Data
 
             fields += " )";
 
-            Database.Execute("INSERT INTO {0} {1}", this.Table, fields);
+            Database.Execute(string.Format("INSERT INTO {0} {1}", this.Table, fields), valueArr);
         }
 
         public int InsertAndReturnID()
@@ -220,9 +233,11 @@ namespace Destiny.Data
 
             string fields = string.Empty;
 
+            object[] valueArr = new object[this.Dictionary.Count];
+            this.Dictionary.Values.CopyTo(valueArr, 0);
             foreach (KeyValuePair<string, object> loopPair in this.Dictionary)
             {
-                fields += string.Format("{0}='{1}'", loopPair.Key, loopPair.Value is bool ? (((bool)loopPair.Value) ? 1 : 0) : loopPair.Value);
+                fields += string.Format("{0}={1}", loopPair.Key, "{" + processed + "}");
                 processed++;
 
                 if (processed < this.Dictionary.Count)
@@ -231,7 +246,17 @@ namespace Destiny.Data
                 }
             }
 
-            Database.Execute("UPDATE {0} SET {1} WHERE {2}", this.Table, fields, string.Format(constraints, args));
+            using (MySqlConnection connection = new MySqlConnection(Database.ConnectionString))
+            {
+                connection.Open();
+                using (MySqlCommand command = Database.GetCommand(connection, constraints, args))
+                {
+                    command.CommandText = Database.ParameterizeCommandText("set", string.Format("UPDATE {0} SET {1} WHERE ", this.Table, fields), valueArr) + command.CommandText;
+                    command.Parameters.AddRange(Database.ConstraintsToParameters("set", fields, valueArr));
+
+                    command.ExecuteNonQuery();
+                }
+            }
         }
 
         public override string ToString()

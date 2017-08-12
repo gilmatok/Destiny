@@ -48,7 +48,7 @@ namespace Destiny.Maple.Shops
 
             this.Items = new List<ShopItem>();
 
-            foreach (Datum itemDatum in new Datums("shop_items").Populate("shopid = '{0}' ORDER BY sort DESC", this.ID))
+            foreach (Datum itemDatum in new Datums("shop_items").Populate("shopid = {0} ORDER BY sort DESC", this.ID))
             {
                 this.Items.Add(new ShopItem(this, itemDatum));
             }

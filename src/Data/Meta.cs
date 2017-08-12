@@ -10,7 +10,7 @@ namespace Destiny.Data
         {
             Meta.Tables = new Dictionary<string, Dictionary<string, Column>>();
 
-            foreach (Datum datum in new Datums("COLUMNS").Populate("TABLE_SCHEMA = '{0}'{1}", Database.DefaultSchema, mcdb ? " OR TABLE_SCHEMA = 'mcdb'" : string.Empty))
+            foreach (Datum datum in new Datums("COLUMNS").Populate("TABLE_SCHEMA = {0} OR TABLE_SCHEMA = {1}", Database.DefaultSchema, mcdb ? "mcdb" : string.Empty))
             {
                 Meta.Add(datum);
             }

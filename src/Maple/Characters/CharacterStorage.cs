@@ -34,7 +34,7 @@ namespace Destiny.Maple.Characters
 
             try
             {
-                datum.Populate("AccountID = '{0}'", this.Parent.AccountID);
+                datum.Populate("AccountID = {0}", this.Parent.AccountID);
             }
             catch
             {
@@ -50,7 +50,7 @@ namespace Destiny.Maple.Characters
 
             this.Items = new List<Item>();
 
-            foreach (Datum itemDatum in new Datums("items").Populate("AccountID = '{0}' AND IsStored = True", this.Parent.AccountID))
+            foreach (Datum itemDatum in new Datums("items").Populate("AccountID = {0} AND IsStored = True", this.Parent.AccountID))
             {
                 this.Items.Add(new Item(itemDatum));
             }
@@ -63,7 +63,7 @@ namespace Destiny.Maple.Characters
             datum["Slots"] = this.Slots;
             datum["Meso"] = this.Meso;
 
-            datum.Update("AccountID = '{0}'", this.Parent.AccountID);
+            datum.Update("AccountID = {0}", this.Parent.AccountID);
 
             foreach (Item item in this.Items)
             {
