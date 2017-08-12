@@ -353,9 +353,185 @@ namespace Destiny.Maple.Characters
                 return;
             }
 
-            switch (item.MapleID / 10000)
+            bool used = false;
+
+            switch (item.MapleID) // TODO: Enum for these.
             {
-                case 509: // NOTE: Note (Memo).
+                case 5040000: // NOTE: Teleport Rock.
+                case 5040001: // NOTE: Coke Teleport Rock.
+                case 5041000: // NOTE: VIP Teleport Rock.
+                    {
+
+                    }
+                    break;
+
+                case 5050001: // NOTE: 1st Job SP Reset.
+                case 5050002: // NOTE: 2nd Job SP Reset.
+                case 5050003: // NOTE: 3rd Job SP Reset.
+                case 5050004: // NOTE: 4th Job SP Reset.
+                    {
+
+                    }
+                    break;
+
+                case 5050000: // NOTE: AP Reset.
+                    {
+
+                    }
+                    break;
+
+                case 5071000: // NOTE: Megaphone.
+                    {
+                        if (this.Parent.Level <= 10)
+                        {
+                            // NOTE: You can't use a megaphone unless you're over level 10.
+
+                            return;
+                        }
+
+                        string text = iPacket.ReadMapleString();
+
+                        string message = string.Format("{0} : {1}", this.Parent.Name, text); // TODO: Include medal.
+
+                        // NOTE: In GMS, this sends to everyone on the current channel, not the map (despite the item's description).
+                        using (OutPacket oPacket = new OutPacket(ServerOperationCode.BroadcastMsg))
+                        {
+                            oPacket
+                                .WriteByte((byte)NoticeType.Megaphone)
+                                .WriteMapleString(message);
+
+                            foreach (var character in MasterServer.OnlineCharacters.Where(c => c.Value.Client.Character == this.Parent.Client.Character).Select((c) => c.Value))
+                            {
+                                character.Client.Send(oPacket);
+                            }
+                        }
+
+                        used = true;
+                    }
+                    break;
+
+                case 5072000: // NOTE: Super Megaphone.
+                    {
+                        if (this.Parent.Level <= 10)
+                        {
+                            // NOTE: You can't use a megaphone unless you're over level 10.
+
+                            return;
+                        }
+
+                        string text = iPacket.ReadMapleString();
+                        bool whisper = iPacket.ReadBool();
+
+                        string message = string.Format("{0} : {1}", this.Parent.Name, text); // TODO: Include name.
+
+                        using (OutPacket oPacket = new OutPacket(ServerOperationCode.BroadcastMsg))
+                        {
+                            oPacket
+                                .WriteByte((byte)NoticeType.SuperMegaphone)
+                                .WriteMapleString(message)
+                                .WriteByte(this.Parent.Client.Channel)
+                                .WriteBool(whisper);
+
+                            foreach (Character character in MasterServer.OnlineCharacters.Select((c) => c.Value))
+                            {
+                                character.Client.Send(oPacket);
+                            }
+                        }
+
+                        used = true;
+                    }
+                    break;
+
+                case 5390000: // NOTE: Diablo Messenger.
+                case 5390001: // NOTE: Cloud 9 Messenger.
+                case 5390002: // NOTE: Loveholic Messenger.
+                    {
+
+                    }
+                    break;
+
+                case 5076000: // NOTE: Item Megaphone.
+                    {
+
+                    }
+                    break;
+
+                case 5077000: // NOTE: Art Megaphone.
+                    {
+
+                    }
+                    break;
+
+                case 5170000: // NOTE: Pet Name Tag.
+                    {
+
+                    }
+                    break;
+
+                case 5060000: // NOTE: Item Name Tag.
+                    {
+
+                    }
+                    break;
+
+                case 5520000: // NOTE: Scissors of Karma.
+                case 5060001: // NOTE: Item Lock. 
+                    {
+
+                    }
+                    break;
+
+                case 5075000: // NOTE: Maple TV Messenger.
+                case 5075003: // NOTE: Megassenger.
+                    {
+
+                    }
+                    break;
+
+                case 5075001: // NOTE: Maple TV Star Messenger.
+                case 5075004: // NOTE: Star Megassenger.
+                    {
+
+                    }
+                    break;
+
+                case 5075002: // NOTE: Maple TV Heart Messenger.
+                case 5075005: // NOTE: Heart Megassenger.
+                    {
+
+                    }
+                    break;
+
+                case 5200000: // NOTE: Bronze Sack of Meso.
+                case 5200001: // NOTE: Silver Sack of Meso.
+                case 5200002: // NOTE: Gold Sack of Meso.
+                    {
+
+                    }
+                    break;
+
+                case 5370000: // NOTE: Chalkboard.
+                case 5370001: // NOTE: Chalkboard 2.
+                    {
+
+                    }
+                    break;
+
+                case 5300000: // NOTE: Fungus Scrol.
+                case 5300001: // NOTE: Oinker Delight.
+                case 5300002: // NOTE: Zeta Nightmare.
+                    {
+
+                    }
+                    break;
+
+                case 5570000: // NOTE: Vicious Hammer.
+                    {
+
+                    }
+                    break;
+
+                case 5090000: // NOTE: Note (Memo).
                     {
                         string targetName = iPacket.ReadMapleString();
                         string message = iPacket.ReadMapleString();
@@ -411,10 +587,25 @@ namespace Destiny.Maple.Characters
                                 this.Parent.Client.Send(oPacket);
                             }
 
-                            this.Remove(item, true);
+                            used = true;
                         }
                     }
                     break;
+
+                case 5100000: // NOTE: Congratulatory Song.
+                    {
+
+                    }
+                    break;
+            }
+
+            if (used)
+            {
+                this.Remove(item, true);
+            }
+            else
+            {
+                // TODO: Blank inventory update.
             }
         }
 

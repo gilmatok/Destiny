@@ -54,8 +54,9 @@ namespace Destiny
     {
         Notice,
         Popup,
-        Background,
-        Ticker = 4,
+        Megaphone,
+        SuperMegaphone,
+        Ticker,
         Pink,
         Blue
     }

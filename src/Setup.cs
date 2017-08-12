@@ -24,7 +24,7 @@ namespace Destiny
             string databaseUsername = string.Empty;
             string databasePassword = string.Empty;
 
-        databaseConfiguration:
+            databaseConfiguration:
 
             Log.Inform("Please enter your database credentials: ");
 
@@ -342,7 +342,7 @@ namespace Destiny
 
             Log.SkipLine();
 
-        mcdbConfiguration:
+            mcdbConfiguration:
             Log.Inform("The setup will now check for a MapleStory database.");
 
             try
@@ -428,7 +428,7 @@ namespace Destiny
 
             WorldFlag worldFlag = WorldFlag.None;
 
-        inputFlag:
+            inputFlag:
             Log.SkipLine();
             try
             {
@@ -442,16 +442,16 @@ namespace Destiny
             Log.SkipLine();
 
             Log.Success("World '{0}' configured!", worldName);
-        #endregion
+            #endregion
 
-        #region User Profile Configuration
-        userProfile:
+            #region User Profile Configuration
+            userProfile:
             Log.Inform("Please choose what information to display.\n  A. Hide packets (recommended)\n  B. Show names\n  C. Show content");
             Log.SkipLine();
 
             LogLevel logLevel;
 
-        multipleChoice:
+            multipleChoice:
             switch (Log.Input("Please enter your choice: ", "Hide").ToLower())
             {
                 case "a":
