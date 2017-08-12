@@ -305,6 +305,18 @@ namespace Destiny.Maple.Characters
             return remaining;
         }
 
+        public void Sort(InPacket iPacket)
+        {
+            iPacket.ReadInt(); // NOTE: Ticks.
+            ItemType type = (ItemType)iPacket.ReadByte();
+        }
+
+        public void Gather(InPacket iPacket)
+        {
+            iPacket.ReadInt(); // NOTE: Ticks.
+            ItemType type = (ItemType)iPacket.ReadByte();
+        }
+
         public void Handle(InPacket iPacket)
         {
             iPacket.ReadInt();

@@ -1223,6 +1223,159 @@ namespace Destiny.Maple.Characters
             }
         }
 
+        private const sbyte BumpDamage = -1;
+        private const sbyte MapDamage = -2;
+
+        public void Damage(InPacket iPacket)
+        {
+            iPacket.Skip(4); // NOTE: Ticks.
+            sbyte type = (sbyte)iPacket.ReadByte();
+            iPacket.ReadByte(); // NOTE: Elemental type.
+            int damage = iPacket.ReadInt();
+            bool damageApplied = false;
+            bool deadlyAttack = false;
+            byte hit = 0;
+            byte stance = 0;
+            int disease = 0;
+            byte level = 0;
+            short mpBurn = 0;
+            int mobObjectID = 0;
+            int mobID = 0;
+            int noDamageSkillID = 0;
+
+            if (type != MapDamage)
+            {
+                mobID = iPacket.ReadInt();
+                mobObjectID = iPacket.ReadInt();
+
+                Mob mob;
+
+                try
+                {
+                    mob = this.Map.Mobs[mobObjectID];
+                }
+                catch (KeyNotFoundException)
+                {
+                    return;
+                }
+
+                if (mobID != mob.MapleID)
+                {
+                    return;
+                }
+
+                if (type != BumpDamage)
+                {
+                    // TODO: Get mob attack and apply to disease/level/mpBurn/deadlyAttack.
+                }
+            }
+
+            hit = iPacket.ReadByte();
+            byte reduction = iPacket.ReadByte();
+            iPacket.ReadByte(); // NOTE: Unknown.
+
+            if (reduction != 0)
+            {
+                // TODO: Return damage (Power Guard).
+            }
+
+            if (type == MapDamage)
+            {
+                level = iPacket.ReadByte();
+                disease = iPacket.ReadInt();
+            }
+            else
+            {
+                stance = iPacket.ReadByte();
+
+                if (stance > 0)
+                {
+                    // TODO: Power Stance.
+                }
+            }
+
+            if (damage == -1)
+            {
+                // TODO: Validate no damage skills.
+            }
+
+            if (disease > 0 && damage != 0)
+            {
+                // NOTE: Fake/Guardian don't prevent disease.
+                // TODO: Add disease buff.
+            }
+
+            if (damage > 0)
+            {
+                // TODO: Check for Meso Guard.
+                // TODO: Check for Magic Guard.
+                // TODO: Check for Achilles.
+
+                if (!damageApplied)
+                {
+                    if (deadlyAttack)
+                    {
+                        // TODO: Deadly attack function.
+                    }
+                    else
+                    {
+                        this.Health -= (short)damage;
+                    }
+
+                    if (mpBurn > 0)
+                    {
+                        this.Mana -= (short)mpBurn;
+                    }
+                }
+
+                // TODO: Apply damage to buffs.
+            }
+
+            using (OutPacket oPacket = new OutPacket(ServerOperationCode.UserHit))
+            {
+                oPacket
+                    .WriteInt(this.ID)
+                    .WriteSByte(type);
+
+                switch (type)
+                {
+                    case MapDamage:
+                        {
+                            oPacket
+                                .WriteInt(damage)
+                                .WriteInt(damage);
+                        }
+                        break;
+
+                    default:
+                        {
+                            oPacket
+                                .WriteInt(damage) // TODO: ... or PGMR damage.
+                                .WriteInt(mobID)
+                                .WriteByte(hit)
+                                .WriteByte(reduction);
+
+                            if (reduction > 0)
+                            {
+                                // TODO: PGMR stuff.
+                            }
+
+                            oPacket
+                                .WriteByte(stance)
+                                .WriteInt(damage);
+
+                            if (noDamageSkillID > 0)
+                            {
+                                oPacket.WriteInt(noDamageSkillID);
+                            }
+                        }
+                        break;
+                }
+
+                this.Map.Broadcast(oPacket, this);
+            }
+        }
+
         public void Talk(InPacket iPacket)
         {
             string text = iPacket.ReadMapleString();

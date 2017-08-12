@@ -71,7 +71,7 @@
         //67
         //68
         ItemSort = 0x45,
-        ItemSort2 = 0x46,
+        ItemGather = 0x46,
         ItemMovement = 0x47,
         UseItem = 0x48,
         CancelItemEffect = 0x49,

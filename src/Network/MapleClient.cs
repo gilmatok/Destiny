@@ -162,6 +162,7 @@ namespace Destiny
                     break;
 
                 case ClientOperationCode.TakeDamage:
+                    this.Character.Damage(iPacket);
                     break;
 
                 case ClientOperationCode.PlayerChat:
@@ -200,13 +201,12 @@ namespace Destiny
                 case ClientOperationCode.HiredMerchant:
                     break;
 
-                //case ClientOperationCode.DueyAction:
-                //    break;
-
                 case ClientOperationCode.ItemSort:
+                    this.Character.Items.Sort(iPacket);
                     break;
 
-                case ClientOperationCode.ItemSort2:
+                case ClientOperationCode.ItemGather:
+                    this.Character.Items.Gather(iPacket);
                     break;
 
                 case ClientOperationCode.ItemMovement:
