@@ -97,7 +97,7 @@ namespace Destiny.Maple.Life.Reactors
                 .WritePoint(this.Position)
                 .WriteShort() // NOTE: Flags (not sure).
                 .WriteBool() // NOTE: Unknown
-                .WriteString(this.Label);
+                .WriteMapleString(this.Label);
 
             return oPacket;
         }

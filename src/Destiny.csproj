@@ -79,6 +79,7 @@
     <Compile Include="Maple\Data\CachedSkills.cs" />
     <Compile Include="Maple\Data\CreationData.cs" />
     <Compile Include="Maple\Data\DataProvider.cs" />
+    <Compile Include="Maple\Interaction\Trade.cs" />
     <Compile Include="Maple\InventoryOperation.cs" />
     <Compile Include="Maple\Life\LifeObject.cs" />
     <Compile Include="Maple\Life\Loot.cs" />
@@ -167,7 +168,6 @@
     <Compile Include="IO\Log.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Maple\Interaction\" />
     <Folder Include="Maple\Social\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

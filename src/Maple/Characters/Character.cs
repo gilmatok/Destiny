@@ -8,6 +8,7 @@ using Destiny.Maple.Commands;
 using Destiny.Maple.Life;
 using Destiny.Data;
 using Destiny.Maple.Data;
+using Destiny.Maple.Interaction;
 
 namespace Destiny.Maple.Characters
 {
@@ -32,6 +33,7 @@ namespace Destiny.Maple.Characters
         public CharacterStorage Storage { get; private set; }
         public ControlledMobs ControlledMobs { get; private set; }
         public ControlledNpcs ControlledNpcs { get; private set; }
+        public Trade Trade { get; set; }
 
         private DateTime LastHealthHealOverTime = new DateTime();
         private DateTime LastManaHealOverTime = new DateTime();
@@ -1452,6 +1454,59 @@ namespace Destiny.Maple.Characters
             }
         }
 
+        public void Interact(InPacket iPacket)
+        {
+            InteractionCode code = (InteractionCode)iPacket.ReadByte();
+
+            switch (code)
+            {
+                case InteractionCode.Create:
+                    {
+                        InteractionType type = (InteractionType)iPacket.ReadByte();
+
+                        switch (type)
+                        {
+                            case InteractionType.Omok:
+                                {
+
+                                }
+                                break;
+
+                            case InteractionType.Trade:
+                                {
+                                    if (this.Trade == null)
+                                    {
+                                        this.Trade = new Trade(this);
+                                    }
+                                }
+                                break;
+
+                            case InteractionType.PlayerShop:
+                                {
+
+                                }
+                                break;
+
+                            case InteractionType.HiredMerchant:
+                                {
+
+                                }
+                                break;
+                        }
+                    }
+                    break;
+
+                default:
+                    {
+                        if (this.Trade != null)
+                        {
+                            this.Trade.Handle(this, code, iPacket);
+                        }
+                    }
+                    break;
+            }
+        }
+
         public void ChangeMapSpecial(InPacket iPacket)
         {
             byte portals = iPacket.ReadByte();
@@ -1528,13 +1583,13 @@ namespace Destiny.Maple.Characters
                 .WriteInt();
         }
 
-        public void EncodeApperance(OutPacket oPacket)
+        public void EncodeApperance(OutPacket oPacket, bool mega = false)
         {
             oPacket
                 .WriteByte((byte)this.Gender)
                 .WriteByte(this.Skin)
                 .WriteInt(this.Face)
-                .WriteBool(true)
+                .WriteBool(mega)
                 .WriteInt(this.Hair);
 
             Dictionary<byte, int> visibleLayer = new Dictionary<byte, int>();

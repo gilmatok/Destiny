@@ -74,6 +74,30 @@ namespace Destiny
         Job = 8
     }
 
+    public enum InteractionCode : byte
+    {
+        Create = 0,
+        Invite = 2,
+        Decline = 3,
+        Visit = 4,
+        Room = 5,
+        Chat = 6,
+        Exit = 10,
+        Open = 11,
+        TradeBirthday = 14,
+        SetItems = 15,
+        SetMeso = 16,
+        Confirm = 17
+    }
+
+    public enum InteractionType : byte
+    {
+        Omok = 1,
+        Trade = 3,
+        PlayerShop = 4,
+        HiredMerchant = 5
+    }
+
     #region Character
     public enum Gender : byte
     {

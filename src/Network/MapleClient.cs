@@ -334,6 +334,7 @@ namespace Destiny
                     break;
 
                 case ClientOperationCode.PlayerInteraction:
+                    this.Character.Interact(iPacket);
                     break;
 
                 case ClientOperationCode.PartyOperation:

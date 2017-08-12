@@ -83,7 +83,7 @@ namespace Destiny.Core.IO
             return this;
         }
 
-        public OutPacket WriteString(string value)
+        private OutPacket WriteString(string value)
         {
             for (int i = 0; i < value.Length; i++)
             {
@@ -114,8 +114,8 @@ namespace Destiny.Core.IO
         {
             string final = string.Format(fmt, args);
 
-            WriteShort((short)final.Length);
-            WriteString(final);
+            this.WriteShort((short)final.Length);
+            this.WriteString(final);
 
             return this;
         }
