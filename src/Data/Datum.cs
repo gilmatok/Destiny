@@ -201,15 +201,13 @@ namespace Destiny.Data
 
             fields += " ) VALUES ( ";
 
-            processed = 0;
-
             object[] valueArr = new object[this.Dictionary.Count];
             this.Dictionary.Values.CopyTo(valueArr, 0);
             for (int i = 0; i < valueArr.Length; i++)
             {
                 fields += "{" + i + "}";
 
-                if (i < this.Dictionary.Count)
+                if (i < valueArr.Length - 1)
                 {
                     fields += ", ";
                 }
