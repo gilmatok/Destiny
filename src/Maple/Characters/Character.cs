@@ -553,6 +553,53 @@ namespace Destiny.Maple.Characters
             }
         }
 
+        public Portal ClosestPortal
+        {
+            get
+            {
+                Portal closestPortal = null;
+                double shortestDistance = double.PositiveInfinity;
+
+                foreach (Portal loopPortal in this.Map.Portals)
+                {
+                    double distance = loopPortal.Position.DistanceFrom(this.Position);
+
+                    if (distance < shortestDistance)
+                    {
+                        closestPortal = loopPortal;
+                        shortestDistance = distance;
+                    }
+                }
+
+                return closestPortal;
+            }
+        }
+
+        public Portal ClosestSpawnPoint
+        {
+            get
+            {
+                Portal closestPortal = null;
+                double shortestDistance = double.PositiveInfinity;
+
+                foreach (Portal loopPortal in this.Map.Portals)
+                {
+                    if (loopPortal.IsSpawnPoint)
+                    {
+                        double distance = loopPortal.Position.DistanceFrom(this.Position);
+
+                        if (distance < shortestDistance)
+                        {
+                            closestPortal = loopPortal;
+                            shortestDistance = distance;
+                        }
+                    }
+                }
+
+                return closestPortal;
+            }
+        }
+
         private bool Assigned { get; set; }
 
         public Character(int id = 0, MapleClient client = null)
@@ -616,6 +663,11 @@ namespace Destiny.Maple.Characters
 
         public void Save()
         {
+            if (this.IsInitialized)
+            {
+                this.SpawnPoint = this.ClosestSpawnPoint.ID;
+            }
+
             Datum datum = new Datum("characters");
 
             datum["AccountID"] = this.AccountID;
@@ -903,12 +955,13 @@ namespace Destiny.Maple.Characters
                         try
                         {
                             portal = this.Map.Portals[label];
-                            this.ChangeMap(portal.DestinationMap, portal.Link.ID);
                         }
                         catch (KeyNotFoundException)
                         {
                             return;
                         }
+
+                        this.ChangeMap(portal.DestinationMapID, portal.Link.ID);
                     }
                     break;
             }

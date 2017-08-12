@@ -5,7 +5,7 @@ namespace Destiny.Core.IO
 {
     public static class BufferPool
     {
-        public const int BufferSize = 1024;
+        public const int BufferSize = 2048;
 
         private static ConcurrentBag<byte[]> sBufferPool = new ConcurrentBag<byte[]>();
 

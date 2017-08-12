@@ -33,7 +33,7 @@ namespace Destiny
             if (this.Character != null)
             {
                 this.Character.Save();
-
+                this.Character.LastNpc = null;
                 this.Character.Map.Characters.Remove(this.Character);
             }
 

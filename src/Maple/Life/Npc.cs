@@ -13,15 +13,7 @@ namespace Destiny.Maple.Life
         public Character Controller { get; set; }
 
         public Shop Shop { get; set; }
-
-        public string ScriptPath
-        {
-            get
-            {
-                return string.Format(@"..\..\scripts\npcs\{0}.js", this.MapleID);
-            }
-        }
-
+        
         public void Converse(Character talker)
         {
             if (this.Shop != null)

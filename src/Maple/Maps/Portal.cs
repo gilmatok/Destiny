@@ -7,23 +7,31 @@ namespace Destiny.Maple.Maps
     {
         public byte ID { get; private set; }
         public string Label { get; private set; }
-        public int DestinationMap { get; private set; }
+        public int DestinationMapID { get; private set; }
         public string DestinationLabel { get; private set; }
         public string Script { get; private set; }
+
+        public bool IsSpawnPoint
+        {
+            get
+            {
+                return this.Label == "sp";
+            }
+        }
+
+        public Map DestinationMap
+        {
+            get
+            {
+                return MasterServer.Channels[this.Map.Channel].Maps[this.DestinationMapID];
+            }
+        }
 
         public Portal Link
         {
             get
             {
-                return MasterServer.Channels[this.Map.Channel].Maps[this.DestinationMap].Portals[this.DestinationLabel];
-            }
-        }
-
-        public string ScriptPath
-        {
-            get
-            {
-                return string.Format(@"..\..\scripts\portals\{0}.js", this.Script);
+                return MasterServer.Channels[this.Map.Channel].Maps[this.DestinationMapID].Portals[this.DestinationLabel];
             }
         }
 
@@ -32,7 +40,7 @@ namespace Destiny.Maple.Maps
             this.ID = (byte)(int)datum["id"];
             this.Label = (string)datum["label"];
             this.Position = new Point((short)datum["x_pos"], (short)datum["y_pos"]);
-            this.DestinationMap = (int)datum["destination"];
+            this.DestinationMapID = (int)datum["destination"];
             this.DestinationLabel = (string)datum["destination_label"];
             this.Script = (string)datum["script"];
         }
