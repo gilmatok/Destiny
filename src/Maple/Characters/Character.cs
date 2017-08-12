@@ -31,6 +31,7 @@ namespace Destiny.Maple.Characters
         public CharacterSkills Skills { get; private set; }
         public CharacterQuests Quests { get; private set; }
         public CharacterKeymap Keymap { get; private set; }
+        public CharacterMemos Memos { get; private set; }
         public CharacterStorage Storage { get; private set; }
         public ControlledMobs ControlledMobs { get; private set; }
         public ControlledNpcs ControlledNpcs { get; private set; }
@@ -615,6 +616,7 @@ namespace Destiny.Maple.Characters
             this.Skills = new CharacterSkills(this);
             this.Quests = new CharacterQuests(this);
             this.Keymap = new CharacterKeymap(this);
+            this.Memos = new CharacterMemos(this);
             this.Storage = new CharacterStorage(this);
 
             this.Position = new Point(0, 0);
@@ -665,6 +667,7 @@ namespace Destiny.Maple.Characters
             this.Skills.Load();
             this.Quests.Load();
             this.Keymap.Load();
+            this.Memos.Load();
         }
 
         public void Save()
@@ -801,6 +804,8 @@ namespace Destiny.Maple.Characters
                 this.Map.Characters.Add(this);
 
                 this.Keymap.Send();
+
+                this.Memos.Send();
             }
         }
 

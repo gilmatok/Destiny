@@ -231,6 +231,7 @@ namespace Destiny
                     break;
 
                 case ClientOperationCode.UseCashItem:
+                    this.Character.Items.UseCashItem(iPacket);
                     break;
 
                 case ClientOperationCode.UseCatchItem:

@@ -6,6 +6,7 @@ using Destiny.Core.IO;
 using Destiny.Data;
 using Destiny.Core.Network;
 using System.Linq;
+using Destiny.Network;
 
 namespace Destiny.Maple.Characters
 {
@@ -340,6 +341,83 @@ namespace Destiny.Maple.Characters
             }
         }
 
+        public void UseCashItem(InPacket iPacket)
+        {
+            short slot = iPacket.ReadShort();
+            int itemID = iPacket.ReadInt();
+
+            Item item = this[itemID, slot];
+
+            if (item == null)
+            {
+                return;
+            }
+
+            switch (item.MapleID / 10000)
+            {
+                case 509: // NOTE: Note (Memo).
+                    {
+                        string targetName = iPacket.ReadMapleString();
+                        string message = iPacket.ReadMapleString();
+
+                        if (MasterServer.OnlineCharacters.ContainsKey(targetName))
+                        {
+                            using (OutPacket oPacket = new OutPacket(ServerOperationCode.MemoResult))
+                            {
+                                oPacket
+                                    .WriteByte((byte)MemoResult.Error)
+                                    .WriteByte((byte)MemoError.ReceiverOnline);
+
+                                this.Parent.Client.Send(oPacket);
+                            }
+                        }
+                        else if (!Database.Exists("characters", "Name = {0}", targetName))
+                        {
+                            using (OutPacket oPacket = new OutPacket(ServerOperationCode.MemoResult))
+                            {
+                                oPacket
+                                    .WriteByte((byte)MemoResult.Error)
+                                    .WriteByte((byte)MemoError.ReceiverInvalidName);
+
+                                this.Parent.Client.Send(oPacket);
+                            }
+                        }
+                        else if (false) // TODO: Receiver's inbox is full. I believe the maximum amount is 5, but need to verify.
+                        {
+                            using (OutPacket oPacket = new OutPacket(ServerOperationCode.MemoResult))
+                            {
+                                oPacket
+                                    .WriteByte((byte)MemoResult.Error)
+                                    .WriteByte((byte)MemoError.ReceiverInboxFull);
+
+                                this.Parent.Client.Send(oPacket);
+                            }
+                        }
+                        else
+                        {
+                            Datum datum = new Datum("memos");
+
+                            datum["CharacterID"] = Database.Fetch("characters", "ID", "Name = {0}", targetName);
+                            datum["Sender"] = this.Parent.Name;
+                            datum["Message"] = message;
+                            datum["Received"] = DateTime.Now;
+
+                            datum.Insert();
+
+                            using (OutPacket oPacket = new OutPacket(ServerOperationCode.MemoResult))
+                            {
+                                oPacket.WriteByte((byte)MemoResult.Sent);
+
+                                this.Parent.Client.Send(oPacket);
+                            }
+
+                            this.Remove(item, true);
+                        }
+                    }
+                    break;
+            }
+        }
+
         public void UseReturnScroll(InPacket iPacket)
         {
             iPacket.ReadInt(); // NOTE: Ticks.
@@ -473,7 +551,7 @@ namespace Destiny.Maple.Characters
 
         public IEnumerable<Item> GetStored()
         {
-            foreach(Item loopItem in this.Items)
+            foreach (Item loopItem in this.Items)
             {
                 if (loopItem.IsStored)
                 {

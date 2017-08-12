@@ -66,6 +66,7 @@
     <Compile Include="IO\Settings.cs" />
     <Compile Include="Maple\Attack.cs" />
     <Compile Include="Maple\Characters\CharacterKeymap.cs" />
+    <Compile Include="Maple\Characters\CharacterMemos.cs" />
     <Compile Include="Maple\Characters\CharacterStorage.cs" />
     <Compile Include="Maple\Commands\Commands.cs" />
     <Compile Include="Maple\Commands\Implementation\KillMobsCommand.cs" />
@@ -97,6 +98,7 @@
     <Compile Include="Maple\Maps\MapSeats.cs" />
     <Compile Include="Maple\Maps\MapSpawnPoints.cs" />
     <Compile Include="Maple\Maps\Seat.cs" />
+    <Compile Include="Maple\Memo.cs" />
     <Compile Include="Maple\Meso.cs" />
     <Compile Include="Maple\NoAccountException.cs" />
     <Compile Include="Maple\Quest.cs" />

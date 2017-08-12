@@ -109,6 +109,20 @@ namespace Destiny
         Whisper = 6
     }
 
+    public enum MemoResult : byte
+    {
+        Send = 3,
+        Sent = 4,
+        Error = 5
+    }
+
+    public enum MemoError : byte
+    {
+        ReceiverOnline,
+        ReceiverInvalidName,
+        ReceiverInboxFull
+    }
+
     #region Character
     public enum Gender : byte
     {
