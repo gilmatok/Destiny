@@ -2,6 +2,7 @@
 using MySql.Data.MySqlClient;
 using System;
 using System.IO;
+using System.Linq;
 
 namespace Destiny.Data
 {
@@ -91,12 +92,38 @@ namespace Destiny.Data
 
         internal static void Execute(string nonQuery, params object[] args)
         {
-            MySqlHelper.ExecuteNonQuery(Database.ConnectionString, string.Format(nonQuery, args));
+            using (MySqlConnection connection = new MySqlConnection(Database.ConnectionString))
+            {
+                connection.Open();
+                using (MySqlCommand command = GetCommand(connection, nonQuery, args))
+                {
+                    command.ExecuteNonQuery();
+                }
+            }
+        }
+
+        internal static MySqlDataReader ExecuteReader(string query, params object[] args)
+        {
+            using (MySqlConnection connection = new MySqlConnection(Database.ConnectionString))
+            {
+                connection.Open();
+                using (MySqlCommand command = GetCommand(connection, query, args))
+                {
+                    return command.ExecuteReader();
+                }
+            }
         }
 
         public static object Scalar(string nonQuery, params object[] args)
         {
-            return MySqlHelper.ExecuteScalar(Database.ConnectionString, string.Format(nonQuery, args));
+            using (MySqlConnection connection = new MySqlConnection(Database.ConnectionString))
+            {
+                connection.Open();
+                using (MySqlCommand command = GetCommand(connection, nonQuery, args))
+                {
+                    return command.ExecuteScalar();
+                }
+            }
         }
 
         public static string DefaultSchema
@@ -127,14 +154,32 @@ namespace Destiny.Data
 
         public static void Delete(string table, string constraints, params object[] args)
         {
-            Database.Execute("DELETE FROM {0} WHERE {1}", table, string.Format(constraints, args));
+            using (MySqlConnection connection = new MySqlConnection(Database.ConnectionString))
+            {
+                connection.Open();
+                using (MySqlCommand command = GetCommand(connection, constraints, args))
+                {
+                    command.CommandText = string.Format("DELETE FROM {0} WHERE ", table) + command.CommandText;
+
+                    command.ExecuteNonQuery();
+                }
+            }
         }
 
         public static bool Exists(string table, string constraints, params object[] args)
         {
-            using (MySqlDataReader reader = MySqlHelper.ExecuteReader(Database.ConnectionString, string.Format("SELECT * FROM {0} WHERE {1}", table, string.Format(constraints, args))))
+            using (MySqlConnection connection = new MySqlConnection(Database.ConnectionString))
             {
-                return reader.HasRows;
+                connection.Open();
+                using (MySqlCommand command = GetCommand(connection, constraints, args))
+                {
+                    command.CommandText = string.Format("SELECT * FROM {0} WHERE ", table) + command.CommandText;
+
+                    using (MySqlDataReader reader = command.ExecuteReader())
+                    {
+                        return reader.HasRows;
+                    }
+                }
             }
         }
 
@@ -189,6 +234,32 @@ namespace Destiny.Data
         public static TemporarySchema TemporarySchema(string schema)
         {
             return new TemporarySchema(schema);
+        }
+
+        public static MySqlCommand GetCommand(MySqlConnection connection, string str, params object[] args)
+        {
+            MySqlCommand command = new MySqlCommand(ParameterizeCommandText("param", str, args), connection);
+
+            command.Parameters.AddRange(ConstraintsToParameters("param", str, args));
+
+            return command;
+        }
+
+        public static string ParameterizeCommandText(string namePrefix, string commandText, params object[] args)
+        {
+            return commandText != null ? string.Format(commandText, args?.Select((v, i) => "@" + namePrefix + i).ToArray()) : string.Empty;
+        }
+
+        public static MySqlParameter[] ConstraintsToParameters(string namePrefix, string constraints, params object[] args)
+        {
+            MySqlParameter[] parameters = new MySqlParameter[args != null ? args.Length : 0];
+
+            for (int i = 0; i < args?.Length; i++)
+            {
+                parameters[i] = new MySqlParameter("@" + namePrefix + i, args[i]);
+            }
+
+            return parameters;
         }
     }
 }

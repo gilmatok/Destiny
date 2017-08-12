@@ -35,7 +35,7 @@ namespace Destiny.Maple
 
             try
             {
-                datum.Populate("ID = '{0}'", accountID);
+                datum.Populate("ID = {0}", accountID);
             }
             catch (RowNotInTableException)
             {
@@ -51,7 +51,7 @@ namespace Destiny.Maple
 
             try
             {
-                datum.Populate("Username = '{0}'", username);
+                datum.Populate("Username = {0}", username);
             }
             catch (RowNotInTableException)
             {
@@ -99,7 +99,7 @@ namespace Destiny.Maple
 
             if (this.Assigned)
             {
-                datum.Update("ID = '{0}'", this.ID);
+                datum.Update("ID = {0}", this.ID);
             }
             else
             {

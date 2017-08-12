@@ -740,7 +740,7 @@ namespace Destiny.Maple.Characters
         {
             Datum datum = new Datum("characters");
 
-            datum.Populate("ID = '{0}'", this.ID);
+            datum.Populate("ID = {0}", this.ID);
 
             this.ID = (int)datum["ID"];
             this.Assigned = true;
@@ -816,7 +816,7 @@ namespace Destiny.Maple.Characters
 
             if (this.Assigned)
             {
-                datum.Update("ID = '{0}'", this.ID);
+                datum.Update("ID = {0}", this.ID);
             }
             else
             {

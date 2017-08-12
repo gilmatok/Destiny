@@ -581,8 +581,8 @@ namespace Destiny
                     oPacket
                         .WriteInt(this.Account.ID)
                         .WriteByte((byte)this.Account.Gender)
-                        .WriteBool(this.Account.IsMaster)
-                        .WriteByte((byte)(this.Account.IsMaster ? 0x80 : 0x00))
+                        .WriteBool() // NOTE: Is Admin
+                        .WriteByte() // NOTE: Admin byte
                         .WriteBool()
                         .WriteMapleString(this.Account.Username)
                         .WriteByte()
@@ -816,7 +816,7 @@ namespace Destiny
 
             List<Character> characters = new List<Character>();
 
-            foreach (Datum datum in new Datums("characters").PopulateWith("ID", "AccountID = '{0}'", this.Account.ID))
+            foreach (Datum datum in new Datums("characters").PopulateWith("ID", "AccountID = {0}", this.Account.ID))
             {
                 Character character = new Character((int)datum["ID"], this);
 
@@ -847,7 +847,7 @@ namespace Destiny
         private void CheckCharacterName(InPacket iPacket)
         {
             string name = iPacket.ReadMapleString();
-            bool unusable = Database.Exists("characters", "Name = '{0}'", name);
+            bool unusable = Database.Exists("characters", "Name = {0}", name);
 
             using (OutPacket oPacket = new OutPacket(ServerOperationCode.CheckDuplicatedIDResult))
             {
@@ -877,7 +877,7 @@ namespace Destiny
 
             //Name constraints
             if (name.Length < 4 || name.Length > 12
-                || Database.Exists("characters", "Name = '{0}'", name)
+                || Database.Exists("characters", "Name = {0}", name)
                 || DataProvider.CreationData.ForbiddenNames.Any(forbiddenWord => name.ToLowerInvariant().Contains(forbiddenWord)))
             {
                 error = true;
@@ -985,13 +985,8 @@ namespace Destiny
 
             if (SHACryptograph.Encrypt(SHAMode.SHA256, pic) == this.Account.Pic || !MasterServer.Login.RequestPic)
             {
-                Database.Delete("characters", "ID = '{0}'", characterID);
-                Database.Delete("buffs", "CharacterID = '{0}'", characterID);
-                Database.Delete("items", "CharacterID = '{0}'", characterID);
-                Database.Delete("keymaps", "CharacterID = '{0}'", characterID);
-                Database.Delete("quests_completed", "CharacterID = '{0}'", characterID);
-                Database.Delete("quests_started", "CharacterID = '{0}'", characterID);
-                Database.Delete("skills", "CharacterID = '{0}'", characterID);
+                //NOTE: As long as foreign keys are set to cascade, all child entries related to this characterId will also be deleted
+                Database.Delete("characters", "ID = {0}", characterID);
 
                 result = CharacterDeletionResult.Valid;
             }
@@ -1121,7 +1116,7 @@ namespace Destiny
             this.IsInViewAllChar = true;
 
             List<Character> characters = new List<Character>();
-            foreach (Datum datum in new Datums("characters").PopulateWith("ID", "AccountID = '{0}'", this.Account.ID))
+            foreach (Datum datum in new Datums("characters").PopulateWith("ID", "AccountID = {0}", this.Account.ID))
             {
                 int characterID = (int)datum["ID"];
                 Character tempChar = new Character(characterID, this);

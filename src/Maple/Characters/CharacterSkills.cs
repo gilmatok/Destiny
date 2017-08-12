@@ -17,7 +17,7 @@ namespace Destiny.Maple.Characters
 
         public void Load()
         {
-            foreach (Datum datum in new Datums("skills").Populate("CharacterID = '{0}'", this.Parent.ID))
+            foreach (Datum datum in new Datums("skills").Populate("CharacterID = {0}", this.Parent.ID))
             {
                 this.Add(new Skill(datum));
             }
