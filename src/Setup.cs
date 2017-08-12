@@ -215,6 +215,7 @@ namespace Destiny
                               `Meso` int(11) NOT NULL DEFAULT '0'
                             ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+
                             ALTER TABLE `accounts`
                               ADD PRIMARY KEY (`ID`),
                               ADD KEY `username` (`Username`) USING BTREE;
@@ -260,6 +261,7 @@ namespace Destiny
                               ADD PRIMARY KEY (`AccountID`),
                               ADD KEY `account_id` (`AccountID`) USING BTREE;
 
+
                             ALTER TABLE `accounts`
                               MODIFY `ID` int(10) NOT NULL AUTO_INCREMENT;
                             ALTER TABLE `buffs`
@@ -274,26 +276,26 @@ namespace Destiny
                               MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
 
                             ALTER TABLE `buffs`
-                              ADD CONSTRAINT `buffs_ibfk_1` FOREIGN KEY (`CharacterID`) REFERENCES `characters` (`ID`);
+                              ADD CONSTRAINT `buffs_ibfk_1` FOREIGN KEY (`CharacterID`) REFERENCES `characters` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
 
                             ALTER TABLE `characters`
-                              ADD CONSTRAINT `characters_ibfk_1` FOREIGN KEY (`AccountID`) REFERENCES `accounts` (`ID`);
+                              ADD CONSTRAINT `characters_ibfk_1` FOREIGN KEY (`AccountID`) REFERENCES `accounts` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
 
                             ALTER TABLE `items`
                               ADD CONSTRAINT `items_ibfk_1` FOREIGN KEY (`AccountID`) REFERENCES `accounts` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE,
                               ADD CONSTRAINT `items_ibfk_2` FOREIGN KEY (`CharacterID`) REFERENCES `characters` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
 
                             ALTER TABLE `keymaps`
-                              ADD CONSTRAINT `keymaps_ibfk_1` FOREIGN KEY (`CharacterID`) REFERENCES `characters` (`ID`);
+                              ADD CONSTRAINT `keymaps_ibfk_1` FOREIGN KEY (`CharacterID`) REFERENCES `characters` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
 
                             ALTER TABLE `quests_completed`
-                              ADD CONSTRAINT `quests_completed_ibfk_1` FOREIGN KEY (`CharacterID`) REFERENCES `characters` (`ID`);
+                              ADD CONSTRAINT `quests_completed_ibfk_1` FOREIGN KEY (`CharacterID`) REFERENCES `characters` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
 
                             ALTER TABLE `quests_started`
-                              ADD CONSTRAINT `quests_started_ibfk_1` FOREIGN KEY (`CharacterID`) REFERENCES `characters` (`ID`);
+                              ADD CONSTRAINT `quests_started_ibfk_1` FOREIGN KEY (`CharacterID`) REFERENCES `characters` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
 
                             ALTER TABLE `skills`
-                              ADD CONSTRAINT `skills_ibfk_1` FOREIGN KEY (`CharacterID`) REFERENCES `characters` (`ID`);
+                              ADD CONSTRAINT `skills_ibfk_1` FOREIGN KEY (`CharacterID`) REFERENCES `characters` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
 
                             ALTER TABLE `storages`
                               ADD CONSTRAINT `storages_ibfk_1` FOREIGN KEY (`AccountID`) REFERENCES `accounts` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;

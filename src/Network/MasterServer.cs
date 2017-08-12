@@ -1,4 +1,8 @@
-﻿namespace Destiny.Network
+﻿using Destiny.Maple.Characters;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace Destiny.Network
 {
     public static class MasterServer
     {
@@ -8,6 +12,15 @@
         public static WorldServer World { get; private set; }
         public static ChannelServer[] Channels { get; private set; }
         public static CashShopServer CashShop { get; private set; }
+        public static Dictionary<string, Character> OnlineCharacters
+        {
+            get
+            {
+                return MasterServer.Channels
+                    .SelectMany(channel => channel.Clients.Select(client => client.Character))
+                    .ToDictionary(chr => chr.Name, chr => chr);
+            }
+        }
 
         static MasterServer()
         {

@@ -1464,18 +1464,8 @@ namespace Destiny.Maple.Characters
             CommandType type = (CommandType)iPacket.ReadByte();
             string targetName = iPacket.ReadMapleString();
 
-            // TODO: Target should be obtained from the whole world, not just the map.
-            // We don't have a player storage collection yet, so for tests I'll be using map.
-            Character target;
-
-            try
-            {
-                target = this.Map.Characters[targetName];
-            }
-            catch (KeyNotFoundException)
-            {
-                target = null;
-            }
+            Character target = null;
+            MasterServer.OnlineCharacters.TryGetValue(targetName, out target);
 
             switch (type)
             {
