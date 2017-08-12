@@ -34,6 +34,7 @@ namespace Destiny.Maple.Characters
         public ControlledMobs ControlledMobs { get; private set; }
         public ControlledNpcs ControlledNpcs { get; private set; }
         public Trade Trade { get; set; }
+        public PlayerShop PlayerShop { get; set; }
 
         private DateTime LastHealthHealOverTime = new DateTime();
         private DateTime LastManaHealOverTime = new DateTime();
@@ -1483,7 +1484,12 @@ namespace Destiny.Maple.Characters
 
                             case InteractionType.PlayerShop:
                                 {
+                                    string description = iPacket.ReadMapleString();
 
+                                    if (this.PlayerShop == null)
+                                    {
+                                        this.PlayerShop = new PlayerShop(this, description);
+                                    }
                                 }
                                 break;
 
@@ -1496,11 +1502,29 @@ namespace Destiny.Maple.Characters
                     }
                     break;
 
+                case InteractionCode.Visit:
+                    {
+                        if (this.PlayerShop == null)
+                        {
+                            int objectID = iPacket.ReadInt();
+
+                            if (this.Map.PlayerShops.Contains(objectID))
+                            {
+                                this.Map.PlayerShops[objectID].AddVisitor(this);
+                            }
+                        }
+                    }
+                    break;
+
                 default:
                     {
                         if (this.Trade != null)
                         {
                             this.Trade.Handle(this, code, iPacket);
+                        }
+                        else if (this.PlayerShop != null)
+                        {
+                            this.PlayerShop.Handle(this, code, iPacket);
                         }
                     }
                     break;
@@ -1750,14 +1774,32 @@ namespace Destiny.Maple.Characters
                 .WriteByte()
                 .WriteByte()
                 .WriteInt(1)
-                .WriteLong()
-                .WriteBool()
-                .WriteBool()
-                .WriteByte()
-                .WriteByte()
-                .WriteByte()
-                .WriteZero(3)
-                .WriteByte(byte.MaxValue);
+                .WriteLong();
+
+            if (this.PlayerShop != null && this.PlayerShop.Owner == this)
+            {
+                oPacket
+                    .WriteByte(4)
+                    .WriteInt(this.PlayerShop.ObjectID)
+                    .WriteMapleString(this.PlayerShop.Description)
+                    .WriteByte()
+                    .WriteByte()
+                    .WriteByte(1)
+                    .WriteByte((byte)(this.PlayerShop.IsFull ? 1 : 2)) // NOTE: Visitor availability.
+                    .WriteByte();
+            }
+            else
+            {
+                oPacket.WriteByte();
+            }
+
+            oPacket
+                .WriteBool() // NOTE: Chalkboard.
+                .WriteByte() // NOTE: Couple ring.
+                .WriteByte() // NOTE: Friendship ring.
+                .WriteByte() // NOTE: Marriage ring.
+                .WriteZero(3) // NOTE: Unknown.
+                .WriteByte(byte.MaxValue); // NOTE: Team.
 
             return oPacket;
         }

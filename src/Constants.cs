@@ -87,7 +87,12 @@ namespace Destiny
         TradeBirthday = 14,
         SetItems = 15,
         SetMeso = 16,
-        Confirm = 17
+        Confirm = 17,
+        AddItem = 22,
+        Buy = 23,
+        UpdateItems = 25,
+        RemoveItem = 27,
+        OpenStore = 30,
     }
 
     public enum InteractionType : byte

@@ -79,6 +79,8 @@
     <Compile Include="Maple\Data\CachedSkills.cs" />
     <Compile Include="Maple\Data\CreationData.cs" />
     <Compile Include="Maple\Data\DataProvider.cs" />
+    <Compile Include="Maple\Interaction\PlayerShop.cs" />
+    <Compile Include="Maple\Interaction\PlayerShopItem.cs" />
     <Compile Include="Maple\Interaction\Trade.cs" />
     <Compile Include="Maple\InventoryOperation.cs" />
     <Compile Include="Maple\Life\LifeObject.cs" />
@@ -90,6 +92,7 @@
     <Compile Include="Maple\Maps\MapFactory.cs" />
     <Compile Include="Maple\Life\SpawnPoint.cs" />
     <Compile Include="Maple\Maps\MapFootholds.cs" />
+    <Compile Include="Maple\Maps\MapPlayerShops.cs" />
     <Compile Include="Maple\Maps\MapSeats.cs" />
     <Compile Include="Maple\Maps\MapSpawnPoints.cs" />
     <Compile Include="Maple\Maps\Seat.cs" />

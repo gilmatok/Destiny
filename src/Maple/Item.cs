@@ -8,7 +8,7 @@ using System;
 
 namespace Destiny.Maple
 {
-    public sealed class Item : Drop
+    public class Item : Drop
     {
         public static ItemType GetType(int mapleID)
         {
@@ -929,10 +929,10 @@ namespace Destiny.Maple
 
             if (this.IsCash)
             {
-                oPacket.WriteLong(); // TODO: Unique ID for certain cash items
+                oPacket.WriteLong(1); // TODO: Unique ID for certain cash items
             }
 
-            oPacket.WriteLong(); // TODO: Expiration.
+            oPacket.WriteLong(150842304000000000); // TODO: Expiration.
 
             if (this.Type == ItemType.Equipment)
             {
@@ -970,10 +970,6 @@ namespace Destiny.Maple
                         .WriteLong()
                         .WriteInt(-1);
                 }
-            }
-            else if (this.Type == ItemType.Cash)
-            {
-                //TODO
             }
             else
             {

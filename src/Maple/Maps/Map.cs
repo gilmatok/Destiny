@@ -38,6 +38,7 @@ namespace Destiny.Maple.Maps
         public MapSeats Seats { get; private set; }
         public MapPortals Portals { get; private set; }
         public MapSpawnPoints SpawnPoints { get; private set; }
+        public MapPlayerShops PlayerShops { get; private set; }
 
         public Map CachedReference
         {
@@ -63,6 +64,7 @@ namespace Destiny.Maple.Maps
             this.Seats = this.CachedReference.Seats;
             this.Portals = this.CachedReference.Portals;
             this.SpawnPoints = this.CachedReference.SpawnPoints;
+            this.PlayerShops = this.CachedReference.PlayerShops;
 
             this.SpawnPoints.Spawn(); // TODO: Move to MapFactory.
         }
@@ -82,6 +84,7 @@ namespace Destiny.Maple.Maps
             this.Reactors = new MapReactors(this);
             this.Portals = new MapPortals(this);
             this.SpawnPoints = new MapSpawnPoints(this);
+            this.PlayerShops = new MapPlayerShops(this);
         }
 
         public void Broadcast(OutPacket oPacket, Character ignored = null)
