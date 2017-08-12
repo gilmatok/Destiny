@@ -169,6 +169,7 @@ namespace Destiny
                     break;
 
                 case ClientOperationCode.CloseChalkboard:
+                    this.Character.Chalkboard = string.Empty;
                     break;
 
                 case ClientOperationCode.FaceExpression:

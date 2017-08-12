@@ -23,7 +23,7 @@ namespace Destiny.Maple
         public short Slot { get; set; }
         private short maxPerStack;
         private short quantity;
-        public string Creator { get; private set; }
+        public string Creator { get; set; }
 
         public bool IsCash { get; private set; }
         public bool OnlyOne { get; private set; }

@@ -391,7 +391,7 @@ namespace Destiny.Maple.Characters
 
                         string text = iPacket.ReadMapleString();
 
-                        string message = string.Format("{0} : {1}", this.Parent.Name, text); // TODO: Include medal.
+                        string message = string.Format($"{this.Parent.Name} : {text}"); // TODO: Include medal name.
 
                         // NOTE: In GMS, this sends to everyone on the current channel, not the map (despite the item's description).
                         using (OutPacket oPacket = new OutPacket(ServerOperationCode.BroadcastMsg))
@@ -422,7 +422,7 @@ namespace Destiny.Maple.Characters
                         string text = iPacket.ReadMapleString();
                         bool whisper = iPacket.ReadBool();
 
-                        string message = string.Format("{0} : {1}", this.Parent.Name, text); // TODO: Include name.
+                        string message = string.Format($"{this.Parent.Name} : {text}"); // TODO: Include medal name.
 
                         using (OutPacket oPacket = new OutPacket(ServerOperationCode.BroadcastMsg))
                         {
@@ -446,13 +446,87 @@ namespace Destiny.Maple.Characters
                 case 5390001: // NOTE: Cloud 9 Messenger.
                 case 5390002: // NOTE: Loveholic Messenger.
                     {
+                        if (this.Parent.Level <= 10)
+                        {
+                            // NOTE: You can't use a megaphone unless you're over level 10.
 
+                            return;
+                        }
+
+                        string text1 = iPacket.ReadMapleString();
+                        string text2 = iPacket.ReadMapleString();
+                        string text3 = iPacket.ReadMapleString();
+                        string text4 = iPacket.ReadMapleString();
+                        bool whisper = iPacket.ReadBool();
+
+                        using (OutPacket oPacket = new OutPacket(ServerOperationCode.SetAvatarMegaphone))
+                        {
+                            oPacket
+                                .WriteInt(itemID)
+                                .WriteMapleString(this.Parent.Name)
+                                .WriteMapleString(text1)
+                                .WriteMapleString(text2)
+                                .WriteMapleString(text3)
+                                .WriteMapleString(text4)
+                                .WriteInt(this.Parent.Client.Channel)
+                                .WriteBool(whisper);
+
+                            this.Parent.EncodeApperance(oPacket, true);
+
+                            foreach (Character character in MasterServer.OnlineCharacters.Select((c) => c.Value))
+                            {
+                                character.Client.Send(oPacket);
+                            }
+                        }
+
+                        used = true;
                     }
                     break;
 
                 case 5076000: // NOTE: Item Megaphone.
                     {
+                        string text = iPacket.ReadMapleString();
+                        bool whisper = iPacket.ReadBool();
+                        bool includeItem = iPacket.ReadBool();
 
+                        Item targetItem = null;
+
+                        if (includeItem)
+                        {
+                            ItemType type = (ItemType)iPacket.ReadInt();
+                            short targetSlot = iPacket.ReadShort();
+
+                            targetItem = this[type, targetSlot];
+
+                            if (targetItem == null)
+                            {
+                                return;
+                            }
+                        }
+
+                        string message = string.Format($"{this.Parent.Name} : {text}"); // TODO: Include medal name.
+
+                        using (OutPacket oPacket = new OutPacket(ServerOperationCode.BroadcastMsg))
+                        {
+                            oPacket
+                                .WriteByte((byte)NoticeType.ItemMegaphone)
+                                .WriteMapleString(message)
+                                .WriteByte(this.Parent.Client.Channel)
+                                .WriteBool(whisper)
+                                .WriteByte((byte)(targetItem != null ? targetItem.Slot : 0));
+
+                            if (targetItem != null)
+                            {
+                                targetItem.Encode(oPacket, true, true);
+                            }
+
+                            foreach (Character character in MasterServer.OnlineCharacters.Select((c) => c.Value))
+                            {
+                                character.Client.Send(oPacket);
+                            }
+                        }
+
+                        used = true;
                     }
                     break;
 
@@ -470,7 +544,24 @@ namespace Destiny.Maple.Characters
 
                 case 5060000: // NOTE: Item Name Tag.
                     {
+                        short targetSlot = iPacket.ReadShort();
 
+                        if (targetSlot == 0)
+                        {
+                            return;
+                        }
+
+                        Item targetItem = this[ItemType.Equipment, targetSlot];
+
+                        if (targetItem == null)
+                        {
+                            return;
+                        }
+
+                        targetItem.Creator = this.Parent.Name;
+                        targetItem.Update(); // TODO: This does not seem to update the item's creator.
+
+                        used = true;
                     }
                     break;
 
@@ -513,7 +604,9 @@ namespace Destiny.Maple.Characters
                 case 5370000: // NOTE: Chalkboard.
                 case 5370001: // NOTE: Chalkboard 2.
                     {
+                        string text = iPacket.ReadMapleString();
 
+                        this.Parent.Chalkboard = text;
                     }
                     break;
 

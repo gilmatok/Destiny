@@ -61,6 +61,7 @@ namespace Destiny.Maple.Characters
         private short fame;
         private int meso;
         private Npc lastNpc;
+        private string chalkboard;
 
         public Gender Gender
         {
@@ -555,6 +556,28 @@ namespace Destiny.Maple.Characters
             set
             {
                 lastNpc = value;
+            }
+        }
+
+        public string Chalkboard
+        {
+            get
+            {
+                return chalkboard;
+            }
+            set
+            {
+                chalkboard = value;
+
+                using (OutPacket oPacket = new OutPacket(ServerOperationCode.Chalkboard))
+                {
+                    oPacket
+                        .WriteInt(this.ID)
+                        .WriteBool(!string.IsNullOrEmpty(this.Chalkboard))
+                        .WriteMapleString(this.Chalkboard);
+
+                    this.Map.Broadcast(oPacket);
+                }
             }
         }
 
@@ -1884,8 +1907,16 @@ namespace Destiny.Maple.Characters
                 oPacket.WriteByte();
             }
 
+            bool hasChalkboard = !string.IsNullOrEmpty(this.Chalkboard);
+
+            oPacket.WriteBool(hasChalkboard);
+
+            if (hasChalkboard)
+            {
+                oPacket.WriteMapleString(this.Chalkboard);
+            }
+
             oPacket
-                .WriteBool() // NOTE: Chalkboard.
                 .WriteByte() // NOTE: Couple ring.
                 .WriteByte() // NOTE: Friendship ring.
                 .WriteByte() // NOTE: Marriage ring.

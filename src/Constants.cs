@@ -58,7 +58,8 @@ namespace Destiny
         SuperMegaphone,
         Ticker,
         Pink,
-        Blue
+        Blue,
+        ItemMegaphone = 8
     }
 
     public enum ServerType
