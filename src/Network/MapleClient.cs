@@ -366,6 +366,7 @@ namespace Destiny
                     break;
 
                 case ClientOperationCode.ChangeKeymap:
+                    this.Character.Keymap.Change(iPacket);
                     break;
 
                 case ClientOperationCode.RingAction:
@@ -877,7 +878,6 @@ namespace Destiny
 
             bool error = false;
 
-            //Name constraints
             if (name.Length < 4 || name.Length > 12
                 || Database.Exists("characters", "Name = {0}", name)
                 || DataProvider.CreationData.ForbiddenNames.Any(forbiddenWord => name.ToLowerInvariant().Contains(forbiddenWord)))
@@ -885,7 +885,6 @@ namespace Destiny
                 error = true;
             }
 
-            //Gender-specific cosmetic/item checks
             if (gender == Gender.Male)
             {
                 if (!DataProvider.CreationData.MaleSkins.Any(x => x.Item1 == jobType && x.Item2 == skin)
@@ -914,9 +913,8 @@ namespace Destiny
                     error = true;
                 }
             }
-            else
+            else // NOTE: Not allowed to choose "both" genders at character creation.
             {
-                //Not allowed to choose "both" genders at character creation
                 error = true;
             }
 
@@ -952,7 +950,46 @@ namespace Destiny
             character.Items.Add(new Item(weaponID, equipped: true));
             character.Items.Add(new Item(jobType == JobType.Cygnus ? 4161047 : jobType == JobType.Explorer ? 4161001 : 4161048), forceGetSlot: true);
 
-            character.Keymap.AddDefault();
+            character.Keymap.Add(new Shortcut(KeymapKey.One, KeymapAction.AllChat));
+            character.Keymap.Add(new Shortcut(KeymapKey.Two, KeymapAction.PartyChat));
+            character.Keymap.Add(new Shortcut(KeymapKey.Three, KeymapAction.BuddyChat));
+            character.Keymap.Add(new Shortcut(KeymapKey.Four, KeymapAction.GuildChat));
+            character.Keymap.Add(new Shortcut(KeymapKey.Five, KeymapAction.AllianceChat));
+            character.Keymap.Add(new Shortcut(KeymapKey.Six, KeymapAction.SpouseChat));
+            character.Keymap.Add(new Shortcut(KeymapKey.Q, KeymapAction.QuestMenu));
+            character.Keymap.Add(new Shortcut(KeymapKey.W, KeymapAction.WorldMap));
+            character.Keymap.Add(new Shortcut(KeymapKey.E, KeymapAction.EquipmentMenu));
+            character.Keymap.Add(new Shortcut(KeymapKey.R, KeymapAction.BuddyList));
+            character.Keymap.Add(new Shortcut(KeymapKey.I, KeymapAction.ItemMenu));
+            character.Keymap.Add(new Shortcut(KeymapKey.O, KeymapAction.PartySearch));
+            character.Keymap.Add(new Shortcut(KeymapKey.P, KeymapAction.PartyList));
+            character.Keymap.Add(new Shortcut(KeymapKey.BracketLeft, KeymapAction.Shortcut));
+            character.Keymap.Add(new Shortcut(KeymapKey.BracketRight, KeymapAction.QuickSlot));
+            character.Keymap.Add(new Shortcut(KeymapKey.LeftCtrl, KeymapAction.Attack));
+            character.Keymap.Add(new Shortcut(KeymapKey.S, KeymapAction.AbilityMenu));
+            character.Keymap.Add(new Shortcut(KeymapKey.F, KeymapAction.FamilyList));
+            character.Keymap.Add(new Shortcut(KeymapKey.G, KeymapAction.GuildList));
+            character.Keymap.Add(new Shortcut(KeymapKey.H, KeymapAction.WhisperChat));
+            character.Keymap.Add(new Shortcut(KeymapKey.K, KeymapAction.SkillMenu));
+            character.Keymap.Add(new Shortcut(KeymapKey.L, KeymapAction.QuestHelper));
+            character.Keymap.Add(new Shortcut(KeymapKey.Semicolon, KeymapAction.Medal));
+            character.Keymap.Add(new Shortcut(KeymapKey.Quote, KeymapAction.ExpandChat));
+            character.Keymap.Add(new Shortcut(KeymapKey.Backtick, KeymapAction.CashShop));
+            character.Keymap.Add(new Shortcut(KeymapKey.Backslash, KeymapAction.SetKey));
+            character.Keymap.Add(new Shortcut(KeymapKey.Z, KeymapAction.PickUp));
+            character.Keymap.Add(new Shortcut(KeymapKey.X, KeymapAction.Sit));
+            character.Keymap.Add(new Shortcut(KeymapKey.C, KeymapAction.Messenger));
+            character.Keymap.Add(new Shortcut(KeymapKey.B, KeymapAction.MonsterBook));
+            character.Keymap.Add(new Shortcut(KeymapKey.M, KeymapAction.MiniMap));
+            character.Keymap.Add(new Shortcut(KeymapKey.LeftAlt, KeymapAction.Jump));
+            character.Keymap.Add(new Shortcut(KeymapKey.Space, KeymapAction.NpcChat));
+            character.Keymap.Add(new Shortcut(KeymapKey.F1, KeymapAction.Cockeyed));
+            character.Keymap.Add(new Shortcut(KeymapKey.F2, KeymapAction.Happy));
+            character.Keymap.Add(new Shortcut(KeymapKey.F3, KeymapAction.Sarcastic));
+            character.Keymap.Add(new Shortcut(KeymapKey.F4, KeymapAction.Crying));
+            character.Keymap.Add(new Shortcut(KeymapKey.F5, KeymapAction.Outraged));
+            character.Keymap.Add(new Shortcut(KeymapKey.F6, KeymapAction.Shocked));
+            character.Keymap.Add(new Shortcut(KeymapKey.F7, KeymapAction.Annoyed));
 
             if (!error)
             {
@@ -989,7 +1026,7 @@ namespace Destiny
 
             if (SHACryptograph.Encrypt(SHAMode.SHA256, pic) == this.Account.Pic || !MasterServer.Login.RequestPic)
             {
-                //NOTE: As long as foreign keys are set to cascade, all child entries related to this characterId will also be deleted
+                //NOTE: As long as foreign keys are set to cascade, all child entries related to this CharacterID will also be deleted.
                 Database.Delete("characters", "ID = {0}", characterID);
 
                 result = CharacterDeletionResult.Valid;

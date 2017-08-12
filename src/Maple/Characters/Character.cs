@@ -799,6 +799,8 @@ namespace Destiny.Maple.Characters
             if (!cashShop)
             {
                 this.Map.Characters.Add(this);
+
+                this.Keymap.Send();
             }
         }
 

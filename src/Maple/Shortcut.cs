@@ -5,8 +5,8 @@ namespace Destiny.Maple
     public sealed class Shortcut
     {
         public KeymapKey Key { get; private set; }
-        public KeymapType Type { get; private set; }
-        public KeymapAction Action { get; private set; }
+        public KeymapType Type { get; set; }
+        public KeymapAction Action { get; set; }
 
         public Shortcut(Datum datum)
         {
@@ -15,10 +15,19 @@ namespace Destiny.Maple
             this.Action = (KeymapAction)datum["Action"];
         }
 
-        public Shortcut(KeymapKey key, KeymapAction action)
+        public Shortcut(KeymapKey key, KeymapAction action, KeymapType type = KeymapType.None)
         {
             this.Key = key;
-            this.Type = this.GetTypeFromAction(action);
+
+            if (type == KeymapType.None)
+            {
+                this.Type = this.GetTypeFromAction(action);
+            }
+            else
+            {
+                this.Type = type;
+            }
+
             this.Action = action;
         }
 
@@ -69,6 +78,7 @@ namespace Destiny.Maple
                 case KeymapAction.AllianceChat:
                 case KeymapAction.PartySearch:
                 case KeymapAction.FamilyList:
+                case KeymapAction.Medal:
                     return KeymapType.Menu;
             }
 

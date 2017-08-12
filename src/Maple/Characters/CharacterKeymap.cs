@@ -1,10 +1,14 @@
-﻿using Destiny.Data;
+﻿using Destiny.Core.IO;
+using Destiny.Core.Network;
+using Destiny.Data;
 using System.Collections.ObjectModel;
 
 namespace Destiny.Maple.Characters
 {
     public sealed class CharacterKeymap : KeyedCollection<KeymapKey, Shortcut>
     {
+        private const int KeyCount = 90;
+
         public Character Parent { get; private set; }
 
         public CharacterKeymap(Character parent)
@@ -42,47 +46,80 @@ namespace Destiny.Maple.Characters
             Database.Delete("keymaps", "CharacterID = {0}", this.Parent.ID);
         }
 
-        public void AddDefault()
+        public void Send()
         {
-            this.Add(new Shortcut(KeymapKey.One, KeymapAction.AllChat));
-            this.Add(new Shortcut(KeymapKey.Two, KeymapAction.PartyChat));
-            this.Add(new Shortcut(KeymapKey.Three, KeymapAction.BuddyChat));
-            this.Add(new Shortcut(KeymapKey.Four, KeymapAction.GuildChat));
-            this.Add(new Shortcut(KeymapKey.Five, KeymapAction.AllianceChat));
-            this.Add(new Shortcut(KeymapKey.Six, KeymapAction.SpouseChat));
-            this.Add(new Shortcut(KeymapKey.Q, KeymapAction.QuestMenu));
-            this.Add(new Shortcut(KeymapKey.W, KeymapAction.WorldMap));
-            this.Add(new Shortcut(KeymapKey.E, KeymapAction.EquipmentMenu));
-            this.Add(new Shortcut(KeymapKey.R, KeymapAction.BuddyList));
-            this.Add(new Shortcut(KeymapKey.I, KeymapAction.ItemMenu));
-            this.Add(new Shortcut(KeymapKey.O, KeymapAction.PartySearch));
-            this.Add(new Shortcut(KeymapKey.P, KeymapAction.PartyList));
-            this.Add(new Shortcut(KeymapKey.BracketLeft, KeymapAction.Shortcut));
-            this.Add(new Shortcut(KeymapKey.BracketRight, KeymapAction.QuickSlot));
-            this.Add(new Shortcut(KeymapKey.LeftCtrl, KeymapAction.Attack));
-            this.Add(new Shortcut(KeymapKey.S, KeymapAction.AbilityMenu));
-            this.Add(new Shortcut(KeymapKey.F, KeymapAction.FamilyList));
-            this.Add(new Shortcut(KeymapKey.G, KeymapAction.GuildList));
-            this.Add(new Shortcut(KeymapKey.H, KeymapAction.WhisperChat));
-            this.Add(new Shortcut(KeymapKey.K, KeymapAction.SkillMenu));
-            this.Add(new Shortcut(KeymapKey.L, KeymapAction.QuestHelper));
-            this.Add(new Shortcut(KeymapKey.Quote, KeymapAction.ExpandChat));
-            this.Add(new Shortcut(KeymapKey.Backtick, KeymapAction.CashShop));
-            this.Add(new Shortcut(KeymapKey.Backslash, KeymapAction.SetKey));
-            this.Add(new Shortcut(KeymapKey.Z, KeymapAction.PickUp));
-            this.Add(new Shortcut(KeymapKey.X, KeymapAction.Sit));
-            this.Add(new Shortcut(KeymapKey.C, KeymapAction.Messenger));
-            this.Add(new Shortcut(KeymapKey.B, KeymapAction.MonsterBook));
-            this.Add(new Shortcut(KeymapKey.M, KeymapAction.MiniMap));
-            this.Add(new Shortcut(KeymapKey.LeftAlt, KeymapAction.Jump));
-            this.Add(new Shortcut(KeymapKey.Space, KeymapAction.NpcChat));
-            this.Add(new Shortcut(KeymapKey.F1, KeymapAction.Cockeyed));
-            this.Add(new Shortcut(KeymapKey.F2, KeymapAction.Happy));
-            this.Add(new Shortcut(KeymapKey.F3, KeymapAction.Sarcastic));
-            this.Add(new Shortcut(KeymapKey.F4, KeymapAction.Crying));
-            this.Add(new Shortcut(KeymapKey.F5, KeymapAction.Outraged));
-            this.Add(new Shortcut(KeymapKey.F6, KeymapAction.Shocked));
-            this.Add(new Shortcut(KeymapKey.F7, KeymapAction.Annoyed));
+            using (OutPacket oPacket = new OutPacket(ServerOperationCode.KeyMap))
+            {
+                oPacket.WriteBool(false);
+
+                for (int i = 0; i < CharacterKeymap.KeyCount; i++)
+                {
+                    KeymapKey key = (KeymapKey)i;
+
+                    if (this.Contains(key))
+                    {
+                        Shortcut shortcut = this[key];
+
+                        oPacket
+                            .WriteByte((byte)shortcut.Type)
+                            .WriteInt((int)shortcut.Action);
+                    }
+                    else
+                    {
+                        oPacket
+                            .WriteByte()
+                            .WriteInt();
+                    }
+                }
+
+                this.Parent.Client.Send(oPacket);
+            }
+        }
+
+        public void Change(InPacket iPacket)
+        {
+            int mode = iPacket.ReadInt();
+            int count = iPacket.ReadInt();
+
+            if (mode == 0)
+            {
+                if (count == 0)
+                {
+                    return;
+                }
+
+                for (int i = 0; i < count; i++)
+                {
+                    KeymapKey key = (KeymapKey)iPacket.ReadInt();
+                    KeymapType type = (KeymapType)iPacket.ReadByte();
+                    KeymapAction action = (KeymapAction)iPacket.ReadInt();
+
+                    if (this.Contains(key))
+                    {
+                        if (type == KeymapType.None)
+                        {
+                            this.Remove(key);
+                        }
+                        else
+                        {
+                            this[key].Type = type;
+                            this[key].Action = action;
+                        }
+                    }
+                    else
+                    {
+                        this.Add(new Shortcut(key, action, type));
+                    }
+                }
+            }
+            else if (mode == 1) // NOTE: Pet automatic mana potion.
+            {
+
+            }
+            else if (mode == 2) // NOTE: Pet automatic mana potion.
+            {
+
+            }
         }
 
         protected override KeymapKey GetKeyForItem(Shortcut item)

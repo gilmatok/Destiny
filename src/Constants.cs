@@ -363,6 +363,7 @@ namespace Destiny
         AllianceChat = 24,
         PartySearch = 25,
         FamilyList = 26,
+        Medal = 27,
 
         PickUp = 50,
         Sit = 51,
