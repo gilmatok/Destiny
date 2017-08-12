@@ -26,7 +26,7 @@ namespace Destiny.Data
                 using (MySqlCommand command = Database.GetCommand(connection, constraints, args))
                 {
                     string whereClause = constraints != null ? " WHERE " + command.CommandText : string.Empty;
-                    command.CommandText = string.Format("SELECT {0} FROM {1}{2}", fields == null ? "*" : Database.CorrectFields(fields), this.Table, whereClause);
+                    command.CommandText = string.Format("SELECT {0} FROM `{1}`{2}", fields == null ? "*" : Database.CorrectFields(fields), this.Table, whereClause);
 
                     using (MySqlDataReader reader = command.ExecuteReader())
                     {
@@ -152,7 +152,7 @@ namespace Destiny.Data
                 connection.Open();
                 using (MySqlCommand command = Database.GetCommand(connection, constraints, args))
                 {
-                    command.CommandText = string.Format("SELECT {0} FROM {1} WHERE ", Database.CorrectFields(fields), this.Table) + command.CommandText;
+                    command.CommandText = string.Format("SELECT {0} FROM `{1}` WHERE ", Database.CorrectFields(fields), this.Table) + command.CommandText;
 
                     using (MySqlDataReader reader = command.ExecuteReader())
                     {
@@ -190,7 +190,7 @@ namespace Destiny.Data
 
             foreach (KeyValuePair<string, object> loopPair in this.Dictionary)
             {
-                fields += loopPair.Key;
+                fields += "`" + loopPair.Key + "`";
                 processed++;
 
                 if (processed < this.Dictionary.Count)
@@ -215,7 +215,7 @@ namespace Destiny.Data
 
             fields += " )";
 
-            Database.Execute(string.Format("INSERT INTO {0} {1}", this.Table, fields), valueArr);
+            Database.Execute(string.Format("INSERT INTO `{0}` {1}", this.Table, fields), valueArr);
         }
 
         public int InsertAndReturnID()
@@ -235,7 +235,7 @@ namespace Destiny.Data
             this.Dictionary.Values.CopyTo(valueArr, 0);
             foreach (KeyValuePair<string, object> loopPair in this.Dictionary)
             {
-                fields += string.Format("{0}={1}", loopPair.Key, "{" + processed + "}");
+                fields += string.Format("`{0}`={1}", loopPair.Key, "{" + processed + "}");
                 processed++;
 
                 if (processed < this.Dictionary.Count)
@@ -249,7 +249,7 @@ namespace Destiny.Data
                 connection.Open();
                 using (MySqlCommand command = Database.GetCommand(connection, constraints, args))
                 {
-                    command.CommandText = Database.ParameterizeCommandText("set", string.Format("UPDATE {0} SET {1} WHERE ", this.Table, fields), valueArr) + command.CommandText;
+                    command.CommandText = Database.ParameterizeCommandText("set", string.Format("UPDATE `{0}` SET {1} WHERE ", this.Table, fields), valueArr) + command.CommandText;
                     command.Parameters.AddRange(Database.ConstraintsToParameters("set", fields, valueArr));
 
                     command.ExecuteNonQuery();

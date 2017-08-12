@@ -57,8 +57,8 @@ namespace Destiny
                         Log.Inform("Please wait...");
 
                         Database.ExecuteScript(databaseHost, databaseUsername, databasePassword, @"
-							CREATE DATABASE IF NOT EXISTS {0} DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
-                            USE {0};
+							CREATE DATABASE IF NOT EXISTS `{0}` DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
+                            USE `{0}`;
 
                             DROP TABLE IF EXISTS `accounts`;
                             CREATE TABLE `accounts` (
@@ -173,7 +173,7 @@ namespace Destiny
                             CREATE TABLE `keymaps` (
                               `ID` int(11) NOT NULL,
                               `CharacterID` int(11) NOT NULL,
-                              `KeyID` int(11) NOT NULL,
+                              `Key` int(11) NOT NULL,
                               `Type` tinyint(3) UNSIGNED NOT NULL,
                               `Action` int(11) NOT NULL
                             ) ENGINE=InnoDB DEFAULT CHARSET=latin1;

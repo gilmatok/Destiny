@@ -66,7 +66,7 @@ namespace Destiny.Data
 
             foreach (string field in tokens)
             {
-                final += field;
+                final += "`" + field + "`";
                 processed++;
 
                 if (processed < tokens.Length)
@@ -159,7 +159,7 @@ namespace Destiny.Data
                 connection.Open();
                 using (MySqlCommand command = GetCommand(connection, constraints, args))
                 {
-                    command.CommandText = string.Format("DELETE FROM {0} WHERE ", table) + command.CommandText;
+                    command.CommandText = string.Format("DELETE FROM `{0}` WHERE ", table) + command.CommandText;
 
                     command.ExecuteNonQuery();
                 }
@@ -173,7 +173,7 @@ namespace Destiny.Data
                 connection.Open();
                 using (MySqlCommand command = GetCommand(connection, constraints, args))
                 {
-                    command.CommandText = string.Format("SELECT * FROM {0} WHERE ", table) + command.CommandText;
+                    command.CommandText = string.Format("SELECT * FROM `{0}` WHERE ", table) + command.CommandText;
 
                     using (MySqlDataReader reader = command.ExecuteReader())
                     {
