@@ -183,6 +183,15 @@ namespace Destiny
                               `IP` varchar(15) NOT NULL
                             ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+                            DROP TABLE IF EXISTS `memos`;
+                            CREATE TABLE `memos` (
+                              `ID` int(11) NOT NULL,
+                              `CharacterID` int(11) NOT NULL DEFAULT '0',
+                              `Sender` varchar(13) NOT NULL DEFAULT '',
+                              `Message` text,
+                              `Received` datetime DEFAULT NULL
+                            ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
                             DROP TABLE IF EXISTS `quests_completed`;
                             CREATE TABLE `quests_completed` (
                               `CharacterID` int(11) NOT NULL,
@@ -247,6 +256,10 @@ namespace Destiny
                             ALTER TABLE `master_ip`
                               ADD PRIMARY KEY (`IP`);
 
+                            ALTER TABLE `memos`
+                              ADD PRIMARY KEY ('ID'),
+                              ADD KEY `CharacterID` (`CharacterID`);
+
                             ALTER TABLE `quests_completed`
                               ADD UNIQUE KEY `Quest` (`CharacterID`,`QuestID`);
 
@@ -272,6 +285,8 @@ namespace Destiny
                               MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
                             ALTER TABLE `keymaps`
                               MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
+                            ALTER TABLE `memos`
+                              MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
                             ALTER TABLE `skills`
                               MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
 
@@ -287,6 +302,9 @@ namespace Destiny
 
                             ALTER TABLE `keymaps`
                               ADD CONSTRAINT `keymaps_ibfk_1` FOREIGN KEY (`CharacterID`) REFERENCES `characters` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+                            ALTER TABLE `memos`
+                              ADD CONSTRAINT `memos_ibfk_1` FOREIGN KEY (`CharacterID`) REFERENCES `characters` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
 
                             ALTER TABLE `quests_completed`
                               ADD CONSTRAINT `quests_completed_ibfk_1` FOREIGN KEY (`CharacterID`) REFERENCES `characters` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
