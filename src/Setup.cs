@@ -193,6 +193,15 @@ namespace Destiny
                               `Received` datetime DEFAULT NULL
                             ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+                            DROP TABLE IF EXISTS `pets`;
+                            CREATE TABLE `pets` (
+                              `ID` int(11) NOT NULL,
+                              `Name` varchar(13) NOT NULL DEFAULT '',
+                              `Level` tinyint(3) unsigned NOT NULL DEFAULT '1',
+                              `Closeness` smallint(5) NOT NULL DEFAULT '0',
+                              `Fullness` tinyint(3) unsigned NOT NULL DEFAULT '1'
+                            ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
                             DROP TABLE IF EXISTS `quests_completed`;
                             CREATE TABLE `quests_completed` (
                               `CharacterID` int(11) NOT NULL,
@@ -261,6 +270,9 @@ namespace Destiny
                               ADD PRIMARY KEY (`ID`),
                               ADD KEY `CharacterID` (`CharacterID`);
 
+                            ALTER TABLE `pets`
+                              ADD PRIMARY KEY (`ID`);
+
                             ALTER TABLE `quests_completed`
                               ADD UNIQUE KEY `Quest` (`CharacterID`,`QuestID`);
 
@@ -287,6 +299,8 @@ namespace Destiny
                             ALTER TABLE `keymaps`
                               MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
                             ALTER TABLE `memos`
+                              MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
+                            ALTER TABLE `pets`
                               MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
                             ALTER TABLE `skills`
                               MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;

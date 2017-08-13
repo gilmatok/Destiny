@@ -146,6 +146,7 @@
         //133
         //134
         ChangeKeymap = 135,
+        MovePet = 167,
 
         #region QUESTIONABLE
         RingAction = 136,
@@ -158,7 +159,6 @@
         MtsMigration = 0x9A,
         PetTalk = 0x9B,
         UseSolomonItem = 0x9C,
-        MovePet = 0xA1,
         PetChat = 0xA2,
         PetCommand = 0xA3,
         PetLoot = 0xA4,

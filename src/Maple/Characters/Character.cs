@@ -31,6 +31,7 @@ namespace Destiny.Maple.Characters
         public CharacterSkills Skills { get; private set; }
         public CharacterQuests Quests { get; private set; }
         public CharacterKeymap Keymap { get; private set; }
+        public CharacterPets Pets { get; private set; }
         public CharacterMemos Memos { get; private set; }
         public CharacterStorage Storage { get; private set; }
         public ControlledMobs ControlledMobs { get; private set; }
@@ -639,6 +640,7 @@ namespace Destiny.Maple.Characters
             this.Skills = new CharacterSkills(this);
             this.Quests = new CharacterQuests(this);
             this.Keymap = new CharacterKeymap(this);
+            this.Pets = new CharacterPets(this);
             this.Memos = new CharacterMemos(this);
             this.Storage = new CharacterStorage(this);
 
@@ -746,6 +748,7 @@ namespace Destiny.Maple.Characters
             this.Skills.Save();
             this.Quests.Save();
             this.Keymap.Save();
+            this.Pets.Save();
 
             Log.Inform("Saved character '{0}' to database.", this.Name);
         }

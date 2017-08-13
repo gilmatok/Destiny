@@ -289,6 +289,7 @@ namespace Destiny
                     break;
 
                 case ClientOperationCode.SpawnPet:
+                    this.Character.Pets.Spawn(iPacket);
                     break;
 
                 case ClientOperationCode.CancelDebuff:
@@ -399,6 +400,7 @@ namespace Destiny
                     break;
 
                 case ClientOperationCode.MovePet:
+                    this.Character.Pets.Move(iPacket);
                     break;
 
                 case ClientOperationCode.PetChat:
