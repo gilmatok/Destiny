@@ -2,6 +2,7 @@
 using Destiny.Maple.Data;
 using Destiny.Network;
 using System;
+using System.Linq;
 
 namespace Destiny.Maple.Commands
 {
@@ -47,6 +48,7 @@ namespace Destiny.Maple.Commands
                 }
                 else
                 {
+                    string mapName = "";
                     int mapID = int.TryParse(args[0], out mapID) ? mapID : -1;
                     byte portalID = 0;
 
@@ -54,11 +56,12 @@ namespace Destiny.Maple.Commands
                     {
                         byte.TryParse(args[1], out portalID);
                     }
-
+                    
                     if (mapID == -1)
                     {
+                        mapName = string.Join(" ", args);
                         CommandMaps val;
-                        Enum.TryParse<CommandMaps>(args[0].Replace(" ", ""), true, out val);
+                        Enum.TryParse<CommandMaps>(mapName.ToAlphaNumeric(), true, out val);
                         if (val > 0)
                             mapID = (int)val;
                     }
@@ -72,7 +75,7 @@ namespace Destiny.Maple.Commands
                     }
                     else
                     {
-                        caller.Notify(string.Format("[Command] Invalid map '{0}'.", args[0]));
+                        caller.Notify(string.Format("[Command] Invalid map name \"{0}\".", mapName));
                     }
                 }
             }
@@ -80,10 +83,43 @@ namespace Destiny.Maple.Commands
 
         private enum CommandMaps
         {
-            //TODO: Add more of these - Proof of concept only
+            MushroomTown = 10000,
             Amherst = 1000000,
             Southperry = 2000000,
-            Sleepywood = 105040300
+            Henesys = 100000000,
+            SomeoneElsesHouse = 100000005,
+            HenesysMarket = 100000100,
+            HenesysPark = 100000200,
+            HenesysGamePark = 100000203,
+            Ellinia = 101000000,
+            MagicLibrary = 101000003,
+            ElliniaStation = 101000300,
+            Perion = 102000000,
+            KerningCity = 103000000,
+            SubwayTicketingBooth = 103000100,
+            KerningSquare = 103040000,
+            LithHarbor = 104000000,
+            ThicketAroundtheBeachIII = 104000400,
+            ThePigBeach = 104010001,
+            Sleepywood = 105040300,
+            RegularSauna = 105040401,
+            VIPSauna = 105040402,
+            AntTunnel = 105050000,
+            AntTunnelPark = 105070001,
+            TheGraveofMushmom = 105070002,
+            OXQuiz = 109020001,
+            OlaOla = 109030001,
+            MapleStoryPhysicalFitnessTest = 109040000,
+            Snowball = 109060000,
+            MinigameChallenge = 109070000,
+            CoconutHarvest = 109080000,
+            FlorinaBeach = 110000000,
+            NautilusHarbor = 120000000,
+            Ereve = 130000000,
+            Rien = 140000000,
+            GM = 180000000,
+            Blank = 180000001,
+            Orbis = 200000000
         }
     }
 }

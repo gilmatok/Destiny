@@ -39,7 +39,7 @@ namespace Destiny.Maple.Maps
                 }
             }
 
-            item.Position = this.Map.Portals[item.SpawnPoint].Position;
+            item.Position = this.Map.Portals.Count > 0 ? this.Map.Portals[item.SpawnPoint].Position : new Point(0, 0);
 
             base.InsertItem(index, item);
 

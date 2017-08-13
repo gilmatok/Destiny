@@ -6,6 +6,7 @@ using System;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace Destiny
 {
@@ -97,6 +98,12 @@ namespace Destiny
             }
 
             return true;
+        }
+
+        public static string ToAlphaNumeric(this string input)
+        {
+            Regex rgx = new Regex("[^a-zA-Z0-9]");
+            return rgx.Replace(input, "");
         }
 
         public static string ClearFormatters(this string value)
