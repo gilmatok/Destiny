@@ -24,6 +24,7 @@ namespace Destiny.Maple
         private short maxPerStack;
         private short quantity;
         public string Creator { get; set; }
+        public DateTime Expiration { get; set; }
 
         public bool IsCash { get; private set; }
         public bool OnlyOne { get; private set; }
@@ -395,13 +396,20 @@ namespace Destiny.Maple
 
         public bool Assigned { get; set; }
 
-        public Item(int mapleID, short quantity = 1, bool equipped = false)
+        public Item(int mapleID, short quantity = 1, DateTime? expiration = null, bool equipped = false)
         {
             this.MapleID = mapleID;
             this.MaxPerStack = this.CachedReference.MaxPerStack;
             this.Quantity = (this.Type == ItemType.Equipment) ? (short)1 : quantity;
             if (equipped) this.Slot = (short)this.GetEquippedSlot();
             this.Creator = string.Empty;
+
+            if (!expiration.HasValue)
+            {
+                expiration = new DateTime(2079, 1, 1, 12, 0, 0); // NOTE: Default expiration time (permanent).
+            }
+
+            this.Expiration = (DateTime)expiration;
 
             this.IsCash = this.CachedReference.IsCash;
             this.OnlyOne = this.CachedReference.OnlyOne;
@@ -465,6 +473,7 @@ namespace Destiny.Maple
                 this.Quantity = (short)datum["Quantity"];
                 this.Slot = (short)datum["Slot"];
                 this.Creator = (string)datum["Creator"];
+                this.Expiration = (DateTime)datum["Expiration"];
 
                 this.IsCash = this.CachedReference.IsCash;
                 this.OnlyOne = this.CachedReference.OnlyOne;
@@ -929,10 +938,10 @@ namespace Destiny.Maple
 
             if (this.IsCash)
             {
-                oPacket.WriteLong(1); // TODO: Unique ID for certain cash items
+                oPacket.WriteLong(1); // TODO: Unique ID for cash items.
             }
 
-            oPacket.WriteLong(150842304000000000); // TODO: Expiration.
+            oPacket.WriteDateTime(this.Expiration);
 
             if (this.Type == ItemType.Equipment)
             {

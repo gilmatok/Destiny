@@ -166,7 +166,8 @@ namespace Destiny
                               `PreventsSlipping` tinyint(1) UNSIGNED NOT NULL DEFAULT '0',
                               `PreventsColdness` tinyint(1) UNSIGNED NOT NULL DEFAULT '0',
                               `IsStored` tinyint(1) UNSIGNED NOT NULL DEFAULT '0',
-                              `Quantity` smallint(6) NOT NULL DEFAULT '1'
+                              `Quantity` smallint(6) NOT NULL DEFAULT '1',
+                              `Expiration` datetime NOT NULL DEFAULT '2079-01-01 12:00:00'
                             ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
                             DROP TABLE IF EXISTS `keymaps`;

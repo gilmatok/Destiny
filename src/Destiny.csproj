@@ -65,6 +65,8 @@
     <Compile Include="IO\SettingReadException.cs" />
     <Compile Include="IO\Settings.cs" />
     <Compile Include="Maple\Attack.cs" />
+    <Compile Include="Maple\Buff.cs" />
+    <Compile Include="Maple\Characters\CharacterBuffs.cs" />
     <Compile Include="Maple\Characters\CharacterKeymap.cs" />
     <Compile Include="Maple\Characters\CharacterMemos.cs" />
     <Compile Include="Maple\Characters\CharacterStorage.cs" />
