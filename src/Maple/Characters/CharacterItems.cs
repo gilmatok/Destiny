@@ -396,7 +396,13 @@ namespace Destiny.Maple.Characters
 
                 case 5050000: // NOTE: AP Reset.
                     {
+                        StatisticType statDestination = (StatisticType)iPacket.ReadInt();
+                        StatisticType statSource = (StatisticType)iPacket.ReadInt();
 
+                        this.Parent.AddAbility(statDestination, 1, true);
+                        this.Parent.AddAbility(statSource, -1, true);
+
+                        used = true;
                     }
                     break;
 
@@ -558,7 +564,20 @@ namespace Destiny.Maple.Characters
 
                 case 5170000: // NOTE: Pet Name Tag.
                     {
+                        // TODO: Get the summoned pet.
 
+                        string name = iPacket.ReadMapleString();
+
+                        using (OutPacket oPacket = new OutPacket(ServerOperationCode.PetNameChanged))
+                        {
+                            oPacket
+                                .WriteInt(this.Parent.ID)
+                                .WriteByte() // NOTE: Index.
+                                .WriteMapleString(name)
+                                .WriteByte();
+
+                            this.Parent.Map.Broadcast(oPacket);
+                        }
                     }
                     break;
 
@@ -617,7 +636,20 @@ namespace Destiny.Maple.Characters
                 case 5200001: // NOTE: Silver Sack of Meso.
                 case 5200002: // NOTE: Gold Sack of Meso.
                     {
+                        this.Parent.Meso += item.Meso;
 
+                        // TODO: We definitely need a GainMeso method with inChat parameter.
+                        using (OutPacket oPacket = new OutPacket(ServerOperationCode.Message))
+                        {
+                            oPacket
+                                .WriteByte((byte)MessageType.IncreaseMeso)
+                                .WriteInt(item.Meso)
+                                .WriteShort();
+
+                            this.Parent.Client.Send(oPacket);
+                        }
+
+                        used = true;
                     }
                     break;
 

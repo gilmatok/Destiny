@@ -1011,7 +1011,7 @@ namespace Destiny.Maple.Characters
         {
             // NOTE: If the map doesn't exist, this line will throw an exception. Calling method needs to catch and handle that situation.
             Map newMap = MasterServer.Channels[this.Client.Channel].Maps[mapID];
-            
+
             // NOTE: If a portal isn't specified, a random spawn point will be chosen.
             if (portalID == 0)
             {
@@ -1039,7 +1039,7 @@ namespace Destiny.Maple.Characters
             {
                 newMap.Characters.Add(this);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 //Failed to change map... Attempt to add the character back to the map they were on
                 oldMap.Characters.Add(this);
@@ -1061,6 +1061,68 @@ namespace Destiny.Maple.Characters
                     .WriteDateTime(DateTime.Now);
 
                 this.Client.Send(oPacket);
+            }
+        }
+
+        public void AddAbility(StatisticType statistic, short mod, bool isReset)
+        {
+            short maxStat = short.MaxValue; // TODO: Should this be a setting?
+            bool isSubtract = mod < 0;
+
+            lock (this)
+            {
+                switch (statistic)
+                {
+                    case StatisticType.Strength:
+                        if (this.Strength >= maxStat)
+                        {
+                            return;
+                        }
+
+                        this.Strength += mod;
+                        break;
+
+                    case StatisticType.Dexterity:
+                        if (this.Dexterity >= maxStat)
+                        {
+                            return;
+                        }
+
+                        this.Dexterity += mod;
+                        break;
+
+                    case StatisticType.Intelligence:
+                        if (this.Intelligence >= maxStat)
+                        {
+                            return;
+                        }
+
+                        this.Intelligence += mod;
+                        break;
+
+                    case StatisticType.Luck:
+                        if (this.Luck >= maxStat)
+                        {
+                            return;
+                        }
+
+                        this.Luck += mod;
+                        break;
+
+                    case StatisticType.MaxHealth:
+                    case StatisticType.MaxMana:
+                        {
+                            // TODO: This is way too complicated for now.
+                        }
+                        break;
+                }
+
+                if (!isReset)
+                {
+                    this.AbilityPoints -= mod;
+                }
+
+                // TODO: Update bonuses.
             }
         }
 

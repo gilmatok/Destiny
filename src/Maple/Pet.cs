@@ -1,5 +1,4 @@
-﻿using System;
-using Destiny.Core.IO;
+﻿using Destiny.Core.IO;
 using Destiny.Maple.Maps;
 using Destiny.Core.Network;
 using Destiny.Maple.Characters;

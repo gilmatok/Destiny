@@ -35,6 +35,7 @@ namespace Destiny.Maple
         public bool IsScissored { get; private set; }
         public bool IsStored { get; set; }
         public int SalePrice { get; private set; }
+        public int Meso { get; private set; }
 
         public byte UpgradesAvailable { get; private set; }
         public byte UpgradesApplied { get; private set; }
@@ -418,6 +419,7 @@ namespace Destiny.Maple
             this.IsScissored = this.CachedReference.IsScissored;
             this.SalePrice = this.CachedReference.SalePrice;
             this.RequiredLevel = this.CachedReference.RequiredLevel;
+            this.Meso = this.CachedReference.Meso;
 
             if (this.Type == ItemType.Equipment)
             {
@@ -484,6 +486,7 @@ namespace Destiny.Maple
                 this.IsStored = (bool)datum["IsStored"];
                 this.SalePrice = this.CachedReference.SalePrice;
                 this.RequiredLevel = this.CachedReference.RequiredLevel;
+                this.Meso = this.CachedReference.Meso;
 
                 if (this.Type == ItemType.Equipment)
                 {
@@ -534,6 +537,7 @@ namespace Destiny.Maple
                 this.IsScissored = false;
                 this.SalePrice = (int)datum["price"];
                 this.RequiredLevel = (byte)datum["min_level"];
+                this.Meso = (int)datum["money"];
             }
         }
 
