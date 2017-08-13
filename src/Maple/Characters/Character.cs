@@ -1008,9 +1008,7 @@ namespace Destiny.Maple.Characters
         {
             // NOTE: If the map doesn't exist, this line will throw an exception. Calling method needs to catch and handle that situation.
             Map newMap = MasterServer.Channels[this.Client.Channel].Maps[mapID];
-
-            this.Map.Characters.Remove(this);
-
+            
             // NOTE: If a portal isn't specified, a random spawn point will be chosen.
             if (portalID == 0)
             {
@@ -1024,11 +1022,25 @@ namespace Destiny.Maple.Characters
                     }
                 }
 
-                this.SpawnPoint = spawnPoints[Constants.Random.Next(0, spawnPoints.Count - 1)].ID;
+                this.SpawnPoint = spawnPoints.Count > 0 ? spawnPoints[Constants.Random.Next(0, spawnPoints.Count - 1)].ID : (byte)0;
             }
             else
             {
                 this.SpawnPoint = portalID;
+            }
+
+            Map oldMap = this.Map;
+            oldMap.Characters.Remove(this);
+
+            try
+            {
+                newMap.Characters.Add(this);
+            }
+            catch(Exception e)
+            {
+                //Failed to change map... Attempt to add the character back to the map they were on
+                oldMap.Characters.Add(this);
+                throw e;
             }
 
             using (OutPacket oPacket = new OutPacket(ServerOperationCode.SetField))
@@ -1047,8 +1059,6 @@ namespace Destiny.Maple.Characters
 
                 this.Client.Send(oPacket);
             }
-
-            newMap.Characters.Add(this);
         }
 
         public void Move(InPacket iPacket)

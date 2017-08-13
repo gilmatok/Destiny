@@ -258,7 +258,7 @@ namespace Destiny
                               ADD PRIMARY KEY (`IP`);
 
                             ALTER TABLE `memos`
-                              ADD PRIMARY KEY ('ID'),
+                              ADD PRIMARY KEY (`ID`),
                               ADD KEY `CharacterID` (`CharacterID`);
 
                             ALTER TABLE `quests_completed`
