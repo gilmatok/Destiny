@@ -4,6 +4,7 @@ using Destiny.Maple.Characters;
 using Destiny.Maple.Data;
 using Destiny.Maple.Life;
 using Destiny.Network;
+using Destiny.Server;
 using Destiny.Threading;
 using System;
 using System.Collections.Generic;
@@ -45,7 +46,7 @@ namespace Destiny.Maple.Maps
                         owner = attacker.Key;
                     }
 
-                    attacker.Key.Experience += (int)Math.Min(item.Experience, (attacker.Value * item.Experience) / item.MaxHealth) * MasterServer.World.ExperienceRate;
+                    attacker.Key.Experience += (int)Math.Min(item.Experience, (attacker.Value * item.Experience) / item.MaxHealth) * 1; // TODO: World's experience rate.
                 }
             }
 
@@ -57,11 +58,11 @@ namespace Destiny.Maple.Maps
 
                 foreach (Loot loopLoot in item.Loots)
                 {
-                    if ((Constants.Random.Next(1000000) / MasterServer.World.DropRate) <= loopLoot.Chance)
+                    if ((Constants.Random.Next(1000000) / 1) <= loopLoot.Chance) // TODO: World's drop rate.
                     {
                         if (loopLoot.IsMeso)
                         {
-                            drops.Add(new Meso((short)(Constants.Random.Next(loopLoot.MinimumQuantity, loopLoot.MaximumQuantity) * MasterServer.World.MesoRate))
+                            drops.Add(new Meso((short)(Constants.Random.Next(loopLoot.MinimumQuantity, loopLoot.MaximumQuantity) * 1)) // TODO: World's meso rate.
                             {
                                 Dropper = item,
                                 Owner = owner

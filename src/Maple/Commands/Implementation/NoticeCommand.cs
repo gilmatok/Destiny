@@ -1,5 +1,5 @@
 ﻿using Destiny.Maple.Characters;
-using Destiny.Network;
+using Destiny.Server;
 
 namespace Destiny.Maple.Commands
 {
@@ -17,7 +17,7 @@ namespace Destiny.Maple.Commands
         {
             get
             {
-                return "message";
+                return "[ message ]";
             }
         }
 
@@ -31,20 +31,15 @@ namespace Destiny.Maple.Commands
 
         public override void Execute(Character caller, string[] args)
         {
-            if (args.Length < 1)
+            string message = args.Length > 0 ? args[0] : string.Empty;
+
+            foreach (WorldServer world in MasterServer.Worlds)
             {
-                this.ShowSyntax(caller);
-            }
-            else
-            {
-                foreach (ChannelServer channel in MasterServer.Channels)
+                foreach (ChannelServer channel in world)
                 {
-                    lock (channel.Clients)
+                    foreach (Character character in channel.Players)
                     {
-                        foreach (MapleClient client in channel.Clients)
-                        {
-                            client.Character.Notify(args[0], NoticeType.Notice);
-                        }
+                        character.Notify(message, NoticeType.Notice);
                     }
                 }
             }

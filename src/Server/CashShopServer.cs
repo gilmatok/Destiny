@@ -1,4 +1,6 @@
-﻿namespace Destiny.Network
+﻿using Destiny.Network;
+
+namespace Destiny.Server
 {
     public sealed class CashShopServer : ServerBase
     {

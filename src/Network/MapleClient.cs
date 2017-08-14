@@ -5,7 +5,7 @@ using Destiny.Data;
 using Destiny.Maple;
 using Destiny.Maple.Characters;
 using Destiny.Maple.Data;
-using Destiny.Network;
+using Destiny.Server;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,6 +21,7 @@ namespace Destiny
         public string LastUsername { get; private set; }
         public string LastPassword { get; private set; }
 
+        public byte World { get; set; }
         public byte Channel { get; set; }
         public bool IsInCashShop { get; set; }
 
@@ -41,12 +42,16 @@ namespace Destiny
             {
                 MasterServer.CashShop.Clients.Remove(this);
             }
-            else if (this.Channel >= 0)
+            else if (this.Character != null && this.Character.IsInitialized)
             {
-                MasterServer.Channels[this.Channel].Clients.Remove(this);
-            }
+                MasterServer.Worlds[this.World][this.Channel].Players.Unregister(this.Character);
 
-            MasterServer.Login.Clients.Remove(this);
+                MasterServer.Worlds[this.World][this.Channel].Clients.Remove(this);
+            }
+            else
+            {
+                MasterServer.Login.Clients.Remove(this);
+            }
         }
 
         protected override void Dispatch(InPacket iPacket)
@@ -760,39 +765,34 @@ namespace Destiny
 
         private void ListWorlds()
         {
-            using (OutPacket oPacket = new OutPacket(ServerOperationCode.WorldInformation))
+            foreach (WorldServer world in MasterServer.Worlds)
             {
-                oPacket
-                    .WriteByte()
-                    .WriteMapleString(MasterServer.World.Name)
-                    .WriteByte((byte)MasterServer.World.Flag)
-                    .WriteMapleString(MasterServer.World.EventMessage)
-                    .WriteShort(100) //Event EXP rate
-                    .WriteShort(100) //Event Drop rate
-                    .WriteByte()
-                    .WriteByte((byte)MasterServer.Channels.Length);
-
-                foreach (ChannelServer channel in MasterServer.Channels)
+                using (OutPacket oPacket = new OutPacket(ServerOperationCode.WorldInformation))
                 {
                     oPacket
-                        .WriteMapleString(channel.Label)
-                        .WriteInt(channel.Load)
-                        .WriteByte(1)
-                        .WriteByte(channel.ID)
-                        .WriteByte(); //Adult-only channel
+                        .WriteByte()
+                        .WriteMapleString(world.Name)
+                        .WriteByte((byte)world.Flag)
+                        .WriteMapleString(world.EventMessage)
+                        .WriteShort(100) // NOTE: Event EXP rate.
+                        .WriteShort(100) // NOTE: Event drop rate.
+                        .WriteBool(false) // NOTE: Disables character creation.
+                        .WriteByte((byte)world.Count);
+
+                    foreach (ChannelServer channel in world)
+                    {
+                        oPacket
+                            .WriteMapleString(channel.Label)
+                            .WriteInt(channel.Load)
+                            .WriteByte(1)
+                            .WriteByte(channel.ID)
+                            .WriteBool(false); // NOTE: Adult channel.
+                    }
+
+                    oPacket.WriteShort(); // TODO: Implement world balloons. These are chat bubbles shown on the world select screen.
+
+                    this.Send(oPacket);
                 }
-
-                //TODO: Add login balloons. These are chat bubbles shown on the world select screen
-                oPacket.WriteShort(); //balloon count
-                                      //foreach (var balloon in balloons)
-                                      //{
-                                      //    oPacket
-                                      //        .WriteShort(balloon.X)
-                                      //        .WriteShort(balloon.Y)
-                                      //        .WriteString(balloon.Text);
-                                      //}
-
-                this.Send(oPacket);
             }
 
             using (OutPacket oPacket = new OutPacket(ServerOperationCode.WorldInformation))
@@ -805,7 +805,9 @@ namespace Destiny
 
         private void InformWorldStatus(InPacket iPacket)
         {
-            iPacket.Skip(1); // NOTE: World ID, but we're not using it.
+            byte worldID = iPacket.ReadByte();
+
+            // NOTE: Unless we want to impose a maximum registered users, this is useless.
 
             using (OutPacket oPacket = new OutPacket(ServerOperationCode.CheckUserLimitResult))
             {
@@ -817,13 +819,14 @@ namespace Destiny
 
         private void SelectWorld(InPacket iPacket)
         {
-            iPacket.Skip(1);
-            iPacket.Skip(1); // NOTE: World ID, but we're not using it.
+            iPacket.Skip(1); // NOTE: Connection type (GameLaunching, WebStart, etc.).
+            this.World = iPacket.ReadByte();
             this.Channel = iPacket.ReadByte();
+            iPacket.ReadInt(); // NOTE: IPv4 address.
 
             List<Character> characters = new List<Character>();
 
-            foreach (Datum datum in new Datums("characters").PopulateWith("ID", "AccountID = {0}", this.Account.ID))
+            foreach (Datum datum in new Datums("characters").PopulateWith("ID", "AccountID = {0} && WorldID = {1}", this.Account.ID, this.World))
             {
                 Character character = new Character((int)datum["ID"], this);
 
@@ -944,7 +947,7 @@ namespace Destiny
             character.SkillPoints = 0;
             character.Experience = 0;
             character.Fame = 0;
-            character.Map = MasterServer.Channels[this.Channel].Maps[jobType == JobType.Cygnus ? 130030000 : jobType == JobType.Explorer ? 10000 : 914000000];
+            character.Map = MasterServer.Worlds[this.World][this.Channel].Maps[jobType == JobType.Cygnus ? 130030000 : jobType == JobType.Explorer ? 10000 : 914000000];
             character.SpawnPoint = 0;
             character.Meso = 0;
 
@@ -1094,15 +1097,15 @@ namespace Destiny
 
             if (!requestPic || SHACryptograph.Encrypt(SHAMode.SHA256, pic) == this.Account.Pic)
             {
-                MasterServer.Channels[this.Channel].Migrations.Add(this.Host, this.Account.ID, characterID);
+                MasterServer.Worlds[this.World][this.Channel].Migrations.Add(this.Host, this.Account.ID, characterID);
 
                 using (OutPacket oPacket = new OutPacket(ServerOperationCode.SelectCharacterResult))
                 {
                     oPacket
                         .WriteByte()
                         .WriteByte()
-                        .WriteBytes(MasterServer.World.HostIP.GetAddressBytes())
-                        .WriteShort(MasterServer.Channels[this.Channel].Port)
+                        .WriteBytes(new byte[4] { 127, 0, 0, 1 }) // TODO: HostIP property to channels.
+                        .WriteShort(MasterServer.Worlds[this.World][this.Channel].Port)
                         .WriteInt(characterID)
                         .WriteInt()
                         .WriteByte();
@@ -1125,9 +1128,9 @@ namespace Destiny
         {
             int accountID;
             int characterID = iPacket.ReadInt();
-            iPacket.Skip(2); //NOTE: Unknown
+            iPacket.Skip(2); // NOTE: Unknown
 
-            if ((accountID = MasterServer.Channels[this.Channel].Migrations.Validate(this.Host, characterID)) == -1)
+            if ((accountID = MasterServer.Worlds[this.World][this.Channel].Migrations.Validate(this.Host, characterID)) == -1)
             {
                 this.Close();
 
@@ -1139,9 +1142,13 @@ namespace Destiny
 
             this.Character = new Character(characterID, this);
             this.Character.Load();
+
+            MasterServer.Worlds[this.World][this.Channel].Players.Register(this.Character);
+
             this.Character.Initialize();
         }
 
+        // TODO: Make work with the new worlds.
         private void ViewAllChar(InPacket iPacket)
         {
             if (this.IsInViewAllChar)
@@ -1180,7 +1187,7 @@ namespace Destiny
                 {
                     oPacket
                         .WriteByte((byte)VACResult.SendCount)
-                        .WriteInt(1) //NOTE: World count
+                        .WriteInt(1) // NOTE: World count.
                         .WriteInt(characters.Count);
                     //.WriteInt(Math.Max(1, (int)Math.Ceiling(characters.Count / 3d))); //NOTE: Row count
                 }
@@ -1192,7 +1199,7 @@ namespace Destiny
             {
                 oPacket
                     .WriteByte((byte)VACResult.CharInfo)
-                    .WriteByte() //NOTE: World id
+                    .WriteByte() // NOTE: World id
                     .WriteByte((byte)characters.Count);
 
                 foreach (Character c in characters)

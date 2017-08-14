@@ -1,7 +1,7 @@
 ﻿using Destiny.Core.Network;
 using System.Collections.Generic;
 
-namespace Destiny.Network
+namespace Destiny.Server
 {
     public abstract class ServerBase
     {

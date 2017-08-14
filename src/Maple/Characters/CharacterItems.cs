@@ -7,6 +7,7 @@ using Destiny.Data;
 using Destiny.Core.Network;
 using System.Linq;
 using Destiny.Network;
+using Destiny.Server;
 
 namespace Destiny.Maple.Characters
 {
@@ -426,7 +427,7 @@ namespace Destiny.Maple.Characters
                                 .WriteByte((byte)NoticeType.Megaphone)
                                 .WriteMapleString(message);
 
-                            foreach (var character in MasterServer.OnlineCharacters.Where(c => c.Value.Client.Character == this.Parent.Client.Character).Select((c) => c.Value))
+                            foreach (Character character in MasterServer.Worlds[this.Parent.Client.World][this.Parent.Client.Channel].Players)
                             {
                                 character.Client.Send(oPacket);
                             }
@@ -458,9 +459,15 @@ namespace Destiny.Maple.Characters
                                 .WriteByte(this.Parent.Client.Channel)
                                 .WriteBool(whisper);
 
-                            foreach (Character character in MasterServer.OnlineCharacters.Select((c) => c.Value))
+                            foreach (WorldServer world in MasterServer.Worlds)
                             {
-                                character.Client.Send(oPacket);
+                                foreach (ChannelServer channel in world)
+                                {
+                                    foreach (Character character in channel.Players)
+                                    {
+                                        character.Client.Send(oPacket);
+                                    }
+                                }
                             }
                         }
 
@@ -499,9 +506,15 @@ namespace Destiny.Maple.Characters
 
                             this.Parent.EncodeApperance(oPacket, true);
 
-                            foreach (Character character in MasterServer.OnlineCharacters.Select((c) => c.Value))
+                            foreach (WorldServer world in MasterServer.Worlds)
                             {
-                                character.Client.Send(oPacket);
+                                foreach (ChannelServer channel in world)
+                                {
+                                    foreach (Character character in channel.Players)
+                                    {
+                                        character.Client.Send(oPacket);
+                                    }
+                                }
                             }
                         }
 
@@ -546,9 +559,15 @@ namespace Destiny.Maple.Characters
                                 targetItem.Encode(oPacket, true, true);
                             }
 
-                            foreach (Character character in MasterServer.OnlineCharacters.Select((c) => c.Value))
+                            foreach (WorldServer world in MasterServer.Worlds)
                             {
-                                character.Client.Send(oPacket);
+                                foreach (ChannelServer channel in world)
+                                {
+                                    foreach (Character character in channel.Players)
+                                    {
+                                        character.Client.Send(oPacket);
+                                    }
+                                }
                             }
                         }
 
@@ -681,18 +700,20 @@ namespace Destiny.Maple.Characters
                         string targetName = iPacket.ReadMapleString();
                         string message = iPacket.ReadMapleString();
 
-                        if (MasterServer.OnlineCharacters.ContainsKey(targetName))
-                        {
-                            using (OutPacket oPacket = new OutPacket(ServerOperationCode.MemoResult))
-                            {
-                                oPacket
-                                    .WriteByte((byte)MemoResult.Error)
-                                    .WriteByte((byte)MemoError.ReceiverOnline);
+                        // TODO: Make work with the new worlds.
+                        //if (MasterServer.OnlineCharacters.ContainsKey(targetName))
+                        //{
+                        //    using (OutPacket oPacket = new OutPacket(ServerOperationCode.MemoResult))
+                        //    {
+                        //        oPacket
+                        //            .WriteByte((byte)MemoResult.Error)
+                        //            .WriteByte((byte)MemoError.ReceiverOnline);
 
-                                this.Parent.Client.Send(oPacket);
-                            }
-                        }
-                        else if (!Database.Exists("characters", "Name = {0}", targetName))
+                        //        this.Parent.Client.Send(oPacket);
+                        //    }
+                        //}
+                        //else 
+                        if (!Database.Exists("characters", "Name = {0}", targetName))
                         {
                             using (OutPacket oPacket = new OutPacket(ServerOperationCode.MemoResult))
                             {

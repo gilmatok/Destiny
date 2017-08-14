@@ -1,6 +1,6 @@
 ﻿using Destiny.IO;
 
-namespace Destiny.Network
+namespace Destiny.Server
 {
     public sealed class LoginServer : ServerBase
     {

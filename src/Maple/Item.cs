@@ -962,7 +962,7 @@ namespace Destiny.Maple
                     .WriteInt()
                     .WriteByte(0x50)
                     .WriteByte(0x46)
-                    .WriteInt();
+                    .WriteInt(); // NOTE: Expiry time (trial pet).
             }
             else if (this.Type == ItemType.Equipment)
             {

@@ -9,6 +9,7 @@ using Destiny.Maple.Life;
 using Destiny.Data;
 using Destiny.Maple.Data;
 using Destiny.Maple.Interaction;
+using Destiny.Server;
 
 namespace Destiny.Maple.Characters
 {
@@ -18,6 +19,7 @@ namespace Destiny.Maple.Characters
 
         public int ID { get; set; }
         public int AccountID { get; set; }
+        public byte WorldID { get; set; }
         public string Name { get; set; }
         public bool IsInitialized { get; private set; }
 
@@ -678,7 +680,7 @@ namespace Destiny.Maple.Characters
             this.SkillPoints = (short)datum["SkillPoints"];
             this.Experience = (int)datum["Experience"];
             this.Fame = (short)datum["Fame"];
-            this.Map = MasterServer.Channels[this.Client.Channel].Maps[(int)datum["Map"]];
+            this.Map = MasterServer.Worlds[this.Client.World][this.Client.Channel].Maps[(int)datum["Map"]];
             this.SpawnPoint = (byte)datum["SpawnPoint"];
             this.Meso = (int)datum["Meso"];
 
@@ -705,6 +707,7 @@ namespace Destiny.Maple.Characters
             Datum datum = new Datum("characters");
 
             datum["AccountID"] = this.AccountID;
+            datum["WorldID"] = this.Client.World;
             datum["Name"] = this.Name;
             datum["Gender"] = (byte)this.Gender;
             datum["Skin"] = this.Skin;
@@ -1010,7 +1013,7 @@ namespace Destiny.Maple.Characters
         public void ChangeMap(int mapID, byte portalID = 0)
         {
             // NOTE: If the map doesn't exist, this line will throw an exception. Calling method needs to catch and handle that situation.
-            Map newMap = MasterServer.Channels[this.Client.Channel].Maps[mapID];
+            Map newMap = MasterServer.Worlds[this.Client.World][this.Client.Channel].Maps[mapID];
 
             // NOTE: If a portal isn't specified, a random spawn point will be chosen.
             if (portalID == 0)
@@ -1725,8 +1728,7 @@ namespace Destiny.Maple.Characters
             CommandType type = (CommandType)iPacket.ReadByte();
             string targetName = iPacket.ReadMapleString();
 
-            Character target = null;
-            MasterServer.OnlineCharacters.TryGetValue(targetName, out target);
+            Character target = MasterServer.Worlds[this.Client.World][this.Client.Channel].Players.GetCharacter(targetName);
 
             switch (type)
             {
