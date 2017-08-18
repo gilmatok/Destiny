@@ -1,14 +1,23 @@
 ﻿using Destiny.Core.Network;
+using Destiny.Network;
 using System.Collections.Generic;
+using System.Net.Sockets;
 
 namespace Destiny.Server
 {
     public abstract class ServerBase
     {
-        private Acceptor mAcceptor;
+        protected Acceptor mAcceptor;
+        protected List<MapleClient> mClients;
+        protected PacketProcessor mProcessor;
 
-        public string Label { get; private set; }
-        public List<MapleClient> Clients { get; private set; }
+        public string Label
+        {
+            get
+            {
+                return mProcessor.Label;
+            }
+        }
 
         public short Port
         {
@@ -22,9 +31,9 @@ namespace Destiny.Server
         {
             get
             {
-                lock (this.Clients)
+                lock (mClients)
                 {
-                    return this.Clients.Count;
+                    return mClients.Count;
                 }
             }
         }
@@ -32,9 +41,10 @@ namespace Destiny.Server
         protected ServerBase(string label, short port)
         {
             mAcceptor = new Acceptor(port, this.OnClientAccepted);
+            mClients = new List<MapleClient>();
+            mProcessor = new PacketProcessor(label);
 
-            this.Label = label;
-            this.Clients = new List<MapleClient>();
+            this.SpawnHandlers();
         }
 
         public virtual void Start()
@@ -51,7 +61,7 @@ namespace Destiny.Server
                 mAcceptor.Stop();
             }
 
-            MapleClient[] remainingClients = this.Clients.ToArray();
+            MapleClient[] remainingClients = mClients.ToArray();
 
             foreach (MapleClient client in remainingClients)
             {
@@ -61,16 +71,23 @@ namespace Destiny.Server
             Log.Warn("{0} server stopped.", this.Label);
         }
 
-        protected virtual void OnClientAccepted(MapleClient client)
+        protected abstract void SpawnHandlers();
+        protected abstract void OnClientAccepted(Socket socket);
+
+        public void AddClient(MapleClient client)
         {
-            lock (this.Clients)
+            lock (mClients)
             {
-                this.Clients.Add(client);
+                mClients.Add(client);
             }
+        }
 
-            client.Handshake();
-
-            Log.Inform("Accepted client from {0} on {1} server.", client.Host, this.Label);
+        public void RemoveClient(MapleClient client)
+        {
+            lock (mClients)
+            {
+                mClients.Remove(client);
+            }
         }
     }
 }

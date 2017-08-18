@@ -61,6 +61,9 @@
     <Compile Include="Data\Datum.cs" />
     <Compile Include="Data\Meta.cs" />
     <Compile Include="Data\RowNotUniqueException.cs" />
+    <Compile Include="Handlers\LoginHandlers.cs" />
+    <Compile Include="Handlers\PlayerHandlers.cs" />
+    <Compile Include="Handlers\ServerHandlers.cs" />
     <Compile Include="IO\LogLevel.cs" />
     <Compile Include="IO\SettingReadException.cs" />
     <Compile Include="IO\Settings.cs" />
@@ -172,7 +175,6 @@
     <Compile Include="Server\LoginServer.cs" />
     <Compile Include="Server\MasterServer.cs" />
     <Compile Include="Server\ServerBase.cs" />
-    <Compile Include="Server\CashShopServer.cs" />
     <Compile Include="Threading\Delay.cs" />
     <Compile Include="Data\Database.cs" />
     <Compile Include="IO\Log.cs" />

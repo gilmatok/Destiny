@@ -6,7 +6,6 @@
 
         public static LoginServer Login { get; private set; }
         public static WorldServer[] Worlds { get; private set; }
-        public static CashShopServer CashShop { get; private set; }
 
         static MasterServer()
         {
@@ -17,8 +16,6 @@
             {
                 MasterServer.Worlds[i] = new WorldServer();
             }
-
-            MasterServer.CashShop = new CashShopServer(9000);
         }
 
         public static void Start()
@@ -34,8 +31,6 @@
             {
                 world.Start();
             }
-
-            MasterServer.CashShop.Start();
 
             MasterServer.IsAlive = true;
 
@@ -55,8 +50,6 @@
             {
                 world.Stop();
             }
-
-            MasterServer.CashShop.Stop();
 
             MasterServer.IsAlive = false;
 

@@ -45,7 +45,7 @@
         PlayerMovement = 41,
         Sit = 42,
         UseChair = 43,
-        CloseRangeAttack = 44,
+        MeleeAttack = 44,
         RangedAttack = 45,
         MagicAttack = 46,
         EnergyOrbAttack = 47,
