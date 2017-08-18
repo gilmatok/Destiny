@@ -107,10 +107,8 @@
     <Compile Include="Maple\Shops\Shop.cs" />
     <Compile Include="Maple\Shops\ShopItem.cs" />
     <Compile Include="Maple\Shortcut.cs" />
-    <Compile Include="Maple\Social\Party.cs" />
     <Compile Include="Maple\StyleUnavailableException.cs" />
     <Compile Include="Network\MigrationRegistery.cs" />
-    <Compile Include="Network\PartyRegistery.cs" />
     <Compile Include="Server\WorldServer.cs" />
     <Compile Include="Network\PlayerStorage.cs" />
     <Compile Include="Setup.cs" />
@@ -179,7 +177,9 @@
     <Compile Include="Data\Database.cs" />
     <Compile Include="IO\Log.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Maple\Social\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>IF EXIST "$(SolutionDir)LaunchClient*" copy "$(SolutionDir)LaunchClient*" "$(ProjectDir)$(OutDir)"</PostBuildEvent>

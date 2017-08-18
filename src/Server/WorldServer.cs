@@ -1,5 +1,4 @@
-﻿using Destiny.Network;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 
 namespace Destiny.Server
 {
@@ -17,8 +16,6 @@ namespace Destiny.Server
         public int MesoRate { get; private set; }
         public int DropRate { get; private set; }
 
-        public PartyRegistery Parties { get; private set; }
-
         public WorldServer()
         {
             this.ID = 0;
@@ -32,8 +29,6 @@ namespace Destiny.Server
             this.PartyQuestExperienceRate = 1;
             this.MesoRate = 1;
             this.DropRate = 1;
-
-            this.Parties = new PartyRegistery();
 
             this.Add(new ChannelServer(0, 0, 8585));
             this.Add(new ChannelServer(1, 0, 8586));

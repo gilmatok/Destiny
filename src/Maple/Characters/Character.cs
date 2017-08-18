@@ -1,5 +1,4 @@
-﻿using Destiny.Network;
-using Destiny.Core.IO;
+﻿using Destiny.Core.IO;
 using Destiny.Maple.Maps;
 using System;
 using Destiny.Core.Network;
@@ -10,7 +9,6 @@ using Destiny.Data;
 using Destiny.Maple.Data;
 using Destiny.Maple.Interaction;
 using Destiny.Server;
-using Destiny.Maple.Social;
 
 namespace Destiny.Maple.Characters
 {
@@ -39,7 +37,6 @@ namespace Destiny.Maple.Characters
         public CharacterStorage Storage { get; private set; }
         public ControlledMobs ControlledMobs { get; private set; }
         public ControlledNpcs ControlledNpcs { get; private set; }
-        public Party Party { get; set; }
         public Trade Trade { get; set; }
         public PlayerShop PlayerShop { get; set; }
 
@@ -1879,78 +1876,7 @@ namespace Destiny.Maple.Characters
                     break;
             }
         }
-
-        public void DoParty(InPacket iPacket)
-        {
-            PartyAction action = (PartyAction)iPacket.ReadByte();
-
-            switch (action)
-            {
-                case PartyAction.Create:
-                    {
-                        if (this.Party != null)
-                        {
-                            return;
-                        }
-
-                        this.Party = MasterServer.Worlds[this.Client.World].Parties.Create(this);
-
-                        using (OutPacket oPacket = new OutPacket(ServerOperationCode.PartyResult))
-                        {
-                            oPacket
-                                .WriteByte(8)
-                                .WriteInt(this.Party.ID)
-                                .WriteInt(999999999) // NOTE: Door's map 1 ID.
-                                .WriteInt(999999999) // NOTE: Door's map 2 ID.
-                                .WriteShort() // NOTE: Door's X position.
-                                .WriteShort(); // NOTE: Door's Y position.
-
-                            this.Client.Send(oPacket);
-                        }
-                    }
-                    break;
-
-                case PartyAction.Leave:
-                    {
-                        if (this.Party == null)
-                        {
-                            return;
-                        }
-
-                        if (this == this.Party.Leader)
-                        {
-                            foreach (Character member in this.Party)
-                            {
-                                using (OutPacket oPacket = new OutPacket(ServerOperationCode.PartyResult))
-                                {
-                                    oPacket
-                                        .WriteByte(12)
-                                        .WriteInt(this.Party.ID)
-                                        .WriteInt(member.ID)
-                                        .WriteByte(0)
-                                        .WriteInt(this.Party.ID);
-
-                                    member.Client.Send(oPacket);
-                                }
-
-                                member.Party = null;
-                            }
-                        }
-                        else
-                        {
-
-                        }
-                    }
-                    break;
-
-                case PartyAction.Join:
-                    {
-
-                    }
-                    break;
-            }
-        }
-
+        
         public void ChangeMapSpecial(InPacket iPacket)
         {
             byte portals = iPacket.ReadByte();
