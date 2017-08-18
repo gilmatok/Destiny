@@ -347,6 +347,7 @@ namespace Destiny
                     break;
 
                 case ClientOperationCode.PartyOperation:
+                    this.Character.DoParty(iPacket);
                     break;
 
                 case ClientOperationCode.DenyPartyRequest:
