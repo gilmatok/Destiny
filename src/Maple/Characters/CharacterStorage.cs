@@ -1,9 +1,8 @@
 ﻿using Destiny.Core.IO;
 using Destiny.Core.Network;
-using Destiny.Core.Data;
+using Destiny.Data;
 using Destiny.Maple.Life;
 using System.Collections.Generic;
-using Destiny.Packets;
 
 namespace Destiny.Maple.Characters
 {

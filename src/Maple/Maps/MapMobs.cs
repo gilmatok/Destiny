@@ -1,9 +1,10 @@
 ﻿using Destiny.Core.IO;
-using Destiny.Core.Threading;
+using Destiny.Core.Network;
 using Destiny.Maple.Characters;
 using Destiny.Maple.Data;
 using Destiny.Maple.Life;
-using Destiny.Packets;
+using Destiny.Network;
+using Destiny.Threading;
 using System;
 using System.Collections.Generic;
 
@@ -44,7 +45,7 @@ namespace Destiny.Maple.Maps
                         owner = attacker.Key;
                     }
 
-                    attacker.Key.Experience += (int)Math.Min(item.Experience, (attacker.Value * item.Experience) / item.MaxHealth) * 1; // TODO: World's experience rate.
+                    attacker.Key.Experience += (int)Math.Min(item.Experience, (attacker.Value * item.Experience) / item.MaxHealth) * MasterServer.World.ExperienceRate;
                 }
             }
 
@@ -56,11 +57,11 @@ namespace Destiny.Maple.Maps
 
                 foreach (Loot loopLoot in item.Loots)
                 {
-                    if ((Constants.Random.Next(1000000) / 1) <= loopLoot.Chance) // TODO: World's drop rate.
+                    if ((Constants.Random.Next(1000000) / MasterServer.World.DropRate) <= loopLoot.Chance)
                     {
                         if (loopLoot.IsMeso)
                         {
-                            drops.Add(new Meso((short)(Constants.Random.Next(loopLoot.MinimumQuantity, loopLoot.MaximumQuantity) * 1)) // TODO: World's meso rate.
+                            drops.Add(new Meso((short)(Constants.Random.Next(loopLoot.MinimumQuantity, loopLoot.MaximumQuantity) * MasterServer.World.MesoRate))
                             {
                                 Dropper = item,
                                 Owner = owner
@@ -110,7 +111,7 @@ namespace Destiny.Maple.Maps
                                 }
 
                                 oPacket
-                                    .WriteString(kills)
+                                    .WriteMapleString(kills)
                                     .WriteInt()
                                     .WriteInt();
 

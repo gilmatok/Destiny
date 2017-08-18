@@ -12,12 +12,12 @@ namespace Destiny.Core.Network
         private Socket mSocket;
         private bool mActive;
         private bool mDisposed;
-        private Action<Socket> mClientAcceptedEvent;
+        private Action<MapleClient> mClientAcceptedEvent;
 
         public short Port => mPort;
         public bool Active => mActive;
 
-        public Acceptor(short port, Action<Socket> clientAcceptedEvent)
+        public Acceptor(short port, Action<MapleClient> clientAcceptedEvent)
         {
             mPort = port;
             mActive = false;
@@ -68,10 +68,11 @@ namespace Destiny.Core.Network
             if (!mDisposed && mActive)
             {
                 Socket socket = mSocket.EndAccept(iar);
+                MapleClient client = new MapleClient(socket);
 
                 if (mClientAcceptedEvent != null)
                 {
-                    mClientAcceptedEvent(socket);
+                    mClientAcceptedEvent(client);
                 }
 
                 if (!mDisposed && mActive)

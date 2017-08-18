@@ -1,5 +1,5 @@
 ﻿using Destiny.Core.IO;
-using Destiny.Core.Data;
+using Destiny.Data;
 using Destiny.Maple.Characters;
 using Destiny.Maple.Data;
 
@@ -7,9 +7,8 @@ namespace Destiny.Maple.Maps
 {
     public sealed class Map
     {
-        public MapFactory Parent { get; private set; }
-
         public int MapleID { get; private set; }
+        public byte Channel { get; private set; }
         public int ReturnMapID { get; private set; }
         public int ForcedReturnMapID { get; private set; }
         public byte RegenerationRate { get; private set; }
@@ -49,11 +48,10 @@ namespace Destiny.Maple.Maps
             }
         }
 
-        public Map(MapFactory parent, int mapleID)
+        public Map(int mapleID, byte channel)
         {
-            this.Parent = parent;
-
             this.MapleID = mapleID;
+            this.Channel = channel;
             this.ReturnMapID = this.CachedReference.ReturnMapID;
             this.ForcedReturnMapID = this.CachedReference.ForcedReturnMapID;
 
@@ -67,6 +65,8 @@ namespace Destiny.Maple.Maps
             this.Portals = this.CachedReference.Portals;
             this.SpawnPoints = this.CachedReference.SpawnPoints;
             this.PlayerShops = this.CachedReference.PlayerShops;
+
+            this.SpawnPoints.Spawn(); // TODO: Move to MapFactory.
         }
 
         public Map(Datum datum)

@@ -1,8 +1,7 @@
 ﻿using Destiny.Core.IO;
 using Destiny.Core.Network;
-using Destiny.Core.Data;
+using Destiny.Data;
 using System.Collections.ObjectModel;
-using Destiny.Packets;
 
 namespace Destiny.Maple.Characters
 {

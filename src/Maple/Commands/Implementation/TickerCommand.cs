@@ -1,6 +1,5 @@
 ﻿using Destiny.Maple.Characters;
 using Destiny.Network;
-using Destiny.Server;
 
 namespace Destiny.Maple.Commands
 {
@@ -34,13 +33,13 @@ namespace Destiny.Maple.Commands
         {
             string message = args.Length > 0 ? args[0] : string.Empty;
 
-            foreach (WorldServer world in MasterServer.Worlds)
+            foreach (ChannelServer channel in MasterServer.Channels)
             {
-                foreach (ChannelServer channel in world)
+                lock (channel.Clients)
                 {
-                    foreach (Character character in channel.Players)
+                    foreach (MapleClient client in channel.Clients)
                     {
-                        character.Notify(message, NoticeType.Ticker);
+                        client.Character.Notify(message, NoticeType.Ticker);
                     }
                 }
             }

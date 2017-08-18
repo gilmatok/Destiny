@@ -1,12 +1,11 @@
 ﻿using Destiny.Core.IO;
 using Destiny.Core.Network;
-using Destiny.Core.Data;
+using Destiny.Data;
 using Destiny.Maple.Characters;
 using Destiny.Maple.Data;
 using Destiny.Maple.Maps;
 using System;
 using System.Collections.Generic;
-using Destiny.Packets;
 
 namespace Destiny.Maple.Life
 {
@@ -335,9 +334,9 @@ namespace Destiny.Maple.Life
                 .WriteInt(this.ObjectID)
                 .WriteByte((byte)(this.Controller == null ? 5 : 1))
                 .WriteInt(this.MapleID)
-                .Skip(15) // NOTE: Unknown.
+                .WriteZero(15) // NOTE: Unknown.
                 .WriteByte(0x88) // NOTE: Unknown.
-                .Skip(6) // NOTE: Unknown.
+                .WriteZero(6) // NOTE: Unknown.
                 .WritePoint(this.Position)
                 .WriteByte((byte)(0x02 | (this.IsFacingLeft ? 0x01 : 0x00)))
                 .WriteShort(this.Foothold)

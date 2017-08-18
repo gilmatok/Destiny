@@ -1,5 +1,5 @@
-﻿using Destiny.Core.Data;
-using Destiny.Server;
+﻿using Destiny.Data;
+using Destiny.Network;
 
 namespace Destiny.Maple.Maps
 {
@@ -23,7 +23,7 @@ namespace Destiny.Maple.Maps
         {
             get
             {
-                return this.Map.Parent[this.DestinationMapID];
+                return MasterServer.Channels[this.Map.Channel].Maps[this.DestinationMapID];
             }
         }
 
@@ -31,7 +31,7 @@ namespace Destiny.Maple.Maps
         {
             get
             {
-                return this.Map.Parent[this.DestinationMapID].Portals[this.DestinationLabel];
+                return MasterServer.Channels[this.Map.Channel].Maps[this.DestinationMapID].Portals[this.DestinationLabel];
             }
         }
 
