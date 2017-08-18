@@ -1,8 +1,7 @@
 ﻿using Destiny.Core.IO;
-using Destiny.Core.Network;
 using System.Collections.Generic;
 
-namespace Destiny.Network
+namespace Destiny.Packets
 {
     public delegate void PacketHandler(MapleClient client, InPacket iPacket);
 

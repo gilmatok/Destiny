@@ -3,6 +3,7 @@ using Destiny.Core.IO;
 using Destiny.Core.Network;
 using Destiny.Maple.Characters;
 using System.Collections.Generic;
+using Destiny.Packets;
 
 namespace Destiny.Maple.Interaction
 {
@@ -50,9 +51,9 @@ namespace Destiny.Maple.Interaction
                 this.Owner.EncodeApperance(oPacket);
 
                 oPacket
-                    .WriteMapleString(this.Owner.Name)
+                    .WriteString(this.Owner.Name)
                     .WriteByte(byte.MaxValue)
-                    .WriteMapleString(this.Description)
+                    .WriteString(this.Description)
                     .WriteByte(16)
                     .WriteByte(0);
 
@@ -216,6 +217,8 @@ namespace Destiny.Maple.Interaction
                     {
                         string text = iPacket.ReadMapleString();
 
+                        string message = $"{character.Name} : {text}";
+
                         using (OutPacket oPacket = new OutPacket(ServerOperationCode.PlayerInteraction))
                         {
                             oPacket
@@ -234,7 +237,7 @@ namespace Destiny.Maple.Interaction
 
                             oPacket
                                 .WriteByte(sender)
-                                .WriteMapleString("{0} : {1}", character.Name, text);
+                                .WriteString(message);
 
                             this.Broadcast(oPacket);
                         }
@@ -331,7 +334,7 @@ namespace Destiny.Maple.Interaction
 
                         visitor.EncodeApperance(oPacket);
 
-                        oPacket.WriteMapleString(visitor.Name);
+                        oPacket.WriteString(visitor.Name);
 
                         this.Broadcast(oPacket);
                     }
@@ -350,7 +353,7 @@ namespace Destiny.Maple.Interaction
 
                         this.Owner.EncodeApperance(oPacket);
 
-                        oPacket.WriteMapleString(this.Owner.Name);
+                        oPacket.WriteString(this.Owner.Name);
 
                         for (int slot = 0; slot < 3; slot++)
                         {
@@ -360,13 +363,13 @@ namespace Destiny.Maple.Interaction
 
                                 this.Visitors[slot].EncodeApperance(oPacket);
 
-                                oPacket.WriteMapleString(this.Visitors[slot].Name);
+                                oPacket.WriteString(this.Visitors[slot].Name);
                             }
                         }
 
                         oPacket
                             .WriteByte(byte.MaxValue)
-                            .WriteMapleString(this.Description)
+                            .WriteString(this.Description)
                             .WriteByte(0x10)
                             .WriteByte((byte)this.Items.Count);
 
@@ -436,7 +439,7 @@ namespace Destiny.Maple.Interaction
                 .WriteInt(this.Owner.ID)
                 .WriteByte(4)
                 .WriteInt(this.ObjectID)
-                .WriteMapleString(this.Description)
+                .WriteString(this.Description)
                 .WriteByte(0)
                 .WriteByte(0)
                 .WriteByte(1)

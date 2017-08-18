@@ -1,7 +1,7 @@
-﻿using Destiny.Core.IO;
-using Destiny.Core.Network;
-using Destiny.Data;
+﻿using Destiny.Core.Data;
+using Destiny.Core.IO;
 using Destiny.Maple.Data;
+using Destiny.Packets;
 using System;
 using System.Collections.Generic;
 
@@ -272,7 +272,7 @@ namespace Destiny.Maple.Characters
 
                 if (status == QuestStatus.InProgress)
                 {
-                    oPacket.WriteMapleString(progress);
+                    oPacket.WriteString(progress);
                 }
                 else if (status == QuestStatus.Complete)
                 {
@@ -349,7 +349,7 @@ namespace Destiny.Maple.Characters
                     kills += kill.ToString().PadLeft(3, '\u0030');
                 }
 
-                oPacket.WriteMapleString(kills);
+                oPacket.WriteString(kills);
             }
 
             oPacket.WriteShort((short)this.Completed.Count);

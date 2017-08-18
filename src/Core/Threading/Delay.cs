@@ -2,7 +2,7 @@
 using System.Timers;
 using Timer = System.Timers.Timer;
 
-namespace Destiny.Threading
+namespace Destiny.Core.Threading
 {
     public sealed class Delay
     {

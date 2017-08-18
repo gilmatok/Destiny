@@ -1,11 +1,9 @@
 ﻿using Destiny.Core.IO;
-using Destiny.Core.Network;
+using Destiny.Core.Threading;
 using Destiny.Maple.Characters;
 using Destiny.Maple.Data;
 using Destiny.Maple.Life;
-using Destiny.Network;
-using Destiny.Server;
-using Destiny.Threading;
+using Destiny.Packets;
 using System;
 using System.Collections.Generic;
 
@@ -112,7 +110,7 @@ namespace Destiny.Maple.Maps
                                 }
 
                                 oPacket
-                                    .WriteMapleString(kills)
+                                    .WriteString(kills)
                                     .WriteInt()
                                     .WriteInt();
 

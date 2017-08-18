@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System;
 using System.Collections;
 using Destiny.Core.IO;
-using Destiny.Data;
-using Destiny.Core.Network;
 using System.Linq;
-using Destiny.Network;
 using Destiny.Server;
+using Destiny.Core.Data;
+using Destiny.Packets;
 
 namespace Destiny.Maple.Characters
 {
@@ -425,7 +424,7 @@ namespace Destiny.Maple.Characters
                         {
                             oPacket
                                 .WriteByte((byte)NoticeType.Megaphone)
-                                .WriteMapleString(message);
+                                .WriteString(message);
 
                             foreach (Character character in MasterServer.Worlds[this.Parent.Client.World][this.Parent.Client.Channel].Players)
                             {
@@ -455,7 +454,7 @@ namespace Destiny.Maple.Characters
                         {
                             oPacket
                                 .WriteByte((byte)NoticeType.SuperMegaphone)
-                                .WriteMapleString(message)
+                                .WriteString(message)
                                 .WriteByte(this.Parent.Client.Channel)
                                 .WriteBool(whisper);
 
@@ -496,11 +495,11 @@ namespace Destiny.Maple.Characters
                         {
                             oPacket
                                 .WriteInt(itemID)
-                                .WriteMapleString(this.Parent.Name)
-                                .WriteMapleString(text1)
-                                .WriteMapleString(text2)
-                                .WriteMapleString(text3)
-                                .WriteMapleString(text4)
+                                .WriteString(this.Parent.Name)
+                                .WriteString(text1)
+                                .WriteString(text2)
+                                .WriteString(text3)
+                                .WriteString(text4)
                                 .WriteInt(this.Parent.Client.Channel)
                                 .WriteBool(whisper);
 
@@ -549,7 +548,7 @@ namespace Destiny.Maple.Characters
                         {
                             oPacket
                                 .WriteByte((byte)NoticeType.ItemMegaphone)
-                                .WriteMapleString(message)
+                                .WriteString(message)
                                 .WriteByte(this.Parent.Client.Channel)
                                 .WriteBool(whisper)
                                 .WriteByte((byte)(targetItem != null ? targetItem.Slot : 0));
@@ -592,7 +591,7 @@ namespace Destiny.Maple.Characters
                             oPacket
                                 .WriteInt(this.Parent.ID)
                                 .WriteByte() // NOTE: Index.
-                                .WriteMapleString(name)
+                                .WriteString(name)
                                 .WriteByte();
 
                             this.Parent.Map.Broadcast(oPacket);

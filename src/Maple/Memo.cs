@@ -1,5 +1,5 @@
 ﻿using Destiny.Core.IO;
-using Destiny.Data;
+using Destiny.Core.Data;
 using System;
 
 namespace Destiny.Maple
@@ -24,8 +24,8 @@ namespace Destiny.Maple
         {
             oPacket
                 .WriteInt(this.ID)
-                .WriteMapleString(this.Sender + " ") // NOTE: Nexon forgot a space.
-                .WriteMapleString(this.Message)
+                .WriteString(this.Sender + " ") // NOTE: Nexon forgot a space.
+                .WriteString(this.Message)
                 .WriteDateTime(this.Received)
                 .WriteByte(); // NOTE: 0 - None, 1 - Fame, 2 - Gift.
         }

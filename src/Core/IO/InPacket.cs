@@ -1,5 +1,6 @@
 ﻿using Destiny.Core.Network;
 using Destiny.Maple;
+using Destiny.Packets;
 using System;
 
 namespace Destiny.Core.IO
@@ -7,7 +8,7 @@ namespace Destiny.Core.IO
     public sealed class InPacket
     {
         private int mIndex;
-        private byte[] mBuffer;
+        private readonly byte[] mBuffer;
 
         public static LogLevel LogLevel { get; set; }
 

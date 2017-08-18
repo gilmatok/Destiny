@@ -1,4 +1,5 @@
-﻿using Destiny.Data;
+﻿using Destiny.Core.Data;
+using Destiny.Core.Data;
 using System;
 using System.Data;
 

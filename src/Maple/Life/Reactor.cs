@@ -1,9 +1,10 @@
 ﻿using Destiny.Core.IO;
 using Destiny.Core.Network;
-using Destiny.Data;
+using Destiny.Core.Data;
 using Destiny.Maple.Characters;
 using Destiny.Maple.Data;
 using Destiny.Maple.Maps;
+using Destiny.Packets;
 
 namespace Destiny.Maple.Life.Reactors
 {
@@ -97,7 +98,7 @@ namespace Destiny.Maple.Life.Reactors
                 .WritePoint(this.Position)
                 .WriteShort() // NOTE: Flags (not sure).
                 .WriteBool() // NOTE: Unknown
-                .WriteMapleString(this.Label);
+                .WriteString(this.Label);
 
             return oPacket;
         }

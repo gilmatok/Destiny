@@ -1,7 +1,6 @@
 ﻿using System.Net.Sockets;
 using Destiny.IO;
-using Destiny.Core.Network;
-using Destiny.Handlers;
+using Destiny.Packets;
 
 namespace Destiny.Server
 {
@@ -25,19 +24,19 @@ namespace Destiny.Server
 
         protected override void SpawnHandlers()
         {
-            mProcessor.Add(ClientOperationCode.AccountLogin, LoginHandlers.HandleAccountLogin);
-            mProcessor.Add(ClientOperationCode.WorldList, LoginHandlers.HandleWorldList);
-            mProcessor.Add(ClientOperationCode.WorldRelist, LoginHandlers.HandleWorldList);
-            mProcessor.Add(ClientOperationCode.WorldStatus, LoginHandlers.HandleWorldStatus);
-            mProcessor.Add(ClientOperationCode.WorldSelect, LoginHandlers.HandleWorldSelect);
-            mProcessor.Add(ClientOperationCode.CharacterNameCheck, LoginHandlers.HandleCharacterNameCheck);
-            mProcessor.Add(ClientOperationCode.CharacterCreate, LoginHandlers.HandleCharacterCreation);
-            mProcessor.Add(ClientOperationCode.CharacterDelete, LoginHandlers.HandleCharacterDeletion);
-            mProcessor.Add(ClientOperationCode.CharacterSelect, LoginHandlers.HandleCharacterSelection); // TODO: Should we split these handlers?
-            mProcessor.Add(ClientOperationCode.CharacterSelectRequestPic, LoginHandlers.HandleCharacterSelection);
-            mProcessor.Add(ClientOperationCode.CharacterSelectRegisterPic, LoginHandlers.HandleCharacterSelection);
-            mProcessor.Add(ClientOperationCode.SelectCharacterByVAC, LoginHandlers.HandleCharacterSelection);
-            mProcessor.Add(ClientOperationCode.RegisterPicFromVAC, LoginHandlers.HandleCharacterSelection);
+            mProcessor.Add(ClientOperationCode.AccountLogin, PacketHandlers.HandleAccountLogin);
+            mProcessor.Add(ClientOperationCode.WorldList, PacketHandlers.HandleWorldList);
+            mProcessor.Add(ClientOperationCode.WorldRelist, PacketHandlers.HandleWorldList);
+            mProcessor.Add(ClientOperationCode.WorldStatus, PacketHandlers.HandleWorldStatus);
+            mProcessor.Add(ClientOperationCode.WorldSelect, PacketHandlers.HandleWorldSelect);
+            mProcessor.Add(ClientOperationCode.CharacterNameCheck, PacketHandlers.HandleCharacterNameCheck);
+            mProcessor.Add(ClientOperationCode.CharacterCreate, PacketHandlers.HandleCharacterCreation);
+            mProcessor.Add(ClientOperationCode.CharacterDelete, PacketHandlers.HandleCharacterDeletion);
+            mProcessor.Add(ClientOperationCode.CharacterSelect, PacketHandlers.HandleCharacterSelection); // TODO: Should we split these handlers?
+            mProcessor.Add(ClientOperationCode.CharacterSelectRequestPic, PacketHandlers.HandleCharacterSelection);
+            mProcessor.Add(ClientOperationCode.CharacterSelectRegisterPic, PacketHandlers.HandleCharacterSelection);
+            mProcessor.Add(ClientOperationCode.SelectCharacterByVAC, PacketHandlers.HandleCharacterSelection);
+            mProcessor.Add(ClientOperationCode.RegisterPicFromVAC, PacketHandlers.HandleCharacterSelection);
         }
 
         protected override void OnClientAccepted(Socket socket)

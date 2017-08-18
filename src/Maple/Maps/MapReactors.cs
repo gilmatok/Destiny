@@ -2,7 +2,7 @@
 using Destiny.Maple.Characters;
 using Destiny.Maple.Data;
 using Destiny.Maple.Life.Reactors;
-using Destiny.Threading;
+using Destiny.Core.Threading;
 
 namespace Destiny.Maple.Maps
 {

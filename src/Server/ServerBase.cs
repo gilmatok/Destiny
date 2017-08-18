@@ -1,5 +1,6 @@
 ﻿using Destiny.Core.Network;
 using Destiny.Network;
+using Destiny.Packets;
 using System.Collections.Generic;
 using System.Net.Sockets;
 

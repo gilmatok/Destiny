@@ -1,6 +1,7 @@
 ﻿using Destiny.Maple.Maps;
 using Destiny.Core.IO;
 using Destiny.Core.Network;
+using Destiny.Packets;
 
 namespace Destiny.Maple
 {

@@ -1,5 +1,6 @@
 ﻿using Destiny.Core.IO;
 using Destiny.Core.Security;
+using Destiny.Packets;
 using System;
 using System.Net;
 using System.Net.Sockets;
@@ -164,11 +165,11 @@ namespace Destiny.Core.Network
 
         public void Handshake()
         {
-            using (OutPacket oPacket = new OutPacket(14, 16))
+            using (OutPacket oPacket = new OutPacket(ServerOperationCode.CreateNewCharacterResult)) // NOTE: I don't like empty constructors. The first short is size, so...
             {
                 oPacket
                     .WriteShort(Constants.Version)
-                    .WriteMapleString(Constants.Patch)
+                    .WriteString(Constants.Patch)
                     .WriteBytes(Constants.RIV)
                     .WriteBytes(Constants.SIV)
                     .WriteByte(Constants.Locale);

@@ -1,93 +1,191 @@
-﻿using Destiny.Core.Network;
-using Destiny.Maple;
+﻿using Destiny.Maple;
+using Destiny.Packets;
 using System;
-using System.IO;
-using System.Text;
 
 namespace Destiny.Core.IO
 {
-    public sealed class OutPacket : PacketBase
+    public sealed class OutPacket : IDisposable
     {
-        private BinaryWriter mWriter;
-        
-        public OutPacket(short operationCode, int size = 64)
-        {
-            mStream = new MemoryStream(size);
-            mWriter = new BinaryWriter(mStream, Encoding.ASCII);
+        private int mIndex;
+        private byte[] mBuffer;
 
-            this.WriteShort(operationCode);
+        public ServerOperationCode OperationCode { get; private set; }
+
+        public OutPacket(ServerOperationCode operationCode)
+        {
+            mIndex = 0;
+            mBuffer = new byte[1024];
+
+            this.OperationCode = operationCode;
+
+            this.WriteUShort((ushort)this.OperationCode);
         }
 
-        public OutPacket(ServerOperationCode operationCode) : this((short)operationCode) { }
-
-        public OutPacket WriteBytes(byte[] value)
+        private void EnsureLength(int count)
         {
-            mWriter.Write(value);
-
-            return this;
-        }
-
-        public OutPacket WriteByte(byte value = 0)
-        {
-            mWriter.Write(value);
-
-            return this;
-        }
-
-        public OutPacket WriteSByte(sbyte value = 0)
-        {
-            mWriter.Write(value);
-
-            return this;
-        }
-
-        public OutPacket WriteBool(bool value = false)
-        {
-            mWriter.Write(value);
-
-            return this;
-        }
-
-        public OutPacket WriteShort(short value = 0)
-        {
-            mWriter.Write(value);
-
-            return this;
-        }
-
-        public OutPacket WriteUShort(ushort value = 0)
-        {
-            mWriter.Write(value);
-
-            return this;
-        }
-
-        public OutPacket WriteInt(int value = 0)
-        {
-            mWriter.Write(value);
-
-            return this;
-        }
-
-        public OutPacket WriteUInt(uint value = 0)
-        {
-            mWriter.Write(value);
-
-            return this;
-        }
-
-        public OutPacket WriteLong(long value = 0)
-        {
-            mWriter.Write(value);
-
-            return this;
-        }
-
-        private OutPacket WriteString(string value)
-        {
-            for (int i = 0; i < value.Length; i++)
+            if (mIndex + count > mBuffer.Length)
             {
-                mWriter.Write(value[i]);
+                Array.Resize<byte>(ref mBuffer, mBuffer.Length * 2);
+            }
+        }
+
+        public OutPacket Skip(int count)
+        {
+            this.EnsureLength(count);
+
+            mIndex += count;
+
+            return this;
+        }
+
+        public OutPacket WriteBool(bool value = false) => this.WriteByte((byte)(value ? 1 : 0));
+
+        public unsafe OutPacket WriteByte(byte value = 0)
+        {
+            int size = sizeof(byte);
+
+            this.EnsureLength(size);
+
+            fixed (byte* ptr = mBuffer)
+            {
+                *(ptr + mIndex) = value;
+            }
+
+            mIndex += size;
+
+            return this;
+        }
+
+        public unsafe OutPacket WriteSByte(sbyte value = 0)
+        {
+            int size = sizeof(sbyte);
+
+            this.EnsureLength(size);
+
+            fixed (byte* ptr = mBuffer)
+            {
+                *(sbyte*)(ptr + mIndex) = value;
+            }
+
+            mIndex += size;
+
+            return this;
+        }
+
+        // TODO: Better logic.
+        public OutPacket WriteBytes(params byte[] value)
+        {
+            foreach (byte b in value)
+            {
+                this.WriteByte(b);
+            }
+
+            return this;
+        }
+
+        public unsafe OutPacket WriteShort(short value = 0)
+        {
+            int size = sizeof(short);
+
+            this.EnsureLength(size);
+
+            fixed (byte* ptr = mBuffer)
+            {
+                *(short*)(ptr + mIndex) = value;
+            }
+
+            mIndex += size;
+
+            return this;
+        }
+
+        public unsafe OutPacket WriteUShort(ushort value = 0)
+        {
+            int size = sizeof(ushort);
+
+            this.EnsureLength(size);
+
+            fixed (byte* ptr = mBuffer)
+            {
+                *(ushort*)(ptr + mIndex) = value;
+            }
+
+            mIndex += size;
+
+            return this;
+        }
+
+        public unsafe OutPacket WriteInt(int value = 0)
+        {
+            int size = sizeof(int);
+
+            this.EnsureLength(size);
+
+            fixed (byte* ptr = mBuffer)
+            {
+                *(int*)(ptr + mIndex) = value;
+            }
+
+            mIndex += size;
+
+            return this;
+        }
+
+        public unsafe OutPacket WriteUInt(uint value = 0)
+        {
+            int size = sizeof(uint);
+
+            this.EnsureLength(size);
+
+            fixed (byte* ptr = mBuffer)
+            {
+                *(uint*)(ptr + mIndex) = value;
+            }
+
+            mIndex += size;
+
+            return this;
+        }
+
+        public unsafe OutPacket WriteLong(long value = 0)
+        {
+            int size = sizeof(long);
+
+            this.EnsureLength(size);
+
+            fixed (byte* ptr = mBuffer)
+            {
+                *(long*)(ptr + mIndex) = value;
+            }
+
+            mIndex += size;
+
+            return this;
+        }
+
+        public unsafe OutPacket WriteULong(ulong value = 0)
+        {
+            int size = sizeof(ulong);
+
+            this.EnsureLength(size);
+
+            fixed (byte* ptr = mBuffer)
+            {
+                *(ulong*)(ptr + mIndex) = value;
+            }
+
+            mIndex += size;
+
+            return this;
+        }
+
+        public OutPacket WriteString(string value)
+        {
+            this.WriteShort((short)value.Length);
+
+            foreach (char c in value)
+            {
+                this.WriteByte((byte)c);
             }
 
             return this;
@@ -99,53 +197,40 @@ namespace Destiny.Core.IO
             {
                 if (i < value.Length)
                 {
-                    mWriter.Write(value[i]);
+                    this.WriteByte((byte)value[i]);
                 }
                 else
                 {
-                    WriteByte();
+                    this.WriteByte();
                 }
             }
 
             return this;
         }
 
-        public OutPacket WriteMapleString(string fmt, params object[] args)
+        public OutPacket WritePoint(Point value)
         {
-            string final = string.Format(fmt, args);
-
-            this.WriteShort((short)final.Length);
-            this.WriteString(final);
-
-            return this;
-        }
-
-        public OutPacket WriteZero(int count)
-        {
-            for (int i = 0; i < count; i++)
-                WriteByte();
+            this.WriteShort(value.X);
+            this.WriteShort(value.Y);
 
             return this;
         }
 
         public OutPacket WriteDateTime(DateTime value)
         {
-            mWriter.Write(value.ToFileTimeUtc());
+            this.WriteLong(value.ToFileTimeUtc());
 
             return this;
         }
 
-        public OutPacket WritePoint(Point value)
+        public byte[] ToArray()
         {
-            WriteShort(value.X);
-            WriteShort(value.Y);
-
-            return this;
+            return mBuffer; // TODO: Better logic.
         }
 
-        protected override void CustomDispose()
+        public void Dispose()
         {
-            mWriter.Dispose();
+            // TODO: Dispose logic.
         }
     }
 }

@@ -2,7 +2,8 @@
 using Destiny.Maple.Maps;
 using Destiny.Core.Network;
 using Destiny.Maple.Characters;
-using Destiny.Data;
+using Destiny.Core.Data;
+using Destiny.Packets;
 
 namespace Destiny.Maple
 {
@@ -89,7 +90,7 @@ namespace Destiny.Maple
                 .WriteBool(true)
                 .WriteBool(false) // NOTE: Kick existing pet (only when player doesn't have Follow the Lead skill).
                 .WriteInt(this.Item.MapleID)
-                .WriteMapleString(this.Name)
+                .WriteString(this.Name)
                 .WriteInt() // NOTE: Unique ID.
                 .WriteInt()
                 .WritePoint(this.Position)

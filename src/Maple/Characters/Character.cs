@@ -1,13 +1,13 @@
 ﻿using Destiny.Core.IO;
 using Destiny.Maple.Maps;
 using System;
-using Destiny.Core.Network;
 using System.Collections.Generic;
 using Destiny.Maple.Life;
-using Destiny.Data;
 using Destiny.Maple.Data;
 using Destiny.Maple.Interaction;
 using Destiny.Server;
+using Destiny.Packets;
+using Destiny.Core.Data;
 
 namespace Destiny.Maple.Characters
 {
@@ -575,7 +575,7 @@ namespace Destiny.Maple.Characters
                     oPacket
                         .WriteInt(this.ID)
                         .WriteBool(!string.IsNullOrEmpty(this.Chalkboard))
-                        .WriteMapleString(this.Chalkboard);
+                        .WriteString(this.Chalkboard);
 
                     this.Map.Broadcast(oPacket);
                 }
@@ -892,7 +892,7 @@ namespace Destiny.Maple.Characters
                     oPacket.WriteBool(!string.IsNullOrEmpty(message));
                 }
 
-                oPacket.WriteMapleString(message);
+                oPacket.WriteString(message);
 
                 this.Client.Send(oPacket);
             }
@@ -1222,9 +1222,9 @@ namespace Destiny.Maple.Characters
             oPacket
                 .WriteInt(this.ID)
                 .WriteByte(this.Level)
-                .WriteMapleString(this.Name)
-                .WriteMapleString(string.Empty) // NOTE: Guild name.
-                .WriteZero(6) // NOTE: Guild emblems.
+                .WriteString(this.Name)
+                .WriteString(string.Empty) // NOTE: Guild name.
+                .Skip(6) // NOTE: Guild emblems.
                 .WriteInt()
                 .WriteShort()
                 .WriteByte(0xFC)
@@ -1240,23 +1240,23 @@ namespace Destiny.Maple.Characters
             int magic = Constants.Random.Next();
 
             oPacket
-                .WriteZero(6)
+                .Skip(6)
                 .WriteInt(magic)
-                .WriteZero(11)
+                .Skip(11)
                 .WriteInt(magic)
-                .WriteZero(11)
+                .Skip(11)
                 .WriteInt(magic)
                 .WriteShort()
                 .WriteByte()
                 .WriteLong()
                 .WriteInt(magic)
-                .WriteZero(9)
+                .Skip(9)
                 .WriteInt(magic)
                 .WriteShort()
                 .WriteInt()
-                .WriteZero(10)
+                .Skip(10)
                 .WriteInt(magic)
-                .WriteZero(13)
+                .Skip(13)
                 .WriteInt(magic)
                 .WriteShort()
                 .WriteByte()
@@ -1281,7 +1281,7 @@ namespace Destiny.Maple.Characters
                 oPacket
                     .WriteByte(4)
                     .WriteInt(this.PlayerShop.ObjectID)
-                    .WriteMapleString(this.PlayerShop.Description)
+                    .WriteString(this.PlayerShop.Description)
                     .WriteByte()
                     .WriteByte()
                     .WriteByte(1)
@@ -1299,14 +1299,14 @@ namespace Destiny.Maple.Characters
 
             if (hasChalkboard)
             {
-                oPacket.WriteMapleString(this.Chalkboard);
+                oPacket.WriteString(this.Chalkboard);
             }
 
             oPacket
                 .WriteByte() // NOTE: Couple ring.
                 .WriteByte() // NOTE: Friendship ring.
                 .WriteByte() // NOTE: Marriage ring.
-                .WriteZero(3) // NOTE: Unknown.
+                .Skip(3) // NOTE: Unknown.
                 .WriteByte(byte.MaxValue); // NOTE: Team.
 
             return oPacket;

@@ -1,9 +1,11 @@
-﻿using Destiny.Core.IO;
+﻿using Destiny.Core.Data;
+using Destiny.Core.IO;
 using Destiny.Core.Network;
-using Destiny.Data;
+using Destiny.Core.Data;
 using Destiny.Maple.Characters;
 using Destiny.Maple.Data;
 using System;
+using Destiny.Packets;
 
 namespace Destiny.Maple
 {

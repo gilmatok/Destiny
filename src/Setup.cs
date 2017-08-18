@@ -1,4 +1,4 @@
-﻿using Destiny.Data;
+﻿using Destiny.Core.Data;
 using MySql.Data.MySqlClient;
 using System;
 using System.IO;

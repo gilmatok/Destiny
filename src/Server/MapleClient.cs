@@ -2,7 +2,7 @@
 using Destiny.Core.Network;
 using Destiny.Maple;
 using Destiny.Maple.Characters;
-using Destiny.Network;
+using Destiny.Packets;
 using Destiny.Server;
 using System;
 using System.Net.Sockets;

@@ -1,7 +1,7 @@
 ﻿using Destiny.Core.IO;
 using Destiny.Maple.Characters;
-using Destiny.Core.Network;
-using Destiny.Threading;
+using Destiny.Core.Threading;
+using Destiny.Packets;
 
 namespace Destiny.Maple.Maps
 {

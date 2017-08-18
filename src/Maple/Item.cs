@@ -1,10 +1,12 @@
-﻿using Destiny.Core.IO;
+﻿using Destiny.Core.Data;
+using Destiny.Core.IO;
 using Destiny.Core.Network;
-using Destiny.Data;
+using Destiny.Core.Data;
 using Destiny.Maple.Characters;
 using Destiny.Maple.Data;
 using Destiny.Maple.Maps;
 using System;
+using Destiny.Packets;
 
 namespace Destiny.Maple
 {
@@ -984,7 +986,7 @@ namespace Destiny.Maple
                     .WriteShort(this.Agility)
                     .WriteShort(this.Speed)
                     .WriteShort(this.Jump)
-                    .WriteMapleString(this.Creator)
+                    .WriteString(this.Creator)
                     .WriteByte(this.Flags)
                     .WriteByte();
 
@@ -1005,7 +1007,7 @@ namespace Destiny.Maple
             {
                 oPacket
                     .WriteShort(this.Quantity)
-                    .WriteMapleString(this.Creator)
+                    .WriteString(this.Creator)
                     .WriteByte(this.Flags)
                     .WriteByte();
 

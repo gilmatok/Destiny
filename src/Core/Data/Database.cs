@@ -4,7 +4,7 @@ using System;
 using System.IO;
 using System.Linq;
 
-namespace Destiny.Data
+namespace Destiny.Core.Data
 {
     public class TemporaryConnection : IDisposable
     {

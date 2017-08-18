@@ -1,8 +1,9 @@
 ﻿using Destiny.Core.IO;
 using Destiny.Maple.Characters;
 using Destiny.Core.Network;
-using Destiny.Data;
+using Destiny.Core.Data;
 using Destiny.Maple.Shops;
+using Destiny.Packets;
 
 namespace Destiny.Maple.Life
 {
