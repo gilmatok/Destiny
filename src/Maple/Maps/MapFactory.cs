@@ -4,16 +4,7 @@ namespace Destiny.Maple.Maps
 {
     public sealed class MapFactory : KeyedCollection<int, Map>
     {
-        private byte mChannel;
-
-        // NOTE: To ensure external map factories are functioning properly,
-        // the default channel is 0 so the server can obtain data about maps
-        // regardless of not being owned by a channel.
-        public MapFactory(byte channel = 0)
-            : base()
-        {
-            mChannel = channel;
-        }
+        public MapFactory() : base() { }
 
         public new Map this[int key]
         {
@@ -21,7 +12,7 @@ namespace Destiny.Maple.Maps
             {
                 if (!base.Contains(key))
                 {
-                    this.Add(new Map(key, mChannel));
+                    this.Add(new Map(this, key));
                 }
 
                 return base[key];

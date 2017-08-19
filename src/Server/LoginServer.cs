@@ -1,6 +1,5 @@
 ﻿using System.Net.Sockets;
 using Destiny.IO;
-using Destiny.Packets;
 
 namespace Destiny.Server
 {
@@ -22,26 +21,9 @@ namespace Destiny.Server
             this.RequireStaffIP = Settings.GetBool("Server/RequireStaffIP");
         }
 
-        protected override void SpawnHandlers()
-        {
-            mProcessor.Add(ClientOperationCode.AccountLogin, PacketHandlers.HandleAccountLogin);
-            mProcessor.Add(ClientOperationCode.WorldList, PacketHandlers.HandleWorldList);
-            mProcessor.Add(ClientOperationCode.WorldRelist, PacketHandlers.HandleWorldList);
-            mProcessor.Add(ClientOperationCode.WorldStatus, PacketHandlers.HandleWorldStatus);
-            mProcessor.Add(ClientOperationCode.WorldSelect, PacketHandlers.HandleWorldSelect);
-            mProcessor.Add(ClientOperationCode.CharacterNameCheck, PacketHandlers.HandleCharacterNameCheck);
-            mProcessor.Add(ClientOperationCode.CharacterCreate, PacketHandlers.HandleCharacterCreation);
-            mProcessor.Add(ClientOperationCode.CharacterDelete, PacketHandlers.HandleCharacterDeletion);
-            mProcessor.Add(ClientOperationCode.CharacterSelect, PacketHandlers.HandleCharacterSelection); // TODO: Should we split these handlers?
-            mProcessor.Add(ClientOperationCode.CharacterSelectRequestPic, PacketHandlers.HandleCharacterSelection);
-            mProcessor.Add(ClientOperationCode.CharacterSelectRegisterPic, PacketHandlers.HandleCharacterSelection);
-            mProcessor.Add(ClientOperationCode.SelectCharacterByVAC, PacketHandlers.HandleCharacterSelection);
-            mProcessor.Add(ClientOperationCode.RegisterPicFromVAC, PacketHandlers.HandleCharacterSelection);
-        }
-
         protected override void OnClientAccepted(Socket socket)
         {
-            MapleClient client = new MapleClient(socket, this, mProcessor);
+            MapleClient client = new MapleClient(socket, this);
 
             client.Handshake();
         }

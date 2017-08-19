@@ -6,7 +6,6 @@ namespace Destiny.Server
     {
         public byte ID { get; private set; }
         public string Name { get; private set; }
-        public byte Channels { get; private set; }
         public WorldFlag Flag { get; private set; }
         public string EventMessage { get; private set; }
         public string TickerMessage { get; private set; }
@@ -17,21 +16,25 @@ namespace Destiny.Server
         public int DropRate { get; private set; }
 
         public WorldServer()
+            : base()
         {
             this.ID = 0;
             this.Name = "Scania";
-            this.Channels = 2;
             this.Flag = WorldFlag.New;
-            this.EventMessage = "";
-            this.TickerMessage = "";
+            this.EventMessage = "Welcome to #rDestiny#k!";
+            this.TickerMessage = "Welcome to Destiny!";
             this.ExperienceRate = 1;
             this.QuestExperienceRate = 1;
             this.PartyQuestExperienceRate = 1;
             this.MesoRate = 1;
             this.DropRate = 1;
 
-            this.Add(new ChannelServer(0, 0, 8585));
-            this.Add(new ChannelServer(1, 0, 8586));
+            byte channels = 2;
+
+            for (byte i = 0; i < channels; i++)
+            {
+                this.Add(new ChannelServer(i, this, (short)(8585 + i)));
+            }
         }
 
         public void Start()

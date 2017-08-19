@@ -5,7 +5,8 @@ using Destiny.Data;
 using Destiny.Maple;
 using Destiny.Maple.Characters;
 using Destiny.Maple.Data;
-using Destiny.Network;
+using Destiny.Server;
+using Destiny.Server.Migration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,18 +16,42 @@ namespace Destiny
 {
     public sealed class MapleClient : Session
     {
+        private ServerBase mParentServer;
+
+        public byte WorldID { get; set; }
+        public byte ChannelID { get; set; }
+
         public Account Account { get; set; }
         public Character Character { get; set; }
 
         public string LastUsername { get; private set; }
         public string LastPassword { get; private set; }
 
-        public byte Channel { get; set; }
-        public bool IsInCashShop { get; set; }
-
         public bool IsInViewAllChar { get; set; }
 
-        public MapleClient(Socket socket) : base(socket) { }
+        public WorldServer World
+        {
+            get
+            {
+                return MasterServer.Worlds[this.WorldID];
+            }
+        }
+
+        public ChannelServer Channel
+        {
+            get
+            {
+                return MasterServer.Worlds[this.WorldID][this.ChannelID];
+            }
+        }
+
+        public MapleClient(Socket socket, ServerBase parentServer)
+            : base(socket)
+        {
+            mParentServer = parentServer;
+
+            mParentServer.AddClient(this);
+        }
 
         protected override void Terminate()
         {
@@ -37,16 +62,7 @@ namespace Destiny
                 this.Character.Map.Characters.Remove(this.Character);
             }
 
-            if (this.IsInCashShop)
-            {
-                MasterServer.CashShop.Clients.Remove(this);
-            }
-            else if (this.Channel >= 0)
-            {
-                MasterServer.Channels[this.Channel].Clients.Remove(this);
-            }
-
-            MasterServer.Login.Clients.Remove(this);
+            mParentServer.RemoveClient(this);
         }
 
         protected override void Dispatch(InPacket iPacket)
@@ -129,6 +145,7 @@ namespace Destiny
                     break;
 
                 case ClientOperationCode.ChannelChange:
+                    this.ChangeChannel(iPacket);
                     break;
 
                 case ClientOperationCode.CashShopMigration:
@@ -760,52 +777,57 @@ namespace Destiny
 
         private void ListWorlds()
         {
-            using (OutPacket oPacket = new OutPacket(ServerOperationCode.WorldInformation))
+            foreach (WorldServer world in MasterServer.Worlds)
             {
-                oPacket
-                    .WriteByte()
-                    .WriteMapleString(MasterServer.World.Name)
-                    .WriteByte((byte)MasterServer.World.Flag)
-                    .WriteMapleString(MasterServer.World.EventMessage)
-                    .WriteShort(100) //Event EXP rate
-                    .WriteShort(100) //Event Drop rate
-                    .WriteByte()
-                    .WriteByte((byte)MasterServer.Channels.Length);
-
-                foreach (ChannelServer channel in MasterServer.Channels)
+                using (OutPacket oPacket = new OutPacket(ServerOperationCode.WorldInformation))
                 {
                     oPacket
-                        .WriteMapleString(channel.Label)
-                        .WriteInt(channel.Load)
-                        .WriteByte(1)
-                        .WriteByte(channel.ID)
-                        .WriteByte(); //Adult-only channel
+                        .WriteByte()
+                        .WriteMapleString(world.Name)
+                        .WriteByte((byte)world.Flag)
+                        .WriteMapleString(world.EventMessage)
+                        .WriteShort(100) // NOTE: Event EXP rate
+                        .WriteShort(100) // NOTE: Event Drop rate
+                        .WriteBool(false) // NOTE: Character creation disable.
+                        .WriteByte((byte)world.Count);
+
+                    foreach (ChannelServer channel in world)
+                    {
+                        oPacket
+                            .WriteMapleString(channel.Label)
+                            .WriteInt(channel.Load)
+                            .WriteByte(1)
+                            .WriteByte(channel.ID)
+                            .WriteBool(false); // NOTE: Adult channel.
+                    }
+
+                    //TODO: Add login balloons. These are chat bubbles shown on the world select screen
+                    oPacket.WriteShort(); //balloon count
+                                          //foreach (var balloon in balloons)
+                                          //{
+                                          //    oPacket
+                                          //        .WriteShort(balloon.X)
+                                          //        .WriteShort(balloon.Y)
+                                          //        .WriteString(balloon.Text);
+                                          //}
+
+                    this.Send(oPacket);
                 }
 
-                //TODO: Add login balloons. These are chat bubbles shown on the world select screen
-                oPacket.WriteShort(); //balloon count
-                                      //foreach (var balloon in balloons)
-                                      //{
-                                      //    oPacket
-                                      //        .WriteShort(balloon.X)
-                                      //        .WriteShort(balloon.Y)
-                                      //        .WriteString(balloon.Text);
-                                      //}
+                using (OutPacket oPacket = new OutPacket(ServerOperationCode.WorldInformation))
+                {
+                    oPacket.WriteByte(byte.MaxValue);
 
-                this.Send(oPacket);
-            }
-
-            using (OutPacket oPacket = new OutPacket(ServerOperationCode.WorldInformation))
-            {
-                oPacket.WriteByte(byte.MaxValue);
-
-                this.Send(oPacket);
+                    this.Send(oPacket);
+                }
             }
         }
 
         private void InformWorldStatus(InPacket iPacket)
         {
-            iPacket.Skip(1); // NOTE: World ID, but we're not using it.
+            byte worldID = iPacket.ReadByte();
+
+            // TODO: Validate world ID.
 
             using (OutPacket oPacket = new OutPacket(ServerOperationCode.CheckUserLimitResult))
             {
@@ -817,13 +839,19 @@ namespace Destiny
 
         private void SelectWorld(InPacket iPacket)
         {
-            iPacket.Skip(1);
-            iPacket.Skip(1); // NOTE: World ID, but we're not using it.
-            this.Channel = iPacket.ReadByte();
+            iPacket.ReadByte(); // NOTE: Connection kind (GameLaunching, WebStart, etc.).
+            byte worldID = iPacket.ReadByte();
+            byte channelID = iPacket.ReadByte();
+            iPacket.ReadBytes(4); // NOTE: IPv4 Address.
+
+            // TODO: Validate world/channel ID.
+
+            this.WorldID = worldID;
+            this.ChannelID = channelID;
 
             List<Character> characters = new List<Character>();
 
-            foreach (Datum datum in new Datums("characters").PopulateWith("ID", "AccountID = {0}", this.Account.ID))
+            foreach (Datum datum in new Datums("characters").PopulateWith("ID", "AccountID = {0} AND WorldID = {1}", this.Account.ID, this.WorldID))
             {
                 Character character = new Character((int)datum["ID"], this);
 
@@ -925,6 +953,7 @@ namespace Destiny
             Character character = new Character(client: this); // NOTE: Client is passed because it is needed for ViewAllChar.
 
             character.AccountID = this.Account.ID;
+            character.WorldID = this.WorldID;
             character.Name = name;
             character.Gender = gender;
             character.Skin = skin;
@@ -944,7 +973,7 @@ namespace Destiny
             character.SkillPoints = 0;
             character.Experience = 0;
             character.Fame = 0;
-            character.Map = MasterServer.Channels[this.Channel].Maps[jobType == JobType.Cygnus ? 130030000 : jobType == JobType.Explorer ? 10000 : 914000000];
+            character.Map = this.Channel.Maps[jobType == JobType.Cygnus ? 130030000 : jobType == JobType.Explorer ? 10000 : 914000000];
             character.SpawnPoint = 0;
             character.Meso = 0;
 
@@ -1075,7 +1104,7 @@ namespace Destiny
             if (this.IsInViewAllChar)
             {
                 iPacket.ReadInt(); // NOTE: World ID.
-                this.Channel = 0; // TODO: Least loaded channel.
+                this.ChannelID = 0; // TODO: Least loaded channel.
             }
 
             string macAddresses = iPacket.ReadMapleString(); // TODO: Do something with these.
@@ -1094,15 +1123,15 @@ namespace Destiny
 
             if (!requestPic || SHACryptograph.Encrypt(SHAMode.SHA256, pic) == this.Account.Pic)
             {
-                MasterServer.Channels[this.Channel].Migrations.Add(this.Host, this.Account.ID, characterID);
+                this.Channel.Migrations.Add(new MigrationData(this.Host, this.Account.ID, characterID));
 
                 using (OutPacket oPacket = new OutPacket(ServerOperationCode.SelectCharacterResult))
                 {
                     oPacket
                         .WriteByte()
                         .WriteByte()
-                        .WriteBytes(MasterServer.World.HostIP.GetAddressBytes())
-                        .WriteShort(MasterServer.Channels[this.Channel].Port)
+                        .WriteBytes(127, 0, 0, 1)
+                        .WriteShort(this.Channel.Port)
                         .WriteInt(characterID)
                         .WriteInt()
                         .WriteByte();
@@ -1127,7 +1156,7 @@ namespace Destiny
             int characterID = iPacket.ReadInt();
             iPacket.Skip(2); //NOTE: Unknown
 
-            if ((accountID = MasterServer.Channels[this.Channel].Migrations.Validate(this.Host, characterID)) == -1)
+            if ((accountID = this.Channel.Migrations.Validate(this.Host, characterID)) == -1)
             {
                 this.Close();
 
@@ -1140,6 +1169,27 @@ namespace Destiny
             this.Character = new Character(characterID, this);
             this.Character.Load();
             this.Character.Initialize();
+        }
+
+        private void ChangeChannel(InPacket iPacket)
+        {
+            byte id = iPacket.ReadByte();
+
+            // TODO: Validate channel ID.
+
+            ChannelServer destination = this.World[id];
+
+            destination.Migrations.Add(new MigrationData(this.Host, this.Account.ID, this.Character.ID));
+
+            using (OutPacket oPacket = new OutPacket(ServerOperationCode.MigrateCommand))
+            {
+                oPacket
+                    .WriteBool(true)
+                    .WriteBytes(127, 0, 0, 1)
+                    .WriteShort(destination.Port);
+
+                this.Send(oPacket);
+            }
         }
 
         private void ViewAllChar(InPacket iPacket)

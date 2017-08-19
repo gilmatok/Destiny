@@ -20,7 +20,7 @@ namespace Destiny.Core.IO
 
         public OutPacket(ServerOperationCode operationCode) : this((short)operationCode) { }
 
-        public OutPacket WriteBytes(byte[] value)
+        public OutPacket WriteBytes(params byte[] value)
         {
             mWriter.Write(value);
 

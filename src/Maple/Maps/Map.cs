@@ -7,8 +7,9 @@ namespace Destiny.Maple.Maps
 {
     public sealed class Map
     {
+        public MapFactory Factory { get; private set; }
+
         public int MapleID { get; private set; }
-        public byte Channel { get; private set; }
         public int ReturnMapID { get; private set; }
         public int ForcedReturnMapID { get; private set; }
         public byte RegenerationRate { get; private set; }
@@ -48,10 +49,11 @@ namespace Destiny.Maple.Maps
             }
         }
 
-        public Map(int mapleID, byte channel)
+        public Map(MapFactory factory, int mapleID)
         {
+            this.Factory = factory;
+
             this.MapleID = mapleID;
-            this.Channel = channel;
             this.ReturnMapID = this.CachedReference.ReturnMapID;
             this.ForcedReturnMapID = this.CachedReference.ForcedReturnMapID;
 

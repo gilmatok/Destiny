@@ -57,7 +57,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Core\Collections\EnumerationHelper.cs" />
     <Compile Include="Data\Datum.cs" />
     <Compile Include="Data\Meta.cs" />
     <Compile Include="Data\RowNotUniqueException.cs" />
@@ -108,8 +107,9 @@
     <Compile Include="Maple\Shops\ShopItem.cs" />
     <Compile Include="Maple\Shortcut.cs" />
     <Compile Include="Maple\StyleUnavailableException.cs" />
-    <Compile Include="Network\MigrationRegistery.cs" />
-    <Compile Include="Network\WorldServer.cs" />
+    <Compile Include="Server\Migration\MigrationData.cs" />
+    <Compile Include="Server\Migration\MigrationRegistery.cs" />
+    <Compile Include="Server\WorldServer.cs" />
     <Compile Include="Setup.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Core\IO\BufferPool.cs" />
@@ -147,7 +147,7 @@
     <Compile Include="Core\IO\InPacket.cs" />
     <Compile Include="Maple\Rectangle.cs" />
     <Compile Include="Maple\Skill.cs" />
-    <Compile Include="Network\MapleClient.cs" />
+    <Compile Include="MapleClient.cs" />
     <Compile Include="Core\Network\OpCodes.cs" />
     <Compile Include="Core\IO\OutPacket.cs" />
     <Compile Include="Application.cs" />
@@ -158,7 +158,7 @@
     <Compile Include="Core\Security\MapleCryptograph.cs" />
     <Compile Include="Core\Security\SHACryptograph.cs" />
     <Compile Include="Core\Security\ShandaCryptograph.cs" />
-    <Compile Include="Network\ChannelServer.cs" />
+    <Compile Include="Server\ChannelServer.cs" />
     <Compile Include="Maple\Commands\CommandFactory.cs" />
     <Compile Include="Maple\Commands\Implementation\HelpCommand.cs" />
     <Compile Include="Maple\Commands\Implementation\ItemCommand.cs" />
@@ -168,10 +168,9 @@
     <Compile Include="Maple\Commands\Implementation\MesoCommand.cs" />
     <Compile Include="Maple\Commands\Implementation\NoticeCommand.cs" />
     <Compile Include="Maple\Commands\Implementation\TickerCommand.cs" />
-    <Compile Include="Network\LoginServer.cs" />
-    <Compile Include="Network\MasterServer.cs" />
-    <Compile Include="Network\ServerBase.cs" />
-    <Compile Include="Network\CashShopServer.cs" />
+    <Compile Include="Server\LoginServer.cs" />
+    <Compile Include="Server\MasterServer.cs" />
+    <Compile Include="Server\ServerBase.cs" />
     <Compile Include="Threading\Delay.cs" />
     <Compile Include="Data\Database.cs" />
     <Compile Include="IO\Log.cs" />

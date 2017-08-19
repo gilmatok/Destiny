@@ -33,16 +33,16 @@ namespace Destiny.Maple.Commands
         {
             string message = args.Length > 0 ? args[0] : string.Empty;
 
-            foreach (ChannelServer channel in MasterServer.Channels)
-            {
-                lock (channel.Clients)
-                {
-                    foreach (MapleClient client in channel.Clients)
-                    {
-                        client.Character.Notify(message, NoticeType.Ticker);
-                    }
-                }
-            }
+            //foreach (ChannelServer channel in MasterServer.Channels)
+            //{
+            //    lock (channel.Clients)
+            //    {
+            //        foreach (MapleClient client in channel.Clients)
+            //        {
+            //            client.Character.Notify(message, NoticeType.Ticker);
+            //        }
+            //    }
+            //}
         }
     }
 }

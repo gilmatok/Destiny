@@ -1,6 +1,4 @@
 ﻿using Destiny.Core.Network;
-using Destiny.Network;
-using Destiny.Packets;
 using System.Collections.Generic;
 using System.Net.Sockets;
 
@@ -8,17 +6,10 @@ namespace Destiny.Server
 {
     public abstract class ServerBase
     {
-        protected Acceptor mAcceptor;
-        protected List<MapleClient> mClients;
-        protected PacketProcessor mProcessor;
+        private Acceptor mAcceptor;
+        private List<MapleClient> mClients;
 
-        public string Label
-        {
-            get
-            {
-                return mProcessor.Label;
-            }
-        }
+        public string Label { get; private set; }
 
         public short Port
         {
@@ -43,9 +34,8 @@ namespace Destiny.Server
         {
             mAcceptor = new Acceptor(port, this.OnClientAccepted);
             mClients = new List<MapleClient>();
-            mProcessor = new PacketProcessor(label);
 
-            this.SpawnHandlers();
+            this.Label = label;
         }
 
         public virtual void Start()
@@ -71,10 +61,7 @@ namespace Destiny.Server
 
             Log.Warn("{0} server stopped.", this.Label);
         }
-
-        protected abstract void SpawnHandlers();
-        protected abstract void OnClientAccepted(Socket socket);
-
+        
         public void AddClient(MapleClient client)
         {
             lock (mClients)
@@ -90,5 +77,7 @@ namespace Destiny.Server
                 mClients.Remove(client);
             }
         }
+
+        protected abstract void OnClientAccepted(Socket socket);
     }
 }

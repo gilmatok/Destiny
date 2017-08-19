@@ -107,6 +107,7 @@ namespace Destiny
                             CREATE TABLE `characters` (
                               `ID` int(11) NOT NULL,
                               `AccountID` int(11) NOT NULL,
+                              `WorldID` tinyint(3) NOT NULL,
                               `Name` varchar(13) NOT NULL,
                               `Level` tinyint(3) UNSIGNED NOT NULL DEFAULT '1',
                               `Experience` int(11) NOT NULL DEFAULT '0',

@@ -18,6 +18,7 @@ namespace Destiny.Maple.Characters
 
         public int ID { get; set; }
         public int AccountID { get; set; }
+        public byte WorldID { get; set; }
         public string Name { get; set; }
         public bool IsInitialized { get; private set; }
 
@@ -659,6 +660,7 @@ namespace Destiny.Maple.Characters
             this.Assigned = true;
 
             this.AccountID = (int)datum["AccountID"];
+            this.WorldID = (byte)datum["WorldID"];
             this.Name = (string)datum["Name"];
             this.Gender = (Gender)datum["Gender"];
             this.Skin = (byte)datum["Skin"];
@@ -678,7 +680,7 @@ namespace Destiny.Maple.Characters
             this.SkillPoints = (short)datum["SkillPoints"];
             this.Experience = (int)datum["Experience"];
             this.Fame = (short)datum["Fame"];
-            this.Map = MasterServer.Channels[this.Client.Channel].Maps[(int)datum["Map"]];
+            this.Map = this.Client.Channel.Maps[(int)datum["Map"]];
             this.SpawnPoint = (byte)datum["SpawnPoint"];
             this.Meso = (int)datum["Meso"];
 
@@ -705,6 +707,7 @@ namespace Destiny.Maple.Characters
             Datum datum = new Datum("characters");
 
             datum["AccountID"] = this.AccountID;
+            datum["WorldID"] = this.WorldID;
             datum["Name"] = this.Name;
             datum["Gender"] = (byte)this.Gender;
             datum["Skin"] = this.Skin;
@@ -805,7 +808,7 @@ namespace Destiny.Maple.Characters
                 else
                 {
                     oPacket
-                        .WriteInt(this.Client.Channel)
+                        .WriteInt(this.Client.ChannelID)
                         .WriteByte(++this.Portals)
                         .WriteBool(true)
                         .WriteShort(); // NOTE: Floating messages at top corner.
@@ -1010,7 +1013,7 @@ namespace Destiny.Maple.Characters
         public void ChangeMap(int mapID, byte portalID = 0)
         {
             // NOTE: If the map doesn't exist, this line will throw an exception. Calling method needs to catch and handle that situation.
-            Map newMap = MasterServer.Channels[this.Client.Channel].Maps[mapID];
+            Map newMap = this.Client.Channel.Maps[mapID];
 
             // NOTE: If a portal isn't specified, a random spawn point will be chosen.
             if (portalID == 0)
@@ -1049,7 +1052,7 @@ namespace Destiny.Maple.Characters
             using (OutPacket oPacket = new OutPacket(ServerOperationCode.SetField))
             {
                 oPacket
-                    .WriteInt(this.Client.Channel)
+                    .WriteInt(this.Client.ChannelID)
                     .WriteByte(++this.Portals)
                     .WriteBool()
                     .WriteShort()
@@ -1726,7 +1729,6 @@ namespace Destiny.Maple.Characters
             string targetName = iPacket.ReadMapleString();
 
             Character target = null;
-            MasterServer.OnlineCharacters.TryGetValue(targetName, out target);
 
             switch (type)
             {
@@ -1788,7 +1790,7 @@ namespace Destiny.Maple.Characters
                                 oPacket
                                     .WriteByte(18)
                                     .WriteMapleString(this.Name)
-                                    .WriteByte(this.Client.Channel)
+                                    .WriteByte(this.Client.ChannelID)
                                     .WriteByte() // NOTE: Unknown.
                                     .WriteMapleString(text);
 
