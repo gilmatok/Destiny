@@ -761,81 +761,35 @@ namespace Destiny.Maple.Characters
 
         }
 
-        public void Initialize(bool cashShop = false)
+        public void Initialize()
         {
-            using (OutPacket oPacket = new OutPacket(cashShop ? ServerOperationCode.SetCashShop : ServerOperationCode.SetField))
+            using (OutPacket oPacket = new OutPacket(ServerOperationCode.SetField))
             {
-                if (cashShop)
+                oPacket
+                    .WriteInt(this.Client.ChannelID)
+                    .WriteByte(++this.Portals)
+                    .WriteBool(true)
+                    .WriteShort(); // NOTE: Floating messages at top corner.
+
+                for (int i = 0; i < 3; i++)
                 {
-                    this.EncodeData(oPacket);
-
-                    oPacket
-                        .WriteByte(1)
-                        .WriteMapleString(this.Client.Account.Username)
-                        .WriteInt()
-                        .WriteShort()
-                        .WriteZero(121);
-
-                    for (int i = 1; i <= 8; i++)
-                    {
-                        for (int j = 0; j < 2; j++)
-                        {
-                            oPacket
-                                .WriteInt(i)
-                                .WriteInt(j)
-                                .WriteInt(50200004)
-                                .WriteInt(i)
-                                .WriteInt(j)
-                                .WriteInt(50200069)
-                                .WriteInt(i)
-                                .WriteInt(j)
-                                .WriteInt(50200117)
-                                .WriteInt(i)
-                                .WriteInt(j)
-                                .WriteInt(50100008)
-                                .WriteInt(i)
-                                .WriteInt(j)
-                                .WriteInt(50000047);
-                        }
-                    }
-
-                    oPacket
-                        .WriteInt()
-                        .WriteShort()
-                        .WriteByte()
-                        .WriteInt(75);
+                    oPacket.WriteInt(Constants.Random.Next());
                 }
-                else
-                {
-                    oPacket
-                        .WriteInt(this.Client.ChannelID)
-                        .WriteByte(++this.Portals)
-                        .WriteBool(true)
-                        .WriteShort(); // NOTE: Floating messages at top corner.
 
-                    for (int i = 0; i < 3; i++)
-                    {
-                        oPacket.WriteInt(Constants.Random.Next());
-                    }
+                this.EncodeData(oPacket);
 
-                    this.EncodeData(oPacket);
-
-                    oPacket.WriteDateTime(DateTime.Now);
-                }
+                oPacket.WriteDateTime(DateTime.Now);
 
                 this.Client.Send(oPacket);
             }
 
             this.IsInitialized = true;
 
-            if (!cashShop)
-            {
-                this.Map.Characters.Add(this);
+            this.Map.Characters.Add(this);
 
-                this.Keymap.Send();
+            this.Keymap.Send();
 
-                this.Memos.Send();
-            }
+            this.Memos.Send();
         }
 
         public void Update(params StatisticType[] statistics)

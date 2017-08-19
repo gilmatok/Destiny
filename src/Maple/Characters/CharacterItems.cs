@@ -426,10 +426,7 @@ namespace Destiny.Maple.Characters
                                 .WriteByte((byte)NoticeType.Megaphone)
                                 .WriteMapleString(message);
 
-                            //foreach (var character in MasterServer.OnlineCharacters.Where(c => c.Value.Client.Character == this.Parent.Client.Character).Select((c) => c.Value))
-                            //{
-                            //    character.Client.Send(oPacket);
-                            //}
+                            this.Parent.Client.Channel.Broadcast(oPacket);
                         }
 
                         used = true;
@@ -458,10 +455,7 @@ namespace Destiny.Maple.Characters
                                 .WriteByte(this.Parent.Client.ChannelID)
                                 .WriteBool(whisper);
 
-                            //foreach (Character character in MasterServer.OnlineCharacters.Select((c) => c.Value))
-                            //{
-                            //    character.Client.Send(oPacket);
-                            //}
+                            this.Parent.Client.World.Broadcast(oPacket);
                         }
 
                         used = true;
@@ -499,10 +493,7 @@ namespace Destiny.Maple.Characters
 
                             this.Parent.EncodeApperance(oPacket, true);
 
-                            //foreach (Character character in MasterServer.OnlineCharacters.Select((c) => c.Value))
-                            //{
-                            //    character.Client.Send(oPacket);
-                            //}
+                            this.Parent.Client.World.Broadcast(oPacket);
                         }
 
                         used = true;
@@ -546,10 +537,7 @@ namespace Destiny.Maple.Characters
                                 targetItem.Encode(oPacket, true, true);
                             }
 
-                            //foreach (Character character in MasterServer.OnlineCharacters.Select((c) => c.Value))
-                            //{
-                            //    character.Client.Send(oPacket);
-                            //}
+                            this.Parent.Client.World.Broadcast(oPacket);
                         }
 
                         used = true;
@@ -564,20 +552,20 @@ namespace Destiny.Maple.Characters
 
                 case 5170000: // NOTE: Pet Name Tag.
                     {
-                        // TODO: Get the summoned pet.
+                        //// TODO: Get the summoned pet.
 
-                        string name = iPacket.ReadMapleString();
+                        //string name = iPacket.ReadMapleString();
 
-                        using (OutPacket oPacket = new OutPacket(ServerOperationCode.PetNameChanged))
-                        {
-                            oPacket
-                                .WriteInt(this.Parent.ID)
-                                .WriteByte() // NOTE: Index.
-                                .WriteMapleString(name)
-                                .WriteByte();
+                        //using (OutPacket oPacket = new OutPacket(ServerOperationCode.PetNameChanged))
+                        //{
+                        //    oPacket
+                        //        .WriteInt(this.Parent.ID)
+                        //        .WriteByte() // NOTE: Index.
+                        //        .WriteMapleString(name)
+                        //        .WriteByte();
 
-                            this.Parent.Map.Broadcast(oPacket);
-                        }
+                        //    this.Parent.Map.Broadcast(oPacket);
+                        //}
                     }
                     break;
 
@@ -681,59 +669,59 @@ namespace Destiny.Maple.Characters
                         string targetName = iPacket.ReadMapleString();
                         string message = iPacket.ReadMapleString();
 
-                        //if (MasterServer.OnlineCharacters.ContainsKey(targetName))
-                        //{
-                        //    using (OutPacket oPacket = new OutPacket(ServerOperationCode.MemoResult))
-                        //    {
-                        //        oPacket
-                        //            .WriteByte((byte)MemoResult.Error)
-                        //            .WriteByte((byte)MemoError.ReceiverOnline);
+                        if (this.Parent.Client.World.IsCharacterOnline(targetName))
+                        {
+                            using (OutPacket oPacket = new OutPacket(ServerOperationCode.MemoResult))
+                            {
+                                oPacket
+                                    .WriteByte((byte)MemoResult.Error)
+                                    .WriteByte((byte)MemoError.ReceiverOnline);
 
-                        //        this.Parent.Client.Send(oPacket);
-                        //    }
-                        //}
-                        //else if (!Database.Exists("characters", "Name = {0}", targetName))
-                        //{
-                        //    using (OutPacket oPacket = new OutPacket(ServerOperationCode.MemoResult))
-                        //    {
-                        //        oPacket
-                        //            .WriteByte((byte)MemoResult.Error)
-                        //            .WriteByte((byte)MemoError.ReceiverInvalidName);
+                                this.Parent.Client.Send(oPacket);
+                            }
+                        }
+                        else if (!Database.Exists("characters", "Name = {0}", targetName))
+                        {
+                            using (OutPacket oPacket = new OutPacket(ServerOperationCode.MemoResult))
+                            {
+                                oPacket
+                                    .WriteByte((byte)MemoResult.Error)
+                                    .WriteByte((byte)MemoError.ReceiverInvalidName);
 
-                        //        this.Parent.Client.Send(oPacket);
-                        //    }
-                        //}
-                        //else if (false) // TODO: Receiver's inbox is full. I believe the maximum amount is 5, but need to verify.
-                        //{
-                        //    using (OutPacket oPacket = new OutPacket(ServerOperationCode.MemoResult))
-                        //    {
-                        //        oPacket
-                        //            .WriteByte((byte)MemoResult.Error)
-                        //            .WriteByte((byte)MemoError.ReceiverInboxFull);
+                                this.Parent.Client.Send(oPacket);
+                            }
+                        }
+                        else if (false) // TODO: Receiver's inbox is full. I believe the maximum amount is 5, but need to verify.
+                        {
+                            using (OutPacket oPacket = new OutPacket(ServerOperationCode.MemoResult))
+                            {
+                                oPacket
+                                    .WriteByte((byte)MemoResult.Error)
+                                    .WriteByte((byte)MemoError.ReceiverInboxFull);
 
-                        //        this.Parent.Client.Send(oPacket);
-                        //    }
-                        //}
-                        //else
-                        //{
-                        //    Datum datum = new Datum("memos");
+                                this.Parent.Client.Send(oPacket);
+                            }
+                        }
+                        else
+                        {
+                            Datum datum = new Datum("memos");
 
-                        //    datum["CharacterID"] = Database.Fetch("characters", "ID", "Name = {0}", targetName);
-                        //    datum["Sender"] = this.Parent.Name;
-                        //    datum["Message"] = message;
-                        //    datum["Received"] = DateTime.Now;
+                            datum["CharacterID"] = Database.Fetch("characters", "ID", "Name = {0}", targetName);
+                            datum["Sender"] = this.Parent.Name;
+                            datum["Message"] = message;
+                            datum["Received"] = DateTime.Now;
 
-                        //    datum.Insert();
+                            datum.Insert();
 
-                        //    using (OutPacket oPacket = new OutPacket(ServerOperationCode.MemoResult))
-                        //    {
-                        //        oPacket.WriteByte((byte)MemoResult.Sent);
+                            using (OutPacket oPacket = new OutPacket(ServerOperationCode.MemoResult))
+                            {
+                                oPacket.WriteByte((byte)MemoResult.Sent);
 
-                        //        this.Parent.Client.Send(oPacket);
-                        //    }
+                                this.Parent.Client.Send(oPacket);
+                            }
 
-                        //    used = true;
-                        //}
+                            used = true;
+                        }
                     }
                     break;
 
@@ -750,7 +738,7 @@ namespace Destiny.Maple.Characters
             }
             else
             {
-                // TODO: Blank inventory update.
+                this.Parent.Release(); // TODO: Blank inventory update.
             }
         }
 

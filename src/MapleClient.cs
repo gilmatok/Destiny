@@ -60,6 +60,8 @@ namespace Destiny
                 this.Character.Save();
                 this.Character.LastNpc = null;
                 this.Character.Map.Characters.Remove(this.Character);
+
+                this.Channel.Characters.Unregister(this.Character);
             }
 
             mParentServer.RemoveClient(this);
@@ -1168,6 +1170,9 @@ namespace Destiny
 
             this.Character = new Character(characterID, this);
             this.Character.Load();
+
+            this.Channel.Characters.Register(this.Character);
+
             this.Character.Initialize();
         }
 

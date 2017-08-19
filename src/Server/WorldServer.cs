@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using Destiny.Core.IO;
+using System.Collections.ObjectModel;
 
 namespace Destiny.Server
 {
@@ -51,6 +52,48 @@ namespace Destiny.Server
             {
                 channel.Stop();
             }
+        }
+
+        public void Broadcast(OutPacket oPacket)
+        {
+            foreach (ChannelServer channel in this)
+            {
+                channel.Broadcast(oPacket);
+            }
+        }
+
+        public void Notify(string text, NoticeType type)
+        {
+            foreach (ChannelServer channel in this)
+            {
+                channel.Notify(text, type);
+            }
+        }
+
+        public bool IsCharacterOnline(int id)
+        {
+            foreach (ChannelServer channel in this)
+            {
+                if (channel.Characters.Contains(id))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public bool IsCharacterOnline(string name)
+        {
+            foreach (ChannelServer channel in this)
+            {
+                if (channel.Characters.Contains(name))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         protected override byte GetKeyForItem(ChannelServer item)
