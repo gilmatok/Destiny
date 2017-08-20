@@ -35,7 +35,7 @@ namespace Destiny.Server
 
             for (byte i = 0; i < channels; i++)
             {
-                this.Add(new ChannelServer((byte)(i + 1), this, (short)(8585 + i)));
+                this.Add(new ChannelServer(i, this, (short)(8585 + i)));
             }
         }
 
