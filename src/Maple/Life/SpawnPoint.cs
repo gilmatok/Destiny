@@ -1,5 +1,4 @@
 ﻿using Destiny.Data;
-using Destiny.Maple.Life.Reactors;
 
 namespace Destiny.Maple.Life
 {
@@ -18,7 +17,8 @@ namespace Destiny.Maple.Life
             if (this.IsMob)
             {
                 this.Map.Mobs.Add(new Mob(this));
-             } else
+            }
+            else
             {
                 this.Map.Reactors.Add(new Reactor(this));
             }

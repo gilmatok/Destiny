@@ -149,95 +149,100 @@ namespace Destiny.Maple
             this.Foothold = foothold;
         }
 
-        public void Encode(OutPacket oPacket)
+        public byte[] ToByteArray()
         {
-            oPacket
-                .WritePoint(this.Origin)
-                .WriteByte((byte)this.Count);
-
-            foreach (Movement movement in this)
+            using (OutPacket oPacket = new OutPacket())
             {
-                oPacket.WriteByte((byte)movement.Type);
+                oPacket
+                    .WritePoint(this.Origin)
+                    .WriteByte((byte)this.Count);
 
-                switch (movement.Type)
+                foreach (Movement movement in this)
                 {
-                    case MovementType.Normal:
-                    case MovementType.Normal2:
-                    case MovementType.JumpDown:
-                    case MovementType.WingsFalling:
-                        {
-                            oPacket
-                                .WritePoint(movement.Position)
-                                .WritePoint(movement.Velocity)
-                                .WriteShort(movement.Foothold);
+                    oPacket.WriteByte((byte)movement.Type);
 
-                            if (movement.Type == MovementType.JumpDown)
+                    switch (movement.Type)
+                    {
+                        case MovementType.Normal:
+                        case MovementType.Normal2:
+                        case MovementType.JumpDown:
+                        case MovementType.WingsFalling:
                             {
-                                oPacket.WriteShort(movement.FallStart);
+                                oPacket
+                                    .WritePoint(movement.Position)
+                                    .WritePoint(movement.Velocity)
+                                    .WriteShort(movement.Foothold);
+
+                                if (movement.Type == MovementType.JumpDown)
+                                {
+                                    oPacket.WriteShort(movement.FallStart);
+                                }
+
+                                oPacket
+                                    .WriteByte(movement.Stance)
+                                    .WriteShort(movement.Duration);
                             }
+                            break;
 
-                            oPacket
-                                .WriteByte(movement.Stance)
-                                .WriteShort(movement.Duration);
-                        }
-                        break;
+                        case MovementType.Jump:
+                        case MovementType.JumpKnockback:
+                        case MovementType.FlashJump:
+                        case MovementType.ExcessiveKnockback:
+                        case MovementType.RecoilShot:
+                        case MovementType.Aran:
+                            {
+                                oPacket
+                                    .WritePoint(movement.Velocity)
+                                    .WriteByte(movement.Stance)
+                                    .WriteShort(movement.Duration);
+                            }
+                            break;
 
-                    case MovementType.Jump:
-                    case MovementType.JumpKnockback:
-                    case MovementType.FlashJump:
-                    case MovementType.ExcessiveKnockback:
-                    case MovementType.RecoilShot:
-                    case MovementType.Aran:
-                        {
-                            oPacket
-                                .WritePoint(movement.Velocity)
-                                .WriteByte(movement.Stance)
-                                .WriteShort(movement.Duration);
-                        }
-                        break;
+                        case MovementType.Immediate:
+                        case MovementType.Teleport:
+                        case MovementType.Assaulter:
+                        case MovementType.Assassinate:
+                        case MovementType.Rush:
+                        case MovementType.Chair:
+                            {
+                                oPacket
+                                    .WritePoint(movement.Position)
+                                    .WriteShort(movement.Foothold)
+                                    .WriteByte(movement.Stance)
+                                    .WriteShort(movement.Duration);
+                            }
+                            break;
 
-                    case MovementType.Immediate:
-                    case MovementType.Teleport:
-                    case MovementType.Assaulter:
-                    case MovementType.Assassinate:
-                    case MovementType.Rush:
-                    case MovementType.Chair:
-                        {
-                            oPacket
-                                .WritePoint(movement.Position)
-                                .WriteShort(movement.Foothold)
-                                .WriteByte(movement.Stance)
-                                .WriteShort(movement.Duration);
-                        }
-                        break;
+                        case MovementType.Falling:
+                            {
+                                oPacket.WriteByte(movement.Statistic);
+                            }
+                            break;
 
-                    case MovementType.Falling:
-                        {
-                            oPacket.WriteByte(movement.Statistic);
-                        }
-                        break;
+                        case MovementType.Unknown:
+                            {
+                                oPacket
+                                    .WritePoint(movement.Velocity)
+                                    .WriteShort(movement.FallStart)
+                                    .WriteByte(movement.Stance)
+                                    .WriteShort(movement.Duration);
+                            }
+                            break;
 
-                    case MovementType.Unknown:
-                        {
-                            oPacket
-                                .WritePoint(movement.Velocity)
-                                .WriteShort(movement.FallStart)
-                                .WriteByte(movement.Stance)
-                                .WriteShort(movement.Duration);
-                        }
-                        break;
-
-                    default:
-                        {
-                            oPacket
-                                .WriteByte(movement.Stance)
-                                .WriteShort(movement.Duration);
-                        }
-                        break;
+                        default:
+                            {
+                                oPacket
+                                    .WriteByte(movement.Stance)
+                                    .WriteShort(movement.Duration);
+                            }
+                            break;
+                    }
                 }
-            }
 
-            // NOTE: Keypad and boundary values are not read on the client side.
+                // NOTE: Keypad and boundary values are not read on the client side.
+
+                return oPacket.ToArray();
+            }
         }
     }
 }

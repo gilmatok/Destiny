@@ -2,18 +2,25 @@
 using Destiny.Maple;
 using System;
 using System.IO;
-using System.Text;
 
 namespace Destiny.Core.IO
 {
     public sealed class OutPacket : PacketBase
     {
+        private const int DefaultBufferSize = 32;
+
         private BinaryWriter mWriter;
-        
-        public OutPacket(short operationCode, int size = 64)
+
+        public OutPacket()
+        {
+            mStream = new MemoryStream(DefaultBufferSize);
+            mWriter = new BinaryWriter(mStream);
+        }
+
+        public OutPacket(short operationCode, int size = DefaultBufferSize)
         {
             mStream = new MemoryStream(size);
-            mWriter = new BinaryWriter(mStream, Encoding.ASCII);
+            mWriter = new BinaryWriter(mStream);
 
             this.WriteShort(operationCode);
         }

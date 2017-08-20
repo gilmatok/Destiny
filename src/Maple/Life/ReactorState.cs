@@ -1,7 +1,7 @@
 ﻿using Destiny.Data;
 using System;
 
-namespace Destiny.Maple.Life.Reactors
+namespace Destiny.Maple.Life
 {
     public sealed class ReactorState
     {

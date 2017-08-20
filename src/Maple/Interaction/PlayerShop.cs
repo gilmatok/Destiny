@@ -45,11 +45,8 @@ namespace Destiny.Maple.Interaction
                     .WriteByte(4)
                     .WriteByte(4)
                     .WriteByte(0)
-                    .WriteByte(0);
-
-                this.Owner.EncodeApperance(oPacket);
-
-                oPacket
+                    .WriteByte(0)
+                    .WriteBytes(this.Owner.AppearanceToByteArray())
                     .WriteMapleString(this.Owner.Name)
                     .WriteByte(byte.MaxValue)
                     .WriteMapleString(this.Description)
@@ -292,9 +289,8 @@ namespace Destiny.Maple.Interaction
                     oPacket
                         .WriteShort(loopShopItem.Bundles)
                         .WriteShort(loopShopItem.Quantity)
-                        .WriteInt(loopShopItem.MerchantPrice);
-
-                    loopShopItem.Encode(oPacket, true, true);
+                        .WriteInt(loopShopItem.MerchantPrice)
+                        .WriteBytes(loopShopItem.ToByteArray(true, true));
                 }
 
                 this.Broadcast(oPacket);
@@ -327,11 +323,9 @@ namespace Destiny.Maple.Interaction
                     {
                         oPacket
                             .WriteByte((byte)InteractionCode.Visit)
-                            .WriteByte((byte)(i + 1));
-
-                        visitor.EncodeApperance(oPacket);
-
-                        oPacket.WriteMapleString(visitor.Name);
+                            .WriteByte((byte)(i + 1))
+                            .WriteBytes(visitor.AppearanceToByteArray())
+                            .WriteMapleString(visitor.Name);
 
                         this.Broadcast(oPacket);
                     }
@@ -346,21 +340,18 @@ namespace Destiny.Maple.Interaction
                             .WriteByte(4)
                             .WriteByte(4)
                             .WriteBool(true)
-                            .WriteByte(0);
-
-                        this.Owner.EncodeApperance(oPacket);
-
-                        oPacket.WriteMapleString(this.Owner.Name);
+                            .WriteByte(0)
+                            .WriteBytes(this.Owner.AppearanceToByteArray())
+                            .WriteMapleString(this.Owner.Name);
 
                         for (int slot = 0; slot < 3; slot++)
                         {
                             if (this.Visitors[slot] != null)
                             {
-                                oPacket.WriteByte((byte)(slot + 1));
-
-                                this.Visitors[slot].EncodeApperance(oPacket);
-
-                                oPacket.WriteMapleString(this.Visitors[slot].Name);
+                                oPacket
+                                    .WriteByte((byte)(slot + 1))
+                                    .WriteBytes(this.Visitors[slot].AppearanceToByteArray())
+                                    .WriteMapleString(this.Visitors[slot].Name);
                             }
                         }
 
@@ -375,9 +366,8 @@ namespace Destiny.Maple.Interaction
                             oPacket
                                 .WriteShort(loopShopItem.Bundles)
                                 .WriteShort(loopShopItem.Quantity)
-                                .WriteInt(loopShopItem.MerchantPrice);
-
-                            loopShopItem.Encode(oPacket, true, true);
+                                .WriteInt(loopShopItem.MerchantPrice)
+                                .WriteBytes(loopShopItem.ToByteArray(true, true));
                         }
 
                         visitor.Client.Send(oPacket);

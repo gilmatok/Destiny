@@ -912,107 +912,112 @@ namespace Destiny.Maple
             }
         }
 
-        public void Encode(OutPacket oPacket, bool zeroPosition = false, bool leaveOut = false)
+        public byte[] ToByteArray(bool zeroPosition = false, bool leaveOut = false)
         {
-            if (!zeroPosition && !leaveOut)
+            using (OutPacket oPacket = new OutPacket())
             {
-                byte slot = this.ComputedSlot;
+                if (!zeroPosition && !leaveOut)
+                {
+                    byte slot = this.ComputedSlot;
 
-                if (slot < 0)
-                {
-                    slot = (byte)(slot * -1);
-                }
-                else if (slot > 100)
-                {
-                    slot -= 100;
+                    if (slot < 0)
+                    {
+                        slot = (byte)(slot * -1);
+                    }
+                    else if (slot > 100)
+                    {
+                        slot -= 100;
+                    }
+
+                    if (this.Type == ItemType.Equipment)
+                    {
+                        oPacket.WriteShort(slot);
+                    }
+                    else
+                    {
+                        oPacket.WriteByte(slot);
+                    }
                 }
 
-                if (this.Type == ItemType.Equipment)
+                oPacket
+                    .WriteByte((byte)(this.PetID != 0 ? 3 : this.Type == ItemType.Equipment ? 1 : 2))
+                    .WriteInt(this.MapleID)
+                    .WriteBool(this.IsCash);
+
+                if (this.IsCash)
                 {
-                    oPacket.WriteShort(slot);
+                    oPacket.WriteLong(1); // TODO: Unique ID for cash items.
+                }
+
+                oPacket.WriteDateTime(this.Expiration);
+
+                if (this.PetID != 0)
+                {
+                    Pet pet = this.Character.Pets[this.PetID];
+
+                    oPacket
+                        .WritePaddedString(pet.Name, 13)
+                        .WriteByte(pet.Level)
+                        .WriteShort(pet.Closeness)
+                        .WriteByte(pet.Fullness)
+                        .WriteDateTime(new DateTime(2017, 8, 13, 00, 00, 00))
+                        .WriteInt()
+                        .WriteByte(0x50)
+                        .WriteByte(0x46)
+                        .WriteInt();
+                }
+                else if (this.Type == ItemType.Equipment)
+                {
+                    oPacket
+                        .WriteByte(this.UpgradesAvailable)
+                        .WriteByte(this.UpgradesApplied)
+                        .WriteShort(this.Strength)
+                        .WriteShort(this.Dexterity)
+                        .WriteShort(this.Intelligence)
+                        .WriteShort(this.Luck)
+                        .WriteShort(this.Health)
+                        .WriteShort(this.Mana)
+                        .WriteShort(this.WeaponAttack)
+                        .WriteShort(this.MagicAttack)
+                        .WriteShort(this.WeaponDefense)
+                        .WriteShort(this.MagicDefense)
+                        .WriteShort(this.Accuracy)
+                        .WriteShort(this.Avoidability)
+                        .WriteShort(this.Agility)
+                        .WriteShort(this.Speed)
+                        .WriteShort(this.Jump)
+                        .WriteMapleString(this.Creator)
+                        .WriteByte(this.Flags)
+                        .WriteByte();
+
+                    if (!this.IsEquippedCash)
+                    {
+                        oPacket
+                            .WriteByte()
+                            .WriteByte()
+                            .WriteShort()
+                            .WriteShort()
+                            .WriteInt()
+                            .WriteLong()
+                            .WriteLong()
+                            .WriteInt(-1);
+                    }
                 }
                 else
                 {
-                    oPacket.WriteByte(slot);
-                }
-            }
-
-            oPacket
-                .WriteByte((byte)(this.PetID != 0 ?  3 : this.Type == ItemType.Equipment ? 1 : 2))
-                .WriteInt(this.MapleID)
-                .WriteBool(this.IsCash);
-
-            if (this.IsCash)
-            {
-                oPacket.WriteLong(1); // TODO: Unique ID for cash items.
-            }
-
-            oPacket.WriteDateTime(this.Expiration);
-
-            if (this.PetID != 0)
-            {
-                Pet pet = this.Character.Pets[this.PetID];
-
-                oPacket
-                    .WritePaddedString(pet.Name, 13)
-                    .WriteByte(pet.Level)
-                    .WriteShort(pet.Closeness)
-                    .WriteByte(pet.Fullness)
-                    .WriteDateTime(new DateTime(2017, 8, 13, 00, 00, 00))
-                    .WriteInt()
-                    .WriteByte(0x50)
-                    .WriteByte(0x46)
-                    .WriteInt();
-            }
-            else if (this.Type == ItemType.Equipment)
-            {
-                oPacket
-                    .WriteByte(this.UpgradesAvailable)
-                    .WriteByte(this.UpgradesApplied)
-                    .WriteShort(this.Strength)
-                    .WriteShort(this.Dexterity)
-                    .WriteShort(this.Intelligence)
-                    .WriteShort(this.Luck)
-                    .WriteShort(this.Health)
-                    .WriteShort(this.Mana)
-                    .WriteShort(this.WeaponAttack)
-                    .WriteShort(this.MagicAttack)
-                    .WriteShort(this.WeaponDefense)
-                    .WriteShort(this.MagicDefense)
-                    .WriteShort(this.Accuracy)
-                    .WriteShort(this.Avoidability)
-                    .WriteShort(this.Agility)
-                    .WriteShort(this.Speed)
-                    .WriteShort(this.Jump)
-                    .WriteMapleString(this.Creator)
-                    .WriteByte(this.Flags)
-                    .WriteByte();
-
-                if (!this.IsEquippedCash)
-                {
                     oPacket
-                        .WriteByte()
-                        .WriteByte()
-                        .WriteShort()
-                        .WriteShort()
-                        .WriteInt()
-                        .WriteLong()
-                        .WriteLong()
-                        .WriteInt(-1);
-                }
-            }
-            else
-            {
-                oPacket
-                    .WriteShort(this.Quantity)
-                    .WriteMapleString(this.Creator)
-                    .WriteByte(this.Flags)
-                    .WriteByte();
+                        .WriteShort(this.Quantity)
+                        .WriteMapleString(this.Creator)
+                        .WriteByte(this.Flags)
+                        .WriteByte();
 
-                if (this.IsRechargeable)
-                {
-                    oPacket.WriteLong(); // TODO: Unique ID.
+                    if (this.IsRechargeable)
+                    {
+                        oPacket.WriteLong(); // TODO: Unique ID.
+                    }
                 }
+
+                return oPacket.ToArray();
             }
         }
 

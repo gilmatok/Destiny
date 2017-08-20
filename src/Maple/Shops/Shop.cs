@@ -72,7 +72,7 @@ namespace Destiny.Maple.Shops
 
                 foreach (ShopItem loopShopItem in this.Items)
                 {
-                    loopShopItem.Encode(oPacket);
+                    oPacket.WriteBytes(loopShopItem.ToByteArray());
                 }
 
                 customer.Client.Send(oPacket);

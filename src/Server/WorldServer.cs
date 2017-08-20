@@ -1,4 +1,5 @@
 ﻿using Destiny.Core.IO;
+using Destiny.Maple.Characters;
 using System.Collections.ObjectModel;
 
 namespace Destiny.Server
@@ -34,7 +35,7 @@ namespace Destiny.Server
 
             for (byte i = 0; i < channels; i++)
             {
-                this.Add(new ChannelServer(i, this, (short)(8585 + i)));
+                this.Add(new ChannelServer((byte)(i + 1), this, (short)(8585 + i)));
             }
         }
 
@@ -83,6 +84,23 @@ namespace Destiny.Server
             return false;
         }
 
+        public Character GetCharacter(int id)
+        {
+            Character character = null;
+
+            foreach (ChannelServer channel in this)
+            {
+                character = channel.Characters.GetCharacter(id);
+
+                if (character != null)
+                {
+                    break;
+                }
+            }
+
+            return character;
+        }
+
         public bool IsCharacterOnline(string name)
         {
             foreach (ChannelServer channel in this)
@@ -94,6 +112,23 @@ namespace Destiny.Server
             }
 
             return false;
+        }
+
+        public Character GetCharacter(string name)
+        {
+            Character character = null;
+
+            foreach (ChannelServer channel in this)
+            {
+                character = channel.Characters.GetCharacter(name);
+
+                if (character != null)
+                {
+                    break;
+                }
+            }
+
+            return character;
         }
 
         protected override byte GetKeyForItem(ChannelServer item)

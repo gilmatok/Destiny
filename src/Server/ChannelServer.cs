@@ -17,7 +17,7 @@ namespace Destiny.Server
         public ChannelCharacters()
         {
             this.CharactersByID = new Dictionary<int, Character>();
-            this.CharactersByName = new Dictionary<string, Character>();
+            this.CharactersByName = new Dictionary<string, Character>(StringComparer.OrdinalIgnoreCase);
         }
 
         public void Register(Character character)
@@ -86,7 +86,7 @@ namespace Destiny.Server
             this.World = world;
             this.Migrations = new MigrationRegistery();
             this.Characters = new ChannelCharacters();
-            this.Maps = new MapFactory();
+            this.Maps = new MapFactory(this);
         }
 
         public void Broadcast(OutPacket oPacket)

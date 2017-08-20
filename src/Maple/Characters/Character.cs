@@ -776,9 +776,9 @@ namespace Destiny.Maple.Characters
                     oPacket.WriteInt(Constants.Random.Next());
                 }
 
-                this.EncodeData(oPacket);
-
-                oPacket.WriteDateTime(DateTime.Now);
+                oPacket
+                    .WriteBytes(this.DataToByteArray())
+                    .WriteDateTime(DateTime.UtcNow);
 
                 this.Client.Send(oPacket);
             }
@@ -897,11 +897,8 @@ namespace Destiny.Maple.Characters
             {
                 oPacket
                     .WriteInt(this.ID)
-                    .WriteBool(true);
-
-                this.EncodeApperance(oPacket);
-
-                oPacket
+                    .WriteBool(true)
+                    .WriteBytes(this.AppearanceToByteArray())
                     .WriteByte()
                     .WriteShort();
 
@@ -1102,9 +1099,9 @@ namespace Destiny.Maple.Characters
 
             using (OutPacket oPacket = new OutPacket(ServerOperationCode.UserMove))
             {
-                oPacket.WriteInt(this.ID);
-
-                movements.Encode(oPacket);
+                oPacket
+                    .WriteInt(this.ID)
+                    .WriteBytes(movements.ToByteArray());
 
                 this.Map.Broadcast(oPacket, this);
             }
@@ -1677,12 +1674,13 @@ namespace Destiny.Maple.Characters
             }
         }
 
+        // TODO: Cash Shop/MTS scenarios.
         public void UseCommand(InPacket iPacket)
         {
             CommandType type = (CommandType)iPacket.ReadByte();
             string targetName = iPacket.ReadMapleString();
 
-            Character target = null;
+            Character target = this.Client.World.GetCharacter(targetName);
 
             switch (type)
             {
@@ -1702,20 +1700,17 @@ namespace Destiny.Maple.Characters
                         }
                         else
                         {
+                            bool isInSameChannel = this.Client.ChannelID == target.Client.ChannelID;
+
                             using (OutPacket oPacket = new OutPacket(ServerOperationCode.Command))
                             {
                                 oPacket
                                     .WriteByte(0x09)
                                     .WriteMapleString(targetName)
-                                    .WriteByte(1) // NOTE: 0 - MTS, 1 - Map, 2 - Cash Shop.
-                                    .WriteInt(target.Map.MapleID); // NOTE: -1 if MTS/Cash Shop.
-
-                                if (true) // NOTE: Does not apply if MTS/Cash Shop.
-                                {
-                                    oPacket
-                                        .WriteInt() // NOTE: Unknown.
-                                        .WriteInt(); // NOTE: Unknown.
-                                }
+                                    .WriteByte((byte)(isInSameChannel ? 1 : 3))
+                                    .WriteInt(isInSameChannel ? target.Map.MapleID : target.Client.ChannelID)
+                                    .WriteInt() // NOTE: Unknown.
+                                    .WriteInt(); // NOTE: Unknown.
 
                                 this.Client.Send(oPacket);
                             }
@@ -1854,161 +1849,176 @@ namespace Destiny.Maple.Characters
             }
         }
 
-        public void Encode(OutPacket oPacket)
+        public byte[] ToByteArray()
         {
-            this.EncodeStatistics(oPacket);
-            this.EncodeApperance(oPacket);
-
-            if (!this.Client.IsInViewAllChar)
-            {
-                oPacket.WriteByte(); //NOTE: Family
-            }
-
-            oPacket.WriteBool(this.IsRanked);
-
-            if (this.IsRanked)
+            using (OutPacket oPacket = new OutPacket())
             {
                 oPacket
+                    .WriteBytes(this.StatisticsToByteArray())
+                    .WriteBytes(this.AppearanceToByteArray());
+
+                if (!this.Client.IsInViewAllChar)
+                {
+                    oPacket.WriteByte(); //NOTE: Family
+                }
+
+                oPacket.WriteBool(this.IsRanked);
+
+                if (this.IsRanked)
+                {
+                    oPacket
+                        .WriteInt()
+                        .WriteInt()
+                        .WriteInt()
+                        .WriteInt();
+                }
+
+                return oPacket.ToArray();
+            }
+        }
+
+        public byte[] StatisticsToByteArray()
+        {
+            using (OutPacket oPacket = new OutPacket())
+            {
+                oPacket
+                    .WriteInt(this.ID)
+                    .WritePaddedString(this.Name, 13)
+                    .WriteByte((byte)this.Gender)
+                    .WriteByte(this.Skin)
+                    .WriteInt(this.Face)
+                    .WriteInt(this.Hair)
+                    .WriteLong()
+                    .WriteLong()
+                    .WriteLong()
+                    .WriteByte(this.Level)
+                    .WriteShort((short)this.Job)
+                    .WriteShort(this.Strength)
+                    .WriteShort(this.Dexterity)
+                    .WriteShort(this.Intelligence)
+                    .WriteShort(this.Luck)
+                    .WriteShort(this.Health)
+                    .WriteShort(this.MaxHealth)
+                    .WriteShort(this.Mana)
+                    .WriteShort(this.MaxMana)
+                    .WriteShort(this.AbilityPoints)
+                    .WriteShort(this.SkillPoints)
+                    .WriteInt(this.Experience)
+                    .WriteShort(this.Fame)
                     .WriteInt()
+                    .WriteInt(this.Map.MapleID)
+                    .WriteByte(this.SpawnPoint)
+                    .WriteInt();
+
+                return oPacket.ToArray();
+            }
+        }
+
+        public byte[] AppearanceToByteArray()
+        {
+            using (OutPacket oPacket = new OutPacket())
+            {
+                oPacket
+                    .WriteByte((byte)this.Gender)
+                    .WriteByte(this.Skin)
+                    .WriteInt(this.Face)
+                    .WriteBool(true)
+                    .WriteInt(this.Hair);
+
+                Dictionary<byte, int> visibleLayer = new Dictionary<byte, int>();
+                Dictionary<byte, int> hiddenLayer = new Dictionary<byte, int>();
+
+                foreach (Item item in this.Items.GetEquipped())
+                {
+                    byte slot = item.AbsoluteSlot;
+
+                    if (slot < 100 && !visibleLayer.ContainsKey(slot))
+                    {
+                        visibleLayer[slot] = item.MapleID;
+                    }
+                    else if (slot > 100 && slot != 111)
+                    {
+                        slot -= 100;
+
+                        if (visibleLayer.ContainsKey(slot))
+                        {
+                            hiddenLayer[slot] = visibleLayer[slot];
+                        }
+
+                        visibleLayer[slot] = item.MapleID;
+                    }
+                    else if (visibleLayer.ContainsKey(slot))
+                    {
+                        hiddenLayer[slot] = item.MapleID;
+                    }
+                }
+
+                foreach (KeyValuePair<byte, int> entry in visibleLayer)
+                {
+                    oPacket
+                        .WriteByte(entry.Key)
+                        .WriteInt(entry.Value);
+                }
+
+                oPacket.WriteByte(byte.MaxValue);
+
+                foreach (KeyValuePair<byte, int> entry in hiddenLayer)
+                {
+                    oPacket
+                        .WriteByte(entry.Key)
+                        .WriteInt(entry.Value);
+                }
+
+                oPacket.WriteByte(byte.MaxValue);
+
+                Item cashWeapon = this.Items[EquipmentSlot.CashWeapon];
+
+                oPacket.WriteInt(cashWeapon != null ? cashWeapon.MapleID : 0);
+
+                oPacket
                     .WriteInt()
                     .WriteInt()
                     .WriteInt();
+
+                return oPacket.ToArray();
             }
         }
 
-        public void EncodeStatistics(OutPacket oPacket)
+        public byte[] DataToByteArray(long flag = long.MaxValue)
         {
-            oPacket
-                .WriteInt(this.ID)
-                .WritePaddedString(this.Name, 13)
-                .WriteByte((byte)this.Gender)
-                .WriteByte(this.Skin)
-                .WriteInt(this.Face)
-                .WriteInt(this.Hair)
-                .WriteLong()
-                .WriteLong()
-                .WriteLong()
-                .WriteByte(this.Level)
-                .WriteShort((short)this.Job)
-                .WriteShort(this.Strength)
-                .WriteShort(this.Dexterity)
-                .WriteShort(this.Intelligence)
-                .WriteShort(this.Luck)
-                .WriteShort(this.Health)
-                .WriteShort(this.MaxHealth)
-                .WriteShort(this.Mana)
-                .WriteShort(this.MaxMana)
-                .WriteShort(this.AbilityPoints)
-                .WriteShort(this.SkillPoints)
-                .WriteInt(this.Experience)
-                .WriteShort(this.Fame)
-                .WriteInt()
-                .WriteInt(this.Map.MapleID)
-                .WriteByte(this.SpawnPoint)
-                .WriteInt();
-        }
-
-        public void EncodeApperance(OutPacket oPacket, bool mega = false)
-        {
-            oPacket
-                .WriteByte((byte)this.Gender)
-                .WriteByte(this.Skin)
-                .WriteInt(this.Face)
-                .WriteBool(mega)
-                .WriteInt(this.Hair);
-
-            Dictionary<byte, int> visibleLayer = new Dictionary<byte, int>();
-            Dictionary<byte, int> hiddenLayer = new Dictionary<byte, int>();
-
-            foreach (Item item in this.Items.GetEquipped())
-            {
-                byte slot = item.AbsoluteSlot;
-
-                if (slot < 100 && !visibleLayer.ContainsKey(slot))
-                {
-                    visibleLayer[slot] = item.MapleID;
-                }
-                else if (slot > 100 && slot != 111)
-                {
-                    slot -= 100;
-
-                    if (visibleLayer.ContainsKey(slot))
-                    {
-                        hiddenLayer[slot] = visibleLayer[slot];
-                    }
-
-                    visibleLayer[slot] = item.MapleID;
-                }
-                else if (visibleLayer.ContainsKey(slot))
-                {
-                    hiddenLayer[slot] = item.MapleID;
-                }
-            }
-
-            foreach (KeyValuePair<byte, int> entry in visibleLayer)
+            using (OutPacket oPacket = new OutPacket())
             {
                 oPacket
-                    .WriteByte(entry.Key)
-                    .WriteInt(entry.Value);
-            }
+                    .WriteLong(flag)
+                    .WriteByte() // NOTE: Unknown.
+                    .WriteBytes(this.StatisticsToByteArray())
+                    .WriteByte(20) // NOTE: Max buddylist size.
+                    .WriteBool(false) // NOTE: Blessing of Fairy.
+                    .WriteInt(this.Meso)
+                    .WriteBytes(this.Items.ToByteArray())
+                    .WriteBytes(this.Skills.ToByteArray())
+                    .WriteBytes(this.Quests.ToByteArray())
+                    .WriteShort() // NOTE: Mini games record.
+                    .WriteShort() // NOTE: Rings (1).
+                    .WriteShort() // NOTE: Rings (2). 
+                    .WriteShort(); // NOTE: Rings (3).
 
-            oPacket.WriteByte(byte.MaxValue);
+                // NOTE: Teleport rock locations.
+                for (int i = 0; i < 15; i++)
+                {
+                    oPacket.WriteInt(999999999);
+                }
 
-            foreach (KeyValuePair<byte, int> entry in hiddenLayer)
-            {
                 oPacket
-                    .WriteByte(entry.Key)
-                    .WriteInt(entry.Value);
+                    .WriteInt() // NOTE: Monster book cover ID.
+                    .WriteByte() // NOTE: Unknown.
+                    .WriteShort() // NOTE: Monster book cards count.
+                    .WriteShort() // NOTE: New year cards.
+                    .WriteShort() // NOTE: Area information.
+                    .WriteShort(); // NOTE: Unknown.
+
+                return oPacket.ToArray();
             }
-
-            oPacket.WriteByte(byte.MaxValue);
-
-            Item cashWeapon = this.Items[EquipmentSlot.CashWeapon];
-
-            oPacket.WriteInt(cashWeapon != null ? cashWeapon.MapleID : 0);
-
-            oPacket
-                .WriteInt()
-                .WriteInt()
-                .WriteInt();
-        }
-
-        public void EncodeData(OutPacket oPacket, long flag = long.MaxValue)
-        {
-            oPacket
-                .WriteLong(flag)
-                .WriteByte(); // NOTE: Unknown.
-
-            this.EncodeStatistics(oPacket);
-
-            oPacket
-                .WriteByte(20) // NOTE: Max buddylist size.
-                .WriteBool(false) // NOTE: Blessing of Fairy.
-                .WriteInt(this.Meso);
-
-            this.Items.Encode(oPacket);
-            this.Skills.Encode(oPacket);
-            this.Quests.Encode(oPacket);
-
-            oPacket
-                .WriteShort() // NOTE: Mini games record.
-                .WriteShort() // NOTE: Rings (1).
-                .WriteShort() // NOTE: Rings (2). 
-                .WriteShort(); // NOTE: Rings (3).
-
-            // NOTE: Teleport rock locations.
-            for (int i = 0; i < 15; i++)
-            {
-                oPacket.WriteInt(999999999);
-            }
-
-            oPacket
-                .WriteInt() // NOTE: Monster book cover ID.
-                .WriteByte() // NOTE: Unknown.
-                .WriteShort() // NOTE: Monster book cards count.
-                .WriteShort() // NOTE: New year cards.
-                .WriteShort() // NOTE: Area information.
-                .WriteShort(); // NOTE: Unknown.
         }
 
         public OutPacket GetCreatePacket()
@@ -2061,11 +2071,8 @@ namespace Destiny.Maple.Characters
                 .WriteInt(magic)
                 .WriteShort()
                 .WriteByte()
-                .WriteShort((short)this.Job);
-
-            this.EncodeApperance(oPacket);
-
-            oPacket
+                .WriteShort((short)this.Job)
+                .WriteBytes(this.AppearanceToByteArray())
                 .WriteInt(this.Items.Available(5110000))
                 .WriteInt() // NOTE: Item effect.
                 .WriteInt((int)(Item.GetType(this.Chair) == ItemType.Setup ? this.Chair : 0))

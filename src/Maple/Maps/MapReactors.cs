@@ -1,7 +1,7 @@
 ﻿using Destiny.Core.IO;
 using Destiny.Maple.Characters;
 using Destiny.Maple.Data;
-using Destiny.Maple.Life.Reactors;
+using Destiny.Maple.Life;
 using Destiny.Threading;
 
 namespace Destiny.Maple.Maps

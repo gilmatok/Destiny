@@ -35,7 +35,7 @@ namespace Destiny.Maple.Characters
 
                 foreach (Memo memo in this)
                 {
-                    memo.Encode(oPacket);
+                    oPacket.WriteBytes(memo.ToByteArray());
                 }
 
                 this.Parent.Client.Send(oPacket);

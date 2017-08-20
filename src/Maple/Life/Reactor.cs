@@ -5,7 +5,7 @@ using Destiny.Maple.Characters;
 using Destiny.Maple.Data;
 using Destiny.Maple.Maps;
 
-namespace Destiny.Maple.Life.Reactors
+namespace Destiny.Maple.Life
 {
     public sealed class Reactor : MapObject, ISpawnable
     {

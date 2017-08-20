@@ -1,5 +1,5 @@
 ﻿using Destiny.Data;
-using Destiny.Maple.Life.Reactors;
+using Destiny.Maple.Life;
 using System.Collections.ObjectModel;
 
 namespace Destiny.Maple.Data

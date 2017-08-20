@@ -1,6 +1,5 @@
 ﻿using Destiny.Data;
 using Destiny.Maple.Life;
-using Destiny.Maple.Life.Reactors;
 using Destiny.Maple.Maps;
 using Destiny.Maple.Shops;
 using System.Collections.ObjectModel;

@@ -56,19 +56,33 @@ namespace Destiny.Maple.Maps
             this.MapleID = mapleID;
             this.ReturnMapID = this.CachedReference.ReturnMapID;
             this.ForcedReturnMapID = this.CachedReference.ForcedReturnMapID;
+            this.RegenerationRate = this.CachedReference.RegenerationRate;
+            this.DecreaseHP = this.CachedReference.DecreaseHP;
+            this.DamagePerSecond = this.CachedReference.DamagePerSecond;
+            this.ProtectorItemID = this.CachedReference.ProtectorItemID;
+            this.HasShip = this.CachedReference.HasShip;
+            this.RequiredLevel = this.CachedReference.RequiredLevel;
+            this.SpawnRate = this.CachedReference.SpawnRate;
+            this.IsTown = this.CachedReference.IsTown;
+            this.HasClock = this.CachedReference.HasClock;
+            this.IsEverlasting = this.CachedReference.IsEverlasting;
+            this.DisablesTownScroll = this.CachedReference.DisablesTownScroll;
+            this.IsSwim = this.CachedReference.IsSwim;
+            this.ShufflesReactors = this.CachedReference.ShufflesReactors;
+            this.UniqueShuffledReactor = this.CachedReference.UniqueShuffledReactor;
+            this.IsShop = this.CachedReference.IsShop;
+            this.NoPartyLeaderPass = this.CachedReference.NoPartyLeaderPass;
 
-            this.Characters = this.CachedReference.Characters;
-            this.Drops = this.CachedReference.Drops;
-            this.Mobs = this.CachedReference.Mobs;
-            this.Npcs = this.CachedReference.Npcs;
-            this.Reactors = this.CachedReference.Reactors;
-            this.Footholds = this.CachedReference.Footholds;
-            this.Seats = this.CachedReference.Seats;
-            this.Portals = this.CachedReference.Portals;
-            this.SpawnPoints = this.CachedReference.SpawnPoints;
-            this.PlayerShops = this.CachedReference.PlayerShops;
-
-            this.SpawnPoints.Spawn(); // TODO: Move to MapFactory.
+            this.Characters = new MapCharacters(this);
+            this.Drops = new MapDrops(this);
+            this.Mobs = new MapMobs(this);
+            this.Npcs = new MapNpcs(this);
+            this.Reactors = new MapReactors(this);
+            this.Footholds = new MapFootholds(this);
+            this.Seats = new MapSeats(this);
+            this.Portals = new MapPortals(this);
+            this.SpawnPoints = new MapSpawnPoints(this);
+            this.PlayerShops = new MapPlayerShops(this);
         }
 
         public Map(Datum datum)

@@ -20,14 +20,19 @@ namespace Destiny.Maple
             this.Received = (DateTime)datum["Received"];
         }
 
-        public void Encode(OutPacket oPacket)
+        public byte[] ToByteArray()
         {
-            oPacket
-                .WriteInt(this.ID)
-                .WriteMapleString(this.Sender + " ") // NOTE: Nexon forgot a space.
-                .WriteMapleString(this.Message)
-                .WriteDateTime(this.Received)
-                .WriteByte(); // NOTE: 0 - None, 1 - Fame, 2 - Gift.
+            using (OutPacket oPacket = new OutPacket())
+            {
+                oPacket
+                    .WriteInt(this.ID)
+                    .WriteMapleString(this.Sender + " ") // NOTE: Space is intentional.
+                    .WriteMapleString(this.Message)
+                    .WriteDateTime(this.Received)
+                    .WriteByte(); // TODO: Memo kind (0 - None, 1 - Fame, 2 - Gift).
+
+                return oPacket.ToArray();
+            }
         }
     }
 }

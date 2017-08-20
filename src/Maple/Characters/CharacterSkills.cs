@@ -55,29 +55,34 @@ namespace Destiny.Maple.Characters
             skill.Cast();
         }
 
-        public void Encode(OutPacket oPacket)
+        public byte[] ToByteArray()
         {
-            oPacket.WriteShort((short)this.Count);
-
-            List<Skill> cooldownSkills = new List<Skill>();
-
-            foreach (Skill loopSkill in this)
+            using (OutPacket oPacket = new OutPacket())
             {
-                loopSkill.Encode(oPacket);
+                oPacket.WriteShort((short)this.Count);
 
-                if (loopSkill.IsCoolingDown)
+                List<Skill> cooldownSkills = new List<Skill>();
+
+                foreach (Skill loopSkill in this)
                 {
-                    cooldownSkills.Add(loopSkill);
+                    oPacket.WriteBytes(loopSkill.ToByteArray());
+
+                    if (loopSkill.IsCoolingDown)
+                    {
+                        cooldownSkills.Add(loopSkill);
+                    }
                 }
-            }
 
-            oPacket.WriteShort((short)cooldownSkills.Count);
+                oPacket.WriteShort((short)cooldownSkills.Count);
 
-            foreach(Skill loopCooldown in cooldownSkills)
-            {
-                oPacket
-                    .WriteInt(loopCooldown.MapleID)
-                    .WriteShort((short)loopCooldown.RemainingCooldownSeconds);
+                foreach (Skill loopCooldown in cooldownSkills)
+                {
+                    oPacket
+                        .WriteInt(loopCooldown.MapleID)
+                        .WriteShort((short)loopCooldown.RemainingCooldownSeconds);
+                }
+
+                return oPacket.ToArray();
             }
         }
 

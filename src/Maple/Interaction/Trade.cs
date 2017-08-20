@@ -36,11 +36,8 @@ namespace Destiny.Maple.Interaction
                     .WriteByte(3)
                     .WriteByte(2)
                     .WriteByte(0) // NOTE: Player index.
-                    .WriteByte(0);
-
-                this.Owner.EncodeApperance(oPacket);
-
-                oPacket
+                    .WriteByte(0)
+                    .WriteBytes(this.Owner.AppearanceToByteArray())
                     .WriteMapleString(this.Owner.Name)
                     .WriteByte(byte.MaxValue);
 
@@ -132,11 +129,9 @@ namespace Destiny.Maple.Interaction
                             {
                                 oPacket
                                     .WriteByte((byte)InteractionCode.Visit)
-                                    .WriteByte(1);
-
-                                this.Visitor.EncodeApperance(oPacket);
-
-                                oPacket.WriteMapleString(this.Visitor.Name);
+                                    .WriteByte(1)
+                                    .WriteBytes(this.Visitor.AppearanceToByteArray())
+                                    .WriteMapleString(this.Visitor.Name);
 
                                 this.Owner.Client.Send(oPacket);
                             }
@@ -148,17 +143,11 @@ namespace Destiny.Maple.Interaction
                                     .WriteByte(3)
                                     .WriteByte(2)
                                     .WriteByte(1)
-                                    .WriteByte(0);
-
-                                this.Owner.EncodeApperance(oPacket);
-
-                                oPacket
+                                    .WriteByte(0)
+                                    .WriteBytes(this.Owner.AppearanceToByteArray())
                                     .WriteMapleString(this.Owner.Name)
-                                    .WriteByte(1);
-
-                                this.Visitor.EncodeApperance(oPacket);
-
-                                oPacket
+                                    .WriteByte(1)
+                                    .WriteBytes(this.Visitor.AppearanceToByteArray())
                                     .WriteMapleString(this.Visitor.Name)
                                     .WriteByte(byte.MaxValue);
 
@@ -206,9 +195,8 @@ namespace Destiny.Maple.Interaction
                             oPacket
                                 .WriteByte((byte)InteractionCode.SetItems)
                                 .WriteByte(0)
-                                .WriteByte(targetSlot);
-
-                            item.Encode(oPacket, true);
+                                .WriteByte(targetSlot)
+                                .WriteBytes(item.ToByteArray(true));
 
                             if (character == this.Owner)
                             {
@@ -229,9 +217,8 @@ namespace Destiny.Maple.Interaction
                             oPacket
                                 .WriteByte((byte)InteractionCode.SetItems)
                                 .WriteByte(1)
-                                .WriteByte(targetSlot);
-
-                            item.Encode(oPacket, true);
+                                .WriteByte(targetSlot)
+                                .WriteBytes(item.ToByteArray(true));
 
                             if (character == this.Owner)
                             {

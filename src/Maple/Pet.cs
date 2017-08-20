@@ -66,9 +66,8 @@ namespace Destiny.Maple
             {
                 oPacket
                     .WriteInt(this.Character.ID)
-                    .WriteByte(); // NOTE: Index.
-
-                movements.Encode(oPacket);
+                    .WriteByte() // NOTE: Index.
+                    .WriteBytes(movements.ToByteArray());
 
                 this.Character.Map.Broadcast(oPacket, this.Character);
             }

@@ -334,31 +334,36 @@ namespace Destiny.Maple.Characters
             }
         }
 
-        public void Encode(OutPacket oPacket)
+        public byte[] ToByteArray()
         {
-            oPacket.WriteShort((short)this.Started.Count);
-
-            foreach (KeyValuePair<ushort, Dictionary<int, short>> quest in this.Started)
+            using (OutPacket oPacket = new OutPacket())
             {
-                oPacket.WriteUShort(quest.Key);
+                oPacket.WriteShort((short)this.Started.Count);
 
-                string kills = string.Empty;
-
-                foreach (int kill in quest.Value.Values)
+                foreach (KeyValuePair<ushort, Dictionary<int, short>> quest in this.Started)
                 {
-                    kills += kill.ToString().PadLeft(3, '\u0030');
+                    oPacket.WriteUShort(quest.Key);
+
+                    string kills = string.Empty;
+
+                    foreach (int kill in quest.Value.Values)
+                    {
+                        kills += kill.ToString().PadLeft(3, '\u0030');
+                    }
+
+                    oPacket.WriteMapleString(kills);
                 }
 
-                oPacket.WriteMapleString(kills);
-            }
+                oPacket.WriteShort((short)this.Completed.Count);
 
-            oPacket.WriteShort((short)this.Completed.Count);
+                foreach (KeyValuePair<ushort, DateTime> quest in this.Completed)
+                {
+                    oPacket
+                        .WriteUShort(quest.Key)
+                        .WriteDateTime(quest.Value);
+                }
 
-            foreach (KeyValuePair<ushort, DateTime> quest in this.Completed)
-            {
-                oPacket
-                    .WriteUShort(quest.Key)
-                    .WriteDateTime(quest.Value);
+                return oPacket.ToArray();
             }
         }
     }

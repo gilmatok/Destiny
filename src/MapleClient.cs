@@ -870,7 +870,7 @@ namespace Destiny
 
                 foreach (Character character in characters)
                 {
-                    character.Encode(oPacket);
+                    oPacket.WriteBytes(character.ToByteArray());
                 }
 
                 oPacket
@@ -879,6 +879,73 @@ namespace Destiny
 
                 this.Send(oPacket);
             }
+        }
+
+        private void ViewAllChar(InPacket iPacket)
+        {
+            if (this.IsInViewAllChar)
+            {
+                using (OutPacket oPacket = new OutPacket(ServerOperationCode.ViewAllCharResult))
+                {
+                    oPacket
+                        .WriteByte((byte)VACResult.UnknownError)
+                        .WriteByte();
+
+                    this.Send(oPacket);
+                }
+
+                return;
+            }
+
+            this.IsInViewAllChar = true;
+
+            List<Character> characters = new List<Character>();
+            foreach (Datum datum in new Datums("characters").PopulateWith("ID", "AccountID = {0}", this.Account.ID))
+            {
+                int characterID = (int)datum["ID"];
+                Character tempChar = new Character(characterID, this);
+                tempChar.Load();
+                characters.Add(tempChar);
+            }
+
+            using (OutPacket oPacket = new OutPacket(ServerOperationCode.ViewAllCharResult))
+            {
+                if (characters.Count == 0)
+                {
+                    oPacket
+                        .WriteByte((byte)VACResult.NoCharacters);
+                }
+                else
+                {
+                    oPacket
+                        .WriteByte((byte)VACResult.SendCount)
+                        .WriteInt(1) //NOTE: World count
+                        .WriteInt(characters.Count);
+                    //.WriteInt(Math.Max(1, (int)Math.Ceiling(characters.Count / 3d))); //NOTE: Row count
+                }
+
+                this.Send(oPacket);
+            }
+
+            using (OutPacket oPacket = new OutPacket(ServerOperationCode.ViewAllCharResult))
+            {
+                oPacket
+                    .WriteByte((byte)VACResult.CharInfo)
+                    .WriteByte() //NOTE: World id
+                    .WriteByte((byte)characters.Count);
+
+                foreach (Character character in characters)
+                {
+                    oPacket.WriteBytes(character.ToByteArray());
+                }
+
+                this.Send(oPacket);
+            }
+        }
+
+        private void SetViewAllChar(InPacket iPacket)
+        {
+            this.IsInViewAllChar = iPacket.ReadBool();
         }
 
         private void CheckCharacterName(InPacket iPacket)
@@ -1037,7 +1104,7 @@ namespace Destiny
 
                 if (!error)
                 {
-                    character.Encode(oPacket);
+                    oPacket.WriteBytes(character.ToByteArray());
                 }
 
                 this.Send(oPacket);
@@ -1195,73 +1262,6 @@ namespace Destiny
 
                 this.Send(oPacket);
             }
-        }
-
-        private void ViewAllChar(InPacket iPacket)
-        {
-            if (this.IsInViewAllChar)
-            {
-                using (OutPacket oPacket = new OutPacket(ServerOperationCode.ViewAllCharResult))
-                {
-                    oPacket
-                        .WriteByte((byte)VACResult.UnknownError)
-                        .WriteByte();
-
-                    this.Send(oPacket);
-                }
-
-                return;
-            }
-
-            this.IsInViewAllChar = true;
-
-            List<Character> characters = new List<Character>();
-            foreach (Datum datum in new Datums("characters").PopulateWith("ID", "AccountID = {0}", this.Account.ID))
-            {
-                int characterID = (int)datum["ID"];
-                Character tempChar = new Character(characterID, this);
-                tempChar.Load();
-                characters.Add(tempChar);
-            }
-
-            using (OutPacket oPacket = new OutPacket(ServerOperationCode.ViewAllCharResult))
-            {
-                if (characters.Count == 0)
-                {
-                    oPacket
-                        .WriteByte((byte)VACResult.NoCharacters);
-                }
-                else
-                {
-                    oPacket
-                        .WriteByte((byte)VACResult.SendCount)
-                        .WriteInt(1) //NOTE: World count
-                        .WriteInt(characters.Count);
-                    //.WriteInt(Math.Max(1, (int)Math.Ceiling(characters.Count / 3d))); //NOTE: Row count
-                }
-
-                this.Send(oPacket);
-            }
-
-            using (OutPacket oPacket = new OutPacket(ServerOperationCode.ViewAllCharResult))
-            {
-                oPacket
-                    .WriteByte((byte)VACResult.CharInfo)
-                    .WriteByte() //NOTE: World id
-                    .WriteByte((byte)characters.Count);
-
-                foreach (Character c in characters)
-                {
-                    c.Encode(oPacket);
-                }
-
-                this.Send(oPacket);
-            }
-        }
-
-        private void SetViewAllChar(InPacket iPacket)
-        {
-            this.IsInViewAllChar = iPacket.ReadBool();
         }
     }
 }

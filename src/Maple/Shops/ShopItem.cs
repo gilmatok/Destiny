@@ -65,28 +65,33 @@ namespace Destiny.Maple.Shops
             this.PurchasePrice = 0;
         }
 
-        public void Encode(OutPacket oPacket)
+        public byte[] ToByteArray()
         {
-            oPacket
-                .WriteInt(this.MapleID)
-                .WriteInt(this.PurchasePrice)
-                .WriteInt() // NOTE: Perfect Pitch.
-                .WriteInt() // NOTE: Time limit.
-                .WriteInt(); // NOTE: Unknown.
+            using (OutPacket oPacket = new OutPacket())
+            {
+                oPacket
+                    .WriteInt(this.MapleID)
+                    .WriteInt(this.PurchasePrice)
+                    .WriteInt() // NOTE: Perfect Pitch.
+                    .WriteInt() // NOTE: Time limit.
+                    .WriteInt(); // NOTE: Unknown.
 
-            if (this.IsRecharageable)
-            {
-                oPacket
-                    .WriteShort()
-                    .WriteInt()
-                    .WriteShort((short)(BitConverter.DoubleToInt64Bits(this.UnitPrice) >> 48))
-                    .WriteShort(this.MaxPerStack);
-            }
-            else
-            {
-                oPacket
-                    .WriteShort(this.Quantity)
-                    .WriteShort(this.MaxPerStack);
+                if (this.IsRecharageable)
+                {
+                    oPacket
+                        .WriteShort()
+                        .WriteInt()
+                        .WriteShort((short)(BitConverter.DoubleToInt64Bits(this.UnitPrice) >> 48))
+                        .WriteShort(this.MaxPerStack);
+                }
+                else
+                {
+                    oPacket
+                        .WriteShort(this.Quantity)
+                        .WriteShort(this.MaxPerStack);
+                }
+
+                return oPacket.ToArray();
             }
         }
     }

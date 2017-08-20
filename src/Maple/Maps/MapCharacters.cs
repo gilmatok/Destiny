@@ -1,7 +1,6 @@
 ﻿using Destiny.Core.IO;
 using Destiny.Maple.Characters;
 using Destiny.Maple.Life;
-using Destiny.Maple.Life.Reactors;
 using System.Collections.Generic;
 
 namespace Destiny.Maple.Maps

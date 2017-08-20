@@ -256,9 +256,8 @@ namespace Destiny.Maple.Life
                     .WriteByte(skill1)
                     .WriteByte(skill2)
                     .WriteByte(skill3)
-                    .WriteByte(skill4);
-
-                movements.Encode(oPacket);
+                    .WriteByte(skill4)
+                    .WriteBytes(movements.ToByteArray());
 
                 this.Map.Broadcast(oPacket, this.Controller);
             }

@@ -90,7 +90,7 @@ namespace Destiny.Maple.Characters
 
                 foreach (Item item in this.Items)
                 {
-                    item.Encode(oPacket, true, true);
+                    oPacket.WriteBytes(item.ToByteArray(true, true));
                 }
 
                 oPacket
@@ -148,7 +148,7 @@ namespace Destiny.Maple.Characters
 
                             foreach (Item loopItem in itemsByType)
                             {
-                                loopItem.Encode(oPacket, true, true);
+                                oPacket.WriteBytes(loopItem.ToByteArray(true, true));
                             }
 
                             this.Parent.Client.Send(oPacket);
@@ -213,7 +213,7 @@ namespace Destiny.Maple.Characters
 
                             foreach (Item loopItem in itemsByType)
                             {
-                                loopItem.Encode(oPacket, true, true);
+                                oPacket.WriteBytes(loopItem.ToByteArray(true, true));
                             }
 
                             this.Parent.Client.Send(oPacket);

@@ -350,16 +350,21 @@ namespace Destiny.Maple
             // TODO: Effects.
         }
 
-        public void Encode(OutPacket oPacket)
+        public byte[] ToByteArray()
         {
-            oPacket
-                .WriteInt(this.MapleID)
-                .WriteInt(this.CurrentLevel)
-                .WriteLong(-1); // NOTE: Expiration.
-
-            if (this.IsFromFourthJob)
+            using (OutPacket oPacket = new OutPacket())
             {
-                oPacket.WriteInt(this.MaxLevel);
+                oPacket
+                    .WriteInt(this.MapleID)
+                    .WriteInt(this.CurrentLevel)
+                    .WriteLong(-1); // NOTE: Expiration.
+
+                if (this.IsFromFourthJob)
+                {
+                    oPacket.WriteInt(this.MaxLevel);
+                }
+
+                return oPacket.ToArray();
             }
         }
     }

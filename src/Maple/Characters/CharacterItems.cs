@@ -116,9 +116,8 @@ namespace Destiny.Maple.Characters
                             .WriteByte(1)
                             .WriteByte((byte)InventoryOperationType.AddItem)
                             .WriteByte((byte)item.Type)
-                            .WriteShort(item.Slot);
-
-                        item.Encode(oPacket, true);
+                            .WriteShort(item.Slot)
+                            .WriteBytes(item.ToByteArray(true));
 
                         this.Parent.Client.Send(oPacket);
                     }
@@ -489,9 +488,8 @@ namespace Destiny.Maple.Characters
                                 .WriteMapleString(text3)
                                 .WriteMapleString(text4)
                                 .WriteInt(this.Parent.Client.ChannelID)
-                                .WriteBool(whisper);
-
-                            this.Parent.EncodeApperance(oPacket, true);
+                                .WriteBool(whisper)
+                                .WriteBytes(this.Parent.AppearanceToByteArray());
 
                             this.Parent.Client.World.Broadcast(oPacket);
                         }
@@ -534,7 +532,7 @@ namespace Destiny.Maple.Characters
 
                             if (targetItem != null)
                             {
-                                targetItem.Encode(oPacket, true, true);
+                                oPacket.WriteBytes(targetItem.ToByteArray(true));
                             }
 
                             this.Parent.Client.World.Broadcast(oPacket);
@@ -968,65 +966,70 @@ namespace Destiny.Maple.Characters
             return true;
         }
 
-        public void Encode(OutPacket oPacket)
+        public byte[] ToByteArray()
         {
-            oPacket
-                .WriteByte(this.MaxSlots[ItemType.Equipment])
-                .WriteByte(this.MaxSlots[ItemType.Usable])
-                .WriteByte(this.MaxSlots[ItemType.Setup])
-                .WriteByte(this.MaxSlots[ItemType.Etcetera])
-                .WriteByte(this.MaxSlots[ItemType.Cash])
-                .WriteLong(); // NOTE: Unknown.
-
-            foreach (Item item in this.GetEquipped(EquippedQueryMode.Normal))
+            using (OutPacket oPacket = new OutPacket())
             {
-                item.Encode(oPacket);
+                oPacket
+                    .WriteByte(this.MaxSlots[ItemType.Equipment])
+                    .WriteByte(this.MaxSlots[ItemType.Usable])
+                    .WriteByte(this.MaxSlots[ItemType.Setup])
+                    .WriteByte(this.MaxSlots[ItemType.Etcetera])
+                    .WriteByte(this.MaxSlots[ItemType.Cash])
+                    .WriteLong(); // NOTE: Unknown.
+
+                foreach (Item item in this.GetEquipped(EquippedQueryMode.Normal))
+                {
+                    oPacket.WriteBytes(item.ToByteArray());
+                }
+
+                oPacket.WriteShort();
+
+                foreach (Item item in this.GetEquipped(EquippedQueryMode.Cash))
+                {
+                    oPacket.WriteBytes(item.ToByteArray());
+                }
+
+                oPacket.WriteShort();
+
+                foreach (Item item in this[ItemType.Equipment])
+                {
+                    oPacket.WriteBytes(item.ToByteArray());
+                }
+
+                oPacket.WriteShort();
+                oPacket.WriteShort(); // TODO: Evan inventory.
+
+                foreach (Item item in this[ItemType.Usable])
+                {
+                    oPacket.WriteBytes(item.ToByteArray());
+                }
+
+                oPacket.WriteByte();
+
+                foreach (Item item in this[ItemType.Setup])
+                {
+                    oPacket.WriteBytes(item.ToByteArray());
+                }
+
+                oPacket.WriteByte();
+
+                foreach (Item item in this[ItemType.Etcetera])
+                {
+                    oPacket.WriteBytes(item.ToByteArray());
+                }
+
+                oPacket.WriteByte();
+
+                foreach (Item item in this[ItemType.Cash])
+                {
+                    oPacket.WriteBytes(item.ToByteArray());
+                }
+
+                oPacket.WriteByte();
+
+                return oPacket.ToArray();
             }
-
-            oPacket.WriteShort();
-
-            foreach (Item item in this.GetEquipped(EquippedQueryMode.Cash))
-            {
-                item.Encode(oPacket);
-            }
-
-            oPacket.WriteShort();
-
-            foreach (Item item in this[ItemType.Equipment])
-            {
-                item.Encode(oPacket);
-            }
-
-            oPacket.WriteShort();
-            oPacket.WriteShort(); // TODO: Evan inventory.
-
-            foreach (Item item in this[ItemType.Usable])
-            {
-                item.Encode(oPacket);
-            }
-
-            oPacket.WriteByte();
-
-            foreach (Item item in this[ItemType.Setup])
-            {
-                item.Encode(oPacket);
-            }
-
-            oPacket.WriteByte();
-
-            foreach (Item item in this[ItemType.Etcetera])
-            {
-                item.Encode(oPacket);
-            }
-
-            oPacket.WriteByte();
-
-            foreach (Item item in this[ItemType.Cash])
-            {
-                item.Encode(oPacket);
-            }
-
-            oPacket.WriteByte();
         }
 
         public IEnumerator<Item> GetEnumerator()
