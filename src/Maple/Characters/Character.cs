@@ -1,5 +1,4 @@
-﻿using Destiny.Network;
-using Destiny.Core.IO;
+﻿using Destiny.Core.IO;
 using Destiny.Maple.Maps;
 using System;
 using Destiny.Core.Network;
@@ -1821,6 +1820,171 @@ namespace Destiny.Maple.Characters
                         else if (this.PlayerShop != null)
                         {
                             this.PlayerShop.Handle(this, code, iPacket);
+                        }
+                    }
+                    break;
+            }
+        }
+
+        public void UseAdminCommand(InPacket iPacket)
+        {
+            if (!this.IsGm)
+            {
+                return;
+            }
+
+            AdminCommandType type = (AdminCommandType)iPacket.ReadByte();
+
+            switch (type)
+            {
+                case AdminCommandType.Hide:
+                    {
+                        bool hide = iPacket.ReadBool();
+
+                        if (hide)
+                        {
+                            // TODO: Add SuperGM's hide buff.
+                        }
+                        else
+                        {
+                            // TOOD: Remove SuperGM's hide buff.
+                        }
+                    }
+                    break;
+
+                case AdminCommandType.Send:
+                    {
+                        string name = iPacket.ReadMapleString();
+                        int destinationID = iPacket.ReadInt();
+
+                        Character target = this.Client.World.GetCharacter(name);
+
+                        if (target != null)
+                        {
+                            target.ChangeMap(destinationID);
+                        }
+                        else
+                        {
+                            using (OutPacket oPacket = new OutPacket(ServerOperationCode.AdminResult))
+                            {
+                                oPacket
+                                    .WriteByte(6)
+                                    .WriteByte(1);
+
+                                this.Client.Send(oPacket);
+                            }
+                        }
+                    }
+                    break;
+
+                case AdminCommandType.Summon:
+                    {
+                        int mobID = iPacket.ReadInt();
+                        int count = iPacket.ReadInt();
+
+                        if (DataProvider.Mobs.Contains(mobID))
+                        {
+                            for (int i = 0; i < count; i++)
+                            {
+                                this.Map.Mobs.Add(new Mob(mobID, this.Position));
+                            }
+                        }
+                        else
+                        {
+                            this.Notify("invalid mob: " + mobID); // TODO: Actual message.
+                        }
+                    }
+                    break;
+
+                case AdminCommandType.CreateItem:
+                    {
+                        int itemID = iPacket.ReadInt();
+
+                        this.Items.Add(new Item(itemID));
+                    }
+                    break;
+
+                case AdminCommandType.DestroyFirstITem:
+                    {
+                        // TODO: What does this do?
+                    }
+                    break;
+
+                case AdminCommandType.GiveExperience:
+                    {
+                        int amount = iPacket.ReadInt();
+
+                        this.Experience += amount;
+                    }
+                    break;
+
+                case AdminCommandType.Ban:
+                    {
+                        string name = iPacket.ReadMapleString();
+
+                        Character target = this.Client.World.GetCharacter(name);
+
+                        if (target != null)
+                        {
+                            target.Client.Close();
+                        }
+                        else
+                        {
+                            using (OutPacket oPacket = new OutPacket(ServerOperationCode.AdminResult))
+                            {
+                                oPacket
+                                    .WriteByte(6)
+                                    .WriteByte(1);
+
+                                this.Client.Send(oPacket);
+                            }
+                        }
+                    }
+                    break;
+
+                case AdminCommandType.Block:
+                    {
+                        // TODO: Ban.
+                    }
+                    break;
+
+                case AdminCommandType.ShowMessageMap:
+                    {
+                        // TODO: What does this do?
+                    }
+                    break;
+
+                case AdminCommandType.Snow:
+                    {
+                        // TODO: We have yet to implement map weather.
+                    }
+                    break;
+
+                case AdminCommandType.VarSetGet:
+                    {
+                        // TODO: This seems useless. Should we implement this?
+                    }
+                    break;
+
+                case AdminCommandType.Warn:
+                    {
+                        string name = iPacket.ReadMapleString();
+                        string text = iPacket.ReadMapleString();
+
+                        Character target = this.Client.World.GetCharacter(name);
+
+                        if (target != null)
+                        {
+                            target.Notify(text, NoticeType.Popup);
+                        }
+
+                        using (OutPacket oPacket = new OutPacket(ServerOperationCode.AdminResult))
+                        {
+                            oPacket
+                                .WriteByte(29)
+                                .WriteBool(target != null);
+
+                            this.Client.Send(oPacket);
                         }
                     }
                     break;

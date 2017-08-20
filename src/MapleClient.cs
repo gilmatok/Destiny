@@ -373,6 +373,7 @@ namespace Destiny
                     break;
 
                 case ClientOperationCode.AdminCommand:
+                    this.Character.UseAdminCommand(iPacket);
                     break;
 
                 case ClientOperationCode.AdminLog:
