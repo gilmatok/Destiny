@@ -128,14 +128,35 @@ namespace Destiny
                               `Face` int(11) NOT NULL,
                               `AbilityPoints` smallint(6) NOT NULL DEFAULT '0',
                               `SkillPoints` smallint(6) NOT NULL DEFAULT '0',
-                              `Map` int(11) NOT NULL DEFAULT '0',
+                              `MapID` int(11) NOT NULL DEFAULT '0',
                               `SpawnPoint` tinyint(3) UNSIGNED NOT NULL DEFAULT '0',
                               `MaxBuddies` tinyint(3) UNSIGNED NOT NULL DEFAULT '20',
                               `EquipmentSlots` tinyint(3) UNSIGNED NOT NULL DEFAULT '24',
                               `UsableSlots` tinyint(3) UNSIGNED NOT NULL DEFAULT '24',
                               `SetupSlots` tinyint(3) UNSIGNED NOT NULL DEFAULT '24',
                               `EtceteraSlots` tinyint(3) UNSIGNED NOT NULL DEFAULT '24',
-                              `CashSlots` tinyint(3) UNSIGNED NOT NULL DEFAULT '48'
+                              `CashSlots` tinyint(3) UNSIGNED NOT NULL DEFAULT '48',
+                              `GuildID` int(11) NOT NULL DEFAULT '0',
+                              `GuildRank` int(11) NOT NULL DEFAULT '0'
+                            ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+                            DROP TABLE IF EXISTS `guilds`;
+                            CREATE TABLE `guilds` (
+                              `ID` int(11) NOT NULL AUTO_INCREMENT,
+                              `LeaderID` int(11) NOT NULL DEFAULT '0',
+                              `Name` varchar(13) NOT NULL DEFAULT '',
+                              `Title0` varchar(13) NOT NULL DEFAULT '',
+                              `Title1` varchar(13) NOT NULL DEFAULT '',
+                              `Title2` varchar(13) NOT NULL DEFAULT '',
+                              `Title3` varchar(13) NOT NULL DEFAULT '',
+                              `Title4` varchar(13) NOT NULL DEFAULT '',
+                              `Capacity` int(11) NOT NULL DEFAULT '0',
+                              `Notice` varchar(100) NOT NULL DEFAULT '',
+                              `Points` int(11) NOT NULL DEFAULT '0',
+                              `Logo` smallint(6) NOT NULL DEFAULT '0',
+                              `LogoColor` tinyint(3) unsigned NOT NULL DEFAULT '0',
+                              `Background` smallint(6) NOT NULL DEFAULT '0',
+                              `BackgroundColor` tinyint(3) unsigned NOT NULL DEFAULT '0'
                             ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
                             DROP TABLE IF EXISTS `items`;
@@ -262,6 +283,10 @@ namespace Destiny
                               ADD KEY `account_id` (`AccountID`),
                               ADD KEY `name` (`Name`) USING BTREE;
 
+                            ALTER TABLE `guilds`
+                              ADD PRIMARY KEY (`ID`),
+                              ADD KEY `leader_id` (`LeaderID`) USING BTREE;
+
                             ALTER TABLE `items`
                               ADD PRIMARY KEY (`ID`),
                               ADD KEY `character_id` (`CharacterID`) USING BTREE,
@@ -305,6 +330,8 @@ namespace Destiny
                               MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
                             ALTER TABLE `characters`
                               MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
+                            ALTER TABLE `guilds`
+                              MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
                             ALTER TABLE `items`
                               MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
                             ALTER TABLE `keymaps`
@@ -323,6 +350,9 @@ namespace Destiny
 
                             ALTER TABLE `characters`
                               ADD CONSTRAINT `characters_ibfk_1` FOREIGN KEY (`AccountID`) REFERENCES `accounts` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
+                        
+                            ALTER TABLE `guilds`
+                              ADD CONSTRAINT `guilds_ibfk_1` FOREIGN KEY (`CharacterID`) REFERENCES `characters` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
 
                             ALTER TABLE `items`
                               ADD CONSTRAINT `items_ibfk_1` FOREIGN KEY (`AccountID`) REFERENCES `accounts` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE,
