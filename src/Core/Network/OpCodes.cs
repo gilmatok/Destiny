@@ -70,9 +70,9 @@
         //66
         //67
         //68
-        ItemSort = 0x45,
-        ItemGather = 0x46,
-        ItemMovement = 0x47,
+        InventorySort = 0x45,
+        InventoryGather = 0x46,
+        InventoryAction = 0x47,
         UseItem = 0x48,
         CancelItemEffect = 0x49,
         UseSummonBag = 0x4B,
@@ -85,10 +85,10 @@
         UseCatchItem = 0x50,
         UseSkillBook = 0x51,
         //82
-        UseTeleportRock = 0x53,
         //89
         #endregion QUESTIONABLE
 
+        UseTeleportRock = 84,
         UseReturnScroll = 85,
         UseUpgradeScroll = 86,
         DistributeAP = 87,
@@ -106,7 +106,7 @@
         CancelDebuff = 0x63,
         ChangeMapSpecial = 100,
         UseInnerPortal = 101,
-        TrockAddMap = 0x66,
+        TrockAction = 0x66,
 
         #region QUESTIONABLE
         //103

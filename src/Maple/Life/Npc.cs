@@ -13,16 +13,48 @@ namespace Destiny.Maple.Life
         public Character Controller { get; set; }
 
         public Shop Shop { get; set; }
-        
+
+        public void Move(InPacket iPacket)
+        {
+            byte action1 = iPacket.ReadByte();
+            byte action2 = iPacket.ReadByte();
+
+            Movements movements = null;
+
+            if (iPacket.Remaining > 0)
+            {
+                movements = Movements.Decode(iPacket);
+            }
+
+            using (OutPacket oPacket = new OutPacket(ServerOperationCode.NpcMove))
+            {
+                oPacket
+                    .WriteInt(this.ObjectID)
+                    .WriteByte(action1)
+                    .WriteByte(action2);
+
+                if (movements != null)
+                {
+                    oPacket.WriteBytes(movements.ToByteArray());
+                }
+
+                this.Map.Broadcast(oPacket);
+            }
+        }
+
         public void Converse(Character talker)
         {
             if (this.Shop != null)
             {
                 this.Shop.Show(talker);
             }
-            else // TODO: Check if this Npc is a storage (usually by checking if it's storage deposit cost variable is not 0).
+            else if (false) // TODO: Check if this Npc is a storage (usually by checking if it's storage deposit cost variable is not 0).
             {
                 talker.Storage.Show(this);
+            }
+            else // NOTE: If this Npc is not a shop or a storage, it's a script.
+            {
+                // TODO: Start script.
             }
         }
 

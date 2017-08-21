@@ -235,6 +235,13 @@ namespace Destiny
                               `Meso` int(11) NOT NULL DEFAULT '0'
                             ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+                            DROP TABLE IF EXISTS `trocks`;
+                            CREATE TABLE `trocks` (
+                              `ID` int(11) NOT NULL,
+                              `CharacterID` int(11) NOT NULL,
+                              `Index` tinyint(3) unsigned NOT NULL DEFAULT '0',
+                              `Map` int(11) NOT NULL DEFAULT '0',
+                            ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
                             ALTER TABLE `accounts`
                               ADD PRIMARY KEY (`ID`),
@@ -288,6 +295,9 @@ namespace Destiny
                               ADD PRIMARY KEY (`AccountID`),
                               ADD KEY `account_id` (`AccountID`) USING BTREE;
 
+                            ALTER TABLE `trocks`
+                              ADD PRIMARY KEY (`ID`),
+                              ADD KEY `character_id` (`CharacterID`) USING BTREE;
 
                             ALTER TABLE `accounts`
                               MODIFY `ID` int(10) NOT NULL AUTO_INCREMENT;
@@ -304,6 +314,8 @@ namespace Destiny
                             ALTER TABLE `pets`
                               MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
                             ALTER TABLE `skills`
+                              MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
+                            ALTER TABLE `trocks`
                               MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
 
                             ALTER TABLE `buffs`
@@ -333,6 +345,9 @@ namespace Destiny
 
                             ALTER TABLE `storages`
                               ADD CONSTRAINT `storages_ibfk_1` FOREIGN KEY (`AccountID`) REFERENCES `accounts` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+                            ALTER TABLE `trocks`
+                              ADD CONSTRAINT `trocks_ibfk_1` FOREIGN KEY (`CharacterID`) REFERENCES `characters` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
                             ", databaseSchema);
 
                         Log.Inform("Database '{0}' created.", databaseSchema);

@@ -68,6 +68,7 @@
     <Compile Include="Maple\Characters\CharacterMemos.cs" />
     <Compile Include="Maple\Characters\CharacterPets.cs" />
     <Compile Include="Maple\Characters\CharacterStorage.cs" />
+    <Compile Include="Maple\Characters\CharacterTrocks.cs" />
     <Compile Include="Maple\Commands\Commands.cs" />
     <Compile Include="Maple\Commands\Implementation\KillMobsCommand.cs" />
     <Compile Include="Maple\Commands\Implementation\ReleaseCommand.cs" />

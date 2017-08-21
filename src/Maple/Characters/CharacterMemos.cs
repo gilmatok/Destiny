@@ -1,11 +1,11 @@
 ﻿using Destiny.Core.IO;
 using Destiny.Core.Network;
 using Destiny.Data;
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace Destiny.Maple.Characters
 {
-    public sealed class CharacterMemos : List<Memo>
+    public sealed class CharacterMemos : KeyedCollection<int, Memo>
     {
         public Character Parent { get; private set; }
 
@@ -25,6 +25,42 @@ namespace Destiny.Maple.Characters
         // NOTE: Memos are inserted straight into the database.
         // Therefore, there is no need for a save method.
 
+        public void Handle(InPacket iPacket)
+        {
+            MemoAction action = (MemoAction)iPacket.ReadByte();
+
+            switch (action)
+            {
+                case MemoAction.Send:
+                    {
+                        // TODO: This is occured when you send a note from the Cash Shop.
+                        // As we don't have Cash Shop implemented yet, this remains unhandled.
+                    }
+                    break;
+
+                case MemoAction.Delete:
+                    {
+                        byte count = iPacket.ReadByte();
+                        byte a = iPacket.ReadByte();
+                        byte b = iPacket.ReadByte();
+
+                        for (byte i = 0; i < count; i++)
+                        {
+                            int id = iPacket.ReadInt();
+
+                            if (!this.Contains(id))
+                            {
+                                continue;
+                            }
+
+                            this[id].Delete();
+                        }
+
+                    }
+                    break;
+            }
+        }
+
         public void Send()
         {
             using (OutPacket oPacket = new OutPacket(ServerOperationCode.MemoResult))
@@ -40,6 +76,11 @@ namespace Destiny.Maple.Characters
 
                 this.Parent.Client.Send(oPacket);
             }
+        }
+
+        protected override int GetKeyForItem(Memo item)
+        {
+            return item.ID;
         }
     }
 }

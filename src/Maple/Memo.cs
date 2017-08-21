@@ -10,7 +10,6 @@ namespace Destiny.Maple
         public string Sender { get; private set; }
         public string Message { get; private set; }
         public DateTime Received { get; private set; }
-        public bool IsDeleted { get; private set; }
 
         public Memo(Datum datum)
         {
@@ -18,6 +17,11 @@ namespace Destiny.Maple
             this.Sender = (string)datum["Sender"];
             this.Message = (string)datum["Message"];
             this.Received = (DateTime)datum["Received"];
+        }
+
+        public void Delete()
+        {
+            Database.Delete("memos", "ID = {0}", this.ID);
         }
 
         public byte[] ToByteArray()

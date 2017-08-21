@@ -129,6 +129,12 @@ namespace Destiny
         SetObjectState = 34
     }
 
+    public enum MemoAction : byte
+    {
+        Send = 0,
+        Delete = 1
+    }
+
     public enum MemoResult : byte
     {
         Send = 3,
@@ -141,6 +147,32 @@ namespace Destiny
         ReceiverOnline,
         ReceiverInvalidName,
         ReceiverInboxFull
+    }
+
+    public enum TrockAction : byte
+    {
+        Remove = 0,
+        Add = 1
+    }
+
+    public enum TrockType : byte
+    {
+        Regular = 0,
+        VIP = 1
+    }
+
+    public enum TrockResult : byte
+    {
+        Success,
+        Unknown = 2,
+        Unknown2 = 3,
+        CannotGo2 = 5,
+        DifficultToLocate = 6,
+        DifficultToLocate2 = 7,
+        CannotGo = 8,
+        AlreadyThere = 9,
+        CannotSaveMap = 10,
+        NoobsCannotLeaveMapleIsland = 11
     }
 
     #region Character

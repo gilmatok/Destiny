@@ -5,6 +5,7 @@ using Destiny.Maple.Characters;
 using Destiny.Maple.Data;
 using Destiny.Maple.Maps;
 using System;
+using System.Collections.Generic;
 
 namespace Destiny.Maple
 {
@@ -67,10 +68,30 @@ namespace Destiny.Maple
         public short RequiredFame { get; private set; }
         public Job RequiredJob { get; private set; }
 
-        // NOTE: Properties prefixed with 'C' are consume data.
+        // Consume data properties are prefixed with 'C'.
+        public int CItemId { get; private set; }
+        public string CFlags { get; private set; }
+        public string CCureAilments { get; private set; }
+        public short CEffect { get; private set; }
         public short CHealth { get; private set; }
         public short CMana { get; private set; }
+        public short CHealthPercentage { get; private set; }
+        public short CManaPercentage { get; private set; }
         public int CMoveTo { get; private set; }
+        public short CProb { get; private set; }
+        public int CBuffTime { get; private set; }
+        public short CWeaponAttack { get; private set; }
+        public short CMagicAttack { get; private set; }
+        public short CWeaponDefense { get; private set; }
+        public short CMagicDefense { get; private set; }
+        public short CAccuracy { get; private set; }
+        public short CAvoid { get; private set; }
+        public short CSpeed { get; private set; }
+        public short CJump { get; private set; }
+        public short CMorph { get; private set; }
+
+        public List<Tuple<int, short>> Summons { get; private set; }
+
 
         public ItemType Type
         {
@@ -457,10 +478,29 @@ namespace Destiny.Maple
             }
             else if (this.IsConsumable)
             {
+
+                this.CFlags = this.CachedReference.CFlags;
+                this.CCureAilments = this.CachedReference.CCureAilments;
+                this.CEffect = this.CachedReference.CEffect;
                 this.CHealth = this.CachedReference.CHealth;
                 this.CMana = this.CachedReference.CMana;
+                this.CHealthPercentage = this.CachedReference.CHealthPercentage;
+                this.CManaPercentage = this.CachedReference.CManaPercentage;
                 this.CMoveTo = this.CachedReference.CMoveTo;
+                this.CProb = this.CachedReference.CProb;
+                this.CBuffTime = this.CachedReference.CBuffTime;
+                this.CWeaponAttack = this.CachedReference.CWeaponAttack;
+                this.CMagicAttack = this.CachedReference.CMagicAttack;
+                this.CWeaponDefense = this.CachedReference.CWeaponDefense;
+                this.CMagicDefense = this.CachedReference.CMagicDefense;
+                this.CAccuracy = this.CachedReference.CAccuracy;
+                this.CAvoid = this.CachedReference.CAvoid;
+                this.CSpeed = this.CachedReference.CSpeed;
+                this.CJump = this.CachedReference.CJump;
+                this.CMorph = this.CachedReference.CMorph;
             }
+
+            this.Summons = this.CachedReference.Summons;
         }
 
         public Item(Datum datum)
@@ -521,10 +561,28 @@ namespace Destiny.Maple
                 }
                 else if (this.IsConsumable)
                 {
+                    this.CFlags = this.CachedReference.CFlags;
+                    this.CCureAilments = this.CachedReference.CCureAilments;
+                    this.CEffect = this.CachedReference.CEffect;
                     this.CHealth = this.CachedReference.CHealth;
                     this.CMana = this.CachedReference.CMana;
+                    this.CHealthPercentage = this.CachedReference.CHealthPercentage;
+                    this.CManaPercentage = this.CachedReference.CManaPercentage;
                     this.CMoveTo = this.CachedReference.CMoveTo;
+                    this.CProb = this.CachedReference.CProb;
+                    this.CBuffTime = this.CachedReference.CBuffTime;
+                    this.CWeaponAttack = this.CachedReference.CWeaponAttack;
+                    this.CMagicAttack = this.CachedReference.CMagicAttack;
+                    this.CWeaponDefense = this.CachedReference.CWeaponDefense;
+                    this.CMagicDefense = this.CachedReference.CMagicDefense;
+                    this.CAccuracy = this.CachedReference.CAccuracy;
+                    this.CAvoid = this.CachedReference.CAvoid;
+                    this.CSpeed = this.CachedReference.CSpeed;
+                    this.CJump = this.CachedReference.CJump;
+                    this.CMorph = this.CachedReference.CMorph;
                 }
+
+                this.Summons = this.CachedReference.Summons;
             }
             else
             {
@@ -538,14 +596,32 @@ namespace Destiny.Maple
                 this.SalePrice = (int)datum["price"];
                 this.RequiredLevel = (byte)datum["min_level"];
                 this.Meso = (int)datum["money"];
+
+                this.Summons = new List<Tuple<int, short>>();
             }
         }
 
         public void LoadConsumeData(Datum datum)
         {
+            //this.CFlags = datum["flags"];
+            //this.CCureAilments = datum["cure_ailments"];
+            this.CEffect = (byte)datum["effect"];
             this.CHealth = (short)datum["hp"];
             this.CMana = (short)datum["mp"];
+            this.CHealthPercentage = (short)datum["hp_percentage"];
+            this.CManaPercentage = (short)datum["mp_percentage"];
             this.CMoveTo = (int)datum["move_to"];
+            this.CProb = (byte)datum["prob"];
+            this.CBuffTime = (int)datum["buff_time"];
+            this.CWeaponAttack = (short)datum["weapon_attack"];
+            this.CMagicAttack = (short)datum["magic_attack"];
+            this.CWeaponDefense = (short)datum["weapon_defense"];
+            this.CMagicAttack = (short)datum["magic_attack"];
+            this.CAccuracy = (short)datum["accuracy"];
+            this.CAvoid = (short)datum["avoid"];
+            this.CSpeed = (short)datum["speed"];
+            this.CJump = (short)datum["jump"];
+            this.CMorph = (short)datum["morph"];
         }
 
         public void LoadEquipmentData(Datum datum)

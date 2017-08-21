@@ -1,4 +1,5 @@
 ﻿using Destiny.Data;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
@@ -32,6 +33,14 @@ namespace Destiny.Maple.Data
                 foreach (Datum datum in new Datums("item_equip_data").Populate())
                 {
                     this[(int)datum["itemid"]].LoadEquipmentData(datum);
+                }
+            }
+
+            using (Log.Load("Summons"))
+            {
+                foreach (Datum datum in new Datums("item_summons").Populate())
+                {
+                    this[(int)datum["itemid"]].Summons.Add(new Tuple<int, short>((int)datum["mobid"], (short)datum["chance"]));
                 }
             }
 

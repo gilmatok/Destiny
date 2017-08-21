@@ -7,6 +7,8 @@ using Destiny.Data;
 using Destiny.Core.Network;
 using System.Linq;
 using Destiny.Network;
+using Destiny.Maple.Data;
+using Destiny.Maple.Life;
 
 namespace Destiny.Maple.Characters
 {
@@ -360,14 +362,87 @@ namespace Destiny.Maple.Characters
             }
         }
 
+        public void UseItem(InPacket iPacket)
+        {
+            iPacket.ReadInt(); // NOTE: Ticks.
+            short slot = iPacket.ReadShort();
+            int itemID = iPacket.ReadInt();
+
+            Item item = this[ItemType.Usable, slot];
+
+            if (item == null || itemID != item.MapleID)
+            {
+                return;
+            }
+
+            this.Remove(itemID, 1);
+
+            if (item.CHealth > 0)
+            {
+                this.Parent.Health += item.CHealth;
+            }
+
+            if (item.CMana > 0)
+            {
+                this.Parent.Mana += item.CMana;
+            }
+
+            if (item.CHealthPercentage != 0)
+            {
+                this.Parent.Health += (short)((item.CHealthPercentage * this.Parent.MaxHealth) / 100);
+            }
+
+            if (item.CManaPercentage != 0)
+            {
+                this.Parent.Mana += (short)((item.CManaPercentage * this.Parent.MaxMana) / 100);
+            }
+
+            if (item.CBuffTime > 0 && item.CProb == 0)
+            {
+                // TODO: Add buff.
+            }
+
+            if (false)
+            {
+                // TODO: Add Monster Book card.
+            }
+        }
+
+        public void UseSummonBag(InPacket iPacket)
+        {
+            iPacket.ReadInt(); // NOTE: Ticks.
+            short slot = iPacket.ReadShort();
+            int itemID = iPacket.ReadInt();
+
+            Item item = this[ItemType.Usable, slot];
+
+            if (item == null || itemID != item.MapleID)
+            {
+                return;
+            }
+
+            this.Remove(itemID, 1);
+
+            foreach (Tuple<int, short> summon in item.Summons)
+            {
+                if (Constants.Random.Next(0, 100) < summon.Item2)
+                {
+                    if (DataProvider.Mobs.Contains(summon.Item1))
+                    {
+                        this.Parent.Map.Mobs.Add(new Mob(summon.Item1, this.Parent.Position));
+                    }
+                }
+            }
+        }
+
         public void UseCashItem(InPacket iPacket)
         {
             short slot = iPacket.ReadShort();
             int itemID = iPacket.ReadInt();
 
-            Item item = this[itemID, slot];
+            Item item = this[ItemType.Cash, slot];
 
-            if (item == null)
+            if (item == null || itemID != item.MapleID)
             {
                 return;
             }
@@ -380,7 +455,7 @@ namespace Destiny.Maple.Characters
                 case 5040001: // NOTE: Coke Teleport Rock.
                 case 5041000: // NOTE: VIP Teleport Rock.
                     {
-
+                        used = this.Parent.Trocks.Use(itemID, iPacket);
                     }
                     break;
 
@@ -732,7 +807,7 @@ namespace Destiny.Maple.Characters
 
             if (used)
             {
-                this.Remove(item, true);
+                this.Remove(itemID, 1);
             }
             else
             {
@@ -744,16 +819,16 @@ namespace Destiny.Maple.Characters
         {
             iPacket.ReadInt(); // NOTE: Ticks.
             short slot = iPacket.ReadShort();
-            int mapleID = iPacket.ReadInt();
+            int itemID = iPacket.ReadInt();
 
-            Item item = this[mapleID, slot];
+            Item item = this[itemID, slot];
 
             if (item == null)
             {
                 return;
             }
 
-            this.Remove(item, true);
+            this.Remove(itemID, 1);
 
             this.Parent.ChangeMap(item.CMoveTo);
         }
@@ -1043,3 +1118,4 @@ namespace Destiny.Maple.Characters
         }
     }
 }
+

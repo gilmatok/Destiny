@@ -150,9 +150,6 @@ namespace Destiny
                     this.ChangeChannel(iPacket);
                     break;
 
-                case ClientOperationCode.CashShopMigration:
-                    break;
-
                 case ClientOperationCode.PlayerMovement:
                     this.Character.Move(iPacket);
                     break;
@@ -177,9 +174,6 @@ namespace Destiny
                     this.Character.Attack(iPacket, AttackType.Magic);
                     break;
 
-                case ClientOperationCode.EnergyOrbAttack:
-                    break;
-
                 case ClientOperationCode.TakeDamage:
                     this.Character.Damage(iPacket);
                     break;
@@ -196,17 +190,8 @@ namespace Destiny
                     this.Character.Express(iPacket);
                     break;
 
-                case ClientOperationCode.UseItemEffect:
-                    break;
-
-                case ClientOperationCode.UseDeathItem:
-                    break;
-
                 case ClientOperationCode.NpcConverse:
                     this.Character.Converse(iPacket);
-                    break;
-
-                case ClientOperationCode.NpcResult:
                     break;
 
                 case ClientOperationCode.NpcShop:
@@ -217,57 +202,36 @@ namespace Destiny
                     this.Character.Storage.Handle(iPacket);
                     break;
 
-                case ClientOperationCode.HiredMerchant:
-                    break;
-
-                case ClientOperationCode.ItemSort:
+                case ClientOperationCode.InventorySort:
                     this.Character.Items.Sort(iPacket);
                     break;
 
-                case ClientOperationCode.ItemGather:
+                case ClientOperationCode.InventoryGather:
                     this.Character.Items.Gather(iPacket);
                     break;
 
-                case ClientOperationCode.ItemMovement:
+                case ClientOperationCode.InventoryAction:
                     this.Character.Items.Handle(iPacket);
                     break;
 
                 case ClientOperationCode.UseItem:
-                    break;
-
-                case ClientOperationCode.CancelItemEffect:
+                    this.Character.Items.UseItem(iPacket);
                     break;
 
                 case ClientOperationCode.UseSummonBag:
-                    break;
-
-                case ClientOperationCode.UsePetFood:
-                    break;
-
-                case ClientOperationCode.UseMountFood:
-                    break;
-
-                case ClientOperationCode.UseScriptedItem:
+                    this.Character.Items.UseSummonBag(iPacket);
                     break;
 
                 case ClientOperationCode.UseCashItem:
                     this.Character.Items.UseCashItem(iPacket);
                     break;
 
-                case ClientOperationCode.UseCatchItem:
-                    break;
-
-                case ClientOperationCode.UseSkillBook:
-                    break;
-
-                case ClientOperationCode.UseTeleportRock:
+                case ClientOperationCode.UseTeleportRock: // NOTE: Only occurs with the special Teleport Rock in the usable inventory.
+                    this.Character.Trocks.Use(2320000, iPacket);
                     break;
 
                 case ClientOperationCode.UseReturnScroll:
                     this.Character.Items.UseReturnScroll(iPacket);
-                    break;
-
-                case ClientOperationCode.UseUpgradeScroll:
                     break;
 
                 case ClientOperationCode.DistributeAP:
@@ -290,17 +254,8 @@ namespace Destiny
                     this.Character.Skills.Cast(iPacket);
                     break;
 
-                case ClientOperationCode.CancelBuff:
-                    break;
-
-                case ClientOperationCode.SkillEffect:
-                    break;
-
                 case ClientOperationCode.MesoDrop:
                     this.Character.DropMeso(iPacket);
-                    break;
-
-                case ClientOperationCode.GiveFame:
                     break;
 
                 case ClientOperationCode.PlayerInformation:
@@ -311,175 +266,55 @@ namespace Destiny
                     this.Character.Pets.Spawn(iPacket);
                     break;
 
-                case ClientOperationCode.CancelDebuff:
-                    break;
-
                 case ClientOperationCode.ChangeMapSpecial:
                     this.Character.ChangeMapSpecial(iPacket);
                     break;
 
-                case ClientOperationCode.UseInnerPortal:
-                    break;
-
-                case ClientOperationCode.TrockAddMap:
-                    break;
-
-                case ClientOperationCode.Report:
+                case ClientOperationCode.TrockAction:
+                    this.Character.Trocks.Update(iPacket);
                     break;
 
                 case ClientOperationCode.QuestAction:
                     this.Character.Quests.Handle(iPacket);
                     break;
 
-                case ClientOperationCode.SkillMacro:
-                    break;
-
-                case ClientOperationCode.SpouseChat:
-                    break;
-
-                case ClientOperationCode.UseFishingItem:
-                    break;
-
-                case ClientOperationCode.MakerSkill:
-                    break;
-
-                case ClientOperationCode.UseRemote:
-                    break;
-
-                case ClientOperationCode.PartyChat:
-                    break;
-
                 case ClientOperationCode.Command:
                     this.Character.UseCommand(iPacket);
-                    break;
-
-                case ClientOperationCode.Messenger:
                     break;
 
                 case ClientOperationCode.PlayerInteraction:
                     this.Character.Interact(iPacket);
                     break;
 
-                case ClientOperationCode.PartyOperation:
-                    break;
-
-                case ClientOperationCode.DenyPartyRequest:
-                    break;
-
-                case ClientOperationCode.GuildOperation:
-                    break;
-
-                case ClientOperationCode.DenyGuildRequest:
-                    break;
-
                 case ClientOperationCode.AdminCommand:
                     this.Character.UseAdminCommand(iPacket);
-                    break;
-
-                case ClientOperationCode.AdminLog:
                     break;
 
                 case ClientOperationCode.BuddyListModify:
                     break;
 
                 case ClientOperationCode.NoteAction:
-                    break;
-
-                case ClientOperationCode.UseDoor:
+                    this.Character.Memos.Handle(iPacket);
                     break;
 
                 case ClientOperationCode.ChangeKeymap:
                     this.Character.Keymap.Change(iPacket);
                     break;
 
-                case ClientOperationCode.RingAction:
-                    break;
-
-                case ClientOperationCode.OpenFamily:
-                    break;
-
-                case ClientOperationCode.AddFamily:
-                    break;
-
-                case ClientOperationCode.AcceptFamily:
-                    break;
-
-                case ClientOperationCode.AllianceOperation:
-                    break;
-
-                case ClientOperationCode.BbsOperation:
-                    break;
-
-                case ClientOperationCode.MtsMigration:
-                    break;
-
-                case ClientOperationCode.PetTalk:
-                    break;
-
-                case ClientOperationCode.UseSolomonItem:
-                    break;
-
                 case ClientOperationCode.MovePet:
                     this.Character.Pets.Move(iPacket);
-                    break;
-
-                case ClientOperationCode.PetChat:
-                    break;
-
-                case ClientOperationCode.PetCommand:
-                    break;
-
-                case ClientOperationCode.PetLoot:
-                    break;
-
-                case ClientOperationCode.PetAutoPot:
-                    break;
-
-                case ClientOperationCode.PetExcludeItems:
-                    break;
-
-                case ClientOperationCode.MoveSummon:
-                    break;
-
-                case ClientOperationCode.SummonAttack:
-                    break;
-
-                case ClientOperationCode.DamageSummon:
-                    break;
-
-                case ClientOperationCode.Beholder:
                     break;
 
                 case ClientOperationCode.MobMovement:
                     this.Character.ControlledMobs.Move(iPacket);
                     break;
 
-                case ClientOperationCode.AutoAggro:
-                    break;
-
-                case ClientOperationCode.MobDamageModFriendly:
-                    break;
-
-                case ClientOperationCode.MonsterBomb:
-                    break;
-
-                case ClientOperationCode.MobDamageMob:
-                    break;
-
-                case ClientOperationCode.NpcAction:
-                    break;
-
                 case ClientOperationCode.DropPickup:
                     this.Character.Items.Pickup(iPacket);
                     break;
 
-                case ClientOperationCode.DamageReactor:
-                    break;
-
-                case ClientOperationCode.ChangedMap:
-                    break;
-
                 case ClientOperationCode.NpcMovement:
+                    this.Character.ControlledNpcs.Move(iPacket);
                     break;
 
                 case ClientOperationCode.HitReactor:
@@ -490,46 +325,8 @@ namespace Destiny
                     this.Character.Map.Reactors.Touch(iPacket, this.Character);
                     break;
 
-                case ClientOperationCode.MonsterCarnival:
-                    break;
-
-                case ClientOperationCode.PartySearchRegister:
-                    break;
-
-                case ClientOperationCode.PartySearchStart:
-                    break;
-
-                case ClientOperationCode.PlayerUpdate:
-                    break;
-
-                case ClientOperationCode.CashShopOperation:
-                    break;
-
-                case ClientOperationCode.BuyCashItem:
-                    break;
-
-                case ClientOperationCode.CouponCode:
-                    break;
-
-                case ClientOperationCode.OpenItemInterface:
-                    break;
-
-                case ClientOperationCode.CloseItemInterface:
-                    break;
-
-                case ClientOperationCode.UseItemInterface:
-                    break;
-
-                case ClientOperationCode.MtsOperation:
-                    break;
-
-                case ClientOperationCode.UseMapleLife:
-                    break;
-
-                case ClientOperationCode.UseHammer:
-                    break;
-
-                case ClientOperationCode.MapleTV:
+                default:
+                    Log.Warn("Unhandled packet 0x{0:X4} received from {1}.", (short)iPacket.OperationCode, this.Host);
                     break;
             }
         }

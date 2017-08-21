@@ -31,6 +31,7 @@ namespace Destiny.Maple.Characters
         public CharacterSkills Skills { get; private set; }
         public CharacterQuests Quests { get; private set; }
         public CharacterKeymap Keymap { get; private set; }
+        public CharacterTrocks Trocks { get; private set; }
         public CharacterPets Pets { get; private set; }
         public CharacterMemos Memos { get; private set; }
         public CharacterStorage Storage { get; private set; }
@@ -640,6 +641,7 @@ namespace Destiny.Maple.Characters
             this.Skills = new CharacterSkills(this);
             this.Quests = new CharacterQuests(this);
             this.Keymap = new CharacterKeymap(this);
+            this.Trocks = new CharacterTrocks(this);
             this.Pets = new CharacterPets(this);
             this.Memos = new CharacterMemos(this);
             this.Storage = new CharacterStorage(this);
@@ -693,6 +695,7 @@ namespace Destiny.Maple.Characters
             this.Skills.Load();
             this.Quests.Load();
             this.Keymap.Load();
+            this.Trocks.Load();
             this.Memos.Load();
         }
 
@@ -750,6 +753,7 @@ namespace Destiny.Maple.Characters
             this.Skills.Save();
             this.Quests.Save();
             this.Keymap.Save();
+            this.Trocks.Save();
             this.Pets.Save();
 
             Log.Inform("Saved character '{0}' to database.", this.Name);
@@ -960,17 +964,15 @@ namespace Destiny.Maple.Characters
             }
         }
 
-        public void ChangeMap(int mapID, byte portalID = 0)
+        public void ChangeMap(int mapID, byte portalID = byte.MaxValue) // NOTE: If a portal isn't specified, a random spawn point will be chosen.
         {
-            // NOTE: If the map doesn't exist, this line will throw an exception. Calling method needs to catch and handle that situation.
-            Map newMap = this.Client.Channel.Maps[mapID];
+            Map map = this.Client.Channel.Maps[mapID];
 
-            // NOTE: If a portal isn't specified, a random spawn point will be chosen.
-            if (portalID == 0)
+            if (portalID == byte.MaxValue)
             {
                 List<Portal> spawnPoints = new List<Portal>();
 
-                foreach (Portal loopPortal in newMap.Portals)
+                foreach (Portal loopPortal in map.Portals)
                 {
                     if (loopPortal.IsSpawnPoint)
                     {
@@ -985,19 +987,7 @@ namespace Destiny.Maple.Characters
                 this.SpawnPoint = portalID;
             }
 
-            Map oldMap = this.Map;
-            oldMap.Characters.Remove(this);
-
-            try
-            {
-                newMap.Characters.Add(this);
-            }
-            catch (Exception e)
-            {
-                //Failed to change map... Attempt to add the character back to the map they were on
-                oldMap.Characters.Add(this);
-                throw e;
-            }
+            this.Map.Characters.Remove(this);
 
             using (OutPacket oPacket = new OutPacket(ServerOperationCode.SetField))
             {
@@ -1015,6 +1005,8 @@ namespace Destiny.Maple.Characters
 
                 this.Client.Send(oPacket);
             }
+
+            map.Characters.Add(this);
         }
 
         public void AddAbility(StatisticType statistic, short mod, bool isReset)
@@ -2165,15 +2157,9 @@ namespace Destiny.Maple.Characters
                     .WriteShort() // NOTE: Mini games record.
                     .WriteShort() // NOTE: Rings (1).
                     .WriteShort() // NOTE: Rings (2). 
-                    .WriteShort(); // NOTE: Rings (3).
-
-                // NOTE: Teleport rock locations.
-                for (int i = 0; i < 15; i++)
-                {
-                    oPacket.WriteInt(999999999);
-                }
-
-                oPacket
+                    .WriteShort() // NOTE: Rings (3).
+                    .WriteBytes(this.Trocks.RegularToByteArray())
+                    .WriteBytes(this.Trocks.VIPToByteArray())
                     .WriteInt() // NOTE: Monster book cover ID.
                     .WriteByte() // NOTE: Unknown.
                     .WriteShort() // NOTE: Monster book cards count.
