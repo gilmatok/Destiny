@@ -8,7 +8,6 @@ using Destiny.Maple.Life;
 using Destiny.Data;
 using Destiny.Maple.Data;
 using Destiny.Maple.Interaction;
-using Destiny.Maple.Social;
 
 namespace Destiny.Maple.Characters
 {
@@ -38,7 +37,6 @@ namespace Destiny.Maple.Characters
         public CharacterStorage Storage { get; private set; }
         public ControlledMobs ControlledMobs { get; private set; }
         public ControlledNpcs ControlledNpcs { get; private set; }
-        public Guild Guild { get; set; }
         public Trade Trade { get; set; }
         public PlayerShop PlayerShop { get; set; }
 
@@ -687,11 +685,6 @@ namespace Destiny.Maple.Characters
             this.SpawnPoint = (byte)datum["SpawnPoint"];
             this.Meso = (int)datum["Meso"];
 
-            if ((int)datum["GuildID"] > 0)
-            {
-                this.Guild = this.Client.World.Guilds[(int)datum["GuildID"]];
-            }
-
             this.Items.MaxSlots[ItemType.Equipment] = (byte)datum["EquipmentSlots"];
             this.Items.MaxSlots[ItemType.Usable] = (byte)datum["UsableSlots"];
             this.Items.MaxSlots[ItemType.Setup] = (byte)datum["SetupSlots"];
@@ -739,8 +732,6 @@ namespace Destiny.Maple.Characters
             datum["MapID"] = this.Map.MapleID;
             datum["SpawnPoint"] = this.SpawnPoint;
             datum["Meso"] = this.Meso;
-            datum["GuildID"] = this.Guild != null ? this.Guild.ID : 0;
-            datum["GuildRank"] = this.Guild != null ? this.Guild[this.ID].Rank : 0;
 
             datum["EquipmentSlots"] = this.Items.MaxSlots[ItemType.Equipment];
             datum["UsableSlots"] = this.Items.MaxSlots[ItemType.Usable];
@@ -800,14 +791,7 @@ namespace Destiny.Maple.Characters
             this.Map.Characters.Add(this);
 
             this.Keymap.Send();
-
-            if (this.Guild != null)
-            {
-                this.Guild[this.ID].IsOnline = true;
-
-                this.Guild.Show(this);
-            }
-
+            
             this.Memos.Send();
         }
 
@@ -1715,12 +1699,12 @@ namespace Destiny.Maple.Characters
 
                 case MultiChatType.Guild:
                     {
-                        if (this.Guild == null)
-                        {
-                            // NOTE: Player trying to chat in a guild while not being in a guild.
+                        //if (this.Guild == null)
+                        //{
+                        //    // NOTE: Player trying to chat in a guild while not being in a guild.
 
-                            return;
-                        }
+                        //    return;
+                        //}
                     }
                     break;
 
@@ -2275,14 +2259,14 @@ namespace Destiny.Maple.Characters
                 .WriteByte(this.Level)
                 .WriteMapleString(this.Name);
 
-            if (this.Guild != null)
+            if (false)
             {
-                oPacket
-                    .WriteMapleString(this.Guild.Name)
-                    .WriteShort(this.Guild.Logo)
-                    .WriteByte(this.Guild.LogoColor)
-                    .WriteShort(this.Guild.Background)
-                    .WriteByte(this.Guild.BackgroundColor);
+                //oPacket
+                //    .WriteMapleString(this.Guild.Name)
+                //    .WriteShort(this.Guild.Logo)
+                //    .WriteByte(this.Guild.LogoColor)
+                //    .WriteShort(this.Guild.Background)
+                //    .WriteByte(this.Guild.BackgroundColor);
             }
             else
             {
