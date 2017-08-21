@@ -5,6 +5,7 @@ using Destiny.Data;
 using Destiny.Maple;
 using Destiny.Maple.Characters;
 using Destiny.Maple.Data;
+using Destiny.Maple.Social;
 using Destiny.Server;
 using Destiny.Server.Migration;
 using System;
@@ -60,6 +61,11 @@ namespace Destiny
                 this.Character.Save();
                 this.Character.LastNpc = null;
                 this.Character.Map.Characters.Remove(this.Character);
+
+                if (this.Character.Guild != null)
+                {
+                    this.Character.Guild[this.Character.ID].IsOnline = false;
+                }
 
                 this.Channel.Characters.Unregister(this.Character);
             }
@@ -278,6 +284,10 @@ namespace Destiny
                     this.Character.Quests.Handle(iPacket);
                     break;
 
+                case ClientOperationCode.MultiChat:
+                    this.Character.MultiTalk(iPacket);
+                    break;
+
                 case ClientOperationCode.Command:
                     this.Character.UseCommand(iPacket);
                     break;
@@ -286,11 +296,66 @@ namespace Destiny
                     this.Character.Interact(iPacket);
                     break;
 
-                case ClientOperationCode.AdminCommand:
-                    this.Character.UseAdminCommand(iPacket);
+                    // TODO: Move this elsewhere.
+                case ClientOperationCode.GuildOperation:
+                    {
+                        GuildAction action = (GuildAction)iPacket.ReadByte();
+
+                        switch (action)
+                        {
+                            case GuildAction.Create:
+                                {
+                                    // NOTE: This packet is called from the guild creation menu.
+                                    // The menu can only be opened from Hercale NPC at the guild headquarters.
+                                    // Therefore, we should probably add a check to see if it was correctly done
+                                    // and that the player is present in the map.
+
+                                    // TODO: As we don't have NPC scripts implemented yet, this remains unhandled.
+                                }
+                                break;
+
+                            case GuildAction.Join:
+                                {
+                                    if (this.Character.Guild != null)
+                                    {
+                                        // NOTE: Trying to join a guild while inside one.
+
+                                        return;
+                                    }
+
+                                    int guildID = iPacket.ReadInt();
+                                    int characterID = iPacket.ReadInt();
+
+                                    // TODO: Validate guild ID.
+                                    // TODO: Validate character ID.
+                                    // TODO: Validate initivation.
+
+                                    Guild guild = this.World.Guilds[guildID];
+
+                                    if (guild.IsFull)
+                                    {
+                                        this.Character.Notify("The guild you are trying to join is already full."); // TODO: Actual message.
+
+                                        return;
+                                    }
+
+                                    guild.Add(new GuildMember(this.Character));
+
+                                    this.Character.Guild = this.World.Guilds[guildID];
+                                    this.Character.Guild.Show(this.Character);
+
+                                }
+                                break;
+
+                            default:
+                                this.Character.Guild.Handle(action, this.Character, iPacket);
+                                break;
+                        }
+                    }
                     break;
 
-                case ClientOperationCode.BuddyListModify:
+                case ClientOperationCode.AdminCommand:
+                    this.Character.UseAdminCommand(iPacket);
                     break;
 
                 case ClientOperationCode.NoteAction:

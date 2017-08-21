@@ -1,9 +1,42 @@
 ﻿using Destiny.Core.IO;
+using Destiny.Data;
 using Destiny.Maple.Characters;
+using Destiny.Maple.Social;
 using System.Collections.ObjectModel;
 
 namespace Destiny.Server
 {
+    public sealed class WorldGuilds : KeyedCollection<int, Guild>
+    {
+        public WorldServer Parent { get; private set; }
+
+        public WorldGuilds(WorldServer parent)
+        {
+            this.Parent = parent;
+        }
+
+        public void Load()
+        {
+            using (Log.Load(this.Parent.Name + " Guilds"))
+            {
+                foreach (Datum datum in new Datums("guilds").Populate())
+                {
+                    this.Add(new Guild(this.Parent, datum));
+                }
+
+                foreach (Datum datum in new Datums("characters").Populate("GuildID > 0"))
+                {
+                    this[(int)datum["GuildID"]].Add(new GuildMember(datum));
+                }
+            }
+        }
+
+        protected override int GetKeyForItem(Guild item)
+        {
+            return item.ID;
+        }
+    }
+
     public sealed class WorldServer : KeyedCollection<byte, ChannelServer>
     {
         public byte ID { get; private set; }
@@ -16,6 +49,8 @@ namespace Destiny.Server
         public int PartyQuestExperienceRate { get; private set; }
         public int MesoRate { get; private set; }
         public int DropRate { get; private set; }
+
+        public WorldGuilds Guilds { get; private set; }
 
         public WorldServer()
             : base()
@@ -31,6 +66,8 @@ namespace Destiny.Server
             this.MesoRate = 1;
             this.DropRate = 1;
 
+            this.Guilds = new WorldGuilds(this);
+
             byte channels = 2;
 
             for (byte i = 0; i < channels; i++)
@@ -41,6 +78,8 @@ namespace Destiny.Server
 
         public void Start()
         {
+            this.Guilds.Load();
+
             foreach (ChannelServer channel in this)
             {
                 channel.Start();

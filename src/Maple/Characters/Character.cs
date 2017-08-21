@@ -8,6 +8,7 @@ using Destiny.Maple.Life;
 using Destiny.Data;
 using Destiny.Maple.Data;
 using Destiny.Maple.Interaction;
+using Destiny.Maple.Social;
 
 namespace Destiny.Maple.Characters
 {
@@ -37,6 +38,7 @@ namespace Destiny.Maple.Characters
         public CharacterStorage Storage { get; private set; }
         public ControlledMobs ControlledMobs { get; private set; }
         public ControlledNpcs ControlledNpcs { get; private set; }
+        public Guild Guild { get; set; }
         public Trade Trade { get; set; }
         public PlayerShop PlayerShop { get; set; }
 
@@ -681,9 +683,14 @@ namespace Destiny.Maple.Characters
             this.SkillPoints = (short)datum["SkillPoints"];
             this.Experience = (int)datum["Experience"];
             this.Fame = (short)datum["Fame"];
-            this.Map = this.Client.Channel.Maps[(int)datum["Map"]];
+            this.Map = this.Client.Channel.Maps[(int)datum["MapID"]];
             this.SpawnPoint = (byte)datum["SpawnPoint"];
             this.Meso = (int)datum["Meso"];
+
+            if ((int)datum["GuildID"] > 0)
+            {
+                this.Guild = this.Client.World.Guilds[(int)datum["GuildID"]];
+            }
 
             this.Items.MaxSlots[ItemType.Equipment] = (byte)datum["EquipmentSlots"];
             this.Items.MaxSlots[ItemType.Usable] = (byte)datum["UsableSlots"];
@@ -729,9 +736,11 @@ namespace Destiny.Maple.Characters
             datum["SkillPoints"] = this.SkillPoints;
             datum["Experience"] = this.Experience;
             datum["Fame"] = this.Fame;
-            datum["Map"] = this.Map.MapleID;
+            datum["MapID"] = this.Map.MapleID;
             datum["SpawnPoint"] = this.SpawnPoint;
             datum["Meso"] = this.Meso;
+            datum["GuildID"] = this.Guild != null ? this.Guild.ID : 0;
+            datum["GuildRank"] = this.Guild != null ? this.Guild[this.ID].Rank : 0;
 
             datum["EquipmentSlots"] = this.Items.MaxSlots[ItemType.Equipment];
             datum["UsableSlots"] = this.Items.MaxSlots[ItemType.Usable];
@@ -791,6 +800,13 @@ namespace Destiny.Maple.Characters
             this.Map.Characters.Add(this);
 
             this.Keymap.Send();
+
+            if (this.Guild != null)
+            {
+                this.Guild[this.ID].IsOnline = true;
+
+                this.Guild.Show(this);
+            }
 
             this.Memos.Send();
         }
@@ -1665,6 +1681,80 @@ namespace Destiny.Maple.Characters
             }
         }
 
+        public void MultiTalk(InPacket iPacket)
+        {
+            MultiChatType type = (MultiChatType)iPacket.ReadByte();
+            byte count = iPacket.ReadByte();
+
+            List<int> recipients = new List<int>();
+
+            while (count-- > 0)
+            {
+                int recipientID = iPacket.ReadInt();
+
+                recipients.Add(recipientID);
+            }
+
+            string text = iPacket.ReadMapleString();
+
+
+            // NOTE: This only exists for validation of source.
+            switch (type)
+            {
+                case MultiChatType.Buddy:
+                    {
+
+                    }
+                    break;
+
+                case MultiChatType.Party:
+                    {
+
+                    }
+                    break;
+
+                case MultiChatType.Guild:
+                    {
+                        if (this.Guild == null)
+                        {
+                            // NOTE: Player trying to chat in a guild while not being in a guild.
+
+                            return;
+                        }
+                    }
+                    break;
+
+                case MultiChatType.Alliance:
+                    {
+
+                    }
+                    break;
+            }
+
+            // NOTE: This is here for convinience. If you accidently use another text window (like party) and not the main text window,
+            // your commands won't be shown but instead executed from there as well.
+            if (text.StartsWith(Constants.CommandIndiciator.ToString()))
+            {
+                CommandFactory.Execute(this, text);
+            }
+            else
+            {
+
+                using (OutPacket oPacket = new OutPacket(ServerOperationCode.GroupMessage))
+                {
+                    oPacket
+                        .WriteByte((byte)type)
+                        .WriteMapleString(this.Name)
+                        .WriteMapleString(text);
+
+                    foreach (int recipient in recipients)
+                    {
+                        this.Client.World.GetCharacter(recipient).Client.Send(oPacket);
+                    }
+                }
+            }
+        }
+
         // TODO: Cash Shop/MTS scenarios.
         public void UseCommand(InPacket iPacket)
         {
@@ -2183,9 +2273,23 @@ namespace Destiny.Maple.Characters
             oPacket
                 .WriteInt(this.ID)
                 .WriteByte(this.Level)
-                .WriteMapleString(this.Name)
-                .WriteMapleString(string.Empty) // NOTE: Guild name.
-                .WriteZero(6) // NOTE: Guild emblems.
+                .WriteMapleString(this.Name);
+
+            if (this.Guild != null)
+            {
+                oPacket
+                    .WriteMapleString(this.Guild.Name)
+                    .WriteShort(this.Guild.Logo)
+                    .WriteByte(this.Guild.LogoColor)
+                    .WriteShort(this.Guild.Background)
+                    .WriteByte(this.Guild.BackgroundColor);
+            }
+            else
+            {
+                oPacket.Skip(8);
+            }
+
+            oPacket
                 .WriteInt()
                 .WriteShort()
                 .WriteByte(0xFC)

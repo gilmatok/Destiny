@@ -131,6 +131,7 @@
         //122
         #endregion QUESTIONABLE
 
+        MultiChat = 119,
         Command = 120,
         Messenger = 122,
         PlayerInteraction = 123,
@@ -143,9 +144,9 @@
         BuddyListModify = 130,
         NoteAction = 131,
         UseDoor = 132,
-        //133
-        //134
         ChangeKeymap = 135,
+        FamilyPedigree = 145,
+        FamilyOpen = 146,
         MovePet = 167,
 
         #region QUESTIONABLE
@@ -194,7 +195,7 @@
         UseHammer = 0xF8,
         MapleTV = 0x222,
         #endregion QUESTIONABLE
-        
+
         HitReactor = 205,
         TouchReactor = 206,
         //207

@@ -175,6 +175,35 @@ namespace Destiny
         NoobsCannotLeaveMapleIsland = 11
     }
 
+    public enum GuildAction : byte
+    {
+        Update = 0,
+        Create = 2,
+        Invite = 5,
+        Join = 6,
+        Leave = 7,
+        Expel = 8,
+        ModifyTitles = 13,
+        ModifyRank = 14,
+        ModifyEmblem = 15,
+        ModifyNotice = 16
+    }
+
+    public enum GuildIniviationResult : byte
+    {
+        Success,
+        AlreadyInGuild = 40,
+        NotInChannel = 42,
+    }
+
+    public enum MultiChatType : byte
+    {
+        Buddy = 0,
+        Party = 1,
+        Guild = 2,
+        Alliance = 3
+    }
+
     #region Character
     public enum Gender : byte
     {
