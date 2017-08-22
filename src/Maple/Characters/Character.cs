@@ -1601,12 +1601,12 @@ namespace Destiny.Maple.Characters
         {
             iPacket.ReadInt(); // NOTE: Ticks.
             iPacket.ReadInt(); // NOTE: Unknown.
-            short healthAmount = iPacket.ReadShort();
-            short manaAmount = iPacket.ReadShort();
+            short healthAmount = iPacket.ReadShort(); // TODO: Validate
+            short manaAmount = iPacket.ReadShort(); // TODO: Validate
 
             if (healthAmount != 0)
             {
-                if ((DateTime.Now - this.LastHealthHealOverTime).Seconds < 2)
+                if ((DateTime.Now - this.LastHealthHealOverTime).TotalSeconds < 2)
                 {
                     return;
                 }
@@ -1619,7 +1619,7 @@ namespace Destiny.Maple.Characters
 
             if (manaAmount != 0)
             {
-                if ((DateTime.Now - this.LastManaHealOverTime).Seconds < 2)
+                if ((DateTime.Now - this.LastManaHealOverTime).TotalSeconds < 2)
                 {
                     return;
                 }

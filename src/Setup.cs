@@ -107,7 +107,7 @@ namespace Destiny
                             CREATE TABLE `characters` (
                               `ID` int(11) NOT NULL,
                               `AccountID` int(11) NOT NULL,
-                              `WorldID` tinyint(3) NOT NULL,
+                              `WorldID` tinyint(3) UNSIGNED NOT NULL,
                               `Name` varchar(13) NOT NULL,
                               `Level` tinyint(3) UNSIGNED NOT NULL DEFAULT '1',
                               `Experience` int(11) NOT NULL DEFAULT '0',
@@ -141,10 +141,10 @@ namespace Destiny
                               `GuildRank` int(11) NOT NULL DEFAULT '0'
                             ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-                            DROP TABLE IF EXISTS `destiny`.`guilds`;
-                            CREATE TABLE  `destiny`.`guilds` (
+                            DROP TABLE IF EXISTS `guilds`;
+                            CREATE TABLE `guilds` (
                               `ID` int(11) NOT NULL,
-                              `WorldID` tinyint(3) unsigned NOT NULL DEFAULT '0',
+                              `WorldID` tinyint(3) UNSIGNED NOT NULL DEFAULT '0',
                               `Name` varchar(13) NOT NULL DEFAULT '',
                               `Notice` varchar(100) NOT NULL DEFAULT '',
                               `Rank1` varchar(13) NOT NULL DEFAULT '',
@@ -153,9 +153,9 @@ namespace Destiny
                               `Rank4` varchar(13) NOT NULL DEFAULT '',
                               `Rank5` varchar(13) NOT NULL DEFAULT '',
                               `Logo` smallint(6) NOT NULL DEFAULT '0',
-                              `LogoColor` tinyint(3) unsigned NOT NULL DEFAULT '0',
+                              `LogoColor` tinyint(3) UNSIGNED NOT NULL DEFAULT '0',
                               `Background` smallint(6) NOT NULL DEFAULT '0',
-                              `BackgroundColor` tinyint(3) unsigned NOT NULL DEFAULT '0'
+                              `BackgroundColor` tinyint(3) UNSIGNED NOT NULL DEFAULT '0'
                             ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
                             DROP TABLE IF EXISTS `items`;
@@ -188,7 +188,8 @@ namespace Destiny
                               `PreventsColdness` tinyint(1) UNSIGNED NOT NULL DEFAULT '0',
                               `IsStored` tinyint(1) UNSIGNED NOT NULL DEFAULT '0',
                               `Quantity` smallint(6) NOT NULL DEFAULT '1',
-                              `Expiration` datetime NOT NULL DEFAULT '2079-01-01 12:00:00'
+                              `Expiration` datetime NOT NULL DEFAULT '2079-01-01 12:00:00',
+                              `PetID` int(11) NOT NULL DEFAULT '0'
                             ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
                             DROP TABLE IF EXISTS `keymaps`;
@@ -218,9 +219,9 @@ namespace Destiny
                             CREATE TABLE `pets` (
                               `ID` int(11) NOT NULL,
                               `Name` varchar(13) NOT NULL DEFAULT '',
-                              `Level` tinyint(3) unsigned NOT NULL DEFAULT '1',
+                              `Level` tinyint(3) UNSIGNED NOT NULL DEFAULT '1',
                               `Closeness` smallint(5) NOT NULL DEFAULT '0',
-                              `Fullness` tinyint(3) unsigned NOT NULL DEFAULT '1'
+                              `Fullness` tinyint(3) UNSIGNED NOT NULL DEFAULT '1'
                             ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
                             DROP TABLE IF EXISTS `quests_completed`;
@@ -259,9 +260,10 @@ namespace Destiny
                             CREATE TABLE `trocks` (
                               `ID` int(11) NOT NULL,
                               `CharacterID` int(11) NOT NULL,
-                              `Index` tinyint(3) unsigned NOT NULL DEFAULT '0',
-                              `Map` int(11) NOT NULL DEFAULT '0',
+                              `Index` tinyint(3) UNSIGNED NOT NULL DEFAULT '0',
+                              `Map` int(11) NOT NULL DEFAULT '0'
                             ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
 
                             ALTER TABLE `accounts`
                               ADD PRIMARY KEY (`ID`),
@@ -322,6 +324,7 @@ namespace Destiny
                               ADD PRIMARY KEY (`ID`),
                               ADD KEY `character_id` (`CharacterID`) USING BTREE;
 
+
                             ALTER TABLE `accounts`
                               MODIFY `ID` int(10) NOT NULL AUTO_INCREMENT;
                             ALTER TABLE `buffs`
@@ -348,7 +351,7 @@ namespace Destiny
 
                             ALTER TABLE `characters`
                               ADD CONSTRAINT `characters_ibfk_1` FOREIGN KEY (`AccountID`) REFERENCES `accounts` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
-                        
+
                             ALTER TABLE `items`
                               ADD CONSTRAINT `items_ibfk_1` FOREIGN KEY (`AccountID`) REFERENCES `accounts` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE,
                               ADD CONSTRAINT `items_ibfk_2` FOREIGN KEY (`CharacterID`) REFERENCES `characters` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
