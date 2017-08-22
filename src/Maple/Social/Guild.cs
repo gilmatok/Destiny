@@ -165,10 +165,17 @@ namespace Destiny.Maple.Social
             }
             else if (item.Expelled)
             {
-                Datum datum = new Datum("memos");
+                Datum datum = new Datum("characters");
+
+                datum["GuildID"] = 0;
+                datum["GuildRank"] = 0;
+
+                datum.Update("ID = {0}", item.ID);
+
+                datum = new Datum("memos");
 
                 datum["CharacterID"] = item.ID;
-                datum["Sender"] = "Guild Master"; // TODO: Get the kicker name.
+                datum["Sender"] = item.Expeller;
                 datum["Message"] = "You have been expelled from the guild.";
                 datum["Received"] = DateTime.UtcNow;
 

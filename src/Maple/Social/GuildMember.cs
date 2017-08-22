@@ -15,6 +15,7 @@ namespace Destiny.Maple.Social
         public Job Job { get; private set; }
         public int Rank { get; set; }
         public bool Expelled { get; set; }
+        public string Expeller { get; set; }
 
         private Character character;
 

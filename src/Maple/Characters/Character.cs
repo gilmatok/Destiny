@@ -797,7 +797,7 @@ namespace Destiny.Maple.Characters
             datum["Meso"] = this.Meso;
             datum["PartyID"] = this.Party != null ? this.Party.ID : 0;
             datum["GuildID"] = this.Guild != null ? this.Guild.ID : 0;
-            datum["GuildRank"] = this.GuildRank;
+            datum["GuildRank"] = this.Guild != null ? this.GuildRank : 0;
 
             datum["EquipmentSlots"] = this.Items.MaxSlots[ItemType.Equipment];
             datum["UsableSlots"] = this.Items.MaxSlots[ItemType.Usable];

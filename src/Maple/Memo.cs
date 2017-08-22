@@ -33,7 +33,7 @@ namespace Destiny.Maple
                     .WriteMapleString(this.Sender + " ") // NOTE: Space is intentional.
                     .WriteMapleString(this.Message)
                     .WriteDateTime(this.Received)
-                    .WriteByte(); // TODO: Memo kind (0 - None, 1 - Fame, 2 - Gift).
+                    .WriteByte(3); // TODO: Memo kind (0 - None, 1 - Fame, 2 - Gift).
 
                 return oPacket.ToArray();
             }

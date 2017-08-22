@@ -597,6 +597,7 @@ namespace Destiny
                                     GuildMember member = this.Character.Guild[targetID];
 
                                     member.Expelled = true;
+                                    member.Expeller = this.Character.Name;
 
                                     this.Character.Guild.Remove(member);
                                 }
