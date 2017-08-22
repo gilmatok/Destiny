@@ -1,9 +1,12 @@
 ﻿using Destiny.Core.IO;
 using Destiny.Data;
+using Destiny.IO;
 using Destiny.Maple.Characters;
 using Destiny.Maple.Social;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Net;
 
 namespace Destiny.Server
 {
@@ -11,6 +14,7 @@ namespace Destiny.Server
     {
         public byte ID { get; private set; }
         public string Name { get; private set; }
+        public IPAddress HostIP { get; private set; }
         public WorldFlag Flag { get; private set; }
         public string EventMessage { get; private set; }
         public string TickerMessage { get; private set; }
@@ -26,30 +30,41 @@ namespace Destiny.Server
         private Dictionary<int, Party> Parties { get; set; }
         private int mGuildIDs = 0;
         private Dictionary<int, Guild> Guilds { get; set; }
+        
+        public WorldStatus Status
+        {
+            get
+            {
+                return WorldStatus.Normal; //TODO: Other statuses based on population
+            }
+        }
 
-        public WorldServer()
+        public WorldServer(byte id)
             : base()
         {
-            this.ID = 0;
-            this.Name = "Scania";
-            this.Flag = WorldFlag.New;
-            this.EventMessage = "Welcome to #rDestiny#k!";
-            this.TickerMessage = "Welcome to Destiny!";
-            this.ExperienceRate = 1;
-            this.QuestExperienceRate = 1;
-            this.PartyQuestExperienceRate = 1;
-            this.MesoRate = 1;
-            this.DropRate = 1;
+            this.ID = id;
+            string configSection = "World" + this.ID.ToString();
+
+            this.Name = Settings.GetString(configSection + "/Name");
+            this.HostIP = Settings.GetIPAddress(configSection + "/HostIP");
+            this.Flag = Settings.GetEnum<WorldFlag>(configSection + "/Flag");
+            this.EventMessage = Settings.GetString(configSection + "/EventMessage");
+            this.TickerMessage = Settings.GetString(configSection + "/TickerMessage");
+            this.ExperienceRate = Settings.GetInt(configSection + "/ExperienceRate");
+            this.QuestExperienceRate = Settings.GetInt(configSection + "/QuestExperienceRate");
+            this.PartyQuestExperienceRate = Settings.GetInt(configSection + "/PartyQuestExperienceRate");
+            this.MesoRate = Settings.GetInt(configSection + "/MesoDropRate");
+            this.DropRate = Settings.GetInt(configSection + "/ItemDropRate");
 
             this.Messengers = new Dictionary<int, Messenger>();
             this.Parties = new Dictionary<int, Party>();
             this.Guilds = new Dictionary<int, Guild>();
 
-            byte channels = 2;
+            byte channels = Settings.GetByte(configSection + "/Channels");
 
             for (byte i = 0; i < channels; i++)
             {
-                this.Add(new ChannelServer(i, this, (short)(8585 + i)));
+                this.Add(new ChannelServer(i, this, (short)(8585 + 100 * id + i)));
             }
         }
 

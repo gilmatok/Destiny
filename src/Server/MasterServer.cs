@@ -1,4 +1,5 @@
 ﻿using Destiny.Data;
+using Destiny.IO;
 
 namespace Destiny.Server
 {
@@ -11,12 +12,13 @@ namespace Destiny.Server
 
         static MasterServer()
         {
+            int worldCount = Settings.GetInt("Server/Worlds");
             MasterServer.Login = new LoginServer(8484);
-            MasterServer.Worlds = new WorldServer[1];
+            MasterServer.Worlds = new WorldServer[worldCount];
 
             for (byte i = 0; i < MasterServer.Worlds.Length; i++)
             {
-                MasterServer.Worlds[i] = new WorldServer();
+                MasterServer.Worlds[i] = new WorldServer(i);
             }
         }
 

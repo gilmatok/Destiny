@@ -455,52 +455,67 @@ namespace Destiny
             bool requestPic = Log.YesNo("Require players to enter PIC on character selection? ", true);
             int maxCharacters = Log.Input("Maximum characters per account: ", 3);
             bool requireStaffIP = Log.YesNo("Require staff to connect through specific IPs? ", true);
-
-            Log.SkipLine();
+            int worldCount = Log.Input("Worlds: ", 1);
             #endregion
 
             #region World Configuration
             Log.Entitle("World Configuration");
 
-            Log.SkipLine();
+            string[] worldName = new string[worldCount];
+            int[] worldChannels = new int[worldCount];
+            IPAddress[] worldIP = new IPAddress[worldCount];
+            string[] worldEventMessage = new string[worldCount];
+            string[] worldTickerMessage = new string[worldCount];
+            int[] worldExperienceRate = new int[worldCount];
+            int[] worldQuestExperienceRate = new int[worldCount];
+            int[] worldPartyQuestExperienceRate = new int[worldCount];
+            int[] worldMesoDropRate = new int[worldCount];
+            int[] worldItemDropRate = new int[worldCount];
+            WorldFlag[] worldFlag = new WorldFlag[worldCount];
 
-            Log.Inform("Please enter the basic details: ");
-
-            string worldName = Log.Input("Name: ", "Scania");
-            int worldChannels = Log.Input("Channels: ", 1);
-            IPAddress worldIP = Log.Input("Host IP (external for remote only): ", IPAddress.Loopback);
-            string worldEventMessage = Log.Input("Event message: ", string.Empty);
-            string worldTickerMessage = Log.Input("Ticker message: ", string.Empty);
-
-            Log.SkipLine();
-            Log.Inform("Please specify the rates: ");
-
-            int worldExperienceRate = Log.Input("Normal experience: ", 1);
-            int worldQuestExperienceRate = Log.Input("Quest experience: ", 1);
-            int worldPartyQuestExperienceRate = Log.Input("Party quest experience: ", 1);
-            int worldMesoDropRate = Log.Input("Meso drop: ", 1);
-            int worldItemDropRate = Log.Input("Item drop: ", 1);
-
-            Log.SkipLine();
-
-            Log.Inform("Which flag should be shown with this World?\n  None\n  New\n  Hot\n  Event");
-
-            WorldFlag worldFlag = WorldFlag.None;
-
-            inputFlag:
-            Log.SkipLine();
-            try
+            for (int i = 0; i < worldCount; i++)
             {
-                worldFlag = (WorldFlag)Enum.Parse(typeof(WorldFlag), Log.Input("World flag: ", "None"), true);
-            }
-            catch
-            {
-                goto inputFlag;
-            }
+                Log.Inform("Please enter the following basic details for World {0}: ", i);
 
-            Log.SkipLine();
+                worldName[i] = Log.Input("Name: ", Enum.GetName(typeof(WorldNames), i));
+                worldChannels[i] = Log.Input("Channels: ", 1);
+                worldIP[i] = Log.Input("Host IP (external for remote only): ", IPAddress.Loopback);
+                worldEventMessage[i] = Log.Input("Event message: ", string.Empty);
+                worldTickerMessage[i] = Log.Input("Ticker message: ", string.Empty);
 
-            Log.Success("World '{0}' configured!", worldName);
+                Log.SkipLine();
+                Log.Inform("Please specify the rates: ");
+
+                worldExperienceRate[i] = Log.Input("Normal experience: ", 1);
+                worldQuestExperienceRate[i] = Log.Input("Quest experience: ", 1);
+                worldPartyQuestExperienceRate[i] = Log.Input("Party quest experience: ", 1);
+                worldMesoDropRate[i] = Log.Input("Meso drop: ", 1);
+                worldItemDropRate[i] = Log.Input("Item drop: ", 1);
+
+                Log.SkipLine();
+
+                Log.Inform("Which flag should be shown with this World?\n  None\n  New\n  Hot\n  Event");
+
+                worldFlag[i] = WorldFlag.None;
+
+                inputFlag:
+                Log.SkipLine();
+                try
+                {
+                    worldFlag[i] = (WorldFlag)Enum.Parse(typeof(WorldFlag), Log.Input("World flag: ", "None"), true);
+                }
+                catch
+                {
+                    goto inputFlag;
+                }
+
+                Log.SkipLine();
+
+                Log.Success("World '{0}' configured!", worldName[i]);
+
+                Log.SkipLine();
+                Log.SkipLine();
+            }
             #endregion
 
             #region User Profile Configuration
@@ -550,35 +565,39 @@ namespace Destiny
                 RequestPic={3}
                 MaxCharacters={4}
                 RequireStaffIP={5}
+                Worlds={6}
     
                 [Database]
-                Host={6}
-                Schema={7}
-                Username={8}
-                Password={9}
-
-                [World]
-                Name={10}
-                Channels={11}
-                HostIP={12}
-                Flag={13}
-                EventMessage={14}
-                TickerMessage={15}
-                ExperienceRate={16}
-                QuestExperienceRate={17}
-                PartyQuestExperienceRate={18}
-                MesoDropRate={19}
-                ItemDropRate={20}",
+                Host={7}
+                Schema={8}
+                Username={9}
+                Password={10}",
                 logLevel, autoRegister, requestPin, requestPic,
-                maxCharacters, requireStaffIP, databaseHost,
-                databaseSchema, databaseUsername, databasePassword,
-                worldName, worldChannels, worldIP, worldFlag,
-                worldEventMessage, worldTickerMessage, worldExperienceRate, worldQuestExperienceRate,
-                worldPartyQuestExperienceRate, worldMesoDropRate, worldItemDropRate).Replace("  ", "");
+                maxCharacters, requireStaffIP, worldCount, databaseHost,
+                databaseSchema, databaseUsername, databasePassword).Replace("  ", "");
 
             using (StreamWriter file = new StreamWriter(Application.ExecutablePath + "Configuration.ini"))
             {
                 file.WriteLine(lines);
+                for (int i = 0; i < worldCount; i++)
+                {
+                    file.WriteLine(string.Format(@"
+                    [World{0}]
+                    Name={1}
+                    Channels={2}
+                    HostIP={3}
+                    Flag={4}
+                    EventMessage={5}
+                    TickerMessage={6}
+                    ExperienceRate={7}
+                    QuestExperienceRate={8}
+                    PartyQuestExperienceRate={9}
+                    MesoDropRate={10}
+                    ItemDropRate={11}",
+                    i, worldName[i], worldChannels[i], worldIP[i], worldFlag[i],
+                    worldEventMessage[i], worldTickerMessage[i], worldExperienceRate[i], worldQuestExperienceRate[i],
+                    worldPartyQuestExperienceRate[i], worldMesoDropRate[i], worldItemDropRate[i]).Replace("  ", ""));
+                }
             }
 
             Log.Success("Configuration done!");

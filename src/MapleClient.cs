@@ -1175,7 +1175,7 @@ namespace Destiny
                 using (OutPacket oPacket = new OutPacket(ServerOperationCode.WorldInformation))
                 {
                     oPacket
-                        .WriteByte()
+                        .WriteByte(world.ID)
                         .WriteMapleString(world.Name)
                         .WriteByte((byte)world.Flag)
                         .WriteMapleString(world.EventMessage)
@@ -1220,11 +1220,12 @@ namespace Destiny
         {
             byte worldID = iPacket.ReadByte();
 
-            // TODO: Validate world ID.
-
+            if (worldID >= MasterServer.Worlds.Length)
+                return;
+            
             using (OutPacket oPacket = new OutPacket(ServerOperationCode.CheckUserLimitResult))
             {
-                oPacket.WriteShort((short)WorldStatus.Normal);
+                oPacket.WriteShort((short)MasterServer.Worlds[worldID].Status);
 
                 this.Send(oPacket);
             }
@@ -1312,27 +1313,31 @@ namespace Destiny
                 {
                     oPacket
                         .WriteByte((byte)VACResult.SendCount)
-                        .WriteInt(1) //NOTE: World count
+                        .WriteInt(MasterServer.Worlds.Length)
                         .WriteInt(characters.Count);
-                    //.WriteInt(Math.Max(1, (int)Math.Ceiling(characters.Count / 3d))); //NOTE: Row count
                 }
 
                 this.Send(oPacket);
             }
 
-            using (OutPacket oPacket = new OutPacket(ServerOperationCode.ViewAllCharResult))
+            foreach (WorldServer world in MasterServer.Worlds)
             {
-                oPacket
-                    .WriteByte((byte)VACResult.CharInfo)
-                    .WriteByte() //NOTE: World id
-                    .WriteByte((byte)characters.Count);
-
-                foreach (Character character in characters)
+                using (OutPacket oPacket = new OutPacket(ServerOperationCode.ViewAllCharResult))
                 {
-                    oPacket.WriteBytes(character.ToByteArray());
-                }
+                    IEnumerable<Character> worldChars = characters.Where(x => x.WorldID == world.ID);
 
-                this.Send(oPacket);
+                    oPacket
+                        .WriteByte((byte)VACResult.CharInfo)
+                        .WriteByte(world.ID)
+                        .WriteByte((byte)worldChars.Count());
+
+                    foreach (Character character in worldChars)
+                    {
+                        oPacket.WriteBytes(character.ToByteArray());
+                    }
+
+                    this.Send(oPacket);
+                }
             }
         }
 
@@ -1565,7 +1570,7 @@ namespace Destiny
 
             if (this.IsInViewAllChar)
             {
-                iPacket.ReadInt(); // NOTE: World ID.
+                this.WorldID = (byte)iPacket.ReadInt();
                 this.ChannelID = 0; // TODO: Least loaded channel.
             }
 
@@ -1597,7 +1602,7 @@ namespace Destiny
                     oPacket
                         .WriteByte()
                         .WriteByte()
-                        .WriteBytes(127, 0, 0, 1)
+                        .WriteBytes(this.World.HostIP.GetAddressBytes())
                         .WriteShort(this.Channel.Port)
                         .WriteInt(characterID)
                         .WriteInt()
@@ -1655,7 +1660,7 @@ namespace Destiny
             {
                 oPacket
                     .WriteBool(true)
-                    .WriteBytes(127, 0, 0, 1)
+                    .WriteBytes(this.World.HostIP.GetAddressBytes())
                     .WriteShort(destination.Port);
 
                 this.Send(oPacket);
