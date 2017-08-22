@@ -100,7 +100,6 @@
         SkillEffect = 0x5D,
         MesoDrop = 0x5E,
         GiveFame = 0x5F,
-        //96
         PlayerInformation = 97,
         SpawnPet = 0x62,
         CancelDebuff = 0x63,
@@ -148,6 +147,7 @@
         FamilyPedigree = 145,
         FamilyOpen = 146,
         MovePet = 167,
+        NpcMovement = 197,
 
         #region QUESTIONABLE
         RingAction = 136,
@@ -178,10 +178,7 @@
         DropPickup = 0xCA,
         DamageReactor = 0xC3,
         ChangedMap = 0xC4,
-        NpcMovement = 0xC5,
         MonsterCarnival = 0xD0,
-        PartySearchRegister = 0xD2,
-        PartySearchStart = 0xD4,
         PlayerUpdate = 0xD5,
         CashShopOperation = 0xDA,
         BuyCashItem = 0xDB,
@@ -199,6 +196,8 @@
         HitReactor = 205,
         TouchReactor = 206,
         //207
+        PartySearchStart = 222,
+        PartySearchStop = 223,
     }
 
     public enum ServerOperationCode : short

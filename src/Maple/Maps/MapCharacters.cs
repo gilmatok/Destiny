@@ -1,4 +1,5 @@
 ﻿using Destiny.Core.IO;
+using Destiny.Core.Network;
 using Destiny.Maple.Characters;
 using Destiny.Maple.Life;
 using System.Collections.Generic;
@@ -84,7 +85,7 @@ namespace Destiny.Maple.Maps
                     }
                 }
             }
-            
+
             lock (this.Map.Reactors)
             {
                 foreach (Reactor reactor in this.Map.Reactors)
@@ -115,6 +116,37 @@ namespace Destiny.Maple.Maps
             using (OutPacket oPacket = item.GetCreatePacket())
             {
                 this.Map.Broadcast(oPacket, item);
+            }
+
+            if (item.Party != null)
+            {
+                item.Party.Members[item.ID].Map = this.Map.MapleID;
+
+                foreach (Character character in item.Party.Characters.Values)
+                {
+                    if (character != item && character.Map.MapleID == this.Map.MapleID)
+                    {
+                        using (OutPacket oPacket = new OutPacket(ServerOperationCode.UpdatePartyMemberHP))
+                        {
+                            oPacket
+                                .WriteInt(character.ID)
+                                .WriteInt(character.Health)
+                                .WriteInt(character.MaxHealth);
+
+                            item.Client.Send(oPacket);
+                        }
+
+                        using (OutPacket oPacket = new OutPacket(ServerOperationCode.UpdatePartyMemberHP))
+                        {
+                            oPacket
+                                .WriteInt(item.ID)
+                                .WriteInt(item.Health)
+                                .WriteInt(item.MaxHealth);
+
+                            character.Client.Send(oPacket);
+                        }
+                    }
+                }
             }
         }
 

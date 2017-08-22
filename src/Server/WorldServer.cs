@@ -1,5 +1,7 @@
 ﻿using Destiny.Core.IO;
 using Destiny.Maple.Characters;
+using Destiny.Maple.Social;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
 namespace Destiny.Server
@@ -17,6 +19,9 @@ namespace Destiny.Server
         public int MesoRate { get; private set; }
         public int DropRate { get; private set; }
 
+        private int mPartyIDs = 0;
+        private Dictionary<int, Party> Parties { get; set; }
+
         public WorldServer()
             : base()
         {
@@ -30,6 +35,8 @@ namespace Destiny.Server
             this.PartyQuestExperienceRate = 1;
             this.MesoRate = 1;
             this.DropRate = 1;
+
+            this.Parties = new Dictionary<int, Party>();
 
             byte channels = 2;
 
@@ -129,6 +136,27 @@ namespace Destiny.Server
             }
 
             return character;
+        }
+
+        public Party GetParty(int id)
+        {
+            Party ret = null;
+
+            this.Parties.TryGetValue(id, out ret);
+
+            return ret;
+        }
+
+        public void CreateParty(Character leader)
+        {
+            int id = ++mPartyIDs;
+
+            this.Parties.Add(id, new Party(this, id, leader));
+        }
+
+        public void RemoveParty(Party party)
+        {
+            this.Parties.Remove(party.ID);
         }
 
         protected override byte GetKeyForItem(ChannelServer item)

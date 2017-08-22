@@ -136,6 +136,7 @@ namespace Destiny
                               `SetupSlots` tinyint(3) UNSIGNED NOT NULL DEFAULT '24',
                               `EtceteraSlots` tinyint(3) UNSIGNED NOT NULL DEFAULT '24',
                               `CashSlots` tinyint(3) UNSIGNED NOT NULL DEFAULT '48',
+                              `PartyID` int(11) NOT NULL DEFAULT '0',
                               `GuildID` int(11) NOT NULL DEFAULT '0',
                               `GuildRank` int(11) NOT NULL DEFAULT '0'
                             ) ENGINE=InnoDB DEFAULT CHARSET=latin1;

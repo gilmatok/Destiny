@@ -8,6 +8,7 @@ using Destiny.Maple.Life;
 using Destiny.Data;
 using Destiny.Maple.Data;
 using Destiny.Maple.Interaction;
+using Destiny.Maple.Social;
 
 namespace Destiny.Maple.Characters
 {
@@ -37,6 +38,7 @@ namespace Destiny.Maple.Characters
         public CharacterStorage Storage { get; private set; }
         public ControlledMobs ControlledMobs { get; private set; }
         public ControlledNpcs ControlledNpcs { get; private set; }
+        public Party Party { get; set; }
         public Trade Trade { get; set; }
         public PlayerShop PlayerShop { get; set; }
 
@@ -330,6 +332,19 @@ namespace Destiny.Maple.Characters
                 if (this.IsInitialized)
                 {
                     this.Update(StatisticType.Health);
+
+                    if (this.Party != null)
+                    {
+                        using (OutPacket oPacket = new OutPacket(ServerOperationCode.UpdatePartyMemberHP))
+                        {
+                            oPacket
+                                .WriteInt(this.ID)
+                                .WriteInt(this.Health)
+                                .WriteInt(this.MaxHealth);
+
+                            this.Party.Broadcast(oPacket);
+                        }
+                    }
                 }
             }
         }
@@ -347,6 +362,19 @@ namespace Destiny.Maple.Characters
                 if (this.IsInitialized)
                 {
                     this.Update(StatisticType.MaxHealth);
+
+                    if (this.Party != null)
+                    {
+                        using (OutPacket oPacket = new OutPacket(ServerOperationCode.UpdatePartyMemberHP))
+                        {
+                            oPacket
+                                .WriteInt(this.ID)
+                                .WriteInt(this.Health)
+                                .WriteInt(this.MaxHealth);
+
+                            this.Party.Broadcast(oPacket);
+                        }
+                    }
                 }
             }
         }
@@ -651,7 +679,7 @@ namespace Destiny.Maple.Characters
             this.ControlledNpcs = new ControlledNpcs(this);
         }
 
-        public void Load()
+        public void Load(bool channel = false)
         {
             Datum datum = new Datum("characters");
 
@@ -685,6 +713,28 @@ namespace Destiny.Maple.Characters
             this.SpawnPoint = (byte)datum["SpawnPoint"];
             this.Meso = (int)datum["Meso"];
 
+            if (channel)
+            {
+                int partyID = (int)datum["PartyID"];
+
+                if (partyID != 0)
+                {
+                    Party party = this.Client.World.GetParty(partyID);
+
+                    if (party != null)
+                    {
+                        party.AddMember(this, true);
+                    }
+                }
+
+                int guildID = (int)datum["GuildID"];
+
+                if (guildID != 0)
+                {
+
+                }
+            }
+
             this.Items.MaxSlots[ItemType.Equipment] = (byte)datum["EquipmentSlots"];
             this.Items.MaxSlots[ItemType.Usable] = (byte)datum["UsableSlots"];
             this.Items.MaxSlots[ItemType.Setup] = (byte)datum["SetupSlots"];
@@ -692,11 +742,15 @@ namespace Destiny.Maple.Characters
             this.Items.MaxSlots[ItemType.Cash] = (byte)datum["CashSlots"];
 
             this.Items.Load();
-            this.Skills.Load();
-            this.Quests.Load();
-            this.Keymap.Load();
-            this.Trocks.Load();
-            this.Memos.Load();
+
+            if (channel)
+            {
+                this.Skills.Load();
+                this.Quests.Load();
+                this.Keymap.Load();
+                this.Trocks.Load();
+                this.Memos.Load();
+            }
         }
 
         public void Save()
@@ -732,6 +786,9 @@ namespace Destiny.Maple.Characters
             datum["MapID"] = this.Map.MapleID;
             datum["SpawnPoint"] = this.SpawnPoint;
             datum["Meso"] = this.Meso;
+            datum["PartyID"] = this.Party != null ? this.Party.ID : 0;
+            datum["GuildID"] = 0;
+            datum["GuildRank"] = 0;
 
             datum["EquipmentSlots"] = this.Items.MaxSlots[ItemType.Equipment];
             datum["UsableSlots"] = this.Items.MaxSlots[ItemType.Usable];
@@ -791,7 +848,7 @@ namespace Destiny.Maple.Characters
             this.Map.Characters.Add(this);
 
             this.Keymap.Send();
-            
+
             this.Memos.Send();
         }
 

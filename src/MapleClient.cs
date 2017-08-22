@@ -5,6 +5,7 @@ using Destiny.Data;
 using Destiny.Maple;
 using Destiny.Maple.Characters;
 using Destiny.Maple.Data;
+using Destiny.Maple.Social;
 using Destiny.Server;
 using Destiny.Server.Migration;
 using System;
@@ -60,7 +61,17 @@ namespace Destiny
                 this.Character.Save();
                 this.Character.LastNpc = null;
                 this.Character.Map.Characters.Remove(this.Character);
-                
+
+                if (this.Character.Trade != null)
+                {
+                    this.Character.Trade.Cancel();
+                }
+
+                if (this.Character.Party != null)
+                {
+                    this.Character.Party.SilentRemoveMember(this.Character);
+                }
+
                 this.Channel.Characters.Unregister(this.Character);
             }
 
@@ -289,7 +300,195 @@ namespace Destiny
                 case ClientOperationCode.PlayerInteraction:
                     this.Character.Interact(iPacket);
                     break;
-                    
+
+                case ClientOperationCode.PartyOperation:
+                    {
+                        PartyAction action = (PartyAction)iPacket.ReadByte();
+
+                        switch (action)
+                        {
+                            case PartyAction.Create:
+                                {
+                                    if (this.Character.Party != null)
+                                    {
+                                        // NOTE: Trying to create a party while being in one.
+
+                                        return;
+                                    }
+
+                                    this.World.CreateParty(this.Character);
+                                }
+                                break;
+
+                            case PartyAction.Leave:
+                                {
+                                    if (this.Character.Party == null)
+                                    {
+                                        // NOTE: Trying to leave a party while not being in one.
+
+                                        return;
+                                    }
+
+                                    if (this.Character.Party.LeaderID == this.Character.ID)
+                                    {
+                                        this.Character.Party.Disband();
+                                    }
+                                    else
+                                    {
+                                        this.Character.Party.HardRemoveMember(this.Character);
+                                    }
+                                }
+                                break;
+
+                            case PartyAction.Join:
+                                {
+                                    if (this.Character.Party != null)
+                                    {
+                                        // NOTE: Trying to join a party while being in one.
+
+                                        return;
+                                    }
+
+                                    int partyID = iPacket.ReadInt();
+
+                                    // TODO: Validate invitation.
+
+                                    Party party = this.World.GetParty(partyID);
+
+                                    if (party == null)
+                                    {
+                                        // NOTE: Party is non existent or has been disband.
+
+                                        return;
+                                    }
+
+                                    if (party.IsFull)
+                                    {
+                                        // NOTE: Party is at full capacity (6 members).
+
+                                        return;
+                                    }
+
+                                    party.AddMember(this.Character);
+                                }
+                                break;
+
+                            case PartyAction.Invite:
+                                {
+                                    if (this.Character.Party == null)
+                                    {
+                                        // NOTE: Trying to invite someone while not being in a party.
+
+                                        return;
+                                    }
+
+                                    if (this.Character.Party.LeaderID != this.Character.ID)
+                                    {
+                                        // NOTE: Trying to invite someone while not being the leader of the party.
+
+                                        return;
+                                    }
+
+                                    string targetName = iPacket.ReadMapleString();
+
+                                    Character target = this.World.GetCharacter(targetName);
+
+                                    // TODO: Check if target is taking care of another inivitation.
+
+                                    if (target.Party != null)
+                                    {
+                                        // TODO: Target is already in a party message.
+
+                                        return;
+                                    }
+
+                                    using (OutPacket oPacket = new OutPacket(ServerOperationCode.PartyResult))
+                                    {
+                                        oPacket
+                                            .WriteByte((byte)PartyResult.Invite)
+                                            .WriteInt(this.Character.Party.ID)
+                                            .WriteMapleString(this.Character.Name)
+                                            .WriteByte();
+
+                                        target.Client.Send(oPacket);
+                                    }
+                                }
+                                break;
+
+                            case PartyAction.Expel:
+                                {
+                                    if (this.Character.Party != null)
+                                    {
+                                        // NOTE: Trying to expel a member while not being in a party.
+
+                                        return;
+                                    }
+
+                                    if (this.Character.Party.LeaderID != this.Character.ID)
+                                    {
+                                        // NOTE: Trying to expel a member while not being the leader of the party.
+
+                                        return;
+                                    }
+
+                                    int memberID = iPacket.ReadInt();
+
+                                    Character member = this.Character.Party.Characters[memberID];
+
+                                    if (member == null)
+                                    {
+                                        // NOTE: Trying to kick a non existent member.
+
+                                        return;
+                                    }
+
+                                    this.Character.Party.HardRemoveMember(member, true);
+                                }
+                                break;
+
+                            case PartyAction.ChangeLeader:
+                                {
+                                    if (this.Character.Party == null)
+                                    {
+                                        // NOTE: Trying to change leaders while not being in a party.
+
+                                        return;
+                                    }
+
+                                    if (this.Character.Party.LeaderID != this.Character.ID)
+                                    {
+                                        // NOTE: Trying to change leaders while not being the leader of the party.
+
+                                        return;
+                                    }
+
+                                    int leaderID = iPacket.ReadInt();
+
+                                    this.Character.Party.UpdateLeader(leaderID);
+                                }
+                                break;
+                        }
+                    }
+                    break;
+
+                case ClientOperationCode.DenyPartyRequest:
+                    {
+
+                    }
+                    break;
+
+                case ClientOperationCode.GuildOperation:
+                    {
+
+                    }
+                    break;
+
+                case ClientOperationCode.DenyGuildRequest:
+                    {
+
+                    }
+                    break;
+
                 case ClientOperationCode.AdminCommand:
                     this.Character.UseAdminCommand(iPacket);
                     break;
@@ -699,12 +898,14 @@ namespace Destiny
             this.IsInViewAllChar = true;
 
             List<Character> characters = new List<Character>();
+
             foreach (Datum datum in new Datums("characters").PopulateWith("ID", "AccountID = {0}", this.Account.ID))
             {
-                int characterID = (int)datum["ID"];
-                Character tempChar = new Character(characterID, this);
-                tempChar.Load();
-                characters.Add(tempChar);
+                Character character = new Character((int)datum["ID"], this);
+
+                character.Load();
+
+                characters.Add(character);
             }
 
             using (OutPacket oPacket = new OutPacket(ServerOperationCode.ViewAllCharResult))
@@ -1035,7 +1236,7 @@ namespace Destiny
             this.Account.Load(accountID);
 
             this.Character = new Character(characterID, this);
-            this.Character.Load();
+            this.Character.Load(true);
 
             this.Channel.Characters.Register(this.Character);
 

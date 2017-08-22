@@ -1,4 +1,6 @@
-﻿namespace Destiny.Server
+﻿using Destiny.Data;
+
+namespace Destiny.Server
 {
     public static class MasterServer
     {
@@ -31,6 +33,10 @@
             {
                 world.Start();
             }
+
+            Database.Execute("UPDATE characters SET PartyID = 0");
+
+            Log.Inform("Reset all parties.");
 
             MasterServer.IsAlive = true;
 

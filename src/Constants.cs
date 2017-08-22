@@ -175,35 +175,6 @@ namespace Destiny
         NoobsCannotLeaveMapleIsland = 11
     }
 
-    public enum GuildAction : byte
-    {
-        Update = 0,
-        Create = 2,
-        Invite = 5,
-        Join = 6,
-        Leave = 7,
-        Expel = 8,
-        ModifyTitles = 13,
-        ModifyRank = 14,
-        ModifyEmblem = 15,
-        ModifyNotice = 16
-    }
-
-    public enum GuildIniviationResult : byte
-    {
-        Success,
-        AlreadyInGuild = 40,
-        NotInChannel = 42,
-    }
-
-    public enum MultiChatType : byte
-    {
-        Buddy = 0,
-        Party = 1,
-        Guild = 2,
-        Alliance = 3
-    }
-
     #region Character
     public enum Gender : byte
     {
@@ -720,6 +691,57 @@ namespace Destiny
         FacesLeft = 0x01,
         ActivateByTouch = 0x02,
         RemoveInFieldSet = 0x04
+    }
+    #endregion
+
+    #region Social
+    public enum MultiChatType : byte
+    {
+        Buddy = 0,
+        Party = 1,
+        Guild = 2,
+        Alliance = 3
+    }
+
+    public enum PartyAction : byte
+    {
+        Create =1,
+        Leave = 2,
+        Join = 3,
+        Invite = 4,
+        Expel = 5,
+        ChangeLeader = 6
+    }
+
+    public enum PartyResult : byte
+    {
+        Invite = 4,
+        Update = 7,
+        Create = 8,
+        RemoveOrLeave = 12,
+        Join = 15,
+        ChangeLeader = 26
+    }
+
+    public enum GuildAction : byte
+    {
+        Update = 0,
+        Create = 2,
+        Invite = 5,
+        Join = 6,
+        Leave = 7,
+        Expel = 8,
+        ModifyTitles = 13,
+        ModifyRank = 14,
+        ModifyEmblem = 15,
+        ModifyNotice = 16
+    }
+
+    public enum GuildIniviationResult : byte
+    {
+        Success,
+        AlreadyInGuild = 40,
+        NotInChannel = 42,
     }
     #endregion
 
