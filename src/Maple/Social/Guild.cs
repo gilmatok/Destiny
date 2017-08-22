@@ -139,6 +139,15 @@ namespace Destiny.Maple.Social
 
                     this.Broadcast(oPacket, item);
                 }
+
+                using (OutPacket oPacket = new OutPacket(ServerOperationCode.GuildNameChanged))
+                {
+                    oPacket
+                        .WriteInt(item.ID)
+                        .WriteMapleString(this.Name);
+
+                    item.Character.Map.Broadcast(oPacket, item.Character);
+                }
             }
         }
 
@@ -162,6 +171,15 @@ namespace Destiny.Maple.Social
             if (item.Character != null)
             {
                 item.Character.Guild = null;
+                
+                using (OutPacket oPacket = new OutPacket(ServerOperationCode.GuildNameChanged))
+                {
+                    oPacket
+                        .WriteInt(item.ID)
+                        .WriteMapleString(string.Empty);
+
+                    item.Character.Map.Broadcast(oPacket, item.Character);
+                }
             }
             else if (item.Expelled)
             {

@@ -987,19 +987,6 @@ namespace Destiny.Maple.Characters
             this.Update();
         }
 
-        public void Respawn()
-        {
-            using (OutPacket oPacket = this.GetDestroyPacket())
-            {
-                this.Map.Broadcast(oPacket, this);
-            }
-
-            using (OutPacket oPacket = this.GetCreatePacket())
-            {
-                this.Map.Broadcast(oPacket, this);
-            }
-        }
-
         public void Notify(string message, NoticeType type = NoticeType.Pink)
         {
             using (OutPacket oPacket = new OutPacket(ServerOperationCode.BroadcastMsg))

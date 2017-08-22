@@ -565,8 +565,6 @@ namespace Destiny
                                     }
 
                                     guild.Add(new GuildMember(this.Character));
-
-                                    this.Character.Respawn();
                                 }
                                 break;
 
@@ -578,8 +576,6 @@ namespace Destiny
                                     }
 
                                     this.Character.Guild.Remove(this.Character.ID);
-
-                                    this.Character.Respawn();
                                 }
                                 break;
 
@@ -604,11 +600,6 @@ namespace Destiny
                                     member.Expeller = this.Character.Name;
 
                                     this.Character.Guild.Remove(member);
-
-                                    if (member.Character != null)
-                                    {
-                                        member.Character.Respawn();
-                                    }
                                 }
                                 break;
 
@@ -711,7 +702,17 @@ namespace Destiny
                                     {
                                         if (member.Character != null)
                                         {
-                                            member.Character.Respawn();
+                                            using (OutPacket oPacket = new OutPacket(ServerOperationCode.GuildMarkChanged))
+                                            {
+                                                oPacket
+                                                    .WriteInt(member.Character.ID)
+                                                    .WriteShort(this.Character.Guild.Background)
+                                                    .WriteByte(this.Character.Guild.BackgroundColor)
+                                                    .WriteShort(this.Character.Guild.Logo)
+                                                    .WriteByte(this.Character.Guild.LogoColor);
+
+                                                member.Character.Map.Broadcast(oPacket, member.Character);
+                                            }
                                         }
                                     }
                                 }
@@ -761,7 +762,7 @@ namespace Destiny
                     this.Character.Keymap.Change(iPacket);
                     break;
 
-                    // TODO: Move else-where.
+                // TODO: Move else-where.
                 case ClientOperationCode.BbsOperation:
                     {
                         BbsAction action = (BbsAction)iPacket.ReadByte();
