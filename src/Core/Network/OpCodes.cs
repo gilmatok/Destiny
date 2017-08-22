@@ -146,6 +146,7 @@
         ChangeKeymap = 135,
         FamilyPedigree = 145,
         FamilyOpen = 146,
+        BbsOperation = 155,
         MovePet = 167,
         NpcMovement = 197,
 
@@ -156,7 +157,6 @@
         AcceptFamily = 0x94,
         UseFamily = 0x95,
         AllianceOperation = 0x96,
-        BbsOperation = 0x99,
         MtsMigration = 0x9A,
         PetTalk = 0x9B,
         UseSolomonItem = 0x9C,

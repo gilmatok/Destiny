@@ -761,6 +761,22 @@ namespace Destiny
                     this.Character.Keymap.Change(iPacket);
                     break;
 
+                    // TODO: Move else-where.
+                case ClientOperationCode.BbsOperation:
+                    {
+                        BbsAction action = (BbsAction)iPacket.ReadByte();
+
+                        switch (action)
+                        {
+                            case BbsAction.List:
+                                {
+                                    int page = iPacket.ReadInt();
+                                }
+                                break;
+                        }
+                    }
+                    break;
+
                 case ClientOperationCode.MovePet:
                     this.Character.Pets.Move(iPacket);
                     break;

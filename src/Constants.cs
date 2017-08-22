@@ -755,6 +755,16 @@ namespace Destiny
         ShowEmblem = 66,
         UpdateNotice = 68
     }
+
+    public enum BbsAction : byte
+    {
+        AddOrEdit,
+        Delete,
+        List,
+        View,
+        Reply,
+        DeleteReply
+    }
     #endregion
 
     #region Map
