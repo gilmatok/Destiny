@@ -565,6 +565,8 @@ namespace Destiny
                                     }
 
                                     guild.Add(new GuildMember(this.Character));
+
+                                    this.Character.Respawn();
                                 }
                                 break;
 
@@ -576,6 +578,8 @@ namespace Destiny
                                     }
 
                                     this.Character.Guild.Remove(this.Character.ID);
+
+                                    this.Character.Respawn();
                                 }
                                 break;
 
@@ -600,6 +604,11 @@ namespace Destiny
                                     member.Expeller = this.Character.Name;
 
                                     this.Character.Guild.Remove(member);
+
+                                    if (member.Character != null)
+                                    {
+                                        member.Character.Respawn();
+                                    }
                                 }
                                 break;
 
@@ -655,6 +664,7 @@ namespace Destiny
                                     {
                                         oPacket
                                             .WriteByte((byte)GuildResult.ChangeRank)
+                                            .WriteInt(this.Character.Guild.ID)
                                             .WriteInt(targetID)
                                             .WriteByte(newRank);
 
@@ -695,6 +705,14 @@ namespace Destiny
                                             .WriteByte(this.Character.Guild.LogoColor);
 
                                         this.Character.Guild.Broadcast(oPacket);
+                                    }
+
+                                    foreach (GuildMember member in this.Character.Guild)
+                                    {
+                                        if (member.Character != null)
+                                        {
+                                            member.Character.Respawn();
+                                        }
                                     }
                                 }
                                 break;
