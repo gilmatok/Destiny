@@ -55,7 +55,6 @@ namespace Destiny.Maple.Social
         {
             this.Members[member.ID] = member;
         }
-
         public void Show(Character member)
         {
             using (OutPacket oPacket = new OutPacket(ServerOperationCode.GuildResult))

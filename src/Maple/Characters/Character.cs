@@ -1736,6 +1736,8 @@ namespace Destiny.Maple.Characters
             }
         }
 
+        // TODO: Should we refactor it in a way that sends it to the buddy/party/guild objects
+        // instead of pooling the world for characters?
         public void MultiTalk(InPacket iPacket)
         {
             MultiChatType type = (MultiChatType)iPacket.ReadByte();
@@ -1752,8 +1754,6 @@ namespace Destiny.Maple.Characters
 
             string text = iPacket.ReadMapleString();
 
-
-            // NOTE: This only exists for validation of source.
             switch (type)
             {
                 case MultiChatType.Buddy:
@@ -1764,18 +1764,29 @@ namespace Destiny.Maple.Characters
 
                 case MultiChatType.Party:
                     {
+                        if (this.Party == null)
+                        {
+                            return;
+                        }
 
+                        foreach (int recipient in recipients)
+                        {
+
+                        }
                     }
                     break;
 
                 case MultiChatType.Guild:
                     {
-                        //if (this.Guild == null)
-                        //{
-                        //    // NOTE: Player trying to chat in a guild while not being in a guild.
+                        if (this.Guild == null)
+                        {
+                            return;
+                        }
 
-                        //    return;
-                        //}
+                        foreach (int recipient in recipients)
+                        {
+
+                        }
                     }
                     break;
 
@@ -1794,7 +1805,6 @@ namespace Destiny.Maple.Characters
             }
             else
             {
-
                 using (OutPacket oPacket = new OutPacket(ServerOperationCode.GroupMessage))
                 {
                     oPacket
