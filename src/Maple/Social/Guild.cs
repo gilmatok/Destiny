@@ -2,29 +2,36 @@
 using Destiny.Core.Network;
 using Destiny.Data;
 using Destiny.Maple.Characters;
-using System.Collections.Generic;
+using System;
+using System.Collections.ObjectModel;
 
 namespace Destiny.Maple.Social
 {
-    public sealed class Guild
+    public sealed class Guild : KeyedCollection<int, GuildMember>
     {
         public int ID { get; private set; }
         public string Name { get; private set; }
-        public string Notice { get; private set; }
-        public string Rank1 { get; private set; }
-        public string Rank2 { get; private set; }
-        public string Rank3 { get; private set; }
-        public string Rank4 { get; private set; }
-        public string Rank5 { get; private set; }
-        public short Logo { get; private set; }
-        public byte LogoColor { get; private set; }
-        public short Background { get; private set; }
-        public byte BackgroundColor { get; private set; }
+        public string Notice { get; set; }
+        public string Rank1 { get; set; }
+        public string Rank2 { get; set; }
+        public string Rank3 { get; set; }
+        public string Rank4 { get; set; }
+        public string Rank5 { get; set; }
+        public short Logo { get; set; }
+        public byte LogoColor { get; set; }
+        public short Background { get; set; }
+        public byte BackgroundColor { get; set; }
 
-        private Dictionary<int, GuildMember> Members { get; set; }
-        private Dictionary<int, Character> Characters { get; set; }
+        public bool IsFull
+        {
+            get
+            {
+                return this.Count == 10; // TODO: Use capacity value.
+            }
+        }
 
         public Guild(Datum datum)
+            : base()
         {
             this.ID = (int)datum["ID"];
             this.Name = (string)datum["Name"];
@@ -38,23 +45,22 @@ namespace Destiny.Maple.Social
             this.LogoColor = (byte)datum["LogoColor"];
             this.Background = (short)datum["Background"];
             this.BackgroundColor = (byte)datum["BackgroundColor"];
-
-            this.Members = new Dictionary<int, GuildMember>();
-            this.Characters = new Dictionary<int, Character>();
         }
 
-        public void AddMember(Character character)
+        public void Broadcast(OutPacket oPacket, GuildMember ignored = null)
         {
-            character.Guild = this;
-
-            this.Members[character.ID] = new GuildMember(this, character);
-            this.Characters[character.ID] = character;
+            foreach (GuildMember member in this)
+            {
+                if (member.Character != null)
+                {
+                    if (member != ignored)
+                    {
+                        member.Character.Client.Send(oPacket);
+                    }
+                }
+            }
         }
 
-        public void AddMember(GuildMember member)
-        {
-            this.Members[member.ID] = member;
-        }
         public void Show(Character member)
         {
             using (OutPacket oPacket = new OutPacket(ServerOperationCode.GuildResult))
@@ -65,38 +71,6 @@ namespace Destiny.Maple.Social
                     .WriteBytes(this.ToByteArray());
 
                 member.Client.Send(oPacket);
-            }
-        }
-
-        public void UpdateNotice(string text)
-        {
-            this.Notice = text;
-
-            Datum datum = new Datum("guilds");
-
-            datum["Notice"] = text;
-
-            datum.Update("ID = {0}", this.ID);
-
-            using (OutPacket oPacket = new OutPacket(ServerOperationCode.GuildResult))
-            {
-                oPacket
-                    .WriteByte((byte)GuildResult.UpdateNotice)
-                    .WriteInt(this.ID)
-                    .WriteMapleString(this.Notice);
-
-                this.Broadcast(oPacket);
-            }
-        }
-
-        public void Broadcast(OutPacket oPacket, Character ignored = null)
-        {
-            foreach (Character character in this.Characters.Values)
-            {
-                if (character != ignored)
-                {
-                    character.Client.Send(oPacket);
-                }
             }
         }
 
@@ -112,14 +86,14 @@ namespace Destiny.Maple.Social
                     .WriteMapleString(this.Rank3)
                     .WriteMapleString(this.Rank4)
                     .WriteMapleString(this.Rank5)
-                    .WriteByte((byte)this.Members.Count);
+                    .WriteByte((byte)this.Count);
 
-                foreach (int memberID in this.Members.Keys)
+                foreach (GuildMember member in this)
                 {
-                    oPacket.WriteInt(memberID);
+                    oPacket.WriteInt(member.ID);
                 }
 
-                foreach (GuildMember member in this.Members.Values)
+                foreach (GuildMember member in this)
                 {
                     oPacket.WriteBytes(member.ToByteArray());
                 }
@@ -136,6 +110,72 @@ namespace Destiny.Maple.Social
 
                 return oPacket.ToArray();
             }
+        }
+
+        protected override int GetKeyForItem(GuildMember item)
+        {
+            return item.ID;
+        }
+
+        protected override void InsertItem(int index, GuildMember item)
+        {
+            item.Guild = this;
+
+            base.InsertItem(index, item);
+
+            if (item.Character != null)
+            {
+                item.Character.Guild = this;
+
+                this.Show(item.Character);
+
+                using (OutPacket oPacket = new OutPacket(ServerOperationCode.GuildResult))
+                {
+                    oPacket
+                        .WriteByte((byte)GuildResult.AddMember)
+                        .WriteInt(this.ID)
+                        .WriteInt(item.ID)
+                        .WriteBytes(item.ToByteArray());
+
+                    this.Broadcast(oPacket, item);
+                }
+            }
+        }
+
+        protected override void RemoveItem(int index)
+        {
+            GuildMember item = base.Items[index];
+
+            item.Guild = null;
+
+            using (OutPacket oPacket = new OutPacket(ServerOperationCode.GuildResult))
+            {
+                oPacket
+                    .WriteByte((byte)(item.Expelled ? GuildResult.MemberExpel : GuildResult.LeaveMember))
+                    .WriteInt(this.ID)
+                    .WriteInt(item.ID)
+                    .WriteMapleString(item.Name);
+
+                this.Broadcast(oPacket);
+            }
+
+            if (item.Character != null)
+            {
+                item.Character.Guild = null;
+            }
+            else if (item.Expelled)
+            {
+                Datum datum = new Datum("memos");
+
+                datum["CharacterID"] = item.ID;
+                datum["Sender"] = "Guild Master"; // TODO: Get the kicker name.
+                datum["Message"] = "You have been expelled from the guild.";
+                datum["Received"] = DateTime.UtcNow;
+
+                datum.Insert();
+            }
+
+            base.RemoveItem(index);
         }
     }
 }

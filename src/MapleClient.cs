@@ -62,14 +62,19 @@ namespace Destiny
                 this.Character.LastNpc = null;
                 this.Character.Map.Characters.Remove(this.Character);
 
-                if (this.Character.Trade != null)
-                {
-                    this.Character.Trade.Cancel();
-                }
-
                 if (this.Character.Party != null)
                 {
                     this.Character.Party.SilentRemoveMember(this.Character);
+                }
+
+                if (this.Character.Guild != null)
+                {
+                    this.Character.Guild[this.Character.ID].Character = null;
+                }
+
+                if (this.Character.Trade != null)
+                {
+                    this.Character.Trade.Cancel();
                 }
 
                 this.Channel.Characters.Unregister(this.Character);
@@ -478,6 +483,7 @@ namespace Destiny
                     }
                     break;
 
+                // TODO: Move else-where.
                 case ClientOperationCode.GuildOperation:
                     {
                         GuildAction action = (GuildAction)iPacket.ReadByte();
@@ -493,65 +499,225 @@ namespace Destiny
 
                             case GuildAction.Invite:
                                 {
+                                    if (this.Character.Guild == null || this.Character.GuildRank > 2)
+                                    {
+                                        return;
+                                    }
 
+                                    string targetName = iPacket.ReadMapleString();
+
+                                    Character target = this.Channel.Characters.GetCharacter(targetName);
+
+                                    if (target == null || target.Guild != null)
+                                    {
+                                        using (OutPacket oPacket = new OutPacket(ServerOperationCode.GuildResult))
+                                        {
+                                            oPacket.WriteByte((byte)GuildResult.InviteeNotInChannel);
+
+                                            this.Send(oPacket);
+                                        }
+                                    }
+                                    else if (target.Guild != null)
+                                    {
+                                        using (OutPacket oPacket = new OutPacket(ServerOperationCode.GuildResult))
+                                        {
+                                            oPacket.WriteByte((byte)GuildResult.InviteeAlreadyInGuild);
+
+                                            this.Send(oPacket);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        using (OutPacket oPacket = new OutPacket(ServerOperationCode.GuildResult))
+                                        {
+                                            oPacket
+                                                .WriteByte((byte)GuildResult.Invite)
+                                                .WriteInt(this.Character.Guild.ID)
+                                                .WriteMapleString(this.Character.Name);
+
+                                            target.Client.Send(oPacket);
+                                        }
+                                    }
                                 }
                                 break;
 
                             case GuildAction.Join:
                                 {
+                                    if (this.Character.Guild != null)
+                                    {
+                                        return;
+                                    }
 
+                                    int guildID = iPacket.ReadInt();
+
+                                    // TODO: Validate initivation.
+
+                                    Guild guild = this.World.GetGuild(guildID);
+
+                                    if (guild == null)
+                                    {
+                                        return;
+                                    }
+
+                                    if (guild.IsFull)
+                                    {
+                                        return;
+                                    }
+
+                                    guild.Add(new GuildMember(this.Character));
                                 }
                                 break;
 
                             case GuildAction.Leave:
                                 {
+                                    if (this.Character.Guild == null || this.Character.GuildRank == 1)
+                                    {
+                                        return;
+                                    }
 
+                                    this.Character.Guild.Remove(this.Character.ID);
                                 }
                                 break;
 
                             case GuildAction.Expel:
                                 {
+                                    if (this.Character.Guild == null || this.Character.GuildRank > 2)
+                                    {
+                                        return;
+                                    }
 
+                                    int targetID = iPacket.ReadInt();
+                                    string targetName = iPacket.ReadMapleString();
+
+                                    if (targetID == this.Character.ID)
+                                    {
+                                        return;
+                                    }
+
+                                    GuildMember member = this.Character.Guild[targetID];
+
+                                    member.Expelled = true;
+
+                                    this.Character.Guild.Remove(member);
                                 }
                                 break;
 
                             case GuildAction.ModifyTitles:
                                 {
+                                    if (this.Character.Guild == null || this.Character.GuildRank != 1)
+                                    {
+                                        return;
+                                    }
 
+                                    this.Character.Guild.Rank1 = iPacket.ReadMapleString();
+                                    this.Character.Guild.Rank2 = iPacket.ReadMapleString();
+                                    this.Character.Guild.Rank3 = iPacket.ReadMapleString();
+                                    this.Character.Guild.Rank4 = iPacket.ReadMapleString();
+                                    this.Character.Guild.Rank5 = iPacket.ReadMapleString();
+
+                                    using (OutPacket oPacket = new OutPacket(ServerOperationCode.GuildResult))
+                                    {
+                                        oPacket
+                                            .WriteByte((byte)GuildResult.UpdateRanks)
+                                            .WriteInt(this.Character.Guild.ID)
+                                            .WriteMapleString(this.Character.Guild.Rank1)
+                                            .WriteMapleString(this.Character.Guild.Rank2)
+                                            .WriteMapleString(this.Character.Guild.Rank3)
+                                            .WriteMapleString(this.Character.Guild.Rank4)
+                                            .WriteMapleString(this.Character.Guild.Rank5);
+
+                                        this.Character.Guild.Broadcast(oPacket);
+                                    }
                                 }
                                 break;
 
                             case GuildAction.ModifyRank:
                                 {
+                                    int targetID = iPacket.ReadInt();
+                                    byte newRank = iPacket.ReadByte();
 
+                                    if (this.Character.Guild == null || this.Character.GuildRank > 2 || (newRank == 2 && this.Character.GuildRank != 1) || newRank < 2 || newRank > 5)
+                                    {
+                                        return;
+                                    }
+
+                                    GuildMember member = this.Character.Guild[targetID];
+
+                                    member.Rank = newRank;
+
+                                    if (member.Character != null)
+                                    {
+                                        member.Character.GuildRank = newRank;
+                                    }
+
+                                    using (OutPacket oPacket = new OutPacket(ServerOperationCode.GuildResult))
+                                    {
+                                        oPacket
+                                            .WriteByte((byte)GuildResult.ChangeRank)
+                                            .WriteInt(targetID)
+                                            .WriteByte(newRank);
+
+                                        this.Character.Guild.Broadcast(oPacket);
+                                    }
                                 }
                                 break;
 
                             case GuildAction.ModifyEmblem:
                                 {
+                                    if (this.Character.Guild == null || this.Character.GuildRank != 1)
+                                    {
+                                        return;
+                                    }
 
+                                    short background = iPacket.ReadShort();
+                                    byte backgroundColor = iPacket.ReadByte();
+                                    short logo = iPacket.ReadShort();
+                                    byte logoColor = iPacket.ReadByte();
+
+                                    // TODO: Validate values.
+
+                                    this.Character.Guild.Background = background;
+                                    this.Character.Guild.BackgroundColor = backgroundColor;
+                                    this.Character.Guild.Logo = logo;
+                                    this.Character.Guild.LogoColor = logoColor;
+
+                                    // TODO: Do we save or let the world take care of saving?
+
+                                    using (OutPacket oPacket = new OutPacket(ServerOperationCode.GuildResult))
+                                    {
+                                        oPacket
+                                            .WriteByte((byte)GuildResult.ShowEmblem)
+                                            .WriteInt(this.Character.Guild.ID)
+                                            .WriteShort(this.Character.Guild.Background)
+                                            .WriteByte(this.Character.Guild.BackgroundColor)
+                                            .WriteShort(this.Character.Guild.Logo)
+                                            .WriteByte(this.Character.Guild.LogoColor);
+
+                                        this.Character.Guild.Broadcast(oPacket);
+                                    }
                                 }
                                 break;
 
                             case GuildAction.ModifyNotice:
                                 {
-                                    if (this.Character.Guild == null)
+                                    if (this.Character.Guild == null || this.Character.GuildRank > 2)
                                     {
-                                        // NOTE: Trying to modify notice while not being in a guild.
-
                                         return;
                                     }
 
-                                    if (this.Character.GuildRank > 2)
+                                    this.Character.Guild.Notice = iPacket.ReadMapleString();
+
+                                    // TODO: Do we save or let the world take care of saving?
+
+                                    using (OutPacket oPacket = new OutPacket(ServerOperationCode.GuildResult))
                                     {
-                                        // NOTE: Trying to modify notice while not being a guild master or jr. master.
+                                        oPacket
+                                            .WriteByte((byte)GuildResult.UpdateNotice)
+                                            .WriteInt(this.Character.Guild.ID)
+                                            .WriteMapleString(this.Character.Guild.Notice);
 
-                                        return;
+                                        this.Character.Guild.Broadcast(oPacket);
                                     }
-
-                                    string text = iPacket.ReadMapleString();
-
-                                    this.Character.Guild.UpdateNotice(text);
                                 }
                                 break;
                         }

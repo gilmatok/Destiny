@@ -66,7 +66,7 @@ namespace Destiny.Server
             {
                 foreach (Datum datum in new Datums("characters").PopulateWith("ID, Name, Level, Job, GuildRank", "GuildID = {0}", guild.ID))
                 {
-                    guild.AddMember(new GuildMember(guild, datum));
+                    guild.Add(new GuildMember(datum));
                 }
 
                 mGuildIDs = guild.ID; // NOTE: Setting the last used guild ID.

@@ -744,6 +744,8 @@ namespace Destiny
         ChangeEmblem = 17,
         Info = 26,
         AddMember = 39,
+        InviteeNotInChannel = 40,
+        InviteeAlreadyInGuild = 42,
         LeaveMember = 44,
         MemberExpel = 47,
         Disband = 50,
@@ -752,13 +754,6 @@ namespace Destiny
         ChangeRank = 64,
         ShowEmblem = 66,
         UpdateNotice = 68
-    }
-
-    public enum GuildIniviationResult : byte
-    {
-        Success,
-        AlreadyInGuild = 40,
-        NotInChannel = 42,
     }
     #endregion
 

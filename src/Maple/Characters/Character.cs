@@ -739,7 +739,7 @@ namespace Destiny.Maple.Characters
 
                     if (guild != null)
                     {
-                        guild.AddMember(this);
+                        this.Guild = guild;
                     }
                 }
             }
@@ -858,6 +858,8 @@ namespace Destiny.Maple.Characters
 
             if (this.Guild != null)
             {
+                this.Guild[this.ID].Character = this;
+
                 this.Guild.Show(this);
             }
 
@@ -2340,14 +2342,14 @@ namespace Destiny.Maple.Characters
                 .WriteByte(this.Level)
                 .WriteMapleString(this.Name);
 
-            if (false)
+            if (this.Guild != null)
             {
-                //oPacket
-                //    .WriteMapleString(this.Guild.Name)
-                //    .WriteShort(this.Guild.Logo)
-                //    .WriteByte(this.Guild.LogoColor)
-                //    .WriteShort(this.Guild.Background)
-                //    .WriteByte(this.Guild.BackgroundColor);
+                oPacket
+                    .WriteMapleString(this.Guild.Name)
+                    .WriteShort(this.Guild.Logo)
+                    .WriteByte(this.Guild.LogoColor)
+                    .WriteShort(this.Guild.Background)
+                    .WriteByte(this.Guild.BackgroundColor);
             }
             else
             {
