@@ -832,8 +832,10 @@ namespace Destiny
                     if (MasterServer.Login.AutoRegister && username == this.LastUsername && password == this.LastPassword)
                     {
                         this.Account.Username = username;
-                        this.Account.Salt = HashGenerator.GenerateMD5();
                         this.Account.Password = SHACryptograph.Encrypt(SHAMode.SHA512, password + this.Account.Salt);
+                        this.Account.Salt = HashGenerator.GenerateMD5();
+                        this.Account.EULA = false;
+                        this.Account.Gender = Gender.Unset;
                         this.Account.Pin = string.Empty;
                         this.Account.Pic = string.Empty;
                         this.Account.IsBanned = false;
@@ -889,7 +891,12 @@ namespace Destiny
             if (accepted)
             {
                 this.Account.EULA = true;
-                this.Account.Save();
+
+                Datum datum = new Datum("accounts");
+
+                datum["EULA"] = true;
+
+                datum.Update("ID = {0}", this.Account.ID);
 
                 using (OutPacket oPacket = new OutPacket(ServerOperationCode.CheckPasswordResult))
                 {
@@ -934,7 +941,12 @@ namespace Destiny
                 Gender gender = (Gender)iPacket.ReadByte();
 
                 this.Account.Gender = gender;
-                this.Account.Save();
+
+                Datum datum = new Datum("accounts");
+
+                datum["Gender"] = (byte)this.Account.Gender;
+
+                datum.Update("ID = {0}", this.Account.ID);
 
                 using (OutPacket oPacket = new OutPacket(ServerOperationCode.CheckPasswordResult))
                 {
@@ -1024,7 +1036,12 @@ namespace Destiny
             if (procceed)
             {
                 this.Account.Pin = SHACryptograph.Encrypt(SHAMode.SHA256, pin);
-                this.Account.Save();
+
+                Datum datum = new Datum("accounts");
+
+                datum["Pin"] = this.Account.Pin;
+
+                datum.Update("ID = {0}", this.Account.ID);
 
                 using (OutPacket oPacket = new OutPacket(ServerOperationCode.UpdatePinCodeResult))
                 {
@@ -1446,7 +1463,12 @@ namespace Destiny
                 if (string.IsNullOrEmpty(this.Account.Pic))
                 {
                     this.Account.Pic = SHACryptograph.Encrypt(SHAMode.SHA256, pic);
-                    this.Account.Save();
+
+                    Datum datum = new Datum("accounts");
+
+                    datum["Pic"] = this.Account.Pic;
+
+                    datum.Update("ID = {0}", this.Account.ID);
                 }
             }
 
