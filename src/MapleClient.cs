@@ -62,6 +62,11 @@ namespace Destiny
                 this.Character.LastNpc = null;
                 this.Character.Map.Characters.Remove(this.Character);
 
+                if (this.Character.Messenger != null)
+                {
+                    this.Character.Messenger.RemoveParticipant(this.Character);
+                }
+
                 if (this.Character.Party != null)
                 {
                     this.Character.Party.SilentRemoveMember(this.Character);
@@ -300,6 +305,100 @@ namespace Destiny
 
                 case ClientOperationCode.Command:
                     this.Character.UseCommand(iPacket);
+                    break;
+
+                // TODO: Move else-where.
+                case ClientOperationCode.Messenger:
+                    {
+                        MessengerAction action = (MessengerAction)iPacket.ReadByte();
+
+                        switch (action)
+                        {
+                            case MessengerAction.Open:
+                                {
+                                    int messengerID = iPacket.ReadInt();
+
+                                    if (messengerID == 0)
+                                    {
+                                        this.World.CreateMessenger(this.Character);
+                                    }
+                                    else
+                                    {
+                                        Messenger messenger = this.World.GetMessenger(messengerID);
+
+                                        if (messenger == null || messenger.IsFull)
+                                        {
+                                            // NOTE: I'm pretty sure Nexon doesn't send a message in this case.
+
+                                            return;
+                                        }
+
+                                        messenger.AddParticipant(this.Character);
+                                    }
+                                }
+                                break;
+
+                            case MessengerAction.Leave:
+                                {
+
+                                }
+                                break;
+
+                            case MessengerAction.Invite:
+                                {
+                                    if (this.Character.Messenger == null)
+                                    {
+                                        return;
+                                    }
+
+                                    string targetName = iPacket.ReadMapleString();
+
+                                    Character target = this.World.GetCharacter(targetName);
+
+                                    if (target == null)
+                                    {
+                                        using (OutPacket oPacket = new OutPacket(ServerOperationCode.Messenger))
+                                        {
+                                            oPacket
+                                                .WriteByte((byte)MessengerResult.Note)
+                                                .WriteMapleString(targetName)
+                                                .WriteBool(false);
+
+                                            this.Send(oPacket);
+                                        }
+                                    }
+                                    else if (target.Messenger != null)
+                                    {
+                                        // TODO: What message do we send? 
+                                    }
+                                    else
+                                    {
+                                        using (OutPacket oPacket = new OutPacket(ServerOperationCode.Messenger))
+                                        {
+                                            oPacket
+                                                .WriteByte((byte)MessengerResult.Invite)
+                                                .WriteMapleString(this.Character.Name)
+                                                .WriteByte()
+                                                .WriteInt(this.Character.Messenger.ID)
+                                                .WriteByte();
+
+                                            target.Client.Send(oPacket);
+                                        }
+
+                                        using (OutPacket oPacket = new OutPacket(ServerOperationCode.Messenger))
+                                        {
+                                            oPacket
+                                                .WriteByte((byte)MessengerResult.Note)
+                                                .WriteMapleString(targetName)
+                                                .WriteBool(true);
+
+                                            this.Send(oPacket);
+                                        }
+                                    }
+                                }
+                                break;
+                        }
+                    }
                     break;
 
                 case ClientOperationCode.PlayerInteraction:

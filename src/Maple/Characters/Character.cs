@@ -39,6 +39,7 @@ namespace Destiny.Maple.Characters
         public CharacterStorage Storage { get; private set; }
         public ControlledMobs ControlledMobs { get; private set; }
         public ControlledNpcs ControlledNpcs { get; private set; }
+        public Messenger Messenger { get; set; }
         public Party Party { get; set; }
         public Guild Guild { get; set; }
         public Trade Trade { get; set; }

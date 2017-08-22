@@ -171,7 +171,7 @@ namespace Destiny.Maple.Social
             if (item.Character != null)
             {
                 item.Character.Guild = null;
-                
+
                 using (OutPacket oPacket = new OutPacket(ServerOperationCode.GuildNameChanged))
                 {
                     oPacket

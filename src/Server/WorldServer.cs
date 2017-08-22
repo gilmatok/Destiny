@@ -20,6 +20,8 @@ namespace Destiny.Server
         public int MesoRate { get; private set; }
         public int DropRate { get; private set; }
 
+        private int mMessengerIDs = 0;
+        private Dictionary<int, Messenger> Messengers { get; set; }
         private int mPartyIDs = 0;
         private Dictionary<int, Party> Parties { get; set; }
         private int mGuildIDs = 0;
@@ -39,6 +41,7 @@ namespace Destiny.Server
             this.MesoRate = 1;
             this.DropRate = 1;
 
+            this.Messengers = new Dictionary<int, Messenger>();
             this.Parties = new Dictionary<int, Party>();
             this.Guilds = new Dictionary<int, Guild>();
 
@@ -157,6 +160,22 @@ namespace Destiny.Server
             }
 
             return character;
+        }
+
+        public Messenger GetMessenger(int id)
+        {
+            Messenger ret = null;
+
+            this.Messengers.TryGetValue(id, out ret);
+
+            return ret;
+        }
+
+        public void CreateMessenger(Character host)
+        {
+            int id = ++mMessengerIDs;
+
+            this.Messengers.Add(id, new Messenger(id, host));
         }
 
         public Party GetParty(int id)
