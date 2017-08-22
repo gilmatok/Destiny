@@ -1,4 +1,5 @@
 ﻿using Destiny.Core.IO;
+using Destiny.Data;
 using Destiny.Maple.Characters;
 using Destiny.Maple.Social;
 using System.Collections.Generic;
@@ -21,6 +22,8 @@ namespace Destiny.Server
 
         private int mPartyIDs = 0;
         private Dictionary<int, Party> Parties { get; set; }
+        private int mGuildIDs = 0;
+        private Dictionary<int, Guild> Guilds { get; set; }
 
         public WorldServer()
             : base()
@@ -37,6 +40,7 @@ namespace Destiny.Server
             this.DropRate = 1;
 
             this.Parties = new Dictionary<int, Party>();
+            this.Guilds = new Dictionary<int, Guild>();
 
             byte channels = 2;
 
@@ -52,6 +56,23 @@ namespace Destiny.Server
             {
                 channel.Start();
             }
+
+            foreach (Datum datum in new Datums("guilds").Populate("WorldID = {0}", this.ID))
+            {
+                this.Guilds.Add((int)datum["ID"], new Guild(datum));
+            }
+
+            foreach (Guild guild in this.Guilds.Values)
+            {
+                foreach (Datum datum in new Datums("characters").PopulateWith("ID, Name, Level, Job, GuildRank", "GuildID = {0}", guild.ID))
+                {
+                    guild.AddMember(new GuildMember(guild, datum));
+                }
+
+                mGuildIDs = guild.ID; // NOTE: Setting the last used guild ID.
+            }
+
+            // TODO: Load Guild BBS.
         }
 
         public void Stop()
@@ -157,6 +178,20 @@ namespace Destiny.Server
         public void RemoveParty(Party party)
         {
             this.Parties.Remove(party.ID);
+        }
+
+        public Guild GetGuild(int id)
+        {
+            Guild ret = null;
+
+            this.Guilds.TryGetValue(id, out ret);
+
+            return ret;
+        }
+
+        public void CreateGuild(Character master)
+        {
+
         }
 
         protected override byte GetKeyForItem(ChannelServer item)

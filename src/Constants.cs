@@ -705,7 +705,7 @@ namespace Destiny
 
     public enum PartyAction : byte
     {
-        Create =1,
+        Create = 1,
         Leave = 2,
         Join = 3,
         Invite = 4,
@@ -735,6 +735,23 @@ namespace Destiny
         ModifyRank = 14,
         ModifyEmblem = 15,
         ModifyNotice = 16
+    }
+
+    public enum GuildResult : byte
+    {
+        Create = 1,
+        Invite = 5,
+        ChangeEmblem = 17,
+        Info = 26,
+        AddMember = 39,
+        LeaveMember = 44,
+        MemberExpel = 47,
+        Disband = 50,
+        MemberOnline = 61,
+        UpdateRanks = 62,
+        ChangeRank = 64,
+        ShowEmblem = 66,
+        UpdateNotice = 68
     }
 
     public enum GuildIniviationResult : byte

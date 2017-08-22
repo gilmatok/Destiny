@@ -301,6 +301,7 @@ namespace Destiny
                     this.Character.Interact(iPacket);
                     break;
 
+                // TODO: Move else-where.
                 case ClientOperationCode.PartyOperation:
                     {
                         PartyAction action = (PartyAction)iPacket.ReadByte();
@@ -479,7 +480,81 @@ namespace Destiny
 
                 case ClientOperationCode.GuildOperation:
                     {
+                        GuildAction action = (GuildAction)iPacket.ReadByte();
 
+                        switch (action)
+                        {
+                            case GuildAction.Create:
+                                {
+                                    // NOTE: This type of packet can only be called from the guild UI,
+                                    // which is opened by Hercale NPC located in the guild headquarters in Orbis.
+                                }
+                                break;
+
+                            case GuildAction.Invite:
+                                {
+
+                                }
+                                break;
+
+                            case GuildAction.Join:
+                                {
+
+                                }
+                                break;
+
+                            case GuildAction.Leave:
+                                {
+
+                                }
+                                break;
+
+                            case GuildAction.Expel:
+                                {
+
+                                }
+                                break;
+
+                            case GuildAction.ModifyTitles:
+                                {
+
+                                }
+                                break;
+
+                            case GuildAction.ModifyRank:
+                                {
+
+                                }
+                                break;
+
+                            case GuildAction.ModifyEmblem:
+                                {
+
+                                }
+                                break;
+
+                            case GuildAction.ModifyNotice:
+                                {
+                                    if (this.Character.Guild == null)
+                                    {
+                                        // NOTE: Trying to modify notice while not being in a guild.
+
+                                        return;
+                                    }
+
+                                    if (this.Character.GuildRank > 2)
+                                    {
+                                        // NOTE: Trying to modify notice while not being a guild master or jr. master.
+
+                                        return;
+                                    }
+
+                                    string text = iPacket.ReadMapleString();
+
+                                    this.Character.Guild.UpdateNotice(text);
+                                }
+                                break;
+                        }
                     }
                     break;
 

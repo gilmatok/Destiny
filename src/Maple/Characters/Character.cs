@@ -27,6 +27,7 @@ namespace Destiny.Maple.Characters
         public short Foothold { get; set; }
         public byte Portals { get; set; }
         public int Chair { get; set; }
+        public int GuildRank { get; set; }
 
         public CharacterItems Items { get; private set; }
         public CharacterSkills Skills { get; private set; }
@@ -39,6 +40,7 @@ namespace Destiny.Maple.Characters
         public ControlledMobs ControlledMobs { get; private set; }
         public ControlledNpcs ControlledNpcs { get; private set; }
         public Party Party { get; set; }
+        public Guild Guild { get; set; }
         public Trade Trade { get; set; }
         public PlayerShop PlayerShop { get; set; }
 
@@ -731,7 +733,14 @@ namespace Destiny.Maple.Characters
 
                 if (guildID != 0)
                 {
+                    this.GuildRank = (int)datum["GuildRank"];
 
+                    Guild guild = this.Client.World.GetGuild(guildID);
+
+                    if (guild != null)
+                    {
+                        guild.AddMember(this);
+                    }
                 }
             }
 
@@ -787,8 +796,8 @@ namespace Destiny.Maple.Characters
             datum["SpawnPoint"] = this.SpawnPoint;
             datum["Meso"] = this.Meso;
             datum["PartyID"] = this.Party != null ? this.Party.ID : 0;
-            datum["GuildID"] = 0;
-            datum["GuildRank"] = 0;
+            datum["GuildID"] = this.Guild != null ? this.Guild.ID : 0;
+            datum["GuildRank"] = this.GuildRank;
 
             datum["EquipmentSlots"] = this.Items.MaxSlots[ItemType.Equipment];
             datum["UsableSlots"] = this.Items.MaxSlots[ItemType.Usable];
@@ -846,6 +855,11 @@ namespace Destiny.Maple.Characters
             this.IsInitialized = true;
 
             this.Map.Characters.Add(this);
+
+            if (this.Guild != null)
+            {
+                this.Guild.Show(this);
+            }
 
             this.Keymap.Send();
 

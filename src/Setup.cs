@@ -141,19 +141,17 @@ namespace Destiny
                               `GuildRank` int(11) NOT NULL DEFAULT '0'
                             ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-                            DROP TABLE IF EXISTS `guilds`;
-                            CREATE TABLE `guilds` (
-                              `ID` int(11) NOT NULL AUTO_INCREMENT,
-                              `LeaderID` int(11) NOT NULL DEFAULT '0',
+                            DROP TABLE IF EXISTS `destiny`.`guilds`;
+                            CREATE TABLE  `destiny`.`guilds` (
+                              `ID` int(11) NOT NULL,
+                              `WorldID` tinyint(3) unsigned NOT NULL DEFAULT '0',
                               `Name` varchar(13) NOT NULL DEFAULT '',
-                              `Title0` varchar(13) NOT NULL DEFAULT '',
-                              `Title1` varchar(13) NOT NULL DEFAULT '',
-                              `Title2` varchar(13) NOT NULL DEFAULT '',
-                              `Title3` varchar(13) NOT NULL DEFAULT '',
-                              `Title4` varchar(13) NOT NULL DEFAULT '',
-                              `Capacity` int(11) NOT NULL DEFAULT '0',
                               `Notice` varchar(100) NOT NULL DEFAULT '',
-                              `Points` int(11) NOT NULL DEFAULT '0',
+                              `Rank1` varchar(13) NOT NULL DEFAULT '',
+                              `Rank2` varchar(13) NOT NULL DEFAULT '',
+                              `Rank3` varchar(13) NOT NULL DEFAULT '',
+                              `Rank4` varchar(13) NOT NULL DEFAULT '',
+                              `Rank5` varchar(13) NOT NULL DEFAULT '',
                               `Logo` smallint(6) NOT NULL DEFAULT '0',
                               `LogoColor` tinyint(3) unsigned NOT NULL DEFAULT '0',
                               `Background` smallint(6) NOT NULL DEFAULT '0',
@@ -285,8 +283,7 @@ namespace Destiny
                               ADD KEY `name` (`Name`) USING BTREE;
 
                             ALTER TABLE `guilds`
-                              ADD PRIMARY KEY (`ID`),
-                              ADD KEY `leader_id` (`LeaderID`) USING BTREE;
+                              ADD PRIMARY KEY (`ID`);
 
                             ALTER TABLE `items`
                               ADD PRIMARY KEY (`ID`),
@@ -352,9 +349,6 @@ namespace Destiny
                             ALTER TABLE `characters`
                               ADD CONSTRAINT `characters_ibfk_1` FOREIGN KEY (`AccountID`) REFERENCES `accounts` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
                         
-                            ALTER TABLE `guilds`
-                              ADD CONSTRAINT `guilds_ibfk_1` FOREIGN KEY (`CharacterID`) REFERENCES `characters` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
-
                             ALTER TABLE `items`
                               ADD CONSTRAINT `items_ibfk_1` FOREIGN KEY (`AccountID`) REFERENCES `accounts` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE,
                               ADD CONSTRAINT `items_ibfk_2` FOREIGN KEY (`CharacterID`) REFERENCES `characters` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
