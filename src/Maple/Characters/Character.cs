@@ -163,6 +163,38 @@ namespace Destiny.Maple.Characters
             }
         }
 
+        public int HairStyleOffset
+        {
+            get
+            {
+                return (this.Hair / 10) * 10;
+            }
+        }
+
+        public int FaceStyleOffset
+        {
+            get
+            {
+                return (this.Face - (10 * (this.Face / 10))) + (this.Gender == Gender.Male ? 20000 : 21000);
+            }
+        }
+
+        public int HairColorOffset
+        {
+            get
+            {
+                return this.Hair - (10 * (this.Hair / 10));
+            }
+        }
+
+        public int FaceColorOffset
+        {
+            get
+            {
+                return ((this.Face / 100) - (10 * (this.Face / 1000))) * 100;
+            }
+        }
+
         // TODO: Update party's properties.
         public byte Level
         {
@@ -548,7 +580,7 @@ namespace Destiny.Maple.Characters
             }
         }
 
-        public bool IsGm
+        public bool IsMaster
         {
             get
             {
@@ -1495,7 +1527,7 @@ namespace Destiny.Maple.Characters
                 {
                     oPacket
                         .WriteInt(this.ID)
-                        .WriteBool(this.IsGm)
+                        .WriteBool(this.IsMaster)
                         .WriteMapleString(text)
                         .WriteBool(shout);
 
@@ -1715,7 +1747,7 @@ namespace Destiny.Maple.Characters
                 return;
             }
 
-            if (target.IsGm && !this.IsGm)
+            if (target.IsMaster && !this.IsMaster)
             {
                 return;
             }
@@ -1985,7 +2017,7 @@ namespace Destiny.Maple.Characters
 
         public void UseAdminCommand(InPacket iPacket)
         {
-            if (!this.IsGm)
+            if (!this.IsMaster)
             {
                 return;
             }

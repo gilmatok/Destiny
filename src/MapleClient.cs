@@ -82,6 +82,11 @@ namespace Destiny
                     this.Character.Trade.Cancel();
                 }
 
+                if (this.Character.PlayerShop != null)
+                {
+                    this.Character.PlayerShop.Close();
+                }
+
                 this.Channel.Characters.Unregister(this.Character);
             }
 
@@ -216,6 +221,10 @@ namespace Destiny
                     this.Character.Converse(iPacket);
                     break;
 
+                case ClientOperationCode.NpcResult:
+                    this.Character.LastNpc.Handle(this.Character, iPacket);
+                    break;
+
                 case ClientOperationCode.NpcShop:
                     this.Character.LastNpc.Shop.Handle(this.Character, iPacket);
                     break;
@@ -311,7 +320,7 @@ namespace Destiny
                 // TODO: Move else-where.
                 case ClientOperationCode.Messenger:
                     {
-                       MessengerAction action = (MessengerAction)iPacket.ReadByte();
+                        MessengerAction action = (MessengerAction)iPacket.ReadByte();
 
                         switch (action)
                         {
@@ -581,7 +590,7 @@ namespace Destiny
 
                             case PartyAction.ChangeLeader:
                                 {
-                                    
+
                                 }
                                 break;
                         }

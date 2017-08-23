@@ -612,6 +612,17 @@ namespace Destiny
     #endregion
 
     #region NPCs
+    public enum NpcMessageType : byte
+    {
+        Standard,
+        YesNo,
+        RequestText,
+        RequestNumber,
+        Choice,
+        RequestStyle = 7,
+        AcceptDecline = 0x0F
+    }
+
     public enum ShopAction : byte
     {
         Buy,

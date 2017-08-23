@@ -729,7 +729,7 @@ namespace Destiny.Maple
                 this.Character.Dexterity < this.RequiredDexterity ||
                 this.Character.Intelligence < this.RequiredIntelligence ||
                 this.Character.Luck < this.RequiredLuck) &&
-                !this.Character.IsGm)
+                !this.Character.IsMaster)
             {
                 return;
             }

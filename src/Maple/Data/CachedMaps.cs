@@ -2,7 +2,9 @@
 using Destiny.Maple.Life;
 using Destiny.Maple.Maps;
 using Destiny.Maple.Shops;
+using System;
 using System.Collections.ObjectModel;
+using System.Reflection;
 
 namespace Destiny.Maple.Data
 {
@@ -50,7 +52,18 @@ namespace Destiny.Maple.Data
                     switch ((string)datum["life_type"])
                     {
                         case "npc":
-                            this[(int)datum["mapid"]].Npcs.Add(new Npc(datum));
+                            {
+                                Type implementedType = Assembly.GetExecutingAssembly().GetType("Destiny.Maple.Life.Npcs.Npc" + (int)datum["lifeid"]);
+
+                                if (implementedType != null)
+                                {
+                                    this[(int)datum["mapid"]].Npcs.Add((Npc)Activator.CreateInstance(implementedType, datum));
+                                }
+                                else
+                                {
+                                    this[(int)datum["mapid"]].Npcs.Add(new Npc(datum));
+                                }
+                            }
                             break;
 
                         case "mob":

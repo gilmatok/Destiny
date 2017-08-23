@@ -3,16 +3,23 @@ using Destiny.Maple.Characters;
 using Destiny.Core.Network;
 using Destiny.Data;
 using Destiny.Maple.Shops;
+using System.Threading.Tasks;
+using System.Collections.Generic;
+using Destiny.Maple.Data;
 
 namespace Destiny.Maple.Life
 {
-    public sealed class Npc : LifeObject, ISpawnable, IControllable
+    public class Npc : LifeObject, ISpawnable, IControllable
     {
         public Npc(Datum datum) : base(datum) { }
 
         public Character Controller { get; set; }
 
         public Shop Shop { get; set; }
+
+        private Dictionary<Character, TaskCompletionSource<bool>> Responses = new Dictionary<Character, TaskCompletionSource<bool>>();
+        private Dictionary<Character, TaskCompletionSource<int>> Choices = new Dictionary<Character, TaskCompletionSource<int>>();
+        private Dictionary<Character, int[]> StyleSelectionHelpers = new Dictionary<Character, int[]>();
 
         public void Move(InPacket iPacket)
         {
@@ -42,19 +49,75 @@ namespace Destiny.Maple.Life
             }
         }
 
-        public void Converse(Character talker)
+        public virtual async Task Converse(Character talker)
         {
             if (this.Shop != null)
             {
                 this.Shop.Show(talker);
             }
-            else if (false) // TODO: Check if this Npc is a storage (usually by checking if it's storage deposit cost variable is not 0).
+            else if (false)
             {
                 talker.Storage.Show(this);
             }
-            else // NOTE: If this Npc is not a shop or a storage, it's a script.
+            else
             {
-                // TODO: Start script.
+                await this.ShowOkDialog(talker, ". . .");
+            }
+        }
+
+        public void Handle(Character talker, InPacket iPacket)
+        {
+            NpcMessageType lastMessageType = (NpcMessageType)iPacket.ReadByte();
+            byte action = iPacket.ReadByte();
+
+            // TODO: Validate last message type.
+
+            int selection = -1;
+
+            byte endTalkByte;
+
+            switch (lastMessageType)
+            {
+                case NpcMessageType.RequestText:
+                case NpcMessageType.RequestNumber:
+                case NpcMessageType.RequestStyle:
+                case NpcMessageType.Choice:
+                    endTalkByte = 0;
+                    break;
+
+                default:
+                    endTalkByte = byte.MaxValue;
+                    break;
+            }
+
+            if (action != endTalkByte)
+            {
+                if (iPacket.Remaining >= 4)
+                {
+                    selection = iPacket.ReadInt();
+                }
+                else if (iPacket.Remaining > 0)
+                {
+                    selection = iPacket.ReadByte();
+                }
+
+                if (lastMessageType == NpcMessageType.RequestStyle)
+                {
+                    selection = this.StyleSelectionHelpers[talker][selection];
+                }
+
+                if (selection != -1)
+                {
+                    this.Choices[talker].SetResult(selection);
+                }
+                else
+                {
+                    this.Responses[talker].SetResult(action == 1 ? true : false);
+                }
+            }
+            else
+            {
+                talker.LastNpc = null;
             }
         }
 
@@ -81,6 +144,124 @@ namespace Destiny.Maple.Life
                 {
                     newController.ControlledNpcs.Add(this);
                 }
+            }
+        }
+
+        public async Task<bool> ShowOkDialog(Character talker, string text)
+        {
+            this.Responses[talker] = new TaskCompletionSource<bool>();
+
+            this.SendDialog(talker, text, NpcMessageType.Standard, 0, 0);
+
+            return await this.Responses[talker].Task;
+        }
+
+        public async Task<bool> ShowNextDialog(Character talker, string text)
+        {
+            this.Responses[talker] = new TaskCompletionSource<bool>();
+
+            this.SendDialog(talker, text, NpcMessageType.Standard, 0, 1);
+
+            return await this.Responses[talker].Task;
+        }
+
+        public async Task<bool> ShowNextPreviousDialog(Character talker, string text)
+        {
+            this.Responses[talker] = new TaskCompletionSource<bool>();
+
+            this.SendDialog(talker, text, NpcMessageType.Standard, 1, 1);
+
+            return await this.Responses[talker].Task;
+        }
+
+        public async Task<bool> ShowPreviousOkDialog(Character talker, string text)
+        {
+            this.Responses[talker] = new TaskCompletionSource<bool>();
+
+            this.SendDialog(talker, text, NpcMessageType.Standard, 1, 0);
+
+            return await this.Responses[talker].Task;
+        }
+
+        public async Task<bool> ShowYesNoDialog(Character talker, string text)
+        {
+            this.Responses[talker] = new TaskCompletionSource<bool>();
+
+            this.SendDialog(talker, text, NpcMessageType.YesNo);
+
+            return await this.Responses[talker].Task;
+        }
+
+        public async Task<int> ShowChoiceDialog(Character talker, string text, params string[] choices)
+        {
+            this.Choices[talker] = new TaskCompletionSource<int>();
+
+            text += "#b\r\n";
+
+            for (int i = 0; i < choices.Length; i++)
+            {
+                text += string.Format("#L{0}#{1}#l\r\n", i, choices[i]);
+            }
+
+            this.SendDialog(talker, text, NpcMessageType.Choice);
+
+            return await this.Choices[talker].Task;
+        }
+
+        public async Task<int> ShowStyleRequestDialog(Character talker, string text, params int[] styleChoices)
+        {
+            this.Choices[talker] = new TaskCompletionSource<int>();
+
+            List<int> validStyles = new List<int>();
+
+            foreach (int loopStyle in styleChoices)
+            {
+                if (DataProvider.Styles.Skins.Contains((byte)loopStyle) ||
+                    DataProvider.Styles.MaleHairs.Contains(loopStyle) ||
+                    DataProvider.Styles.FemaleHairs.Contains(loopStyle) ||
+                    DataProvider.Styles.MaleFaces.Contains(loopStyle) ||
+                    DataProvider.Styles.FemaleFaces.Contains(loopStyle))
+                {
+                    validStyles.Add(loopStyle);
+                }
+            }
+
+            using (OutPacket oPacket = new OutPacket(ServerOperationCode.ScriptMessage))
+            {
+                oPacket
+                     .WriteByte(4) // NOTE: Unknown.
+                     .WriteInt(this.MapleID)
+                     .WriteByte((byte)NpcMessageType.RequestStyle)
+                     .WriteByte() // NOTE: Speaker.
+                     .WriteMapleString(text)
+                     .WriteByte((byte)validStyles.Count);
+
+                foreach (int loopStyle in validStyles)
+                {
+                    oPacket.WriteInt(loopStyle);
+                }
+
+                talker.Client.Send(oPacket);
+            }
+
+            this.StyleSelectionHelpers[talker] = validStyles.ToArray();
+
+            return await this.Choices[talker].Task;
+        }
+
+        private void SendDialog(Character talker, string text, NpcMessageType messageType, params byte[] footer)
+        {
+            using (OutPacket oPacket = new OutPacket(ServerOperationCode.ScriptMessage))
+            {
+                oPacket
+                    .WriteByte(4) // NOTE: Unknown.
+                    .WriteInt(this.MapleID)
+                    .WriteByte((byte)messageType)
+                    .WriteByte() // NOTE: Speaker.
+                    .WriteMapleString(text)
+                    .WriteBytes(footer);
+
+                talker.Client.Send(oPacket);
             }
         }
 
