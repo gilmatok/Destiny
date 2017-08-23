@@ -1,16 +1,16 @@
 ﻿using Destiny.Maple.Characters;
-using Destiny.Maple.Life;
+using Destiny.Maple.Maps;
 using System.Collections.Generic;
 
 namespace Destiny.Maple.Commands.Implementation
 {
-    public sealed class KillMobsCommand : Command
+    public sealed class ClearDropsCommand : Command
     {
         public override string Name
         {
             get
             {
-                return "killmobs";
+                return "clearDrops";
             }
         }
 
@@ -18,7 +18,7 @@ namespace Destiny.Maple.Commands.Implementation
         {
             get
             {
-                return "[ - drop ]";
+                return "[ - pickup ]";
             }
         }
 
@@ -32,19 +32,19 @@ namespace Destiny.Maple.Commands.Implementation
 
         public override void Execute(Character caller, string[] args)
         {
-            if (args.Length > 1)
+            if (args.Length != 1)
             {
-                ShowSyntax(caller);
+                this.ShowSyntax(caller);
             }
             else
             {
-                bool drop = false;
+                bool pickUp = false;
 
                 if (args.Length == 1)
                 {
-                    if (args[0].ToLower() == "-drop" || args[0].ToLower() == "-drops")
+                    if (args[0].ToLower() == "-pickup")
                     {
-                        drop = true;
+                        pickUp = true;
                     }
                     else
                     {
@@ -54,19 +54,23 @@ namespace Destiny.Maple.Commands.Implementation
                     }
                 }
 
-                lock (caller.Map.Mobs)
+                lock (caller.Map.Drops)
                 {
-                    List<Mob> toKill = new List<Mob>();
+                    List<Drop> toPick = new List<Drop>();
 
-                    foreach (Mob loopMob in caller.Map.Mobs)
+                    foreach (Drop loopDrop in caller.Map.Drops)
                     {
-                        toKill.Add(loopMob);
+                        toPick.Add(loopDrop);
                     }
 
-                    foreach (Mob loopMob in toKill)
+                    foreach (Drop loopDrop in toPick)
                     {
-                        loopMob.CanDrop = drop;
-                        loopMob.Die();
+                        if (pickUp)
+                        {
+                            loopDrop.Picker = caller;
+                        }
+
+                        caller.Map.Drops.Remove(loopDrop);
                     }
                 }
             }
