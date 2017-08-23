@@ -4,7 +4,7 @@ using Destiny.Network;
 using System;
 using System.Linq;
 
-namespace Destiny.Maple.Commands
+namespace Destiny.Maple.Commands.Implementation
 {
     public class MapCommand : Command
     {

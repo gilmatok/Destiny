@@ -10,7 +10,7 @@ namespace Destiny.Maple.Commands.Implementation
         {
             get
             {
-                return "clearDrops";
+                return "cleardrops";
             }
         }
 

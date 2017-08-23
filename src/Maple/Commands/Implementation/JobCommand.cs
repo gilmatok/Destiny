@@ -1,7 +1,7 @@
 ﻿using Destiny.Maple.Characters;
 using System;
 
-namespace Destiny.Maple.Commands
+namespace Destiny.Maple.Commands.Implementation
 {
     public sealed class JobCommand : Command
     {

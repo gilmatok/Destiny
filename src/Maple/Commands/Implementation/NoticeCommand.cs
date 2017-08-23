@@ -1,6 +1,6 @@
 ﻿using Destiny.Maple.Characters;
 
-namespace Destiny.Maple.Commands
+namespace Destiny.Maple.Commands.Implementation
 {
     public sealed class NoticeCommand : Command
     {

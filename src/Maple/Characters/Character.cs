@@ -963,7 +963,7 @@ namespace Destiny.Maple.Characters
         {
             using (OutPacket oPacket = new OutPacket(ServerOperationCode.StatChanged))
             {
-                oPacket.WriteBool(); // TODO: bOnExclRequest.
+                oPacket.WriteBool(true); // TODO: bOnExclRequest.
 
                 int flag = 0;
 
@@ -2267,6 +2267,8 @@ namespace Destiny.Maple.Characters
             {
                 return;
             }
+
+            this.Release();
         }
 
         public byte[] ToByteArray()
