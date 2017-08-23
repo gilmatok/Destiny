@@ -9,21 +9,29 @@ namespace Destiny.Maple.Social
         public int ID { get; private set; }
         public Character[] Participants { get; private set; }
 
+        public int Count
+        {
+            get
+            {
+                int count = 0;
+
+                for (int i = 0; i < this.Participants.Length; i++)
+                {
+                    if (this.Participants[i] != null)
+                    {
+                        count++;
+                    }
+                }
+
+                return count;
+            }
+        }
+
         public bool IsFull
         {
             get
             {
-                bool ret = true;
-
-                for (int i = 0; i < this.Participants.Length; i++)
-                {
-                    if (this.Participants[i] == null)
-                    {
-                        ret = false;
-                    }
-                }
-
-                return ret;
+                return this.Count == 3;
             }
         }
 
@@ -100,16 +108,52 @@ namespace Destiny.Maple.Social
 
         public void RemoveParticipant(Character participant)
         {
+            byte index = 0;
 
+            for (int i = 0; i < this.Participants.Length; i++)
+            {
+                if (this.Participants[i] != null)
+                {
+                    if (this.Participants[i] == participant)
+                    {
+                        index = (byte)i;
+
+                        this.Participants[i] = null;
+
+                        break;
+                    }
+                }
+            }
+
+            participant.Messenger = null;
+
+            if (this.Count == 0)
+            {
+                participant.Client.World.RemoveMessenger(this.ID);
+            }
+            else
+            {
+                using (OutPacket oPacket = new OutPacket(ServerOperationCode.Messenger))
+                {
+                    oPacket
+                        .WriteByte((byte)MessengerResult.Leave)
+                        .WriteByte(index);
+
+                    this.Broadcast(oPacket);
+                }
+            }
         }
 
-        public void Broadcast(OutPacket oPacket)
+        public void Broadcast(OutPacket oPacket, Character ignored = null)
         {
             for (int i = 0; i < this.Participants.Length; i++)
             {
                 if (this.Participants[i] != null)
                 {
-                    this.Participants[i].Client.Send(oPacket);
+                    if (this.Participants[i] != ignored)
+                    {
+                        this.Participants[i].Client.Send(oPacket);
+                    }
                 }
             }
         }

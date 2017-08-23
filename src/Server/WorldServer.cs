@@ -193,6 +193,11 @@ namespace Destiny.Server
             this.Messengers.Add(id, new Messenger(id, host));
         }
 
+        public void RemoveMessenger(int id)
+        {
+            this.Messengers.Remove(id);
+        }
+
         public Party GetParty(int id)
         {
             Party ret = null;

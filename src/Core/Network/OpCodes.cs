@@ -33,6 +33,7 @@
         CharacterSelectRegisterPic = 29,
         CharacterSelectRequestPic = 30,
         RegisterPicFromVAC = 31,
+        RequestPicFromVAC = 32,
         //32
         //33
         //34

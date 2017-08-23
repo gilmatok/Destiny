@@ -156,6 +156,7 @@ namespace Destiny
                     break;
 
                 case ClientOperationCode.CharacterSelectRequestPic:
+                case ClientOperationCode.RequestPicFromVAC:
                     this.SelectCharacter(iPacket, requestPic: true);
                     break;
 
@@ -310,7 +311,7 @@ namespace Destiny
                 // TODO: Move else-where.
                 case ClientOperationCode.Messenger:
                     {
-                        MessengerAction action = (MessengerAction)iPacket.ReadByte();
+                       MessengerAction action = (MessengerAction)iPacket.ReadByte();
 
                         switch (action)
                         {
@@ -340,7 +341,12 @@ namespace Destiny
 
                             case MessengerAction.Leave:
                                 {
+                                    if (this.Character.Messenger == null)
+                                    {
+                                        return;
+                                    }
 
+                                    this.Character.Messenger.RemoveParticipant(this.Character);
                                 }
                                 break;
 
@@ -394,6 +400,51 @@ namespace Destiny
 
                                             this.Send(oPacket);
                                         }
+                                    }
+                                }
+                                break;
+
+                            case MessengerAction.Decline:
+                                {
+                                    // TODO: Validate inivitation.
+
+                                    string inviterName = iPacket.ReadMapleString();
+
+                                    Character target = this.World.GetCharacter(inviterName);
+
+                                    if (target == null)
+                                    {
+                                        return;
+                                    }
+
+                                    using (OutPacket oPacket = new OutPacket(ServerOperationCode.Messenger))
+                                    {
+                                        oPacket
+                                            .WriteByte((byte)MessengerResult.Decline)
+                                            .WriteMapleString(this.Character.Name)
+                                            .WriteByte();
+
+                                        target.Client.Send(oPacket);
+                                    }
+                                }
+                                break;
+
+                            case MessengerAction.Chat:
+                                {
+                                    if (this.Character.Messenger == null)
+                                    {
+                                        return;
+                                    }
+
+                                    string text = iPacket.ReadMapleString();
+
+                                    using (OutPacket oPacket = new OutPacket(ServerOperationCode.Messenger))
+                                    {
+                                        oPacket
+                                            .WriteByte((byte)MessengerResult.Chat)
+                                            .WriteMapleString(text);
+
+                                        this.Character.Messenger.Broadcast(oPacket, this.Character);
                                     }
                                 }
                                 break;
@@ -1222,7 +1273,7 @@ namespace Destiny
 
             if (worldID >= MasterServer.Worlds.Length)
                 return;
-            
+
             using (OutPacket oPacket = new OutPacket(ServerOperationCode.CheckUserLimitResult))
             {
                 oPacket.WriteShort((short)MasterServer.Worlds[worldID].Status);
