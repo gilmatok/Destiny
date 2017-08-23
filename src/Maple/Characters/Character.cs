@@ -622,6 +622,24 @@ namespace Destiny.Maple.Characters
             }
             set
             {
+                if (lastNpc != null)
+                {
+                    if (lastNpc.Responses.ContainsKey(this))
+                    {
+                        lastNpc.Responses.Remove(this);
+                    }
+
+                    if (lastNpc.Choices.ContainsKey(this))
+                    {
+                        lastNpc.Choices.Remove(this);
+                    }
+
+                    if (lastNpc.StyleSelectionHelpers.ContainsKey(this))
+                    {
+                        lastNpc.StyleSelectionHelpers.Remove(this);
+                    }
+                }
+
                 lastNpc = value;
             }
         }
@@ -1564,10 +1582,18 @@ namespace Destiny.Maple.Characters
             this.Converse(this.Map.Npcs[objectID]);
         }
 
-        public void Converse(Npc npc)
+        public async void Converse(Npc npc)
         {
+            if (this.LastNpc != null)
+            {
+                return;
+            }
+
             this.LastNpc = npc;
-            this.LastNpc.Converse(this);
+
+            await this.LastNpc.Converse(this);
+
+            this.LastNpc = null;
         }
 
         public void DistributeAP(StatisticType type, short amount = 1)

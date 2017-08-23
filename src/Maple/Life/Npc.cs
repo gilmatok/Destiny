@@ -17,9 +17,9 @@ namespace Destiny.Maple.Life
 
         public Shop Shop { get; set; }
 
-        private Dictionary<Character, TaskCompletionSource<bool>> Responses = new Dictionary<Character, TaskCompletionSource<bool>>();
-        private Dictionary<Character, TaskCompletionSource<int>> Choices = new Dictionary<Character, TaskCompletionSource<int>>();
-        private Dictionary<Character, int[]> StyleSelectionHelpers = new Dictionary<Character, int[]>();
+        public Dictionary<Character, TaskCompletionSource<bool>> Responses = new Dictionary<Character, TaskCompletionSource<bool>>();
+        public Dictionary<Character, TaskCompletionSource<int>> Choices = new Dictionary<Character, TaskCompletionSource<int>>();
+        public Dictionary<Character, int[]> StyleSelectionHelpers = new Dictionary<Character, int[]>();
 
         public void Move(InPacket iPacket)
         {
