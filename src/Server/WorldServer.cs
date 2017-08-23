@@ -228,9 +228,11 @@ namespace Destiny.Server
             return ret;
         }
 
-        public void CreateGuild(Character master)
+        public void CreateGuild(Character master, string name)
         {
+            int id = ++mGuildIDs;
 
+            this.Guilds.Add(id, new Guild(id, name, master));
         }
 
         protected override byte GetKeyForItem(ChannelServer item)

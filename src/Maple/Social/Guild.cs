@@ -47,6 +47,27 @@ namespace Destiny.Maple.Social
             this.BackgroundColor = (byte)datum["BackgroundColor"];
         }
 
+        public Guild(int id, string name, Character master)
+            : base()
+        {
+            this.ID = id;
+            this.Name = name;
+            this.Notice = string.Empty;
+            this.Rank1 = "Master";
+            this.Rank2 = "Jr. Master";
+            this.Rank3 = "Member";
+            this.Rank4 = "Member";
+            this.Rank5 = "Member";
+            this.Logo = 0;
+            this.LogoColor = 0;
+            this.Background = 0;
+            this.BackgroundColor = 0;
+
+            master.GuildRank = 5; // TODO: Move else-where.
+
+            this.Add(new GuildMember(master));
+        }
+
         public void Broadcast(OutPacket oPacket, GuildMember ignored = null)
         {
             foreach (GuildMember member in this)
@@ -129,15 +150,18 @@ namespace Destiny.Maple.Social
 
                 this.Show(item.Character);
 
-                using (OutPacket oPacket = new OutPacket(ServerOperationCode.GuildResult))
+                if (this.Count > 1)
                 {
-                    oPacket
-                        .WriteByte((byte)GuildResult.AddMember)
-                        .WriteInt(this.ID)
-                        .WriteInt(item.ID)
-                        .WriteBytes(item.ToByteArray());
+                    using (OutPacket oPacket = new OutPacket(ServerOperationCode.GuildResult))
+                    {
+                        oPacket
+                            .WriteByte((byte)GuildResult.AddMember)
+                            .WriteInt(this.ID)
+                            .WriteInt(item.ID)
+                            .WriteBytes(item.ToByteArray());
 
-                    this.Broadcast(oPacket, item);
+                        this.Broadcast(oPacket, item);
+                    }
                 }
 
                 using (OutPacket oPacket = new OutPacket(ServerOperationCode.GuildNameChanged))

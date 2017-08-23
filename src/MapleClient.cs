@@ -612,8 +612,32 @@ namespace Destiny
                         {
                             case GuildAction.Create:
                                 {
-                                    // NOTE: This type of packet can only be called from the guild UI,
-                                    // which is opened by Hercale NPC located in the guild headquarters in Orbis.
+                                    if (this.Character.Guild != null || this.Character.Map.MapleID != 200000301)
+                                    {
+                                        return;
+                                    }
+
+                                    if (this.Character.Meso < 1500000) // TODO: Make this a constant.
+                                    {
+                                        this.Character.Notify("You do not have enough mesos to create a Guild.");
+
+                                        return;
+                                    }
+
+                                    string guildName = iPacket.ReadMapleString();
+
+                                    if (!guildName.IsAlphaNumeric() || guildName.Length < 3 || guildName.Length > 12) // TODO: Better name checks.
+                                    {
+                                        this.Character.Notify("The Guild name you have chosen is not accepted.");
+
+                                        return;
+                                    }
+
+                                    this.World.CreateGuild(this.Character, guildName);
+
+                                    this.Character.Meso -= 1500000;
+
+                                    this.Character.Notify("You have successfully created a Guild");
                                 }
                                 break;
 

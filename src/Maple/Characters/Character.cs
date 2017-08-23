@@ -605,6 +605,14 @@ namespace Destiny.Maple.Characters
             }
         }
 
+        public bool IsAlive
+        {
+            get
+            {
+                return this.Health > 0;
+            }
+        }
+
         public bool IsMaster
         {
             get
@@ -781,10 +789,10 @@ namespace Destiny.Maple.Characters
             this.Dexterity = (short)datum["Dexterity"];
             this.Intelligence = (short)datum["Intelligence"];
             this.Luck = (short)datum["Luck"];
-            this.Health = (short)datum["Health"];
             this.MaxHealth = (short)datum["MaxHealth"];
-            this.Mana = (short)datum["Mana"];
             this.MaxMana = (short)datum["MaxMana"];
+            this.Health = (short)datum["Health"];
+            this.Mana = (short)datum["Mana"];
             this.AbilityPoints = (short)datum["AbilityPoints"];
             this.SkillPoints = (short)datum["SkillPoints"];
             this.Experience = (int)datum["Experience"];
@@ -1096,18 +1104,33 @@ namespace Destiny.Maple.Characters
                 return;
             }
 
-            int destinationID = iPacket.ReadInt();
+            int mode = iPacket.ReadInt();
+            string portalLabel = iPacket.ReadMapleString();
+            iPacket.ReadByte();
+            bool wheel = iPacket.ReadShort() > 0;
 
-            switch (destinationID)
+            switch (mode)
             {
+                case 0:
+                    {
+                        if (this.IsAlive)
+                        {
+                            return;
+                        }
+
+                        this.Health = this.MaxHealth;
+
+                        this.ChangeMap(this.Map.ReturnMapID);
+                    }
+                    break;
+
                 case -1:
                     {
-                        string label = iPacket.ReadMapleString();
                         Portal portal;
 
                         try
                         {
-                            portal = this.Map.Portals[label];
+                            portal = this.Map.Portals[portalLabel];
                         }
                         catch (KeyNotFoundException)
                         {
@@ -1609,16 +1632,9 @@ namespace Destiny.Maple.Characters
 
         public async void Converse(Npc npc)
         {
-            if (this.LastNpc != null)
-            {
-                return;
-            }
-
             this.LastNpc = npc;
 
             await this.LastNpc.Converse(this);
-
-            this.LastNpc = null;
         }
 
         public void DistributeAP(StatisticType type, short amount = 1)

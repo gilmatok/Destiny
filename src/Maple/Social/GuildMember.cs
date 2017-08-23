@@ -65,7 +65,7 @@ namespace Destiny.Maple.Social
             this.Name = character.Name;
             this.Level = character.Level;
             this.Job = character.Job;
-            this.Rank = 5;
+            this.Rank = character.GuildRank;
             this.character = character;
         }
 

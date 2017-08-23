@@ -24,7 +24,7 @@ namespace Destiny.Maple.Life.Npcs
 
                             if (result)
                             {
-                                // TODO: Do we have to check for meso?
+                                // TODO: GMS-Like guild creation with a full party, accepting, etcetera.
 
                                 using (OutPacket oPacket = new OutPacket(ServerOperationCode.GuildResult))
                                 {
@@ -48,6 +48,8 @@ namespace Destiny.Maple.Life.Npcs
                         if (result)
                         {
                             // TODO: Disband guild.
+
+                            await this.ShowOkDialog(talker, "This feature is not yet available.");
                         }
                     }
                     break;
@@ -61,6 +63,8 @@ namespace Destiny.Maple.Life.Npcs
                             if (result)
                             {
                                 // TODO: Increase guild's capacity.
+
+                                await this.ShowOkDialog(talker, "This feature is not yet available.");
                             }
                         }
                         else
