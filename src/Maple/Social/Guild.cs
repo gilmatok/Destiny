@@ -63,7 +63,7 @@ namespace Destiny.Maple.Social
             this.Background = 0;
             this.BackgroundColor = 0;
 
-            master.GuildRank = 5; // TODO: Move else-where.
+            master.GuildRank = 1; // TODO: Move else-where.
 
             this.Add(new GuildMember(master));
         }
