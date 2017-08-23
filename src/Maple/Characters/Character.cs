@@ -163,6 +163,7 @@ namespace Destiny.Maple.Characters
             }
         }
 
+        // TODO: Update party's properties.
         public byte Level
         {
             get
@@ -228,6 +229,7 @@ namespace Destiny.Maple.Characters
             }
         }
 
+        // TODO: Update party's properties.
         public Job Job
         {
             get
@@ -724,9 +726,9 @@ namespace Destiny.Maple.Characters
                 {
                     Party party = this.Client.World.GetParty(partyID);
 
-                    if (party != null)
+                    if (party != null && party.Contains(this.ID))
                     {
-                        party.AddMember(this, true);
+                        this.Party = party;
                     }
                 }
 
@@ -856,6 +858,11 @@ namespace Destiny.Maple.Characters
             this.IsInitialized = true;
 
             this.Map.Characters.Add(this);
+
+            if (this.Party != null)
+            {
+                this.Party[this.ID].Character = this;
+            }
 
             if (this.Guild != null)
             {

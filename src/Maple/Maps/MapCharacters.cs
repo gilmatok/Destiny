@@ -2,6 +2,7 @@
 using Destiny.Core.Network;
 using Destiny.Maple.Characters;
 using Destiny.Maple.Life;
+using Destiny.Maple.Social;
 using System.Collections.Generic;
 
 namespace Destiny.Maple.Maps
@@ -118,20 +119,21 @@ namespace Destiny.Maple.Maps
                 this.Map.Broadcast(oPacket, item);
             }
 
+            // TODO: Move else-where (maybe ChangeMap).
             if (item.Party != null)
             {
-                item.Party.Members[item.ID].Map = this.Map.MapleID;
+                // TODO: Update party's map.
 
-                foreach (Character character in item.Party.Characters.Values)
+                foreach (PartyMember member in item.Party)
                 {
-                    if (character != item && character.Map.MapleID == this.Map.MapleID)
+                    if (member.Character != item && member.Character != null && member.Character.Map.MapleID == this.Map.MapleID)
                     {
                         using (OutPacket oPacket = new OutPacket(ServerOperationCode.UpdatePartyMemberHP))
                         {
                             oPacket
-                                .WriteInt(character.ID)
-                                .WriteInt(character.Health)
-                                .WriteInt(character.MaxHealth);
+                                .WriteInt(member.Character.ID)
+                                .WriteInt(member.Character.Health)
+                                .WriteInt(member.Character.MaxHealth);
 
                             item.Client.Send(oPacket);
                         }
@@ -143,7 +145,7 @@ namespace Destiny.Maple.Maps
                                 .WriteInt(item.Health)
                                 .WriteInt(item.MaxHealth);
 
-                            character.Client.Send(oPacket);
+                            member.Character.Client.Send(oPacket);
                         }
                     }
                 }

@@ -69,7 +69,7 @@ namespace Destiny
 
                 if (this.Character.Party != null)
                 {
-                    this.Character.Party.SilentRemoveMember(this.Character);
+                    this.Character.Party[this.Character.ID].Character = null;
                 }
 
                 if (this.Character.Guild != null)
@@ -467,8 +467,6 @@ namespace Destiny
                                 {
                                     if (this.Character.Party != null)
                                     {
-                                        // NOTE: Trying to create a party while being in one.
-
                                         return;
                                     }
 
@@ -480,8 +478,6 @@ namespace Destiny
                                 {
                                     if (this.Character.Party == null)
                                     {
-                                        // NOTE: Trying to leave a party while not being in one.
-
                                         return;
                                     }
 
@@ -491,7 +487,7 @@ namespace Destiny
                                     }
                                     else
                                     {
-                                        this.Character.Party.HardRemoveMember(this.Character);
+                                        this.Character.Party.Remove(this.Character.ID);
                                     }
                                 }
                                 break;
@@ -500,8 +496,6 @@ namespace Destiny
                                 {
                                     if (this.Character.Party != null)
                                     {
-                                        // NOTE: Trying to join a party while being in one.
-
                                         return;
                                     }
 
@@ -513,19 +507,15 @@ namespace Destiny
 
                                     if (party == null)
                                     {
-                                        // NOTE: Party is non existent or has been disband.
-
                                         return;
                                     }
 
                                     if (party.IsFull)
                                     {
-                                        // NOTE: Party is at full capacity (6 members).
-
                                         return;
                                     }
 
-                                    party.AddMember(this.Character);
+                                    party.Add(new PartyMember(this.Character));
                                 }
                                 break;
 
@@ -533,15 +523,11 @@ namespace Destiny
                                 {
                                     if (this.Character.Party == null)
                                     {
-                                        // NOTE: Trying to invite someone while not being in a party.
-
                                         return;
                                     }
 
                                     if (this.Character.Party.LeaderID != this.Character.ID)
                                     {
-                                        // NOTE: Trying to invite someone while not being the leader of the party.
-
                                         return;
                                     }
 
@@ -553,8 +539,6 @@ namespace Destiny
 
                                     if (target.Party != null)
                                     {
-                                        // TODO: Target is already in a party message.
-
                                         return;
                                     }
 
@@ -573,54 +557,31 @@ namespace Destiny
 
                             case PartyAction.Expel:
                                 {
-                                    if (this.Character.Party != null)
+                                    if (this.Character.Party == null)
                                     {
-                                        // NOTE: Trying to expel a member while not being in a party.
-
                                         return;
                                     }
 
                                     if (this.Character.Party.LeaderID != this.Character.ID)
                                     {
-                                        // NOTE: Trying to expel a member while not being the leader of the party.
-
                                         return;
                                     }
 
                                     int memberID = iPacket.ReadInt();
 
-                                    Character member = this.Character.Party.Characters[memberID];
+                                    // TODO: Validate member ID.
 
-                                    if (member == null)
-                                    {
-                                        // NOTE: Trying to kick a non existent member.
+                                    PartyMember member = this.Character.Party[memberID];
 
-                                        return;
-                                    }
+                                    member.Expelled = true;
 
-                                    this.Character.Party.HardRemoveMember(member, true);
+                                    this.Character.Party.Remove(memberID);
                                 }
                                 break;
 
                             case PartyAction.ChangeLeader:
                                 {
-                                    if (this.Character.Party == null)
-                                    {
-                                        // NOTE: Trying to change leaders while not being in a party.
-
-                                        return;
-                                    }
-
-                                    if (this.Character.Party.LeaderID != this.Character.ID)
-                                    {
-                                        // NOTE: Trying to change leaders while not being the leader of the party.
-
-                                        return;
-                                    }
-
-                                    int leaderID = iPacket.ReadInt();
-
-                                    this.Character.Party.UpdateLeader(leaderID);
+                                    
                                 }
                                 break;
                         }

@@ -2,45 +2,34 @@
 using Destiny.Core.Network;
 using Destiny.Maple.Characters;
 using Destiny.Server;
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace Destiny.Maple.Social
 {
-    public sealed class Party
+    public sealed class Party : KeyedCollection<int, PartyMember>
     {
         public WorldServer World { get; private set; }
 
         public int ID { get; private set; }
         public int LeaderID { get; private set; }
-        public Dictionary<int, PartyMember> Members { get; private set; }
-        public Dictionary<int, Character> Characters { get; private set; }
-
-        public int Count
-        {
-            get
-            {
-                return this.Members.Count;
-            }
-        }
 
         public bool IsFull
         {
             get
             {
-                return this.Members.Count == 6;
+                return this.Count == 6;
             }
         }
 
         public Party(WorldServer world, int id, Character leader)
+            : base()
         {
             this.World = world;
 
             this.ID = id;
             this.LeaderID = leader.ID;
-            this.Members = new Dictionary<int, PartyMember>();
-            this.Characters = new Dictionary<int, Character>();
 
-            this.AddMember(leader, true);
+            this.Add(new PartyMember(leader));
 
             using (OutPacket oPacket = new OutPacket(ServerOperationCode.PartyResult))
             {
@@ -69,130 +58,6 @@ namespace Destiny.Maple.Social
             }
         }
 
-        public void UpdateLeader(int leaderID, bool fromDisconnection = false)
-        {
-            this.LeaderID = leaderID;
-
-            using (OutPacket oPacket = new OutPacket(ServerOperationCode.PartyResult))
-            {
-                oPacket
-                    .WriteByte((byte)PartyResult.ChangeLeader)
-                    .WriteInt(this.LeaderID)
-                    .WriteBool(fromDisconnection);
-
-                this.Broadcast(oPacket);
-            }
-        }
-
-        public void AddMember(Character member, bool isFirst = false)
-        {
-            member.Party = this;
-
-            this.Members[member.ID] = new PartyMember(this, member);
-            this.Characters[member.ID] = member;
-
-            if (!isFirst)
-            {
-                using (OutPacket oPacket = new OutPacket(ServerOperationCode.PartyResult))
-                {
-                    oPacket
-                        .WriteByte((byte)PartyResult.Join)
-                        .WriteInt(this.ID)
-                        .WriteMapleString(member.Name)
-                        .WriteBytes(this.ToByteArray());
-
-                    this.Broadcast(oPacket);
-                }
-
-                foreach (Character character in this.Characters.Values)
-                {
-                    if (character != member && character.Map.MapleID == member.Map.MapleID)
-                    {
-                        using (OutPacket oPacket = new OutPacket(ServerOperationCode.UpdatePartyMemberHP))
-                        {
-                            oPacket
-                                .WriteInt(member.ID)
-                                .WriteInt(member.Health)
-                                .WriteInt(member.MaxHealth);
-
-                            character.Client.Send(oPacket);
-                        }
-
-                        using (OutPacket oPacket = new OutPacket(ServerOperationCode.UpdatePartyMemberHP))
-                        {
-                            oPacket
-                                .WriteInt(character.ID)
-                                .WriteInt(character.Health)
-                                .WriteInt(character.MaxHealth);
-
-                            member.Client.Send(oPacket);
-                        }
-                    }
-                }
-            }
-        }
-
-        public void SilentRemoveMember(Character character)
-        {
-            this.Characters.Remove(character.ID);
-
-            this.Members[character.ID].Map = 999999999;
-            this.Members[character.ID].Channel = -2;
-
-            using (OutPacket oPacket = new OutPacket(ServerOperationCode.PartyResult))
-            {
-                oPacket
-                    .WriteByte((byte)PartyResult.Update)
-                    .WriteInt(this.ID)
-                    .WriteBytes(this.ToByteArray());
-
-                this.Broadcast(oPacket);
-            }
-        }
-
-        public void HardRemoveMember(Character member, bool expel = false)
-        {
-            using (OutPacket oPacket = new OutPacket(ServerOperationCode.PartyResult))
-            {
-                oPacket
-                    .WriteByte((byte)PartyResult.RemoveOrLeave)
-                    .WriteInt(this.ID)
-                    .WriteInt(member.ID)
-                    .WriteBool(true)
-                    .WriteBool(expel)
-                    .WriteMapleString(member.Name)
-                    .WriteBytes(this.ToByteArray());
-
-                this.Broadcast(oPacket);
-            }
-
-            this.Members.Remove(member.ID);
-            this.Characters.Remove(member.ID);
-
-            using (OutPacket oPacket = new OutPacket(ServerOperationCode.PartyResult))
-            {
-                oPacket
-                    .WriteByte((byte)PartyResult.Update)
-                    .WriteInt(this.ID)
-                    .WriteBytes(this.ToByteArray());
-
-                this.Broadcast(oPacket);
-            }
-
-            member.Party = null;
-        }
-
-        public void Broadcast(OutPacket oPacket, Character ignored = null)
-        {
-            foreach (Character member in this.Characters.Values)
-            {
-                if (member != ignored)
-                {
-                    member.Client.Send(oPacket);
-                }
-            }
-        }
-
         public void Disband()
         {
             using (OutPacket oPacket = new OutPacket(ServerOperationCode.PartyResult))
@@ -206,26 +71,43 @@ namespace Destiny.Maple.Social
                 this.Broadcast(oPacket);
             }
 
-            foreach (Character member in this.Characters.Values)
+            foreach (PartyMember member in this)
             {
-                member.Party = null;
+                if (member.Character != null)
+                {
+                    member.Character.Party = null;
+                }
             }
 
             this.World.RemoveParty(this);
+        }
+
+        public void Broadcast(OutPacket oPacket, PartyMember ignored = null)
+        {
+            foreach (PartyMember member in this)
+            {
+                if (member.Character != null)
+                {
+                    if (member != ignored)
+                    {
+                        member.Character.Client.Send(oPacket);
+                    }
+                }
+            }
         }
 
         public byte[] ToByteArray()
         {
             using (OutPacket oPacket = new OutPacket())
             {
+                int remaining = 6 - this.Count;
+
                 // NOTE: IDs.
 
-                foreach (PartyMember member in this.Members.Values)
+                foreach (PartyMember member in this)
                 {
                     oPacket.WriteInt(member.ID);
                 }
-
-                int remaining = 6 - this.Count;
 
                 for (int i = 0; i < remaining; i++)
                 {
@@ -234,7 +116,7 @@ namespace Destiny.Maple.Social
 
                 // NOTE: Names.
 
-                foreach (PartyMember member in this.Members.Values)
+                foreach (PartyMember member in this)
                 {
                     oPacket.WritePaddedString(member.Name, 13);
                 }
@@ -246,7 +128,7 @@ namespace Destiny.Maple.Social
 
                 // NOTE: Jobs.
 
-                foreach (PartyMember member in this.Members.Values)
+                foreach (PartyMember member in this)
                 {
                     oPacket.WriteInt((int)member.Job);
                 }
@@ -258,7 +140,7 @@ namespace Destiny.Maple.Social
 
                 // NOTE: Levels.
 
-                foreach (PartyMember member in this.Members.Values)
+                foreach (PartyMember member in this)
                 {
                     oPacket.WriteInt(member.Level);
                 }
@@ -270,7 +152,7 @@ namespace Destiny.Maple.Social
 
                 // NOTE: Channels.
 
-                foreach (PartyMember member in this.Members.Values)
+                foreach (PartyMember member in this)
                 {
                     oPacket.WriteInt(member.Channel);
                 }
@@ -284,7 +166,7 @@ namespace Destiny.Maple.Social
 
                 // NOTE: Maps.
 
-                foreach (PartyMember member in this.Members.Values)
+                foreach (PartyMember member in this)
                 {
                     oPacket.WriteInt(member.Map);
                 }
@@ -308,6 +190,89 @@ namespace Destiny.Maple.Social
 
                 return oPacket.ToArray();
             }
+        }
+
+        protected override int GetKeyForItem(PartyMember item)
+        {
+            return item.ID;
+        }
+
+        protected override void InsertItem(int index, PartyMember item)
+        {
+            item.Party = this;
+            item.Character.Party = this;
+
+            base.InsertItem(index, item);
+
+            if (this.Count > 1)
+            {
+                using (OutPacket oPacket = new OutPacket(ServerOperationCode.PartyResult))
+                {
+                    oPacket
+                        .WriteByte((byte)PartyResult.Join)
+                        .WriteInt(this.ID)
+                        .WriteMapleString(item.Name)
+                        .WriteBytes(this.ToByteArray());
+
+                    this.Broadcast(oPacket);
+                }
+
+                foreach (PartyMember member in this)
+                {
+                    if (member != item && member.Character != null && member.Character.Map.MapleID == item.Character.Map.MapleID)
+                    {
+                        using (OutPacket oPacket = new OutPacket(ServerOperationCode.UpdatePartyMemberHP))
+                        {
+                            oPacket
+                                .WriteInt(member.Character.ID)
+                                .WriteInt(member.Character.Health)
+                                .WriteInt(member.Character.MaxHealth);
+
+                            item.Character.Client.Send(oPacket);
+                        }
+
+                        using (OutPacket oPacket = new OutPacket(ServerOperationCode.UpdatePartyMemberHP))
+                        {
+                            oPacket
+                                .WriteInt(item.Character.ID)
+                                .WriteInt(item.Character.Health)
+                                .WriteInt(item.Character.MaxHealth);
+
+                            member.Character.Client.Send(oPacket);
+                        }
+                    }
+                }
+            }
+        }
+
+        protected override void RemoveItem(int index)
+        {
+            PartyMember item = base.Items[index];
+
+            item.Party = null;
+
+            if (item.Character != null)
+            {
+                item.Character.Party = null;
+            }
+
+            using (OutPacket oPacket = new OutPacket(ServerOperationCode.PartyResult))
+            {
+                oPacket
+                    .WriteByte((byte)PartyResult.RemoveOrLeave)
+                    .WriteInt(this.ID)
+                    .WriteInt(item.ID)
+                    .WriteBool(true)
+                    .WriteBool(item.Expelled)
+                    .WriteMapleString(item.Name)
+                    .WriteBytes(this.ToByteArray());
+
+                this.Broadcast(oPacket);
+            }
+
+            base.RemoveItem(index);
+
+            this.Update();
         }
     }
 }

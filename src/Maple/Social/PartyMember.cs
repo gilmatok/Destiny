@@ -4,131 +4,51 @@ namespace Destiny.Maple.Social
 {
     public sealed class PartyMember
     {
-        public Party Party { get; private set; }
+        public Party Party { get; set; }
 
-        private int id;
-        private string name;
-        private byte level;
-        private Job job;
-        private int map;
-        private int channel;
+        public int ID { get; set; }
+        public string Name { get; set; }
+        public byte Level { get; set; }
+        public Job Job { get; set; }
+        public int Map { get; set; }
+        public int Channel { get; set; }
+        public bool Expelled { get; set; }
 
-        private bool Assigned { get; set; }
-
-        public int ID
+        private Character character;
+        public Character Character
         {
             get
             {
-                return id;
+                return character;
             }
             set
             {
-                id = value;
+                character = value;
 
-                if (this.Assigned)
+                if (value == null)
                 {
-                    this.Party.Update();
+                    this.Map = 999999999;
+                    this.Channel = -2;
                 }
+                else
+                {
+                    this.Map = character.Map.MapleID;
+                    this.Channel = character.Client.ChannelID;
+                }
+
+                this.Party.Update();
             }
         }
 
-        public string Name
+        public PartyMember(Character character)
         {
-            get
-            {
-                return name;
-            }
-            set
-            {
-                name = value;
-
-                if (this.Assigned)
-                {
-                    this.Party.Update();
-                }
-            }
-        }
-
-        public byte Level
-        {
-            get
-            {
-                return level;
-            }
-            set
-            {
-                level = value;
-
-                if (this.Assigned)
-                {
-                    this.Party.Update();
-                }
-            }
-        }
-
-        public Job Job
-        {
-            get
-            {
-                return job;
-            }
-            set
-            {
-                job = value;
-
-                if (this.Assigned)
-                {
-                    this.Party.Update();
-                }
-            }
-        }
-
-        public int Map
-        {
-            get
-            {
-                return map;
-            }
-            set
-            {
-                map = value;
-
-                if (this.Assigned)
-                {
-                    this.Party.Update();
-                }
-            }
-        }
-
-        public int Channel
-        {
-            get
-            {
-                return channel;
-            }
-            set
-            {
-                channel = value;
-
-                if (this.Assigned)
-                {
-                    this.Party.Update();
-                }
-            }
-        }
-
-        public PartyMember(Party party, Character character)
-        {
-            this.Party = party;
-
             this.ID = character.ID;
             this.Name = character.Name;
             this.Level = character.Level;
             this.Job = character.Job;
             this.Map = character.Map.MapleID;
             this.Channel = character.Client.ChannelID;
-
-            this.Assigned = true;
+            this.character = character;
         }
     }
 }
