@@ -89,6 +89,8 @@
     <Compile Include="Maple\InventoryOperation.cs" />
     <Compile Include="Maple\Life\LifeObject.cs" />
     <Compile Include="Maple\Life\Loot.cs" />
+    <Compile Include="Maple\Life\Npcs\Npc1002000.cs" />
+    <Compile Include="Maple\Life\Npcs\Npc2010007.cs" />
     <Compile Include="Maple\Life\Npcs\Npc9900000.cs" />
     <Compile Include="Maple\Life\ReactorState.cs" />
     <Compile Include="Maple\Line.cs" />

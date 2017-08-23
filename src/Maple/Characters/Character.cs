@@ -256,6 +256,9 @@ namespace Destiny.Maple.Characters
                                 this.Map.Broadcast(oPacket, this);
                             }
                         }
+
+                        this.Health = this.MaxHealth;
+                        this.Mana = this.MaxMana;
                     }
                 }
             }
@@ -364,7 +367,18 @@ namespace Destiny.Maple.Characters
             }
             set
             {
-                health = value;
+                if (value < 0)
+                {
+                    health = 0;
+                }
+                else if (value > this.MaxHealth)
+                {
+                    health = this.MaxHealth;
+                }
+                else
+                {
+                    health = value;
+                }
 
                 if (this.IsInitialized)
                 {
@@ -424,7 +438,18 @@ namespace Destiny.Maple.Characters
             }
             set
             {
-                mana = value;
+                if (value < 0)
+                {
+                    mana = 0;
+                }
+                else if (value > this.MaxMana)
+                {
+                    mana = this.MaxMana;
+                }
+                else
+                {
+                    mana = value;
+                }
 
                 if (this.IsInitialized)
                 {
