@@ -10,6 +10,7 @@ namespace Destiny.Maple.Characters
     {
         public Character Parent { get; private set; }
 
+        public Npc Npc { get; private set; }
         public byte Slots { get; private set; }
         public int Meso { get; private set; }
 
@@ -73,6 +74,8 @@ namespace Destiny.Maple.Characters
 
         public void Show(Npc npc)
         {
+            this.Npc = npc;
+
             this.Load();
 
             using (OutPacket oPacket = new OutPacket(ServerOperationCode.Storage))
@@ -176,12 +179,14 @@ namespace Destiny.Maple.Characters
                             return;
                         }
 
-                        if (this.Parent.Meso <= 500) // TODO: Actual storage cost.
+                        if (this.Parent.Meso <= this.Npc.StorageCost)
                         {
                             this.Parent.Notify("You don't have enough meso to store the item.", NoticeType.Popup); // TOOD: Is there a packet for this?
 
                             return;
                         }
+
+                        this.Parent.Meso -= this.Npc.StorageCost;
 
                         this.Parent.Items.Remove(item, true);
 

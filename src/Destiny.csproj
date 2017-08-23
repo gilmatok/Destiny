@@ -92,6 +92,7 @@
     <Compile Include="Maple\Life\Npcs\Npc1002000.cs" />
     <Compile Include="Maple\Life\Npcs\Npc2010008.cs" />
     <Compile Include="Maple\Life\Npcs\Npc2010007.cs" />
+    <Compile Include="Maple\Life\Npcs\Npc9900001.cs" />
     <Compile Include="Maple\Life\Npcs\Npc9900000.cs" />
     <Compile Include="Maple\Life\ReactorState.cs" />
     <Compile Include="Maple\Line.cs" />

@@ -74,7 +74,7 @@ namespace Destiny
                               `IsMaster` tinyint(1) UNSIGNED NOT NULL DEFAULT '0',
                               `Birthday` date NOT NULL,
                               `Creation` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                              `MaxCharacters` smallint(3) NOT NULL DEFAULT '3'
+                              `MaxCharacters` int(11) NOT NULL DEFAULT '3'
                             ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
                             DROP TRIGGER IF EXISTS `TR_accounts_CreateStorage`;
                             DELIMITER $$

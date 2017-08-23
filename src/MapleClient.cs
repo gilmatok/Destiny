@@ -1001,8 +1001,9 @@ namespace Destiny
                         this.Account.Pic = string.Empty;
                         this.Account.IsBanned = false;
                         this.Account.IsMaster = false;
-                        this.Account.Creation = DateTime.UtcNow;
                         this.Account.Birthday = DateTime.UtcNow;
+                        this.Account.Creation = DateTime.UtcNow;
+                        this.Account.MaxCharacters = MasterServer.Login.MaxCharacters;
 
                         this.Account.Save();
                     }
@@ -1477,10 +1478,10 @@ namespace Destiny
             character.Dexterity = 5;
             character.Intelligence = 4;
             character.Luck = 4;
-            character.Health = 50;
             character.MaxHealth = 50;
-            character.Mana = 5;
             character.MaxMana = 5;
+            character.Health = 50;
+            character.Mana = 5;
             character.AbilityPoints = 0;
             character.SkillPoints = 0;
             character.Experience = 0;

@@ -135,10 +135,6 @@ namespace Destiny.Maple.Life.Npcs
                 {
                     talker.ChangeMap(100000000);
                 }
-                else
-                {
-                    await this.ShowOkDialog(talker, "Okay, I'll be right here if you need me.");
-                }
             }
         }
     }

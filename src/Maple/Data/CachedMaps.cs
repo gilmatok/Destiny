@@ -75,6 +75,20 @@ namespace Destiny.Maple.Data
                             break;
                     }
                 }
+                
+                foreach (Datum datum in new Datums("npc_data").Populate("storage_cost > 0"))
+                {
+                    foreach (Map map in this)
+                    {
+                        foreach (Npc npc in map.Npcs)
+                        {
+                            if (npc.MapleID == (int)datum["npcid"])
+                            {
+                                npc.StorageCost = (int)datum["storage_cost"];
+                            }
+                        }
+                    }
+                }
             }
 
             using (Log.Load("Shops"))

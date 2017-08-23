@@ -16,6 +16,7 @@ namespace Destiny.Maple.Life
         public Character Controller { get; set; }
 
         public Shop Shop { get; set; }
+        public int StorageCost { get; set; }
 
         public Dictionary<Character, TaskCompletionSource<bool>> Responses = new Dictionary<Character, TaskCompletionSource<bool>>();
         public Dictionary<Character, TaskCompletionSource<int>> Choices = new Dictionary<Character, TaskCompletionSource<int>>();
@@ -55,7 +56,7 @@ namespace Destiny.Maple.Life
             {
                 this.Shop.Show(talker);
             }
-            else if (false)
+            else if (this.StorageCost > 0)
             {
                 talker.Storage.Show(this);
             }
