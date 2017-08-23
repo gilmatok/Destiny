@@ -92,6 +92,8 @@ namespace Destiny.Core.IO
 
         private OutPacket WriteString(string value)
         {
+            value = value ?? string.Empty;
+
             for (int i = 0; i < value.Length; i++)
             {
                 mWriter.Write(value[i]);
@@ -102,6 +104,8 @@ namespace Destiny.Core.IO
 
         public OutPacket WritePaddedString(string value, int length)
         {
+            value = value ?? string.Empty;
+
             for (int i = 0; i < length; i++)
             {
                 if (i < value.Length)
@@ -119,6 +123,8 @@ namespace Destiny.Core.IO
 
         public OutPacket WriteMapleString(string fmt, params object[] args)
         {
+            fmt = fmt ?? string.Empty;
+
             string final = string.Format(fmt, args);
 
             this.WriteShort((short)final.Length);

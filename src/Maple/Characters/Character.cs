@@ -27,7 +27,7 @@ namespace Destiny.Maple.Characters
         public short Foothold { get; set; }
         public byte Portals { get; set; }
         public int Chair { get; set; }
-        public int GuildRank { get; set; }
+        public int? GuildRank { get; set; }
 
         public CharacterItems Items { get; private set; }
         public CharacterSkills Skills { get; private set; }
@@ -803,11 +803,11 @@ namespace Destiny.Maple.Characters
 
             if (channel)
             {
-                int partyID = (int)datum["PartyID"];
+                int? partyID = (int?)datum["PartyID"];
 
-                if (partyID != 0)
+                if (partyID != null)
                 {
-                    Party party = this.Client.World.GetParty(partyID);
+                    Party party = this.Client.World.GetParty((int)partyID);
 
                     if (party != null && party.Contains(this.ID))
                     {
@@ -815,13 +815,13 @@ namespace Destiny.Maple.Characters
                     }
                 }
 
-                int guildID = (int)datum["GuildID"];
+                int? guildID = (int?)datum["GuildID"];
 
-                if (guildID != 0)
+                if (guildID != null)
                 {
                     this.GuildRank = (int)datum["GuildRank"];
 
-                    Guild guild = this.Client.World.GetGuild(guildID);
+                    Guild guild = this.Client.World.GetGuild((int)guildID);
 
                     if (guild != null)
                     {
@@ -881,9 +881,9 @@ namespace Destiny.Maple.Characters
             datum["MapID"] = this.Map.MapleID;
             datum["SpawnPoint"] = this.SpawnPoint;
             datum["Meso"] = this.Meso;
-            datum["PartyID"] = this.Party != null ? this.Party.ID : 0;
-            datum["GuildID"] = this.Guild != null ? this.Guild.ID : 0;
-            datum["GuildRank"] = this.Guild != null ? this.GuildRank : 0;
+            datum["PartyID"] = this.Party?.ID;
+            datum["GuildID"] = this.Guild?.ID;
+            datum["GuildRank"] = this.Guild != null ? this.GuildRank : null;
 
             datum["EquipmentSlots"] = this.Items.MaxSlots[ItemType.Equipment];
             datum["UsableSlots"] = this.Items.MaxSlots[ItemType.Usable];

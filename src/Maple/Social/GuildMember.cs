@@ -13,7 +13,7 @@ namespace Destiny.Maple.Social
         public string Name { get; private set; }
         public byte Level { get; private set; }
         public Job Job { get; private set; }
-        public int Rank { get; set; }
+        public int? Rank { get; set; }
         public bool Expelled { get; set; }
         public string Expeller { get; set; }
 
@@ -77,7 +77,7 @@ namespace Destiny.Maple.Social
                     .WritePaddedString(this.Name, 13)
                     .WriteInt((int)this.Job)
                     .WriteInt(this.Level)
-                    .WriteInt(this.Rank)
+                    .WriteInt(this.Rank ?? 0)
                     .WriteInt(this.IsOnline ? 1 : 0)
                     .WriteInt() // NOTE: Signature.
                     .WriteInt(); // NOTE: Alliance rank.

@@ -34,12 +34,12 @@ namespace Destiny.Maple.Characters
 
             Item item = this.Parent.Items[ItemType.Cash, slot];
 
-            if (item == null)
+            if (item?.PetID == null)
             {
                 return;
             }
 
-            Pet pet = this[item.PetID];
+            Pet pet = this[(int)item.PetID];
 
             if (pet.Summoned)
             {

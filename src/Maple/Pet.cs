@@ -45,7 +45,10 @@ namespace Destiny.Maple
                 return;
             }
 
-            this.ID = item.PetID;
+            if (item.PetID == null)
+                return;
+
+            this.ID = (int)item.PetID;
             this.Item = item;
             this.Name = (string)datum["Name"];
             this.Level = (byte)datum["Level"];

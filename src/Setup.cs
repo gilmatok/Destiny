@@ -136,9 +136,9 @@ namespace Destiny
                               `SetupSlots` tinyint(3) UNSIGNED NOT NULL DEFAULT '24',
                               `EtceteraSlots` tinyint(3) UNSIGNED NOT NULL DEFAULT '24',
                               `CashSlots` tinyint(3) UNSIGNED NOT NULL DEFAULT '48',
-                              `PartyID` int(11) NOT NULL DEFAULT '0',
-                              `GuildID` int(11) NOT NULL DEFAULT '0',
-                              `GuildRank` int(11) NOT NULL DEFAULT '0'
+                              `PartyID` int(11) DEFAULT NULL,
+                              `GuildID` int(11) DEFAULT NULL,
+                              `GuildRank` int(11) DEFAULT NULL
                             ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
                             DROP TABLE IF EXISTS `guilds`;
@@ -189,7 +189,7 @@ namespace Destiny
                               `IsStored` tinyint(1) UNSIGNED NOT NULL DEFAULT '0',
                               `Quantity` smallint(6) NOT NULL DEFAULT '1',
                               `Expiration` datetime NOT NULL DEFAULT '2079-01-01 12:00:00',
-                              `PetID` int(11) NOT NULL DEFAULT '0'
+                              `PetID` int(11) DEFAULT NULL
                             ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
                             DROP TABLE IF EXISTS `keymaps`;
@@ -282,7 +282,8 @@ namespace Destiny
                             ALTER TABLE `characters`
                               ADD PRIMARY KEY (`ID`),
                               ADD KEY `account_id` (`AccountID`),
-                              ADD KEY `name` (`Name`) USING BTREE;
+                              ADD KEY `name` (`Name`) USING BTREE,
+                              ADD KEY `GuildID` (`GuildID`);
 
                             ALTER TABLE `guilds`
                               ADD PRIMARY KEY (`ID`);
@@ -290,7 +291,8 @@ namespace Destiny
                             ALTER TABLE `items`
                               ADD PRIMARY KEY (`ID`),
                               ADD KEY `character_id` (`CharacterID`) USING BTREE,
-                              ADD KEY `AccountID` (`AccountID`);
+                              ADD KEY `AccountID` (`AccountID`),
+                              ADD KEY `PetID` (`PetID`);
 
                             ALTER TABLE `keymaps`
                               ADD PRIMARY KEY (`ID`),
@@ -317,7 +319,7 @@ namespace Destiny
                               ADD KEY `character_id` (`CharacterID`) USING BTREE;
 
                             ALTER TABLE `storages`
-                              ADD PRIMARY KEY (`AccountID`),
+                              ADD PRIMARY KEY (`AccountID`) USING BTREE,
                               ADD KEY `account_id` (`AccountID`) USING BTREE;
 
                             ALTER TABLE `trocks`
@@ -350,11 +352,13 @@ namespace Destiny
                               ADD CONSTRAINT `buffs_ibfk_1` FOREIGN KEY (`CharacterID`) REFERENCES `characters` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
 
                             ALTER TABLE `characters`
-                              ADD CONSTRAINT `characters_ibfk_1` FOREIGN KEY (`AccountID`) REFERENCES `accounts` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
+                              ADD CONSTRAINT `characters_ibfk_1` FOREIGN KEY (`AccountID`) REFERENCES `accounts` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE,
+                              ADD CONSTRAINT `characters_ibfk_2` FOREIGN KEY (`GuildID`) REFERENCES `guilds` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
 
                             ALTER TABLE `items`
                               ADD CONSTRAINT `items_ibfk_1` FOREIGN KEY (`AccountID`) REFERENCES `accounts` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE,
-                              ADD CONSTRAINT `items_ibfk_2` FOREIGN KEY (`CharacterID`) REFERENCES `characters` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
+                              ADD CONSTRAINT `items_ibfk_2` FOREIGN KEY (`CharacterID`) REFERENCES `characters` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE,
+                              ADD CONSTRAINT `items_ibfk_3` FOREIGN KEY (`PetID`) REFERENCES `pets` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
 
                             ALTER TABLE `keymaps`
                               ADD CONSTRAINT `keymaps_ibfk_1` FOREIGN KEY (`CharacterID`) REFERENCES `characters` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;

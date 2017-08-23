@@ -26,7 +26,7 @@ namespace Destiny.Maple
         private short quantity;
         public string Creator { get; set; }
         public DateTime Expiration { get; set; }
-        public int PetID { get; set; }
+        public int? PetID { get; set; }
 
         public bool IsCash { get; private set; }
         public bool OnlyOne { get; private set; }
@@ -425,7 +425,6 @@ namespace Destiny.Maple
             this.MaxPerStack = this.CachedReference.MaxPerStack;
             this.Quantity = (this.Type == ItemType.Equipment) ? (short)1 : quantity;
             if (equipped) this.Slot = (short)this.GetEquippedSlot();
-            this.Creator = string.Empty;
 
             if (!expiration.HasValue)
             {
@@ -517,7 +516,7 @@ namespace Destiny.Maple
                 this.Slot = (short)datum["Slot"];
                 this.Creator = (string)datum["Creator"];
                 this.Expiration = (DateTime)datum["Expiration"];
-                this.PetID = (int)datum["PetID"];
+                this.PetID = (int?)datum["PetID"];
 
                 this.IsCash = this.CachedReference.IsCash;
                 this.OnlyOne = this.CachedReference.OnlyOne;
@@ -1016,7 +1015,7 @@ namespace Destiny.Maple
                 }
 
                 oPacket
-                    .WriteByte((byte)(this.PetID != 0 ? 3 : this.Type == ItemType.Equipment ? 1 : 2))
+                    .WriteByte((byte)(this.PetID != null ? 3 : this.Type == ItemType.Equipment ? 1 : 2))
                     .WriteInt(this.MapleID)
                     .WriteBool(this.IsCash);
 
@@ -1027,9 +1026,9 @@ namespace Destiny.Maple
 
                 oPacket.WriteDateTime(this.Expiration);
 
-                if (this.PetID != 0)
+                if (this.PetID != null)
                 {
-                    Pet pet = this.Character.Pets[this.PetID];
+                    Pet pet = this.Character.Pets[(int)this.PetID];
 
                     oPacket
                         .WritePaddedString(pet.Name, 13)

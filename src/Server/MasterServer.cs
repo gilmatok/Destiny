@@ -36,7 +36,7 @@ namespace Destiny.Server
                 world.Start();
             }
 
-            Database.Execute("UPDATE characters SET PartyID = 0");
+            Database.Execute("UPDATE characters SET PartyID = {0}", new object[] { null });
 
             Log.Inform("Reset all parties.");
 

@@ -37,13 +37,13 @@ namespace Destiny.Maple.Characters
         public void Load()
         {
             // TODO: Use JOIN with the pets table.
-            foreach (Datum datum in new Datums("items").Populate("CharacterID = {0} AND IsStored = False", this.Parent.ID))
+            foreach (Datum datum in new Datums("items").Populate("CharacterID = {0} AND IsStored = 0", this.Parent.ID))
             {
                 Item item = new Item(datum);
 
                 this.Add(item);
 
-                if (item.PetID != 0)
+                if (item.PetID != null)
                 {
                     this.Parent.Pets.Add(new Pet(item));
                 }
