@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Timers;
 using Timer = System.Timers.Timer;
 
@@ -27,10 +28,20 @@ namespace Destiny.Threading
         }
 
         private Timer t;
+        private DateTime startTime;
+
+        public TimeSpan RemainingTime
+        {
+            get
+            {
+                return startTime - DateTime.Now;
+            }
+        }
 
         public Delay(int delay, ThreadStart action)
         {
             t = new Timer(delay);
+            startTime = DateTime.Now.AddMilliseconds(delay);
 
             t.Elapsed += new ElapsedEventHandler(delegate (object sender, ElapsedEventArgs e)
             {

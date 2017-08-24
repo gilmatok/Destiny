@@ -9,6 +9,7 @@ using Destiny.Data;
 using Destiny.Maple.Data;
 using Destiny.Maple.Interaction;
 using Destiny.Maple.Social;
+using Destiny.Maple.Instances;
 
 namespace Destiny.Maple.Characters
 {
@@ -43,6 +44,7 @@ namespace Destiny.Maple.Characters
         public Guild Guild { get; set; }
         public Trade Trade { get; set; }
         public PlayerShop PlayerShop { get; set; }
+        public Instance Instance { get; set; }
 
         private DateTime LastHealthHealOverTime = new DateTime();
         private DateTime LastManaHealOverTime = new DateTime();
@@ -1101,6 +1103,11 @@ namespace Destiny.Maple.Characters
                             return;
                         }
 
+                        if (this.Instance != null)
+                        {
+                            this.Instance.CharacterDeath(this);
+                        }
+
                         this.Health = this.MaxHealth;
 
                         this.ChangeMap(this.Map.ReturnMapID);
@@ -1136,6 +1143,21 @@ namespace Destiny.Maple.Characters
         public void ChangeMap(int mapID, byte portalID = byte.MaxValue) // NOTE: If a portal isn't specified, a random spawn point will be chosen.
         {
             Map map = this.Client.Channel.Maps[mapID];
+
+            if (this.Instance != null)
+            {
+                bool isPartyLeader = false;
+
+                if (this.Party != null)
+                {
+                    if (this.Party.LeaderID == this.ID)
+                    {
+                        isPartyLeader = true;
+                    }
+                }
+
+                this.Instance.CharacterMapChange(this, this.Map, map, isPartyLeader);
+            }
 
             if (portalID == byte.MaxValue)
             {

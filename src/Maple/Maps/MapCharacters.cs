@@ -150,6 +150,23 @@ namespace Destiny.Maple.Maps
                     }
                 }
             }
+
+            if (this.Map.Instance != null)
+            {
+                int remainingSeconds = this.Map.Instance.RemainingSeconds;
+
+                if (remainingSeconds > 0)
+                {
+                    using (OutPacket oPacket = new OutPacket(ServerOperationCode.Clock))
+                    {
+                        oPacket
+                            .WriteByte(0x02)
+                            .WriteInt(remainingSeconds);
+
+                        this.Map.Broadcast(oPacket);
+                    }
+                }
+            }
         }
 
         protected override void RemoveItem(int index)

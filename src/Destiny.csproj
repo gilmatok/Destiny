@@ -82,6 +82,8 @@
     <Compile Include="Maple\Data\CachedSkills.cs" />
     <Compile Include="Maple\Data\CreationData.cs" />
     <Compile Include="Maple\Data\DataProvider.cs" />
+    <Compile Include="Maple\Instances\Implementation\TestInstance.cs" />
+    <Compile Include="Maple\Instances\Instance.cs" />
     <Compile Include="Maple\Interaction\PlayerShop.cs" />
     <Compile Include="Maple\Interaction\PlayerShopItem.cs" />
     <Compile Include="Maple\Interaction\Trade.cs" />

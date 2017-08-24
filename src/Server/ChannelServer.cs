@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using Destiny.Core.IO;
 using System;
 using System.Collections;
+using Destiny.Maple.Instances;
 
 namespace Destiny.Server
 {
@@ -87,6 +88,11 @@ namespace Destiny.Server
             this.Migrations = new MigrationRegistery();
             this.Characters = new ChannelCharacters();
             this.Maps = new MapFactory(this);
+        }
+
+        public override void Start()
+        {
+            base.Start();
         }
 
         public void Broadcast(OutPacket oPacket)

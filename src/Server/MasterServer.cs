@@ -36,9 +36,7 @@ namespace Destiny.Server
                 world.Start();
             }
 
-            Database.Execute("UPDATE characters SET PartyID = {0}", new object[] { null });
-
-            Log.Inform("Reset all parties.");
+            Database.Execute("UPDATE characters SET PartyID = {0}", new object[] { null }); // TODO: Move else-where.
 
             MasterServer.IsAlive = true;
 

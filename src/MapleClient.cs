@@ -87,6 +87,18 @@ namespace Destiny
                     this.Character.PlayerShop.Close();
                 }
 
+                if (this.Character.Instance != null)
+                {
+                    bool isPartyLeader = false;
+
+                    if (this.Character.Party.LeaderID == this.Character.ID)
+                    {
+                        isPartyLeader = true;
+                    }
+
+                    this.Character.Instance.CharacterDisconnect(this.Character, isPartyLeader);
+                }
+
                 this.Channel.Characters.Unregister(this.Character);
             }
 
