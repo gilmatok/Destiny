@@ -70,6 +70,7 @@
     <Compile Include="Maple\Characters\CharacterTrocks.cs" />
     <Compile Include="Maple\Commands\Commands.cs" />
     <Compile Include="Maple\Commands\Implementation\ClearDropsCommand.cs" />
+    <Compile Include="Maple\Commands\Implementation\HorntailCommand.cs" />
     <Compile Include="Maple\Commands\Implementation\KillMobsCommand.cs" />
     <Compile Include="Maple\Commands\Implementation\ReleaseCommand.cs" />
     <Compile Include="Maple\Commands\Implementation\SpawnCommand.cs" />
@@ -82,8 +83,9 @@
     <Compile Include="Maple\Data\CachedSkills.cs" />
     <Compile Include="Maple\Data\CreationData.cs" />
     <Compile Include="Maple\Data\DataProvider.cs" />
-    <Compile Include="Maple\Instances\Implementation\TestInstance.cs" />
+    <Compile Include="Maple\Instances\Implementation\Test.cs" />
     <Compile Include="Maple\Instances\Instance.cs" />
+    <Compile Include="Maple\Instances\InstanceFactory.cs" />
     <Compile Include="Maple\Interaction\PlayerShop.cs" />
     <Compile Include="Maple\Interaction\PlayerShopItem.cs" />
     <Compile Include="Maple\Interaction\Trade.cs" />

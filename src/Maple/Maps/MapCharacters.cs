@@ -153,15 +153,13 @@ namespace Destiny.Maple.Maps
 
             if (this.Map.Instance != null)
             {
-                int remainingSeconds = this.Map.Instance.RemainingSeconds;
-
-                if (remainingSeconds > 0)
+                if (this.Map.Instance.ShowTimer)
                 {
                     using (OutPacket oPacket = new OutPacket(ServerOperationCode.Clock))
                     {
                         oPacket
                             .WriteByte(0x02)
-                            .WriteInt(remainingSeconds);
+                            .WriteInt(this.Map.Instance.RemainingSeconds);
 
                         this.Map.Broadcast(oPacket);
                     }

@@ -13,23 +13,22 @@ namespace Destiny.Maple.Instances
     {
         public ChannelServer Channel { get; private set; }
 
+        public abstract string Name { get; }
+        public abstract bool ShowTimer { get; }
         public List<Map> Maps { get; private set; }
         public List<Party> Parties { get; private set; }
         public Dictionary<int, Character> Characters { get; private set; }
         public Dictionary<string, Delay> Timers { get; private set; }
 
-        public abstract string Name { get; }
-        public abstract int Time { get; }
-
         public int RemainingSeconds
         {
             get
             {
-                return (int)this.Timers["Main"].DueTime.TotalSeconds;
+                return this.Timers.ContainsKey("Main") ? (int)this.Timers["Main"].DueTime.TotalSeconds : 0;
             }
         }
 
-        public Instance(ChannelServer channel)
+        public Instance(ChannelServer channel, int time)
         {
             this.Channel = channel;
 
@@ -38,7 +37,7 @@ namespace Destiny.Maple.Instances
             this.Characters = new Dictionary<int, Character>();
             this.Timers = new Dictionary<string, Delay>();
 
-            this.AddTimer("Main", this.Time, -1);
+            this.AddTimer("Main", time);
         }
 
         public void AddTimer(string label, int timeout, int repeat = Timeout.Infinite)
@@ -113,7 +112,6 @@ namespace Destiny.Maple.Instances
             }
         }
 
-        public virtual void Start() { }
         public virtual void TimerEnd(string label) { }
         public virtual void CharacterDeath(Character character) { }
         public virtual void CharacterDisconnect(Character character, bool isPartyLeader) { }

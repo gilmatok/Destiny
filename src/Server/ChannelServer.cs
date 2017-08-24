@@ -79,6 +79,7 @@ namespace Destiny.Server
         public MigrationRegistery Migrations { get; private set; }
         public ChannelCharacters Characters { get; private set; }
         public MapFactory Maps { get; private set; }
+        public InstanceFactory Instances { get; private set; }
 
         public ChannelServer(byte id, WorldServer world, short port)
             : base(string.Format("{0}-{1}", world.Name, id), port)
@@ -88,6 +89,7 @@ namespace Destiny.Server
             this.Migrations = new MigrationRegistery();
             this.Characters = new ChannelCharacters();
             this.Maps = new MapFactory(this);
+            this.Instances = new InstanceFactory(this);
         }
 
         public override void Start()
