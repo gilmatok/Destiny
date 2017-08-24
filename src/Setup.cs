@@ -264,6 +264,13 @@ namespace Destiny
                               `Map` int(11) NOT NULL DEFAULT '0'
                             ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+                            DROP TABLE IF EXISTS `variables`;
+                            CREATE TABLE `variables` (
+                              `CharacterID` int(11) NOT NULL,
+                              `Key` varchar(255) NOT NULL,
+                              `Value` varchar(255) NOT NULL
+                            ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 
                             ALTER TABLE `accounts`
                               ADD PRIMARY KEY (`ID`),
@@ -326,6 +333,9 @@ namespace Destiny
                               ADD PRIMARY KEY (`ID`),
                               ADD KEY `character_id` (`CharacterID`) USING BTREE;
 
+                            ALTER TABLE `variables`
+                              ADD PRIMARY KEY (`CharacterID`,`Key`);
+
 
                             ALTER TABLE `accounts`
                               MODIFY `ID` int(10) NOT NULL AUTO_INCREMENT;
@@ -380,6 +390,9 @@ namespace Destiny
 
                             ALTER TABLE `trocks`
                               ADD CONSTRAINT `trocks_ibfk_1` FOREIGN KEY (`CharacterID`) REFERENCES `characters` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+                            ALTER TABLE `variables`
+                              ADD CONSTRAINT `variables_ibfk_1` FOREIGN KEY (`CharacterID`) REFERENCES `characters` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
                             ", databaseSchema);
 
                         Log.Inform("Database '{0}' created.", databaseSchema);
