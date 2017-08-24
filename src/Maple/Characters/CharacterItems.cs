@@ -58,14 +58,6 @@ namespace Destiny.Maple.Characters
             }
         }
 
-        public void Delete()
-        {
-            foreach (Item item in this)
-            {
-                item.Delete();
-            }
-        }
-
         public void Add(Item item, bool fromDrop = false, bool autoMerge = true, bool forceGetSlot = false)
         {
             if (this.Available(item.MapleID) % item.MaxPerStack != 0 && autoMerge)

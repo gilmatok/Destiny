@@ -37,6 +37,7 @@ namespace Destiny.Maple.Characters
         public CharacterTrocks Trocks { get; private set; }
         public CharacterMemos Memos { get; private set; }
         public CharacterStorage Storage { get; private set; }
+        public CharacterVariables Variables { get; private set; }
         public ControlledMobs ControlledMobs { get; private set; }
         public ControlledNpcs ControlledNpcs { get; private set; }
         public Messenger Messenger { get; set; }
@@ -248,7 +249,7 @@ namespace Destiny.Maple.Characters
 
                             this.Update(StatisticType.Level);
 
-                            this.ShowForeignEffect(ForeignEffect.Level);
+                            this.ShowRemoteUserEffect(UserEffect.LevelUp);
                         }
 
                         this.Health = this.MaxHealth;
@@ -273,7 +274,7 @@ namespace Destiny.Maple.Characters
                 {
                     this.Update(StatisticType.Job);
 
-                    this.ShowForeignEffect(ForeignEffect.Job);
+                    this.ShowRemoteUserEffect(UserEffect.JobChanged);
                 }
             }
         }
@@ -747,6 +748,7 @@ namespace Destiny.Maple.Characters
             this.Trocks = new CharacterTrocks(this);
             this.Memos = new CharacterMemos(this);
             this.Storage = new CharacterStorage(this);
+            this.Variables = new CharacterVariables(this);
 
             this.Position = new Point(0, 0);
             this.ControlledMobs = new ControlledMobs(this);
@@ -831,6 +833,7 @@ namespace Destiny.Maple.Characters
                 this.Keymap.Load();
                 this.Trocks.Load();
                 this.Memos.Load();
+                this.Variables.Load();
             }
         }
 
@@ -892,13 +895,9 @@ namespace Destiny.Maple.Characters
             this.Quests.Save();
             this.Keymap.Save();
             this.Trocks.Save();
+            this.Variables.Save();
 
             Log.Inform("Saved character '{0}' to database.", this.Name);
-        }
-
-        public void Delete()
-        {
-
         }
 
         public void Initialize()
@@ -1635,7 +1634,17 @@ namespace Destiny.Maple.Characters
             }
         }
 
-        public void ShowForeignEffect(ForeignEffect effect)
+        public void ShowLocalUserEffect(UserEffect effect)
+        {
+            using (OutPacket oPacket = new OutPacket(ServerOperationCode.ShowItemGainInChat))
+            {
+                oPacket.WriteByte((byte)effect);
+
+                this.Client.Send(oPacket);
+            }
+        }
+
+        public void ShowRemoteUserEffect(UserEffect effect)
         {
             using (OutPacket oPacket = new OutPacket(ServerOperationCode.ShowForeignBuff))
             {
@@ -1644,16 +1653,6 @@ namespace Destiny.Maple.Characters
                     .WriteByte((byte)effect);
 
                 this.Map.Broadcast(oPacket);
-            }
-        }
-
-        public void ShowSpecialEffect(SpecialEffect effect)
-        {
-            using (OutPacket oPacket = new OutPacket(ServerOperationCode.ShowItemGainInChat))
-            {
-                oPacket.WriteByte((byte)effect);
-
-                this.Client.Send(oPacket);
             }
         }
 
@@ -2461,12 +2460,12 @@ namespace Destiny.Maple.Characters
                     .WriteShort() // NOTE: Rings (3).
                     .WriteBytes(this.Trocks.RegularToByteArray())
                     .WriteBytes(this.Trocks.VIPToByteArray())
-                    .WriteInt() // NOTE: Monster book cover ID.
-                    .WriteByte() // NOTE: Unknown.
-                    .WriteShort() // NOTE: Monster book cards count.
-                    .WriteShort() // NOTE: New year cards.
-                    .WriteShort() // NOTE: Area information.
-                    .WriteShort(); // NOTE: Unknown.
+                    .WriteInt() // NOTE: Monster Book cover ID.
+                    .WriteShort() // NOTE: Monster Book cards.
+                    .WriteShort() // NOTE: New Year Cards.
+                    .WriteShort() // NOTE: QuestRecordEX.
+                    .WriteShort() // NOTE: AdminShop.
+                    .WriteByte(); // NOTE: Unknown.
 
                 return oPacket.ToArray();
             }

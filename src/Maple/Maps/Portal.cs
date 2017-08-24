@@ -63,7 +63,7 @@ namespace Destiny.Maple.Maps
 
         public void PlaySoundEffect(Character character)
         {
-            character.ShowSpecialEffect(SpecialEffect.PortalSound);
+            character.ShowLocalUserEffect(UserEffect.PlayPortalSE);
         }
     }
 }

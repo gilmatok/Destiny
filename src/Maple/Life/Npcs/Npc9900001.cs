@@ -13,9 +13,9 @@ namespace Destiny.Maple.Life.Npcs
         {
             if (talker.IsMaster)
             {
-                int choice = await this.ShowChoiceDialog(talker, "What would you like to do?", "Test instances", "Adavnce to Game Master");
+                bool result = await this.ShowYesNoDialog(talker, "Would you like to test #binstances#k, #h #?!");
 
-                if (choice == 0)
+                if (result)
                 {
                     string name = "Test";
 
@@ -37,7 +37,7 @@ namespace Destiny.Maple.Life.Npcs
                         }
                     }
                 }
-                else if (choice == 1)
+                else
                 {
                     bool advanced = talker.Job == Job.SuperGM;
 

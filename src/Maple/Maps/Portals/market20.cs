@@ -3,9 +3,9 @@ using Destiny.Maple.Characters;
 
 namespace Destiny.Maple.Maps.Portals
 {
-    public sealed class market01 : Portal
+    public sealed class market20 : Portal
     {
-        public market01(Datum datum) : base(datum) { }
+        public market20(Datum datum) : base(datum) { }
 
         public override void Enter(Character character)
         {
