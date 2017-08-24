@@ -196,6 +196,8 @@ namespace Destiny.Maple.Life
 
                 if (newController != null)
                 {
+                    this.IsProvoked = false;
+
                     newController.ControlledMobs.Add(this);
                 }
             }
@@ -226,7 +228,7 @@ namespace Destiny.Maple.Life
             iPacket.Skip(8);
             iPacket.ReadByte();
             iPacket.ReadInt();
-            
+
             Movements movements = Movements.Decode(iPacket);
 
             this.Position = movements.Position;
@@ -326,7 +328,7 @@ namespace Destiny.Maple.Life
 
             if (requestControl)
             {
-                oPacket.WriteByte(1); // TODO: 2 if mob is provoked (aggro).
+                oPacket.WriteByte((byte)(this.IsProvoked ? 2 : 1));
             }
 
             oPacket

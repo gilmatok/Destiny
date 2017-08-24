@@ -199,9 +199,9 @@
     <Compile Include="Server\LoginServer.cs" />
     <Compile Include="Server\MasterServer.cs" />
     <Compile Include="Server\ServerBase.cs" />
-    <Compile Include="Threading\Delay.cs" />
     <Compile Include="Data\Database.cs" />
     <Compile Include="IO\Log.cs" />
+    <Compile Include="Threading\Delay.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

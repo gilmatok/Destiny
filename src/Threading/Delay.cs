@@ -1,74 +1,62 @@
 ﻿using System;
 using System.Threading;
-using System.Timers;
-using Timer = System.Timers.Timer;
 
 namespace Destiny.Threading
 {
-    public sealed class Delay
+    public sealed class Delay : IDisposable
     {
-        public static void Execute(double delay, ThreadStart action)
-        {
-            Delay.Execute((int)delay, action);
-        }
+        private Action mAction;
+        private TimeSpan mPeriod;
+        private DateTime mNext;
+        private readonly Timer mTimer;
 
-        public static void Execute(int delay, ThreadStart action)
-        {
-            Timer t = new Timer(delay);
-
-            t.Elapsed += new ElapsedEventHandler(delegate (object sender, ElapsedEventArgs e)
-            {
-                t.Stop();
-                action();
-                t.Dispose();
-                t = null;
-            });
-
-            t.Start();
-        }
-
-        private Timer t;
-        private DateTime startTime;
-
-        public TimeSpan RemainingTime
+        public TimeSpan Period
         {
             get
             {
-                return startTime - DateTime.Now;
+                return mPeriod;
             }
         }
 
-        public Delay(int delay, ThreadStart action)
+        public DateTime Next
         {
-            t = new Timer(delay);
-            startTime = DateTime.Now.AddMilliseconds(delay);
-
-            t.Elapsed += new ElapsedEventHandler(delegate (object sender, ElapsedEventArgs e)
+            get
             {
-                if (t != null)
-                {
-                    t.Stop();
-                    action();
-                }
-
-                t = null;
-            });
-        }
-
-        public void Execute()
-        {
-            t.Start();
-        }
-
-        public void Cancel()
-        {
-            if (t != null)
-            {
-                t.Stop();
-                t.Dispose();
+                return mNext;
             }
+        }
 
-            t = null;
+        public TimeSpan DueTime
+        {
+            get
+            {
+                return mNext - DateTime.Now;
+            }
+        }
+
+        public static Delay Execute(Action action, int timeout)
+        {
+            return new Delay(action, timeout, Timeout.Infinite);
+        }
+
+        public Delay(Action action, int timeout, int repeat = Timeout.Infinite)
+        {
+            mAction = action;
+            mPeriod = TimeSpan.FromMilliseconds(repeat);
+            mNext = DateTime.Now.AddMilliseconds(timeout);
+            mTimer = new Timer(this.Callback, null, timeout, repeat);
+        }
+
+        private void Callback(object state)
+        {
+            mNext = DateTime.Now.Add(mPeriod);
+
+            mAction();
+        }
+
+        public void Dispose()
+        {
+            mTimer.Dispose();
         }
     }
 }

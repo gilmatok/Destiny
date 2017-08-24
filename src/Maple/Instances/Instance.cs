@@ -5,6 +5,7 @@ using Destiny.Maple.Social;
 using Destiny.Server;
 using Destiny.Threading;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace Destiny.Maple.Instances
 {
@@ -18,12 +19,13 @@ namespace Destiny.Maple.Instances
         public Dictionary<string, Delay> Timers { get; private set; }
 
         public abstract string Name { get; }
+        public abstract int Time { get; }
 
         public int RemainingSeconds
         {
             get
             {
-                return (int)this.Timers["Main"].RemainingTime.TotalSeconds;
+                return (int)this.Timers["Main"].DueTime.TotalSeconds;
             }
         }
 
@@ -36,19 +38,15 @@ namespace Destiny.Maple.Instances
             this.Characters = new Dictionary<int, Character>();
             this.Timers = new Dictionary<string, Delay>();
 
-            // NOTE: This is just for testing.
+            this.AddTimer("Main", this.Time, -1);
+        }
+
+        public void AddTimer(string label, int timeout, int repeat = Timeout.Infinite)
+        {
+            this.Timers.Add(label, new Delay(() =>
             {
-                var delay = new Delay(15 * 1000, () =>
-                {
-                    this.TimerEnd("Main");
-
-                    this.Timers.Remove("Main");
-                });
-
-                delay.Execute();
-
-                this.Timers.Add("Main", delay);
-            }
+                this.TimerEnd(label);
+            }, timeout, repeat));
         }
 
         public void AddMap(int mapID)

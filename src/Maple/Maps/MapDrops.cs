@@ -16,18 +16,16 @@ namespace Destiny.Maple.Maps
 
             if (item.Expiry != null)
             {
-                item.Expiry.Cancel();
+                item.Expiry.Dispose();
             }
 
-            item.Expiry = new Delay(Drop.ExpiryTime, () =>
+            item.Expiry = new Delay(() =>
             {
                 if (item.Map == this.Map)
                 {
                     this.Remove(item);
                 }
-            });
-
-            item.Expiry.Execute();
+            }, Drop.ExpiryTime);
 
             lock (this.Map.Characters)
             {
@@ -47,7 +45,7 @@ namespace Destiny.Maple.Maps
 
             if (item.Expiry != null)
             {
-                item.Expiry.Cancel();
+                item.Expiry.Dispose();
             }
 
             using (OutPacket oPacket = item.GetDestroyPacket())

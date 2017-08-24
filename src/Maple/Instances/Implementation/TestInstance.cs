@@ -1,4 +1,5 @@
-﻿using Destiny.Maple.Characters;
+﻿using System;
+using Destiny.Maple.Characters;
 using Destiny.Server;
 
 namespace Destiny.Maple.Instances.Implementation
@@ -13,13 +14,19 @@ namespace Destiny.Maple.Instances.Implementation
             }
         }
 
+        public override int Time
+        {
+            get
+            {
+                return 15 * 1000;
+            }
+        }
+
         public TestInstance(ChannelServer channel) : base(channel) { }
 
         public override void Start()
         {
             this.AddMap(0);
-
-            Log.Inform("Test Instance is initialized!");
         }
 
         public override void TimerEnd(string label)

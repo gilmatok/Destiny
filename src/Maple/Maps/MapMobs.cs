@@ -140,7 +140,7 @@ namespace Destiny.Maple.Maps
 
             if (item.SpawnPoint != null)
             {
-                Delay.Execute(3 * 1000, () => item.SpawnPoint.Spawn());
+                Delay.Execute(() => item.SpawnPoint.Spawn(), 3 * 1000); // TODO: Actual respawn time.
             }
 
             foreach (int summonID in item.DeathSummons)

@@ -44,7 +44,7 @@ namespace Destiny.Maple.Maps
 
                 if (item.SpawnPoint != null)
                 {
-                    Delay.Execute((item.SpawnPoint.RespawnTime <= 0 ? 30 : item.SpawnPoint.RespawnTime) * 100, () => item.SpawnPoint.Spawn());
+                    Delay.Execute(() => item.SpawnPoint.Spawn(), (item.SpawnPoint.RespawnTime <= 0 ? 30 : item.SpawnPoint.RespawnTime) * 100);
                 }
             }
         }
