@@ -1028,18 +1028,7 @@ namespace Destiny.Maple
 
                 if (this.PetID != null)
                 {
-                    Pet pet = this.Character.Pets[(int)this.PetID];
 
-                    oPacket
-                        .WritePaddedString(pet.Name, 13)
-                        .WriteByte(pet.Level)
-                        .WriteShort(pet.Closeness)
-                        .WriteByte(pet.Fullness)
-                        .WriteDateTime(new DateTime(2017, 8, 13, 00, 00, 00))
-                        .WriteInt()
-                        .WriteByte(0x50)
-                        .WriteByte(0x46)
-                        .WriteInt();
                 }
                 else if (this.Type == ItemType.Equipment)
                 {

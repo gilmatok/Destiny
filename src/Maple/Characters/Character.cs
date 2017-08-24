@@ -34,7 +34,6 @@ namespace Destiny.Maple.Characters
         public CharacterQuests Quests { get; private set; }
         public CharacterKeymap Keymap { get; private set; }
         public CharacterTrocks Trocks { get; private set; }
-        public CharacterPets Pets { get; private set; }
         public CharacterMemos Memos { get; private set; }
         public CharacterStorage Storage { get; private set; }
         public ControlledMobs ControlledMobs { get; private set; }
@@ -744,7 +743,6 @@ namespace Destiny.Maple.Characters
             this.Quests = new CharacterQuests(this);
             this.Keymap = new CharacterKeymap(this);
             this.Trocks = new CharacterTrocks(this);
-            this.Pets = new CharacterPets(this);
             this.Memos = new CharacterMemos(this);
             this.Storage = new CharacterStorage(this);
 
@@ -892,7 +890,6 @@ namespace Destiny.Maple.Characters
             this.Quests.Save();
             this.Keymap.Save();
             this.Trocks.Save();
-            this.Pets.Save();
 
             Log.Inform("Saved character '{0}' to database.", this.Name);
         }
@@ -1842,7 +1839,7 @@ namespace Destiny.Maple.Characters
                     .WriteShort((short)target.Job)
                     .WriteShort(target.Fame)
                     .WriteBool() // NOTE: Marriage.
-                    .WriteMapleString("-") // NOTE: Guild name.
+                    .WriteMapleString(this.Guild != null ? this.Guild.Name : "-")
                     .WriteMapleString("-") // NOTE: Alliance name.
                     .WriteByte() // NOTE: Unknown.
                     .WriteByte() // NOTE: Pets.

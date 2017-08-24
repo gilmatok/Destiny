@@ -45,7 +45,7 @@ namespace Destiny.Maple.Characters
 
                 if (item.PetID != null)
                 {
-                    this.Parent.Pets.Add(new Pet(item));
+                    //this.Parent.Pets.Add(new Pet(item));
                 }
             }
         }

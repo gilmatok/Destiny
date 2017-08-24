@@ -29,7 +29,7 @@ namespace Destiny.Maple.Life.Npcs
             }
             else
             {
-     choiceSelection:
+                choiceSelection:
                 int choice = await this.ShowChoiceDialog(talker, "Welcome to the #m" + talker.Map.MapleID + "# Gachapon. How may I help you?", "What is Gachapon?", "Where can you buy Gachapon tickets?");
 
                 if (choice == 0)
