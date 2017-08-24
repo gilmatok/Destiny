@@ -41,7 +41,16 @@ namespace Destiny.Maple.Data
             {
                 foreach (Datum datum in new Datums("map_portals").Populate())
                 {
-                    this[(int)datum["mapid"]].Portals.Add(new Portal(datum));
+                    Type implementedType = Assembly.GetExecutingAssembly().GetType("Destiny.Maple.Maps.Portals." + (string)datum["script"]);
+
+                    if (implementedType != null)
+                    {
+                        this[(int)datum["mapid"]].Portals.Add((Portal)Activator.CreateInstance(implementedType, datum));
+                    }
+                    else
+                    {
+                        this[(int)datum["mapid"]].Portals.Add(new Portal(datum));
+                    }
                 }
             }
 
@@ -75,7 +84,7 @@ namespace Destiny.Maple.Data
                             break;
                     }
                 }
-                
+
                 foreach (Datum datum in new Datums("npc_data").Populate("storage_cost > 0"))
                 {
                     foreach (Map map in this)

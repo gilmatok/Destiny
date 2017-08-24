@@ -637,9 +637,9 @@ namespace Destiny.Maple
             this.Health = (short)datum["hp"];
             this.Mana = (short)datum["mp"];
             this.Strength = (short)datum["strength"];
-            this.Strength = (short)datum["dexterity"];
-            this.Strength = (short)datum["intelligence"];
-            this.Strength = (short)datum["luck"];
+            this.Dexterity = (short)datum["dexterity"];
+            this.Intelligence = (short)datum["intelligence"];
+            this.Luck = (short)datum["luck"];
             this.WeaponAttack = (short)datum["weapon_attack"];
             this.WeaponDefense = (short)datum["weapon_defense"];
             this.MagicAttack = (short)datum["magic_attack"];

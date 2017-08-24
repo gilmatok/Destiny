@@ -825,6 +825,30 @@ namespace Destiny
         Unknown3 = 19,
         Aran = 20,
     }
+
+    public enum MapTransferResult : byte
+    {
+        PortalClosed = 1,
+        CannotGo = 2,
+        ForceOfGround = 3,
+        CannotTeleport = 4,
+        ForceOfGround2 = 5,
+        OnlyByParty = 6,
+        CashShopNotAvailable = 7
+    }
+
+    public enum SpecialEffect : byte
+    {
+        SafetyCharm = 6,
+        PortalSound = 7,
+        JobChange = 8,
+        QuestCompletion = 9,
+        Recovery = 10,
+        MonsterBookPickup = 14,
+        ItemLevelUp = 15,
+        MakerSkill = 16,
+        ExperienceCard = 19
+    }
     #endregion
 
     #region World

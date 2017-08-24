@@ -247,14 +247,7 @@ namespace Destiny.Maple.Characters
 
                             this.Update(StatisticType.Level);
 
-                            using (OutPacket oPacket = new OutPacket(ServerOperationCode.ShowForeignBuff))
-                            {
-                                oPacket
-                                    .WriteInt(this.ID)
-                                    .WriteByte((byte)ForeignEffect.Level);
-
-                                this.Map.Broadcast(oPacket, this);
-                            }
+                            this.ShowForeignEffect(ForeignEffect.Level);
                         }
 
                         this.Health = this.MaxHealth;
@@ -279,14 +272,7 @@ namespace Destiny.Maple.Characters
                 {
                     this.Update(StatisticType.Job);
 
-                    using (OutPacket oPacket = new OutPacket(ServerOperationCode.ShowForeignBuff))
-                    {
-                        oPacket
-                            .WriteInt(this.ID)
-                            .WriteByte((byte)ForeignEffect.Job);
-
-                        this.Map.Broadcast(oPacket, this);
-                    }
+                    this.ShowForeignEffect(ForeignEffect.Job);
                 }
             }
         }
@@ -1143,6 +1129,13 @@ namespace Destiny.Maple.Characters
             }
         }
 
+        public void ChangeMap(int mapID, string portalLabel)
+        {
+            Portal portal = this.Client.Channel.Maps[mapID].Portals[portalLabel];
+
+            this.ChangeMap(mapID, portal.ID);
+        }
+
         public void ChangeMap(int mapID, byte portalID = byte.MaxValue) // NOTE: If a portal isn't specified, a random spawn point will be chosen.
         {
             Map map = this.Client.Channel.Maps[mapID];
@@ -1620,6 +1613,28 @@ namespace Destiny.Maple.Characters
                     .WriteInt(expressionID);
 
                 this.Map.Broadcast(oPacket, this);
+            }
+        }
+
+        public void ShowForeignEffect(ForeignEffect effect)
+        {
+            using (OutPacket oPacket = new OutPacket(ServerOperationCode.ShowForeignBuff))
+            {
+                oPacket
+                    .WriteInt(this.ID)
+                    .WriteByte((byte)effect);
+
+                this.Map.Broadcast(oPacket);
+            }
+        }
+
+        public void ShowSpecialEffect(SpecialEffect effect)
+        {
+            using (OutPacket oPacket = new OutPacket(ServerOperationCode.ShowItemGainInChat))
+            {
+                oPacket.WriteByte((byte)effect);
+
+                this.Client.Send(oPacket);
             }
         }
 
@@ -2257,6 +2272,7 @@ namespace Destiny.Maple.Characters
             }
 
             string label = iPacket.ReadMapleString();
+
             Portal portal;
 
             try
@@ -2268,7 +2284,7 @@ namespace Destiny.Maple.Characters
                 return;
             }
 
-            this.Release();
+            portal.Enter(this);
         }
 
         public byte[] ToByteArray()

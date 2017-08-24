@@ -1,8 +1,11 @@
-﻿using Destiny.Data;
+﻿using Destiny.Core.IO;
+using Destiny.Core.Network;
+using Destiny.Data;
+using Destiny.Maple.Characters;
 
 namespace Destiny.Maple.Maps
 {
-    public sealed class Portal : MapObject
+    public class Portal : MapObject
     {
         public byte ID { get; private set; }
         public string Label { get; private set; }
@@ -42,6 +45,25 @@ namespace Destiny.Maple.Maps
             this.DestinationMapID = (int)datum["destination"];
             this.DestinationLabel = (string)datum["destination_label"];
             this.Script = (string)datum["script"];
+        }
+
+        public virtual void Enter(Character character)
+        {
+            Log.Warn("'{0}' attempted to enter an unimplemented portal '{1}'.", character.Name, this.Script);
+
+            using (OutPacket oPacket = new OutPacket(ServerOperationCode.TransferFieldReqInogred))
+            {
+                oPacket.WriteByte((byte)MapTransferResult.PortalClosed);
+
+                character.Client.Send(oPacket);
+            }
+
+            character.Release();
+        }
+
+        public void PlaySoundEffect(Character character)
+        {
+            character.ShowSpecialEffect(SpecialEffect.PortalSound);
         }
     }
 }

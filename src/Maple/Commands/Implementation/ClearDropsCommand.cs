@@ -32,7 +32,7 @@ namespace Destiny.Maple.Commands.Implementation
 
         public override void Execute(Character caller, string[] args)
         {
-            if (args.Length != 1)
+            if (args.Length > 1)
             {
                 this.ShowSyntax(caller);
             }

@@ -3,8 +3,6 @@ using Destiny.Core.Network;
 using Destiny.Maple.Characters;
 using Destiny.Maple.Data;
 using Destiny.Maple.Life;
-using Destiny.Network;
-using Destiny.Server;
 using Destiny.Threading;
 using System;
 using System.Collections.Generic;

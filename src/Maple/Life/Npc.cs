@@ -62,6 +62,8 @@ namespace Destiny.Maple.Life
             }
             else
             {
+                Log.Warn("'{0}' attempted to converse with unimplemented NPC {1}.", talker.Name, this.MapleID);
+
                 await this.ShowOkDialog(talker, ". . .");
             }
         }
