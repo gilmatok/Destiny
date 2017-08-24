@@ -660,6 +660,13 @@ namespace Destiny
         Leave
     }
 
+    public enum AdminShopAction : byte
+    {
+        Buy = 1,
+        Exit = 2,
+        Register = 3
+    }
+
     public enum StorageAction : byte
     {
         Withdraw = 4,

@@ -2461,11 +2461,11 @@ namespace Destiny.Maple.Characters
                     .WriteBytes(this.Trocks.RegularToByteArray())
                     .WriteBytes(this.Trocks.VIPToByteArray())
                     .WriteInt() // NOTE: Monster Book cover ID.
-                    .WriteShort() // NOTE: Monster Book cards.
+                    .WriteByte() // NOTE: Monster Book cards.
                     .WriteShort() // NOTE: New Year Cards.
                     .WriteShort() // NOTE: QuestRecordEX.
                     .WriteShort() // NOTE: AdminShop.
-                    .WriteByte(); // NOTE: Unknown.
+                    .WriteShort(); // NOTE: Unknown.
 
                 return oPacket.ToArray();
             }

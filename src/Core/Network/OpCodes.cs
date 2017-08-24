@@ -70,7 +70,7 @@
         //65
         //66
         //67
-        //68
+        AdminShopAction = 68,
         InventorySort = 0x45,
         InventoryGather = 0x46,
         InventoryAction = 0x47,

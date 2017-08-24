@@ -4,6 +4,7 @@ using Destiny.Core.Security;
 using Destiny.Data;
 using Destiny.Maple;
 using Destiny.Maple.Characters;
+using Destiny.Maple.Commands.Implementation;
 using Destiny.Maple.Data;
 using Destiny.Maple.Social;
 using Destiny.Server;
@@ -17,6 +18,7 @@ namespace Destiny
 {
     public sealed class MapleClient : Session
     {
+        private static byte mCount = 0;
         private ServerBase mParentServer;
 
         public byte WorldID { get; set; }
@@ -243,6 +245,42 @@ namespace Destiny
 
                 case ClientOperationCode.Storage:
                     this.Character.Storage.Handle(iPacket);
+                    break;
+
+                case ClientOperationCode.AdminShopAction:
+                    {
+                        AdminShopAction action = (AdminShopAction)iPacket.ReadByte();
+
+                        switch (action)
+                        {
+                            case AdminShopAction.Buy:
+                                {
+                                    int commodityID = iPacket.ReadInt();
+                                    int quantity = iPacket.ReadInt();
+
+                                    var adminShopItem = ShopCommand.Items[commodityID];
+
+                                    this.Character.Items.Add(new Item(adminShopItem.Item2, (short)quantity));
+
+                                    using (OutPacket oPacket = new OutPacket(ServerOperationCode.AdminShopMessage))
+                                    {
+                                        oPacket.WriteByte();
+
+                                        this.Send(oPacket);
+                                    }
+                                }
+                                break;
+
+                            case AdminShopAction.Exit:
+                                break;
+
+                            case AdminShopAction.Register:
+                                {
+                                    int itemID = iPacket.ReadInt();
+                                }
+                                break;
+                        }
+                    }
                     break;
 
                 case ClientOperationCode.InventorySort:
