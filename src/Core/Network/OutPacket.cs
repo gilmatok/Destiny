@@ -3,7 +3,7 @@ using Destiny.Maple;
 using System;
 using System.IO;
 
-namespace Destiny.Core.IO
+namespace Destiny.Core.Network
 {
     public sealed class OutPacket : PacketBase
     {

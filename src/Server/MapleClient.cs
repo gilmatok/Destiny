@@ -1,7 +1,7 @@
 ﻿using Destiny.Core.IO;
 using Destiny.Core.Network;
 using Destiny.Core.Security;
-using Destiny.Data;
+using Destiny.Core.Data;
 using Destiny.Maple;
 using Destiny.Maple.Characters;
 using Destiny.Maple.Commands.Implementation;

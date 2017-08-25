@@ -1,12 +1,11 @@
 ﻿using Destiny.Core.IO;
-using Destiny.Data;
-using Destiny.IO;
+using Destiny.Core.Data;
 using Destiny.Maple.Characters;
 using Destiny.Maple.Social;
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Net;
+using Destiny.Core.Network;
 
 namespace Destiny.Server
 {
@@ -30,12 +29,12 @@ namespace Destiny.Server
         private Dictionary<int, Party> Parties { get; set; }
         private int mGuildIDs = 0;
         private Dictionary<int, Guild> Guilds { get; set; }
-        
+
         public WorldStatus Status
         {
             get
             {
-                return WorldStatus.Normal; //TODO: Other statuses based on population
+                return WorldStatus.Normal; // TODO: Other statuses are based on population.
             }
         }
 
@@ -43,6 +42,7 @@ namespace Destiny.Server
             : base()
         {
             this.ID = id;
+
             string configSection = "World" + this.ID.ToString();
 
             this.Name = Settings.GetString(configSection + "/Name");

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace Destiny.Core.IO
+namespace Destiny.Core.Network
 {
     public abstract class PacketBase : IDisposable
     {

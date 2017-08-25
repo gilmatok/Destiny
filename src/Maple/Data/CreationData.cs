@@ -1,4 +1,4 @@
-﻿using Destiny.Data;
+﻿using Destiny.Core.Data;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;

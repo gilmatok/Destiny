@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using Destiny.Data;
+using Destiny.Core.Data;
 using Destiny.Maple.Characters;
 
 namespace Destiny.Maple.Life.Npcs

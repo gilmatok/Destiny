@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using Destiny.Data;
+using Destiny.Core.Data;
 using Destiny.Maple.Characters;
 using Destiny.Core.IO;
 using Destiny.Core.Network;

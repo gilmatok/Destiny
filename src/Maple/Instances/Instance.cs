@@ -1,9 +1,9 @@
-﻿using Destiny.Maple.Characters;
+﻿using Destiny.Core.Threading;
+using Destiny.Maple.Characters;
 using Destiny.Maple.Life;
 using Destiny.Maple.Maps;
 using Destiny.Maple.Social;
 using Destiny.Server;
-using Destiny.Threading;
 using System.Collections.Generic;
 using System.Threading;
 

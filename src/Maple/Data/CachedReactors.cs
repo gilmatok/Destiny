@@ -1,4 +1,4 @@
-﻿using Destiny.Data;
+﻿using Destiny.Core.Data;
 using Destiny.Maple.Life;
 using System.Collections.ObjectModel;
 

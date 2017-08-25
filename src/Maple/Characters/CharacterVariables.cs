@@ -1,4 +1,4 @@
-﻿using Destiny.Data;
+﻿using Destiny.Core.Data;
 using System.Collections.ObjectModel;
 
 namespace Destiny.Maple.Characters

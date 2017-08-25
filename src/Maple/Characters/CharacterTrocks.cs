@@ -1,6 +1,6 @@
 ﻿using Destiny.Core.IO;
 using Destiny.Core.Network;
-using Destiny.Data;
+using Destiny.Core.Data;
 using Destiny.Maple.Maps;
 using System.Collections.Generic;
 

@@ -2,7 +2,7 @@
 using Destiny.Maple;
 using System;
 
-namespace Destiny.Core.IO
+namespace Destiny.Core.Network
 {
     public sealed class InPacket
     {

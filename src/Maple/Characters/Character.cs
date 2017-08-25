@@ -5,7 +5,7 @@ using Destiny.Core.Network;
 using System.Collections.Generic;
 using Destiny.Maple.Commands;
 using Destiny.Maple.Life;
-using Destiny.Data;
+using Destiny.Core.Data;
 using Destiny.Maple.Data;
 using Destiny.Maple.Interaction;
 using Destiny.Maple.Social;

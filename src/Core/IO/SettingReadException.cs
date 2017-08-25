@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Destiny.IO
+namespace Destiny.Core.IO
 {
     public class SettingReadException : Exception
     {

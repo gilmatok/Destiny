@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 
-namespace Destiny.Core.IO
+namespace Destiny.Core.Network
 {
     public static class BufferPool
     {

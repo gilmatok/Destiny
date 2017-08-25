@@ -1,5 +1,5 @@
 ﻿using Destiny.Maple.Characters;
-using Destiny.Data;
+using Destiny.Core.Data;
 
 namespace Destiny.Maple.Commands.Implementation
 {

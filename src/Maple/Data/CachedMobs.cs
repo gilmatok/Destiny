@@ -1,6 +1,6 @@
 ﻿using Destiny.Maple.Life;
 using System.Collections.ObjectModel;
-using Destiny.Data;
+using Destiny.Core.Data;
 
 namespace Destiny.Maple.Data
 {

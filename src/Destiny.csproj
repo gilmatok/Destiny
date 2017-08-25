@@ -57,12 +57,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Data\Datum.cs" />
-    <Compile Include="Data\Meta.cs" />
-    <Compile Include="Data\RowNotUniqueException.cs" />
-    <Compile Include="IO\LogLevel.cs" />
-    <Compile Include="IO\SettingReadException.cs" />
-    <Compile Include="IO\Settings.cs" />
+    <Compile Include="Core\Data\Datum.cs" />
+    <Compile Include="Core\Data\Meta.cs" />
+    <Compile Include="Core\Data\RowNotUniqueException.cs" />
+    <Compile Include="Core\IO\LogLevel.cs" />
+    <Compile Include="Core\IO\SettingReadException.cs" />
+    <Compile Include="Core\IO\Settings.cs" />
     <Compile Include="Maple\Attack.cs" />
     <Compile Include="Maple\Characters\CharacterKeymap.cs" />
     <Compile Include="Maple\Characters\CharacterMemos.cs" />
@@ -169,8 +169,8 @@
     <Compile Include="Server\WorldServer.cs" />
     <Compile Include="Setup.cs" />
     <Compile Include="Constants.cs" />
-    <Compile Include="Core\IO\BufferPool.cs" />
-    <Compile Include="Core\IO\PacketBase.cs" />
+    <Compile Include="Core\Network\BufferPool.cs" />
+    <Compile Include="Core\Network\PacketBase.cs" />
     <Compile Include="Maple\Account.cs" />
     <Compile Include="Maple\Characters\Character.cs" />
     <Compile Include="Maple\Characters\CharacterItems.cs" />
@@ -201,12 +201,12 @@
     <Compile Include="Maple\Life\Reactor.cs" />
     <Compile Include="Core\Network\Acceptor.cs" />
     <Compile Include="Core\Network\Session.cs" />
-    <Compile Include="Core\IO\InPacket.cs" />
+    <Compile Include="Core\Network\InPacket.cs" />
     <Compile Include="Maple\Rectangle.cs" />
     <Compile Include="Maple\Skill.cs" />
     <Compile Include="Server\MapleClient.cs" />
     <Compile Include="Core\Network\OpCodes.cs" />
-    <Compile Include="Core\IO\OutPacket.cs" />
+    <Compile Include="Core\Network\OutPacket.cs" />
     <Compile Include="Application.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Core\Security\AesCryptograph.cs" />
@@ -227,9 +227,9 @@
     <Compile Include="Server\LoginServer.cs" />
     <Compile Include="Server\MasterServer.cs" />
     <Compile Include="Server\ServerBase.cs" />
-    <Compile Include="Data\Database.cs" />
-    <Compile Include="IO\Log.cs" />
-    <Compile Include="Threading\Delay.cs" />
+    <Compile Include="Core\Data\Database.cs" />
+    <Compile Include="Core\IO\Log.cs" />
+    <Compile Include="Core\Threading\Delay.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

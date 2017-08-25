@@ -1,6 +1,6 @@
-﻿using Destiny.Core.IO;
-using Destiny.Data;
+﻿using Destiny.Core.Data;
 using System;
+using Destiny.Core.Network;
 
 namespace Destiny.Maple
 {
