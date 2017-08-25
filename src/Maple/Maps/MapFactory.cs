@@ -1,6 +1,9 @@
-﻿using Destiny.Maple.Life;
+﻿using Destiny.Data;
+using Destiny.Maple.Life;
 using Destiny.Server;
+using System;
 using System.Collections.ObjectModel;
+using System.Reflection;
 
 namespace Destiny.Maple.Maps
 {
@@ -20,41 +23,68 @@ namespace Destiny.Maple.Maps
             {
                 if (!base.Contains(key))
                 {
-                    Map map = new Map(this, key);
-
-                    foreach (Npc npc in map.CachedReference.Npcs)
+                    using (Database.TemporarySchema("mcdb"))
                     {
-                        map.Npcs.Add(npc);
+                        foreach (Datum datum in new Datums("map_data").Populate("mapid = {0}", key))
+                        {
+                            this.Add(new Map(this, datum));
+                        }
+
+                        foreach (Datum datum in new Datums("map_footholds").Populate("mapid = {0}", key))
+                        {
+                            this[key].Footholds.Add(new Foothold(datum));
+                        }
+
+                        foreach (Datum datum in new Datums("map_seats").Populate("mapid = {0}", key))
+                        {
+                            this[key].Seats.Add(new Seat(datum));
+                        }
+
+                        foreach (Datum datum in new Datums("map_portals").Populate("mapid = {0}", key))
+                        {
+                            Type implementedType = Assembly.GetExecutingAssembly().GetType("Destiny.Maple.Maps.Portals." + (string)datum["script"]);
+
+                            if (implementedType != null)
+                            {
+                                this[key].Portals.Add((Portal)Activator.CreateInstance(implementedType, datum));
+                            }
+                            else
+                            {
+                                this[key].Portals.Add(new Portal(datum));
+                            }
+                        }
+
+                        foreach (Datum datum in new Datums("map_life").Populate("mapid = {0}", key))
+                        {
+                            switch ((string)datum["life_type"])
+                            {
+                                case "npc":
+                                    {
+                                        Type implementedType = Assembly.GetExecutingAssembly().GetType("Destiny.Maple.Life.Npcs.Npc" + (int)datum["lifeid"]);
+
+                                        if (implementedType != null)
+                                        {
+                                            this[key].Npcs.Add((Npc)Activator.CreateInstance(implementedType, datum));
+                                        }
+                                        else
+                                        {
+                                            this[key].Npcs.Add(new Npc(datum));
+                                        }
+                                    }
+                                    break;
+
+                                case "mob":
+                                    this[key].SpawnPoints.Add(new SpawnPoint(datum, true));
+                                    break;
+
+                                case "reactor":
+                                    this[key].SpawnPoints.Add(new SpawnPoint(datum, false));
+                                    break;
+                            }
+                        }
                     }
 
-                    foreach (Reactor reactor in map.CachedReference.Reactors)
-                    {
-                        map.Reactors.Add(reactor);
-                    }
-
-                    foreach (Foothold foothold in map.CachedReference.Footholds)
-                    {
-                        map.Footholds.Add(foothold);
-                    }
-
-                    foreach (Seat seat in map.CachedReference.Seats)
-                    {
-                        map.Seats.Add(seat);
-                    }
-
-                    foreach (Portal portal in map.CachedReference.Portals)
-                    {
-                        map.Portals.Add(portal);
-                    }
-
-                    foreach (SpawnPoint spawnPoint in map.CachedReference.SpawnPoints)
-                    {
-                        map.SpawnPoints.Add(spawnPoint);
-                    }
-
-                    map.SpawnPoints.Spawn();
-
-                    this.Add(map);
+                    this[key].SpawnPoints.Spawn();
                 }
 
                 return base[key];

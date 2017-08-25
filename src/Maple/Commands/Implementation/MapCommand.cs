@@ -1,8 +1,5 @@
 ﻿using Destiny.Maple.Characters;
-using Destiny.Maple.Data;
-using Destiny.Network;
 using System;
-using System.Linq;
 
 namespace Destiny.Maple.Commands.Implementation
 {
@@ -52,11 +49,11 @@ namespace Destiny.Maple.Commands.Implementation
                     int mapID = int.TryParse(args[0], out mapID) ? mapID : -1;
                     byte portalID = 0;
 
-                    if(args.Length >= 2)
+                    if (args.Length >= 2)
                     {
                         byte.TryParse(args[1], out portalID);
                     }
-                    
+
                     if (mapID == -1)
                     {
                         mapName = string.Join(" ", args);
@@ -65,10 +62,10 @@ namespace Destiny.Maple.Commands.Implementation
                         if (val > 0)
                             mapID = (int)val;
                     }
-                    
+
                     if (mapID > -1)
                     {
-                        if(DataProvider.Maps.Contains(mapID))
+                        if (true) // TODO: Check if map exists.
                             caller.ChangeMap(mapID, portalID);
                         else
                             caller.Notify(string.Format("[Command] Invalid map ID {0}.", mapID));

@@ -1,14 +1,15 @@
 ﻿using Destiny.Maple.Characters;
+using Destiny.Server;
 
 namespace Destiny.Maple.Commands.Implementation
 {
-    public sealed class HelpCommand : Command
+    public sealed class OnlineCommand : Command
     {
         public override string Name
         {
             get
             {
-                return "help";
+                return "online";
             }
         }
 
@@ -24,7 +25,7 @@ namespace Destiny.Maple.Commands.Implementation
         {
             get
             {
-                return false;
+                return true;
             }
         }
 
@@ -36,13 +37,16 @@ namespace Destiny.Maple.Commands.Implementation
             }
             else
             {
-                caller.Notify("[Help]");
+                caller.Notify("[Online]");
 
-                foreach (Command command in CommandFactory.Commands)
+                foreach (WorldServer world in MasterServer.Worlds)
                 {
-                    if ((command.IsRestricted && caller.IsMaster) || !command.IsRestricted && !(command is HelpCommand))
+                    foreach (ChannelServer channel in world)
                     {
-                        caller.Notify(string.Format("    !{0} {1}", command.Name, command.Parameters.ClearFormatters()));
+                        foreach (Character loopCharacter in channel.Characters)
+                        {
+                            caller.Notify("   -" + loopCharacter.Name);
+                        }
                     }
                 }
             }

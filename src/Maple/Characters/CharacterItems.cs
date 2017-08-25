@@ -6,7 +6,6 @@ using Destiny.Core.IO;
 using Destiny.Data;
 using Destiny.Core.Network;
 using System.Linq;
-using Destiny.Network;
 using Destiny.Maple.Data;
 using Destiny.Maple.Life;
 

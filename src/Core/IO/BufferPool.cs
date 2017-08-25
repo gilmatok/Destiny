@@ -5,7 +5,7 @@ namespace Destiny.Core.IO
 {
     public static class BufferPool
     {
-        public const int BufferSize = 2048;
+        public const int BufferSize = 1024;
 
         private static ConcurrentBag<byte[]> sBufferPool = new ConcurrentBag<byte[]>();
 
@@ -28,10 +28,12 @@ namespace Destiny.Core.IO
                 throw new ArgumentNullException("buffer");
             }
 
-            if (buffer.Length != BufferPool.BufferSize)
-            {
-                throw new ArgumentOutOfRangeException("buffer");
-            }
+            //if (buffer.Length != BufferPool.BufferSize)
+            //{
+            //    throw new ArgumentOutOfRangeException("buffer");
+            //}
+
+            Array.Resize<byte>(ref buffer, BufferSize);
 
             Array.Clear(buffer, 0, BufferPool.BufferSize);
 

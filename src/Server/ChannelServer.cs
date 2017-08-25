@@ -105,7 +105,7 @@ namespace Destiny.Server
             }
         }
 
-        public void Notify(string text, NoticeType type)
+        public void Notify(string text, NoticeType type = NoticeType.Notice)
         {
             foreach (Character character in this.Characters)
             {

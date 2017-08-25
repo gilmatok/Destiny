@@ -13,10 +13,8 @@ namespace Destiny.Maple.Data
         public static CachedSkills Skills { get; private set; }
         public static CachedMobs Mobs { get; private set; }
         public static CachedReactors Reactors { get; private set; }
-        public static CachedMaps Maps { get; private set; }
         public static CachedQuests Quests { get; private set; }
         public static CreationData CreationData { get; private set; }
-        public static CachedStrings Strings { get; private set; }
 
         public static void Initialize()
         {
@@ -35,10 +33,8 @@ namespace Destiny.Maple.Data
                 DataProvider.Skills = new CachedSkills();
                 DataProvider.Mobs = new CachedMobs();
                 DataProvider.Reactors = new CachedReactors();
-                DataProvider.Maps = new CachedMaps();
                 DataProvider.Quests = new CachedQuests();
                 DataProvider.CreationData = new CreationData();
-                //DataProvider.Strings = new CachedStrings();
 
                 CommandFactory.Initialize();
 

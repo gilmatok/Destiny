@@ -17,7 +17,7 @@ namespace Destiny.Server
         public IPAddress HostIP { get; private set; }
         public WorldFlag Flag { get; private set; }
         public string EventMessage { get; private set; }
-        public string TickerMessage { get; private set; }
+        public string TickerMessage { get; set; }
         public int ExperienceRate { get; private set; }
         public int QuestExperienceRate { get; private set; }
         public int PartyQuestExperienceRate { get; private set; }
@@ -109,7 +109,7 @@ namespace Destiny.Server
             }
         }
 
-        public void Notify(string text, NoticeType type)
+        public void Notify(string text, NoticeType type = NoticeType.Notice)
         {
             foreach (ChannelServer channel in this)
             {

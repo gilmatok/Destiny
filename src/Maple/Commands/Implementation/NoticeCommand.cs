@@ -16,7 +16,7 @@ namespace Destiny.Maple.Commands.Implementation
         {
             get
             {
-                return "message";
+                return "{ -map | -channel | -world } message";
             }
         }
 
@@ -30,22 +30,32 @@ namespace Destiny.Maple.Commands.Implementation
 
         public override void Execute(Character caller, string[] args)
         {
-            if (args.Length < 1)
+            if (args.Length < 2)
             {
                 this.ShowSyntax(caller);
             }
             else
             {
-                //foreach (ChannelServer channel in MasterServer.Channels)
-                //{
-                //    lock (channel.Clients)
-                //    {
-                //        foreach (MapleClient client in channel.Clients)
-                //        {
-                //            client.Character.Notify(args[0], NoticeType.Notice);
-                //        }
-                //    }
-                //}
+                string message = this.CombineArgs(args, 1);
+
+                switch (args[0].ToLower())
+                {
+                    case "-map":
+                        caller.Map.Notify(message);
+                        break;
+
+                    case "-channel":
+                        caller.Client.Channel.Notify(message);
+                        break;
+
+                    case "-world":
+                        caller.Client.World.Notify(message);
+                        break;
+
+                    default:
+                        this.ShowSyntax(caller);
+                        break;
+                }
             }
         }
     }

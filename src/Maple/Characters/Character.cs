@@ -10,6 +10,7 @@ using Destiny.Maple.Data;
 using Destiny.Maple.Interaction;
 using Destiny.Maple.Social;
 using Destiny.Maple.Instances;
+using Destiny.Server;
 
 namespace Destiny.Maple.Characters
 {

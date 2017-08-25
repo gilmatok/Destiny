@@ -1,7 +1,6 @@
 ﻿using Destiny.Core.IO;
 using Destiny.Data;
 using Destiny.Maple.Characters;
-using Destiny.Maple.Data;
 using Destiny.Maple.Instances;
 
 namespace Destiny.Maple.Maps
@@ -13,11 +12,11 @@ namespace Destiny.Maple.Maps
         public int MapleID { get; private set; }
         public int ReturnMapID { get; private set; }
         public int ForcedReturnMapID { get; private set; }
-        public byte RegenerationRate { get; private set; }
+        public sbyte RegenerationRate { get; private set; }
         public byte DecreaseHP { get; private set; }
         public ushort DamagePerSecond { get; private set; }
         public int ProtectorItemID { get; private set; }
-        public bool HasShip { get; private set; }
+        public sbyte ShipKind { get; private set; }
         public byte RequiredLevel { get; private set; }
         public int TimeLimit { get; private set; }
         public double SpawnRate { get; private set; }
@@ -43,55 +42,30 @@ namespace Destiny.Maple.Maps
         public MapPlayerShops PlayerShops { get; private set; }
         public Instance Instance { get; set; }
 
-        public Map CachedReference
-        {
-            get
-            {
-                return DataProvider.Maps[this.MapleID];
-            }
-        }
-
-        public Map(MapFactory factory, int mapleID)
-        {
-            this.Factory = factory;
-
-            this.MapleID = mapleID;
-            this.ReturnMapID = this.CachedReference.ReturnMapID;
-            this.ForcedReturnMapID = this.CachedReference.ForcedReturnMapID;
-            this.RegenerationRate = this.CachedReference.RegenerationRate;
-            this.DecreaseHP = this.CachedReference.DecreaseHP;
-            this.DamagePerSecond = this.CachedReference.DamagePerSecond;
-            this.ProtectorItemID = this.CachedReference.ProtectorItemID;
-            this.HasShip = this.CachedReference.HasShip;
-            this.RequiredLevel = this.CachedReference.RequiredLevel;
-            this.SpawnRate = this.CachedReference.SpawnRate;
-            this.IsTown = this.CachedReference.IsTown;
-            this.HasClock = this.CachedReference.HasClock;
-            this.IsEverlasting = this.CachedReference.IsEverlasting;
-            this.DisablesTownScroll = this.CachedReference.DisablesTownScroll;
-            this.IsSwim = this.CachedReference.IsSwim;
-            this.ShufflesReactors = this.CachedReference.ShufflesReactors;
-            this.UniqueShuffledReactor = this.CachedReference.UniqueShuffledReactor;
-            this.IsShop = this.CachedReference.IsShop;
-            this.NoPartyLeaderPass = this.CachedReference.NoPartyLeaderPass;
-
-            this.Characters = new MapCharacters(this);
-            this.Drops = new MapDrops(this);
-            this.Mobs = new MapMobs(this);
-            this.Npcs = new MapNpcs(this);
-            this.Reactors = new MapReactors(this);
-            this.Footholds = new MapFootholds(this);
-            this.Seats = new MapSeats(this);
-            this.Portals = new MapPortals(this);
-            this.SpawnPoints = new MapSpawnPoints(this);
-            this.PlayerShops = new MapPlayerShops(this);
-        }
-
-        public Map(Datum datum)
+        public Map(MapFactory factory, Datum datum)
         {
             this.MapleID = (int)datum["mapid"];
             this.ReturnMapID = (int)datum["return_map"];
             this.ForcedReturnMapID = (int)datum["forced_return_map"];
+
+            this.RegenerationRate = (sbyte)datum["regen_rate"];
+            this.DecreaseHP = (byte)datum["decrease_hp"];
+            this.DamagePerSecond = (ushort)datum["damage_per_second"];
+            this.ProtectorItemID = (int)datum["protect_item"];
+            this.ShipKind = (sbyte)datum["ship_kind"];
+            this.SpawnRate = (double)datum["mob_rate"];
+            this.RequiredLevel = (byte)datum["min_level_limit"];
+            this.TimeLimit = (int)datum["time_limit"];
+
+            this.IsTown = ((string)datum["flags"]).Contains("town");
+            this.HasClock = ((string)datum["flags"]).Contains("clock");
+            this.IsEverlasting = ((string)datum["flags"]).Contains("everlast");
+            this.DisablesTownScroll = ((string)datum["flags"]).Contains("scroll_disable");
+            this.IsSwim = ((string)datum["flags"]).Contains("swim");
+            this.ShufflesReactors = ((string)datum["flags"]).Contains("shuffle_reactors");
+            this.UniqueShuffledReactor = (string)datum["shuffle_name"];
+            this.IsShop = ((string)datum["flags"]).Contains("shop");
+            this.NoPartyLeaderPass = ((string)datum["flags"]).Contains("no_party_leader_pass");
 
             this.Characters = new MapCharacters(this);
             this.Drops = new MapDrops(this);
@@ -113,6 +87,14 @@ namespace Destiny.Maple.Maps
                 {
                     character.Client.Send(oPacket);
                 }
+            }
+        }
+
+        public void Notify(string text, NoticeType type = NoticeType.Popup)
+        {
+            foreach (Character character in this.Characters)
+            {
+                character.Notify(text, type);
             }
         }
 

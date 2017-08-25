@@ -18,7 +18,7 @@ namespace Destiny.Maple.Commands.Implementation
         {
             get
             {
-                return "[ - pickup ]";
+                return "[ -pickup ]";
             }
         }
 

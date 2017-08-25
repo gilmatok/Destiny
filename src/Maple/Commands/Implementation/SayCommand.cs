@@ -2,13 +2,13 @@
 
 namespace Destiny.Maple.Commands.Implementation
 {
-    public sealed class HelpCommand : Command
+    public sealed class SayCommand : Command
     {
         public override string Name
         {
             get
             {
-                return "help";
+                return "say";
             }
         }
 
@@ -16,7 +16,7 @@ namespace Destiny.Maple.Commands.Implementation
         {
             get
             {
-                return string.Empty;
+                return "message";
             }
         }
 
@@ -24,27 +24,21 @@ namespace Destiny.Maple.Commands.Implementation
         {
             get
             {
-                return false;
+                return true;
             }
         }
 
         public override void Execute(Character caller, string[] args)
         {
-            if (args.Length != 0)
+            if (args.Length < 1)
             {
                 this.ShowSyntax(caller);
             }
             else
             {
-                caller.Notify("[Help]");
+                string message = this.CombineArgs(args);
 
-                foreach (Command command in CommandFactory.Commands)
-                {
-                    if ((command.IsRestricted && caller.IsMaster) || !command.IsRestricted && !(command is HelpCommand))
-                    {
-                        caller.Notify(string.Format("    !{0} {1}", command.Name, command.Parameters.ClearFormatters()));
-                    }
-                }
+                caller.Client.World.Notify(string.Format("{0}: {1}", caller.Name, message));
             }
         }
     }
