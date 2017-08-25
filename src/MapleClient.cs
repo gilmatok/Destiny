@@ -18,7 +18,6 @@ namespace Destiny
 {
     public sealed class MapleClient : Session
     {
-        private static byte mCount = 0;
         private ServerBase mParentServer;
 
         public byte WorldID { get; set; }
@@ -258,7 +257,7 @@ namespace Destiny
                                     int commodityID = iPacket.ReadInt();
                                     int quantity = iPacket.ReadInt();
 
-                                    var adminShopItem = ShopCommand.Items[commodityID];
+                                    var adminShopItem = AdminShopCommand.Items[commodityID];
 
                                     this.Character.Items.Add(new Item(adminShopItem.Item2, (short)quantity));
 
@@ -1335,9 +1334,7 @@ namespace Destiny
         {
             byte worldID = iPacket.ReadByte();
 
-            {
-                return;
-            }
+            // TODO: Validate world ID.
 
             using (OutPacket oPacket = new OutPacket(ServerOperationCode.CheckUserLimitResult))
             {

@@ -1,27 +1,9 @@
 ﻿using Destiny.Maple.Characters;
-using Destiny.Core.IO;
-using Destiny.Core.Network;
-using System;
-using System.Collections.Generic;
 
 namespace Destiny.Maple.Commands.Implementation
 {
     public sealed class ShopCommand : Command
     {
-        // NOTE: The Npc that is the shop owner.
-        public const int Npc = 2084001;
-
-        // TODO: Make a separate class called AdminShopItem to hold these values.
-        // We can either make the items constant or load them from SQL.
-        // As you can edit them in-game, I think SQL would be better.
-        // In order: ID, MapleID, Price, Stock.
-        public static List<Tuple<int, int, int, short>> Items = new List<Tuple<int, int, int, short>>()
-        {
-            new Tuple<int, int, int, short>(0, 2000000, 1000, 200),
-            new Tuple<int, int, int, short>(1, 2000001, 1000, 200),
-            new Tuple<int, int, int, short>(2, 2000002, 1000, 200)
-        };
-
         public override string Name
         {
             get
@@ -34,7 +16,7 @@ namespace Destiny.Maple.Commands.Implementation
         {
             get
             {
-                return string.Empty;
+                return "[ gear | scrolls | nx | face | ring | chair | mega | pet ]";
             }
         }
 
@@ -48,35 +30,33 @@ namespace Destiny.Maple.Commands.Implementation
 
         public override void Execute(Character caller, string[] args)
         {
-            if (args.Length != 0)
+            if (args.Length != 1)
             {
                 this.ShowSyntax(caller);
             }
             else
             {
-                using (OutPacket oPacket = new OutPacket(ServerOperationCode.AdminShop))
+                int shopID = -1;
+
+                if (args[0] == "gear") shopID = 9999999;
+                else if (args[0] == "scrolls") shopID = 9999998;
+                else if (args[0] == "nx") shopID = 9999997;
+                else if (args[0] == "face") shopID = 9999996;
+                else if (args[0] == "ring") shopID = 9999995;
+                else if (args[0] == "chair") shopID = 9999994;
+                else if (args[0] == "mega") shopID = 9999993;
+                else if (args[0] == "pet") shopID = 9999992;
+
+                if (shopID == -1)
                 {
-                    oPacket
-                        .WriteInt(Npc)
-                        .WriteShort((short)ShopCommand.Items.Count);
+                    this.ShowSyntax(caller);
 
-                    foreach (var item in ShopCommand.Items)
-                    {
-                        oPacket
-                            .WriteInt(item.Item1)
-                            .WriteInt(item.Item2)
-                            .WriteInt(item.Item3)
-                            .WriteByte() // NOTE: Unknown.
-                            .WriteShort(item.Item4);
-                    }
-
-                    // NOTE: If enabled, when you exit the shop the NPC will ask you if you were looking for something that was missing.
-                    // If you press yes, a search box with all the items in game will pop up and you can select an item to "register".
-                    // Once you register an item, a packet will be sent to the server with it's ID so it can be added to the shop.
-                    oPacket.WriteBool(true);
-
-                    caller.Client.Send(oPacket);
+                    return;
                 }
+
+                // TODO: Shop the desired shop.
+                // As we assign shops to NPCs, we need to modify the MCDB values
+                // so each shop will be matched to a different exclusive NPC.
             }
         }
     }
