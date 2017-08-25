@@ -234,6 +234,7 @@
         LastConnectedWorld = 26,
         RecommendedWorldMessage = 27,
         CheckSPWResult = 28,
+
         /*CWvsContext::OnPacket*/
         InventoryOperation = 29,
         InventoryGrow = 30,
@@ -273,7 +274,7 @@
         //64
         GuildResult = 65,
         AllianceResult = 66,
-        OpenGate = 67,
+        TownPortal = 67,
         BroadcastMsg = 68,
         IncubatorResult = 69,
         ShopScannerResult = 70,
@@ -382,6 +383,7 @@
         AnnounceBox = 165,
         ShowConsumeEffect = 166,
         ShowScrollEffect = 167,
+
         /*CUser::OnPetPacket*/
         PetEnterField = 168,
         //169
