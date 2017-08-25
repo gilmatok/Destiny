@@ -374,7 +374,7 @@ namespace Destiny.Maple.Characters
 
                     if (this.Party != null)
                     {
-                        using (OutPacket oPacket = new OutPacket(ServerOperationCode.UpdatePartyMemberHP))
+                        using (OutPacket oPacket = new OutPacket(ServerOperationCode.RecieveHP))
                         {
                             oPacket
                                 .WriteInt(this.ID)
@@ -404,7 +404,7 @@ namespace Destiny.Maple.Characters
 
                     if (this.Party != null)
                     {
-                        using (OutPacket oPacket = new OutPacket(ServerOperationCode.UpdatePartyMemberHP))
+                        using (OutPacket oPacket = new OutPacket(ServerOperationCode.RecieveHP))
                         {
                             oPacket
                                 .WriteInt(this.ID)
@@ -1278,7 +1278,7 @@ namespace Destiny.Maple.Characters
             this.Foothold = movements.Foothold;
             this.Stance = movements.Stance;
 
-            using (OutPacket oPacket = new OutPacket(ServerOperationCode.UserMove))
+            using (OutPacket oPacket = new OutPacket(ServerOperationCode.Move))
             {
                 oPacket
                     .WriteInt(this.ID)
@@ -1307,7 +1307,7 @@ namespace Destiny.Maple.Characters
             {
                 this.Chair = 0;
 
-                using (OutPacket oPacket = new OutPacket(ServerOperationCode.ShowChair))
+                using (OutPacket oPacket = new OutPacket(ServerOperationCode.SetActiveRemoteChair))
                 {
                     oPacket
                         .WriteInt(this.ID)
@@ -1345,7 +1345,7 @@ namespace Destiny.Maple.Characters
 
             this.Chair = mapleID;
 
-            using (OutPacket oPacket = new OutPacket(ServerOperationCode.ShowChair))
+            using (OutPacket oPacket = new OutPacket(ServerOperationCode.SetActiveRemoteChair))
             {
                 oPacket
                     .WriteInt(this.ID)
@@ -1544,7 +1544,7 @@ namespace Destiny.Maple.Characters
                 // TODO: Apply damage to buffs.
             }
 
-            using (OutPacket oPacket = new OutPacket(ServerOperationCode.UserHit))
+            using (OutPacket oPacket = new OutPacket(ServerOperationCode.Hit))
             {
                 oPacket
                     .WriteInt(this.ID)
@@ -1624,7 +1624,7 @@ namespace Destiny.Maple.Characters
                 // TODO: Validate if item exists.
             }
 
-            using (OutPacket oPacket = new OutPacket(ServerOperationCode.UserEmotion))
+            using (OutPacket oPacket = new OutPacket(ServerOperationCode.Emotion))
             {
                 oPacket
                     .WriteInt(this.ID)
@@ -1636,7 +1636,7 @@ namespace Destiny.Maple.Characters
 
         public void ShowLocalUserEffect(UserEffect effect)
         {
-            using (OutPacket oPacket = new OutPacket(ServerOperationCode.ShowItemGainInChat))
+            using (OutPacket oPacket = new OutPacket(ServerOperationCode.Effect))
             {
                 oPacket.WriteByte((byte)effect);
 
@@ -1646,7 +1646,7 @@ namespace Destiny.Maple.Characters
 
         public void ShowRemoteUserEffect(UserEffect effect)
         {
-            using (OutPacket oPacket = new OutPacket(ServerOperationCode.ShowForeignBuff))
+            using (OutPacket oPacket = new OutPacket(ServerOperationCode.RemoteEffect))
             {
                 oPacket
                     .WriteInt(this.ID)
@@ -1976,7 +1976,7 @@ namespace Destiny.Maple.Characters
                     {
                         if (target == null)
                         {
-                            using (OutPacket oPacket = new OutPacket(ServerOperationCode.Command))
+                            using (OutPacket oPacket = new OutPacket(ServerOperationCode.Whisper))
                             {
                                 oPacket
                                     .WriteByte(0x0A)
@@ -1990,7 +1990,7 @@ namespace Destiny.Maple.Characters
                         {
                             bool isInSameChannel = this.Client.ChannelID == target.Client.ChannelID;
 
-                            using (OutPacket oPacket = new OutPacket(ServerOperationCode.Command))
+                            using (OutPacket oPacket = new OutPacket(ServerOperationCode.Whisper))
                             {
                                 oPacket
                                     .WriteByte(0x09)
@@ -2010,7 +2010,7 @@ namespace Destiny.Maple.Characters
                     {
                         string text = iPacket.ReadMapleString();
 
-                        using (OutPacket oPacket = new OutPacket(ServerOperationCode.Command))
+                        using (OutPacket oPacket = new OutPacket(ServerOperationCode.Whisper))
                         {
                             oPacket
                                 .WriteByte(10)
@@ -2022,7 +2022,7 @@ namespace Destiny.Maple.Characters
 
                         if (target != null)
                         {
-                            using (OutPacket oPacket = new OutPacket(ServerOperationCode.Command))
+                            using (OutPacket oPacket = new OutPacket(ServerOperationCode.Whisper))
                             {
                                 oPacket
                                     .WriteByte(18)

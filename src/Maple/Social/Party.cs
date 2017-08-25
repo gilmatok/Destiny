@@ -228,7 +228,7 @@ namespace Destiny.Maple.Social
                 {
                     if (member != item && member.Character != null && member.Character.Map.MapleID == item.Character.Map.MapleID)
                     {
-                        using (OutPacket oPacket = new OutPacket(ServerOperationCode.UpdatePartyMemberHP))
+                        using (OutPacket oPacket = new OutPacket(ServerOperationCode.RecieveHP))
                         {
                             oPacket
                                 .WriteInt(member.Character.ID)
@@ -238,7 +238,7 @@ namespace Destiny.Maple.Social
                             item.Character.Client.Send(oPacket);
                         }
 
-                        using (OutPacket oPacket = new OutPacket(ServerOperationCode.UpdatePartyMemberHP))
+                        using (OutPacket oPacket = new OutPacket(ServerOperationCode.RecieveHP))
                         {
                             oPacket
                                 .WriteInt(item.Character.ID)

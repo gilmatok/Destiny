@@ -1309,6 +1309,25 @@ namespace Destiny
 
                     this.Send(oPacket);
                 }
+
+                // TODO: Last connected world. Get this from the database. Set the last connected world once you succesfully load a character.
+                using (OutPacket oPacket = new OutPacket(ServerOperationCode.LastConnectedWorld))
+                {
+                    oPacket.WriteInt(); // NOTE: World ID.
+
+                    this.Send(oPacket);
+                }
+
+                // TODO: Recommended worlds. Get this from configuration.
+                using (OutPacket oPacket = new OutPacket(ServerOperationCode.RecommendedWorldMessage))
+                {
+                    oPacket
+                        .WriteByte(1) // NOTE: Count.
+                        .WriteInt() // NOTE: World ID.
+                        .WriteMapleString("Check out Scania! The best world to play - and not because it's the only one available... hehe."); // NOTE: Message.
+
+                    this.Send(oPacket);
+                }
             }
         }
 
@@ -1316,8 +1335,9 @@ namespace Destiny
         {
             byte worldID = iPacket.ReadByte();
 
-            if (worldID >= MasterServer.Worlds.Length)
+            {
                 return;
+            }
 
             using (OutPacket oPacket = new OutPacket(ServerOperationCode.CheckUserLimitResult))
             {

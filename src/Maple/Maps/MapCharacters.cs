@@ -128,7 +128,7 @@ namespace Destiny.Maple.Maps
                 {
                     if (member.Character != item && member.Character != null && member.Character.Map.MapleID == this.Map.MapleID)
                     {
-                        using (OutPacket oPacket = new OutPacket(ServerOperationCode.UpdatePartyMemberHP))
+                        using (OutPacket oPacket = new OutPacket(ServerOperationCode.RecieveHP))
                         {
                             oPacket
                                 .WriteInt(member.Character.ID)
@@ -138,7 +138,7 @@ namespace Destiny.Maple.Maps
                             item.Client.Send(oPacket);
                         }
 
-                        using (OutPacket oPacket = new OutPacket(ServerOperationCode.UpdatePartyMemberHP))
+                        using (OutPacket oPacket = new OutPacket(ServerOperationCode.RecieveHP))
                         {
                             oPacket
                                 .WriteInt(item.ID)

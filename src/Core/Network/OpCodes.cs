@@ -227,8 +227,8 @@
         AuthenMessage = 19,
         ChannelSelected = 20,
         HackshieldRequest = 21,
-        RelogResponse = 22,
-        //23
+        WorldCharacterCreationDisabled = 22,
+        MapleEuropeRequired = 23,
         //24
         CheckCRCResult = 25,
         LastConnectedWorld = 26,
@@ -287,8 +287,8 @@
         SetPotionDiscountRate = 78,
         BridleMobCatchFail = 79,
         ImitatedNPCResult = 80,
-        ImitatedNPCData = 81,
-        LimitedNPCDisableInfo = 82,
+        NpcImitateData = 81,
+        NpcUpdateLimitedDisableInfo = 82,
         MonsterBookSetCard = 83,
         MonsteBookSetCover = 84,
         HourChanged = 85,
@@ -331,20 +331,23 @@
         ScriptProgressMessage = 122,
         DataCRCCheckFailed = 123,
         MacroSysDataInit = 124,
+
         /*CStage::OnPacket*/
         SetField = 125,
         SetITC = 126,
         SetCashShop = 127,
+
         /*CMapLoadable::OnPacket*/
         SetBackEffect = 128,
         SetMapObjectVisible = 129,
         ClearBackEffect = 130,
+
         /*CField::OnPacket*/
         TransferFieldReqInogred = 131,
         TransferChannelReqIgnored = 132,
         FieldSpecificData = 133,
         GroupMessage = 134,
-        Command = 135,
+        Whisper = 135,
         CoupleMessage = 136,
         SummonItemInavailable = 137,
         FieldEffect = 138,
@@ -381,8 +384,9 @@
         ShowScrollEffect = 167,
         /*CUser::OnPetPacket*/
         PetEnterField = 168,
+        //169
         PetMove = 170,
-        PetChat = 171,
+        PetAction = 171,
         PetNameChanged = 172,
         PetLoadExceptionList = 173,
         PetActionCommand = 174,
@@ -393,64 +397,67 @@
         SummonedAttack = 178,
         SummonedHit = 179,
         SummonedSkill = 180,
-        //181
-        //182
+        /*CUser::OnDragonPacket*/
+        DragonEnterField = 181,
+        DragonMove = 182,
         //183
         //184
-        UserMove = 185,
-        /*CUserRemote::OnUserRemotePacket*/
+
+        /*CUserPool::OnUserRemotePacket*/
+        Move = 185,
         CloseRangeAttack = 186,
         RangedAttack = 187,
         MagicAttack = 188,
         EnergyAttack = 189,
-        SkillEffect = 190,
-        CancelSkillEffect = 191,
-        UserHit = 192,
-        UserEmotion = 193,
+        SkillPrepare = 190,
+        SkillCancel = 191,
+        Hit = 192,
+        Emotion = 193,
         SetActiveEffectItem = 194,
-        //195
-        ShowChair = 196,
+        ShowUpgradeTombEffect = 195,
+        SetActiveRemoteChair = 196,
         AvatarModified = 197,
-        ShowForeignBuff = 198,
-        GiveForeignBuff = 199,
-        CancelForeignBuff = 200,
-        UpdatePartyMemberHP = 201,
+        RemoteEffect = 198,
+        SetTemporaryStat = 199,
+        ResetTemporaryStat = 200,
+        RecieveHP = 201,
         GuildNameChanged = 202,
         GuildMarkChanged = 203,
-        //204
+        ThrowGrenade = 204,
+
         /*CUserLocal::OnPacket*/
         Sit = 205,
-        ShowItemGainInChat = 206,
-        DojoWarpUp = 207,
+        Effect = 206,
+        Teleport = 207,
         //208
         MesoGiveSucceeded = 209,
         MesoGiveFailed = 210,
-        UpdateQuestInfo = 211,
+        QuestResult = 211,
         NotifyHPDecByField = 212,
-        //213
-        PlayerHint = 214,
+        SkillCooltimeSet = 213,
+        BalloonMsg = 214,
         PlayEventSound = 215,
         PlayMinigameSound = 216,
-        //217
+        MakerResult = 2176,
         //218
-        KoreanEvent = 219,
+        OpenCLassCompetetionPage = 219,
         OpenUI = 220,
-        LockUI = 221,
-        DisableUI = 222,
-        SpawnGuide = 223,
-        TalkGuide = 224,
-        ShowCombo = 225,
+        OpenUIWithOption = 221,
+        SetStandAloneMode = 222,
+        HireTutor = 223,
+        TutorMsg = 224,
+        IncComboResponse = 225,
         //226
         //227
         //228
-        //229
-        //230
-        //231
+        RadioSchedule = 229,
+        OpenSkillGuide = 230,
+        NoticeMsg = 231,
         //232
         //233
         Cooldown = 234,
         //235
-        /*CField::OnPacket*/
+        
         /*CMobPool::OnPacket*/
         MobEnterField = 236,
         MobLeaveField = 237,
@@ -464,16 +471,17 @@
         MobSuspendReset = 244,
         MobAffected = 245,
         MobDamaged = 246,
-        //247
+        MobSpecialEffectBySkill = 247,
         //248
-        MobCatchEffect = 249,
+        MobCrcKeyChanged = 249,
         MobHPIndicator = 250,
-        MobDragged = 251,
-        MobCatch = 252,
-        MobMagnet = 253,
-        //254
+        MobCatchEffect = 251,
+        MobEffectByItem = 252,
+        MobSpeaking = 253,
+        MobIncMobChargeCount = 254,
         MobAttackedByMob = 255,
         //256
+
         /*CNpcPool::OnPacket*/
         NpcEnterField = 257,
         NpcLeaveField = 258,
@@ -483,30 +491,38 @@
         NpcUpdateLimitedInfo = 261,
         NpcSetSpecialAction = 262,
         /*CNpcPool::OnNpcTemplatePacket*/
-        NpcSetScript = 263,
+        NpcSetNpcScript = 263,
+
         //264
-        /*CEntrustedShop::OnPacket <----- Confirm name?*/
-        SpawnHiredMerchant = 265,
-        DestroyHiredMerchant = 266,
-        UpdateHiredMerchant = 267,
+
+        /*CEmployeePool::OnPacket*/
+        EmployeeEnterField = 265,
+        EmployeeLeaveField = 266,
+        EmployeeMiniRoomBalloon = 267,
+
         /*CDropPool::OnPacket*/
         DropEnterField = 268,
         DropLeaveField = 269,
+
         /*CMessageBoxPool::OnPacket*/
         MessageBoxCreateFailed = 270,
         MessageBoxEnterField = 271,
         MessageBoxLeaveField = 272,
+
         /*CAffectedAreaPool::OnPacket*/
-        SpawnMist = 273,
-        RemoveMist = 274,
-        /*Doors*/
-        SpawnDoor = 275,
-        RemoveDoor = 276,
+        AffectedAreaCreated = 273,
+        AffectedAreaRemoved = 274,
+
+        /*CTownPortalPool::OnPacket*/
+        TownPortalCreated = 275,
+        TownPortalRemoved = 276,
+
         /*CReactorPool::OnPacket*/
         ReactorChangeState = 277,
-        ReactorMove = 278, //NOTE: May not be implemented in v83 client
+        ReactorMove = 278, // NOTE: May not be implemented in v83 client.
         ReactorEnterField = 279,
         ReactorLeaveField = 280,
+
         SnowballState = 281,
         HitSnowball = 282,
         SnowballMejssage = 283,
@@ -530,14 +546,23 @@
         AriantScore = 301,
         HorntailCave = 302,
         ZakumShrine = 303,
+
+        /*CScriptMan::OnPacket*/
         ScriptMessage = 304,
+
+        /*CShopDlg::OnPacket*/
         OpenNpcShop = 305,
         ConfirmShopTransaction = 306,
+
+        /*CAdminShopDlg::OnPacket*/
         AdminShopMessage = 307,
         AdminShop = 308,
         Storage = 309,
-        FredrickMessage = 310,
-        Fredrick = 311,
+
+        /*CStoreBankDlg::OnPacket*/
+        StoreBankDlgMessage = 310, // TODO: Correct naming.
+        StoreBankDlgSet = 311, // TODO: Correct naming.
+
         RPSGame = 312,
         Messenger = 313,
         PlayerInteraction = 314,
@@ -561,15 +586,21 @@
         //332
         //333
         //334
-        KeyMap = 335,
-        AutoPotHP = 336,
-        AutoPotMP = 337,
+
+        /*CFuncKeyMappedMan::OnPacket*/
+        FuncKeyMappedInit = 335,
+        FuncKeyMappedPetConsumeItemInit = 336,
+        FuncKeyMappedPetConsumeMPItemInit = 337,
+
         //338
         //339
         //340
-        MapleTV = 341,
-        RemoteMapleTV = 342,
-        EnableMapleTV = 343,
+
+        /*CMapleTVMan::OnPacket*/
+        MapleTVSetMessage = 341,
+        MapleTVClearMessage = 342,
+        MapleTVSendMessageResult = 343,
+
         //344
         //345
         //346

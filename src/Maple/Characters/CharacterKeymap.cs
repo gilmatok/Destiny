@@ -48,7 +48,7 @@ namespace Destiny.Maple.Characters
 
         public void Send()
         {
-            using (OutPacket oPacket = new OutPacket(ServerOperationCode.KeyMap))
+            using (OutPacket oPacket = new OutPacket(ServerOperationCode.FuncKeyMappedInit))
             {
                 oPacket.WriteBool(false);
 
