@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System;
 using System.Collections;
-using Destiny.Core.IO;
 using Destiny.Core.Data;
 using Destiny.Core.Network;
 using System.Linq;
@@ -838,6 +837,13 @@ namespace Destiny.Maple.Characters
                     }
                     else if (drop is Item)
                     {
+                        if (((Item)drop).OnlyOne)
+                        {
+                            // TODO: Appropriate message.
+
+                            return;
+                        }
+
                         ((Item)drop).Slot = this.GetNextFreeSlot(((Item)drop).Type); // TODO: Check for inv. full. 
                         this.Add((Item)drop, true);
                     }

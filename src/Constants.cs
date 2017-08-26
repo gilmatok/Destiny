@@ -608,7 +608,7 @@ namespace Destiny
         RequestNumber,
         Choice,
         RequestStyle = 7,
-        AcceptDecline = 0x0F
+        AcceptDecline = 12
     }
 
     public enum ShopAction : byte

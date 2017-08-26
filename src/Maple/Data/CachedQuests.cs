@@ -65,7 +65,7 @@ namespace Destiny.Maple.Data
 
                 foreach (Datum datum in new Datums("quest_rewards").Populate())
                 {
-                    int state = ((string)datum["quest_state"]) == "start" ? 1 : 0;
+                    int state = ((string)datum["quest_state"]) == "start" ? 0 : 1;
 
                     switch ((string)datum["reward_type"])
                     {

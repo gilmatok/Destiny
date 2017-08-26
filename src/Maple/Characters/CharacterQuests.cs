@@ -1,10 +1,10 @@
-﻿using Destiny.Core.IO;
-using Destiny.Core.Network;
+﻿using Destiny.Core.Network;
 using Destiny.Core.Data;
 using Destiny.Maple.Data;
 using System;
 using System.Collections.Generic;
 using Destiny.Maple.Life;
+using System.Linq;
 
 namespace Destiny.Maple.Characters
 {
@@ -228,7 +228,7 @@ namespace Destiny.Maple.Characters
             using (OutPacket oPacket = new OutPacket(ServerOperationCode.QuestResult))
             {
                 oPacket
-                    .WriteByte(10)
+                    .WriteByte((byte)QuestResult.Complete)
                     .WriteUShort(quest.MapleID)
                     .WriteInt(npcID)
                     .WriteInt();
@@ -245,26 +245,95 @@ namespace Destiny.Maple.Characters
             }
 
             this.Parent.Experience += quest.ExperienceReward[1];
+
+            using (OutPacket oPacket = new OutPacket(ServerOperationCode.Message))
+            {
+                oPacket
+                    .WriteByte((byte)MessageType.IncreaseEXP)
+                    .WriteBool(true)
+                    .WriteInt(quest.ExperienceReward[1])
+                    .WriteBool(true)
+                    .WriteInt() // NOTE: Monster Book bonus.
+                    .WriteShort() // NOTE: Unknown.
+                    .WriteInt() // NOTE: Wedding bonus.
+                    .WriteByte() // NOTE: Party bonus.
+                    .WriteInt() // NOTE: Party bonus.
+                    .WriteInt() // NOTE: Equip bonus.
+                    .WriteInt() // NOTE: Internet Cafe bonus.
+                    .WriteInt() // NOTE: Rainbow Week bonus.
+                    .WriteByte(); // NOTE: Unknown.
+
+                this.Parent.Client.Send(oPacket);
+            }
+
             this.Parent.Fame += (short)quest.FameReward[1];
+
+            // TODO: Fame gain packet in chat.
+
             this.Parent.Meso += quest.MesoReward[1] * this.Parent.Client.World.MesoRate;
 
-            // TODO: Skill and pet rewards.
+            // TODO: Meso gain packet in chat.
 
-            foreach (KeyValuePair<int, short> item in quest.PostItemRewards)
+            foreach (KeyValuePair<Skill, Job> skill in quest.PostSkillRewards)
             {
-                if (item.Value > 0)
+                if (this.Parent.Job == skill.Value)
                 {
-                    this.Parent.Items.Add(new Item(item.Key, item.Value)); // TODO: Quest items rewards are displayed in chat.
-                }
-                else if (item.Value < 0)
-                {
-                    this.Parent.Items.Remove(item.Key, Math.Abs(item.Value));
+                    this.Parent.Skills.Add(skill.Key);
+
+                    // TODO: Skill update packet.
                 }
             }
 
-            if (selection != 0)
+            // TODO: Pet rewards.
+
+            if (selection != 0) // NOTE: Selective reward.
             {
-                // TODO: Selectible item rewards.
+                if (selection == -1) // NOTE: Randomized reward.
+                {
+                    KeyValuePair<int, short> item = quest.PostItemRewards.ElementAt(Constants.Random.Next(0, quest.PostItemRewards.Count));
+
+                    this.Parent.Items.Add(new Item(item.Key, item.Value));
+
+                    using (OutPacket oPacket = new OutPacket(ServerOperationCode.Effect))
+                    {
+                        oPacket
+                            .WriteByte((byte)UserEffect.Quest)
+                            .WriteByte(1)
+                            .WriteInt(item.Key)
+                            .WriteInt(item.Value);
+
+                        this.Parent.Client.Send(oPacket);
+                    }
+                }
+                else
+                {
+                    // TODO: Selective reward based on selection.
+                }
+            }
+            else
+            {
+                foreach (KeyValuePair<int, short> item in quest.PostItemRewards)
+                {
+                    if (item.Value > 0)
+                    {
+                        this.Parent.Items.Add(new Item(item.Key, item.Value));
+                    }
+                    else if (item.Value < 0)
+                    {
+                        this.Parent.Items.Remove(item.Key, Math.Abs(item.Value));
+                    }
+
+                    using (OutPacket oPacket = new OutPacket(ServerOperationCode.Effect))
+                    {
+                        oPacket
+                            .WriteByte((byte)UserEffect.Quest)
+                            .WriteByte(1)
+                            .WriteInt(item.Key)
+                            .WriteInt(item.Value);
+
+                        this.Parent.Client.Send(oPacket);
+                    }
+                }
             }
 
             this.Update(quest.MapleID, QuestStatus.Complete);

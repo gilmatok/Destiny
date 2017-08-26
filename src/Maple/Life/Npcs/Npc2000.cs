@@ -34,7 +34,7 @@ namespace Destiny.Maple.Life.Npcs
                     await this.ShowNextPreviousDialog(talker, "I know you are busy! Please spare me some time~ I can teach you some useful information! Ahahaha!");
                 }
 
-                bool result = await this.ShowYesNoDialog(talker, "So.....  Let me just do this for fun! Abaracadabra~!");
+                bool result = await this.ShowAcceptDeclineDialog(talker, "So.....  Let me just do this for fun! Abaracadabra~!");
 
                 if (result)
                 {

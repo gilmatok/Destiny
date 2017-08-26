@@ -1,5 +1,4 @@
-﻿using Destiny.Core.IO;
-using Destiny.Core.Network;
+﻿using Destiny.Core.Network;
 using Destiny.Core.Data;
 using System.Collections.ObjectModel;
 

@@ -539,25 +539,6 @@ namespace Destiny.Maple.Characters
                 if (this.IsInitialized && delta != 0)
                 {
                     this.Update(StatisticType.Experience);
-
-                    using (OutPacket oPacket = new OutPacket(ServerOperationCode.Message))
-                    {
-                        oPacket
-                            .WriteByte((byte)MessageType.IncreaseEXP)
-                            .WriteBool(true)
-                            .WriteInt(delta)
-                            .WriteBool() // NOTE: In chat.
-                            .WriteInt() // NOTE: Monster Book bonus.
-                            .WriteShort() // NOTE: Unknown.
-                            .WriteInt() // NOTE: Wedding bonus.
-                            .WriteByte() // NOTE: Party bonus.
-                            .WriteInt() // NOTE: Party bonus.
-                            .WriteInt() // NOTE: Equip bonus.
-                            .WriteInt() // NOTE: Internet Cafe bonus.
-                            .WriteInt(); // NOTE: Rainbow Week bonus.
-
-                        this.Client.Send(oPacket);
-                    }
                 }
             }
         }
