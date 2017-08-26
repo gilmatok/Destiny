@@ -186,8 +186,6 @@ namespace Destiny
         Summon
     }
 
-
-
     public enum CommandType : byte
     {
         Find = 5,
@@ -224,6 +222,21 @@ namespace Destiny
         Sealed = 0x8000000000000,
         Darkness = 0x10000000000000,
         Weaken = 0x4000000000000000
+    }
+
+    public enum ReportType : byte
+    {
+        IllegalProgramUsage = 0,
+        ConversationClaim = 1
+    }
+
+    public enum ReportResult : byte
+    {
+        Success,
+        UnableToLocate,
+        Max10TimesADay,
+        YouAreReportedByUser,
+        UnknownError
     }
     #endregion
 

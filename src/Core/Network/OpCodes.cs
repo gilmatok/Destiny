@@ -106,12 +106,12 @@
         CancelDebuff = 0x63,
         ChangeMapSpecial = 100,
         UseInnerPortal = 101,
-        TrockAction = 0x66,
+        TrockAction = 102,
+        Report = 106,
 
         #region QUESTIONABLE
         //103
         //104
-        Report = 0x69,
         //106
         QuestAction = 107,
         //108

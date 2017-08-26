@@ -358,6 +358,10 @@ namespace Destiny.Server
                     this.Character.Trocks.Update(iPacket);
                     break;
 
+                case ClientOperationCode.Report:
+                    this.Character.Report(iPacket);
+                    break;
+
                 case ClientOperationCode.QuestAction:
                     this.Character.Quests.Handle(iPacket);
                     break;

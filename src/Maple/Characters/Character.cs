@@ -923,6 +923,13 @@ namespace Destiny.Maple.Characters
                 this.Client.Send(oPacket);
             }
 
+            using (OutPacket oPacket = new OutPacket(ServerOperationCode.ClaimSvrStatusChanged))
+            {
+                oPacket.WriteBool(true);
+
+                this.Client.Send(oPacket);
+            }
+
             this.IsInitialized = true;
 
             this.Map.Characters.Add(this);
@@ -2313,6 +2320,65 @@ namespace Destiny.Maple.Characters
             portal.Enter(this);
 
             this.Release();
+        }
+
+        public void Report(InPacket iPacket)
+        {
+            ReportType type = (ReportType)iPacket.ReadByte();
+            string victimName = iPacket.ReadMapleString();
+            iPacket.ReadByte(); // NOTE: Unknown.
+            string description = iPacket.ReadMapleString();
+
+            ReportResult result;
+
+            switch (type)
+            {
+                case ReportType.IllegalProgramUsage:
+                    {
+                    }
+                    break;
+
+                case ReportType.ConversationClaim:
+                    {
+                        string chatLog = iPacket.ReadMapleString();
+                    }
+                    break;
+            }
+
+            if (true) // TODO: Check for available report claims.
+            {
+                if (this.Client.World.IsCharacterOnline(victimName)) // TODO: Should we check for map existance instead? The hacker can teleport away before the reported is executed.
+                {
+                    if (this.Meso >= 300)
+                    {
+                        this.Meso -= 300;
+
+                        // TODO: Update GMs of reported player.
+                        // TODO: Update available report claims.
+
+                        result = ReportResult.Success;
+                    }
+                    else
+                    {
+                        result = ReportResult.UnknownError;
+                    }
+                }
+                else
+                {
+                    result = ReportResult.UnableToLocate;
+                }
+            }
+            else
+            {
+                result = ReportResult.Max10TimesADay;
+            }
+
+            using (OutPacket oPacket = new OutPacket(ServerOperationCode.SueCharacterResult))
+            {
+                oPacket.WriteByte((byte)result);
+
+                this.Client.Send(oPacket);
+            }
         }
 
         public byte[] ToByteArray()
