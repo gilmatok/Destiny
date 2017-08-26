@@ -52,6 +52,7 @@ namespace Destiny.Maple.Characters
                 return;
             }
 
+            skill.Recalculate();
             skill.Cast();
         }
 

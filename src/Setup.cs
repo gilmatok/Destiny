@@ -246,6 +246,7 @@ namespace Destiny
                               `MapleID` int(11) NOT NULL,
                               `CurrentLevel` tinyint(3) UNSIGNED NOT NULL,
                               `MaxLevel` tinyint(3) UNSIGNED NOT NULL,
+                              `Expiration` datetime NOT NULL,
                               `CooldownEnd` datetime NOT NULL
                             ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 

@@ -1,5 +1,6 @@
 ﻿using Destiny.Core.Data;
 using Destiny.Core.Network;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -37,13 +38,13 @@ namespace Destiny.Maple.Characters
 
         public void Load()
         {
-            //foreach (Datum datum in new Datums("buffs").Populate("CharacterID = {0}", this.Parent.ID))
-            //{
-            //    if ((DateTime)datum["End"] > DateTime.Now)
-            //    {
-            //        this.Add(new Buff(this, datum));
-            //    }
-            //}
+            foreach (Datum datum in new Datums("buffs").Populate("CharacterID = {0}", this.Parent.ID))
+            {
+                if ((DateTime)datum["End"] > DateTime.Now)
+                {
+                    this.Add(new Buff(this, datum));
+                }
+            }
         }
 
         public void Save()
@@ -143,6 +144,80 @@ namespace Destiny.Maple.Characters
         IEnumerator IEnumerable.GetEnumerator()
         {
             return ((IEnumerable)this.Buffs).GetEnumerator();
+        }
+
+        // TODO: Refactor this to use actual TwoStateTemporaryStat and not some random values.
+        // For now, we use the default mask until we learn more about how buffs work.
+        public byte[] ToByteArray()
+        {
+            using (OutPacket oPacket = new OutPacket())
+            {
+                oPacket
+                    .WriteInt()
+                    .WriteShort()
+                    .WriteByte(0xFC)
+                    .WriteByte(1)
+                    .WriteInt();
+
+                long mask = 0;
+                int value = 0;
+
+                if (this.Contains((int)SkillNames.Rogue.DarkSight))
+                {
+                    mask |= (long)SecondaryBuffStat.DarkSight;
+                }
+
+                if (this.Contains((int)SkillNames.Crusader.ComboAttack))
+                {
+                    mask |= (long)SecondaryBuffStat.Combo;
+                    value = this[(int)SkillNames.Crusader.ComboAttack].Value;
+                }
+
+                if (this.Contains((int)SkillNames.Hermit.ShadowPartner))
+                {
+                    mask |= (long)SecondaryBuffStat.ShadowPartner;
+                }
+
+                if (this.Contains((int)SkillNames.Hunter.SoulArrow) || this.Contains((int)SkillNames.Crossbowman.SoulArrow))
+                {
+                    mask |= (long)SecondaryBuffStat.SoulArrow;
+                }
+
+                oPacket.WriteInt((int)((mask >> 32) & 0xFFFFFFFFL));
+
+                if (value != 0)
+                {
+                    oPacket.WriteByte((byte)value);
+                }
+
+                oPacket.WriteInt((int)(mask & 0xFFFFFFFFL));
+
+                int magic = Constants.Random.Next();
+
+                oPacket
+                    .WriteZero(6)
+                    .WriteInt(magic)
+                    .WriteZero(11)
+                    .WriteInt(magic)
+                    .WriteZero(11)
+                    .WriteInt(magic)
+                    .WriteShort()
+                    .WriteByte()
+                    .WriteLong()
+                    .WriteInt(magic)
+                    .WriteZero(9)
+                    .WriteInt(magic)
+                    .WriteShort()
+                    .WriteInt()
+                    .WriteZero(10)
+                    .WriteInt(magic)
+                    .WriteZero(13)
+                    .WriteInt(magic)
+                    .WriteShort()
+                    .WriteByte();
+
+                return oPacket.ToArray();
+            }
         }
     }
 }

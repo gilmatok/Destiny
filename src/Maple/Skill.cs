@@ -1,5 +1,4 @@
-﻿using Destiny.Core.IO;
-using Destiny.Core.Network;
+﻿using Destiny.Core.Network;
 using Destiny.Core.Data;
 using Destiny.Maple.Characters;
 using Destiny.Maple.Data;
@@ -17,6 +16,7 @@ namespace Destiny.Maple
 
         public int ID { get; set; }
         public int MapleID { get; set; }
+        public DateTime Expiration { get; set; }
 
         public sbyte MobCount { get; set; }
         public sbyte HitCount { get; set; }
@@ -115,6 +115,19 @@ namespace Destiny.Maple
             }
         }
 
+        public bool IsGmBuff
+        {
+            get
+            {
+                return this.MapleID == (int)SkillNames.SuperGM.HealPlusDispel ||
+                       this.MapleID == (int)SkillNames.SuperGM.Haste ||
+                       this.MapleID == (int)SkillNames.SuperGM.HolySymbol ||
+                       this.MapleID == (int)SkillNames.SuperGM.Bless ||
+                       this.MapleID == (int)SkillNames.SuperGM.Resurrection ||
+                       this.MapleID == (int)SkillNames.SuperGM.HyperBody;
+            }
+        }
+
         public bool IsFromFourthJob
         {
             get
@@ -183,18 +196,32 @@ namespace Destiny.Maple
 
         private bool Assigned { get; set; }
 
-        public Skill(int mapleID)
+        public Skill(int mapleID, DateTime? expiration = null)
         {
             this.MapleID = mapleID;
             this.CurrentLevel = 0;
             this.MaxLevel = (byte)DataProvider.Skills[this.MapleID].Count;
+
+            if (!expiration.HasValue)
+            {
+                expiration = new DateTime(2079, 1, 1, 12, 0, 0); // NOTE: Default expiration time (permanent).
+            }
+
+            this.Expiration = (DateTime)expiration;
         }
 
-        public Skill(int mapleID, byte currentLevel, byte maxLevel)
+        public Skill(int mapleID, byte currentLevel, byte maxLevel, DateTime? expiration = null)
         {
             this.MapleID = mapleID;
             this.CurrentLevel = currentLevel;
             this.MaxLevel = maxLevel;
+
+            if (!expiration.HasValue)
+            {
+                expiration = new DateTime(2079, 1, 1, 12, 0, 0); // NOTE: Default expiration time (permanent).
+            }
+
+            this.Expiration = (DateTime)expiration;
         }
 
         public Skill(Datum datum)
@@ -207,6 +234,7 @@ namespace Destiny.Maple
                 this.MapleID = (int)datum["MapleID"];
                 this.CurrentLevel = (byte)datum["CurrentLevel"];
                 this.MaxLevel = (byte)datum["MaxLevel"];
+                this.Expiration = (DateTime)datum["Expiration"];
                 this.CooldownEnd = (DateTime)datum["CooldownEnd"];
             }
             else
@@ -257,6 +285,7 @@ namespace Destiny.Maple
             datum["MapleID"] = this.MapleID;
             datum["CurrentLevel"] = this.CurrentLevel;
             datum["MaxLevel"] = this.MaxLevel;
+            datum["Expiration"] = this.Expiration;
             datum["CooldownEnd"] = this.CooldownEnd;
 
             if (this.Assigned)
@@ -287,7 +316,7 @@ namespace Destiny.Maple
                     .WriteInt(this.MapleID)
                     .WriteInt(this.CurrentLevel)
                     .WriteInt(this.MaxLevel)
-                    .WriteLong(-1) // NOTE: Expiration.
+                    .WriteDateTime(this.Expiration)
                     .WriteByte(4);
 
                 this.Character.Client.Send(oPacket);
@@ -349,10 +378,42 @@ namespace Destiny.Maple
             if (this.HasBuff)
             {
                 this.Character.Buffs.Add(this, 0);
-            }
-            else
-            {
 
+                using (OutPacket oPacket = new OutPacket(ServerOperationCode.Effect))
+                {
+                    oPacket
+                        .WriteByte((byte)UserEffect.SkillUse)
+                        .WriteInt(this.MapleID)
+                        .WriteByte(1)
+                        .WriteByte(1);
+
+                    this.Character.Client.Send(oPacket);
+                }
+
+                using (OutPacket oPacket = new OutPacket(ServerOperationCode.RemoteEffect))
+                {
+                    oPacket
+                        .WriteInt(Character.ID)
+                        .WriteByte((byte)UserEffect.SkillUse)
+                        .WriteInt(this.MapleID)
+                        .WriteByte(1)
+                        .WriteByte(1);
+
+                    this.Character.Map.Broadcast(oPacket, this.Character);
+                }
+
+                if (this.IsGmBuff)
+                {
+                    foreach (Character character in this.Character.Map.Characters.GetInRange(this.Character, 200)) // TOOD: Real value.
+                    {
+                        if (character != this.Character)
+                        {
+                            character.Buffs.Add(this, 0);
+
+                            // TODO: Effects.
+                        }
+                    }
+                }
             }
         }
 
@@ -363,7 +424,7 @@ namespace Destiny.Maple
                 oPacket
                     .WriteInt(this.MapleID)
                     .WriteInt(this.CurrentLevel)
-                    .WriteLong(-1); // NOTE: Expiration.
+                    .WriteDateTime(this.Expiration);
 
                 if (this.IsFromFourthJob)
                 {

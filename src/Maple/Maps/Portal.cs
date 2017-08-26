@@ -1,6 +1,7 @@
 ﻿using Destiny.Core.Data;
 using Destiny.Core.Network;
 using Destiny.Maple.Characters;
+using System;
 
 namespace Destiny.Maple.Maps
 {
@@ -63,6 +64,36 @@ namespace Destiny.Maple.Maps
         public void PlaySoundEffect(Character character)
         {
             character.ShowLocalUserEffect(UserEffect.PlayPortalSE);
+        }
+
+        public void ShowBalloonMessage(Character character, string text)
+        {
+            short width = (short)(Math.Floor((double)(text.Length * 10)));
+            short height = 5;
+
+            using (OutPacket oPacket = new OutPacket(ServerOperationCode.BalloonMsg))
+            {
+                oPacket
+                    .WriteMapleString(text)
+                    .WriteShort(width)
+                    .WriteShort(height)
+                    .WriteByte(1);
+
+                character.Client.Send(oPacket);
+            }
+        }
+
+        public void ShowTutorialMessage(Character character, string dataPath)
+        {
+            using (OutPacket oPacket = new OutPacket(ServerOperationCode.Effect))
+            {
+                oPacket
+                    .WriteByte((byte)UserEffect.AvatarOriented)
+                    .WriteMapleString(dataPath)
+                    .WriteInt(1);
+
+                character.Client.Send(oPacket);
+            }
         }
     }
 }

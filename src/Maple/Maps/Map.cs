@@ -44,6 +44,8 @@ namespace Destiny.Maple.Maps
 
         public Map(MapFactory factory, Datum datum)
         {
+            this.Factory = factory;
+
             this.MapleID = (int)datum["mapid"];
             this.ReturnMapID = (int)datum["return_map"];
             this.ForcedReturnMapID = (int)datum["forced_return_map"];

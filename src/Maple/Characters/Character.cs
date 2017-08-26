@@ -72,6 +72,7 @@ namespace Destiny.Maple.Characters
         private short fame;
         private int meso;
         private Npc lastNpc;
+        private Quest lastQuest;
         private string chalkboard;
 
         public Gender Gender
@@ -664,6 +665,20 @@ namespace Destiny.Maple.Characters
                 }
 
                 lastNpc = value;
+            }
+        }
+
+        public Quest LastQuest
+        {
+            get
+            {
+                return lastQuest;
+            }
+            set
+            {
+                lastQuest = value;
+
+                // TODO: Add checks.
             }
         }
 
@@ -1375,6 +1390,7 @@ namespace Destiny.Maple.Characters
             {
                 skill = this.Skills[attack.SkillID];
 
+                skill.Recalculate();
                 skill.Cast();
             }
 
@@ -1649,7 +1665,7 @@ namespace Destiny.Maple.Characters
             }
         }
 
-        public void ShowRemoteUserEffect(UserEffect effect)
+        public void ShowRemoteUserEffect(UserEffect effect, bool skipSelf = false)
         {
             using (OutPacket oPacket = new OutPacket(ServerOperationCode.RemoteEffect))
             {
@@ -1657,8 +1673,13 @@ namespace Destiny.Maple.Characters
                     .WriteInt(this.ID)
                     .WriteByte((byte)effect);
 
-                this.Map.Broadcast(oPacket);
+                this.Map.Broadcast(oPacket, skipSelf ? this : null);
             }
+        }
+
+        public void Converse(int mapleID)
+        {
+            // TODO.
         }
 
         public void Converse(InPacket iPacket)
@@ -1668,9 +1689,10 @@ namespace Destiny.Maple.Characters
             this.Converse(this.Map.Npcs[objectID]);
         }
 
-        public async void Converse(Npc npc)
+        public async void Converse(Npc npc, Quest quest = null)
         {
             this.LastNpc = npc;
+            this.LastQuest = quest;
 
             await this.LastNpc.Converse(this);
         }
@@ -2505,41 +2527,7 @@ namespace Destiny.Maple.Characters
             }
 
             oPacket
-                .WriteInt()
-                .WriteShort()
-                .WriteByte(0xFC)
-                .WriteByte(1)
-                .WriteInt();
-
-            int buffmask = 0;
-
-            oPacket
-                .WriteInt((int)((buffmask >> 32) & 0xFFFFFFFFL))
-                .WriteInt((int)(buffmask & 0xFFFFFFFFL));
-
-            int magic = Constants.Random.Next();
-
-            oPacket
-                .WriteZero(6)
-                .WriteInt(magic)
-                .WriteZero(11)
-                .WriteInt(magic)
-                .WriteZero(11)
-                .WriteInt(magic)
-                .WriteShort()
-                .WriteByte()
-                .WriteLong()
-                .WriteInt(magic)
-                .WriteZero(9)
-                .WriteInt(magic)
-                .WriteShort()
-                .WriteInt()
-                .WriteZero(10)
-                .WriteInt(magic)
-                .WriteZero(13)
-                .WriteInt(magic)
-                .WriteShort()
-                .WriteByte()
+                .WriteBytes(this.Buffs.ToByteArray())
                 .WriteShort((short)this.Job)
                 .WriteBytes(this.AppearanceToByteArray())
                 .WriteInt(this.Items.Available(5110000))

@@ -4,6 +4,7 @@ using Destiny.Core.Data;
 using Destiny.Maple.Data;
 using System;
 using System.Collections.Generic;
+using Destiny.Maple.Life;
 
 namespace Destiny.Maple.Characters
 {
@@ -171,6 +172,25 @@ namespace Destiny.Maple.Characters
                 case QuestAction.ScriptEnd:
                     {
                         npcId = iPacket.ReadInt();
+
+                        Npc npc = null;
+
+                        foreach (Npc loopNpc in this.Parent.Map.Npcs)
+                        {
+                            if (loopNpc.MapleID == npcId)
+                            {
+                                npc = loopNpc;
+
+                                break;
+                            }
+                        }
+
+                        if (npc == null)
+                        {
+                            return;
+                        }
+
+                        this.Parent.Converse(npc, quest);
                     }
                     break;
             }
@@ -185,11 +205,11 @@ namespace Destiny.Maple.Characters
                 this.Started[quest.MapleID].Add(requiredKills.Key, 0);
             }
 
-            // TODO: Gain start experience rewards.
-            // TODO: Gain start fame rewards.
-            // TODO: Gain start meso rewards.
-            // TODO: Gain start skill rewards.
-            // TODO: Gain start pet rewards.
+            this.Parent.Experience += quest.ExperienceReward[0];
+            this.Parent.Fame += (short)quest.FameReward[0];
+            this.Parent.Meso += quest.MesoReward[0] * this.Parent.Client.World.MesoRate;
+
+            // TODO: Skill and pet rewards.
 
             foreach (KeyValuePair<int, short> item in quest.PreItemRewards)
             {
@@ -204,6 +224,17 @@ namespace Destiny.Maple.Characters
             }
 
             this.Update(quest.MapleID, QuestStatus.InProgress);
+
+            using (OutPacket oPacket = new OutPacket(ServerOperationCode.QuestResult))
+            {
+                oPacket
+                    .WriteByte(10)
+                    .WriteUShort(quest.MapleID)
+                    .WriteInt(npcID)
+                    .WriteInt();
+
+                this.Parent.Client.Send(oPacket);
+            }
         }
 
         public void Complete(Quest quest, int selection)
@@ -213,11 +244,11 @@ namespace Destiny.Maple.Characters
                 this.Parent.Items.Remove(item.Key, item.Value);
             }
 
-            // TODO: Gain end experience rewards.
-            // TODO: Gain end fame rewards.
-            // TODO: Gain end meso rewards.
-            // TODO: Gain end skill rewards.
-            // TODO: Gain end pet rewards.
+            this.Parent.Experience += quest.ExperienceReward[1];
+            this.Parent.Fame += (short)quest.FameReward[1];
+            this.Parent.Meso += quest.MesoReward[1] * this.Parent.Client.World.MesoRate;
+
+            // TODO: Skill and pet rewards.
 
             foreach (KeyValuePair<int, short> item in quest.PostItemRewards)
             {
@@ -233,7 +264,7 @@ namespace Destiny.Maple.Characters
 
             if (selection != 0)
             {
-
+                // TODO: Selectible item rewards.
             }
 
             this.Update(quest.MapleID, QuestStatus.Complete);
@@ -242,7 +273,8 @@ namespace Destiny.Maple.Characters
 
             this.Completed.Add(quest.MapleID, DateTime.UtcNow);
 
-            // TODO: Broadcast quest completion effect to map.
+            this.Parent.ShowLocalUserEffect(UserEffect.QuestComplete);
+            this.Parent.ShowRemoteUserEffect(UserEffect.QuestComplete, true);
         }
 
         public void Forfeit(ushort questID)

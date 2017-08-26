@@ -194,6 +194,15 @@ namespace Destiny.Maple.Life
             return await this.Responses[talker].Task;
         }
 
+        public async Task<bool> ShowAcceptDeclineDialog(Character talker, string text)
+        {
+            this.Responses[talker] = new TaskCompletionSource<bool>();
+
+            this.SendDialog(talker, text, NpcMessageType.AcceptDecline);
+
+            return await this.Responses[talker].Task;
+        }
+
         public async Task<int> ShowChoiceDialog(Character talker, string text, params string[] choices)
         {
             this.Choices[talker] = new TaskCompletionSource<int>();

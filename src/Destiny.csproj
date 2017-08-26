@@ -106,6 +106,8 @@
     <Compile Include="Maple\Life\Npcs\Npc1096001.cs" />
     <Compile Include="Maple\Life\Npcs\Npc1100003.cs" />
     <Compile Include="Maple\Life\Npcs\Npc1101001.cs" />
+    <Compile Include="Maple\Life\Npcs\Npc2000.cs" />
+    <Compile Include="Maple\Life\Npcs\Npc2007.cs" />
     <Compile Include="Maple\Life\Npcs\Npc2101001.cs" />
     <Compile Include="Maple\Life\Npcs\Npc2101000.cs" />
     <Compile Include="Maple\Life\Npcs\Npc22000.cs" />
@@ -128,6 +130,9 @@
     <Compile Include="Maple\Maps\MapPlayerShops.cs" />
     <Compile Include="Maple\Maps\MapSeats.cs" />
     <Compile Include="Maple\Maps\MapSpawnPoints.cs" />
+    <Compile Include="Maple\Maps\Portals\glTutoMsg0.cs" />
+    <Compile Include="Maple\Maps\Portals\infoMinimap.cs" />
+    <Compile Include="Maple\Maps\Portals\tutoChatNPC.cs" />
     <Compile Include="Maple\Maps\Portals\market00.cs" />
     <Compile Include="Maple\Maps\Portals\market08.cs" />
     <Compile Include="Maple\Maps\Portals\market11.cs" />
