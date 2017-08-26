@@ -9,7 +9,7 @@ namespace Destiny.Maple.Maps.Portals
 
         public override void Enter(Character character)
         {
-            this.ShowBalloonMessage(character, "Once you leave this area you won't be able to return.");
+            this.ShowBalloonMessage(character, "Once you leave this area you won't be able to return.", 150, 5);
         }
     }
 }

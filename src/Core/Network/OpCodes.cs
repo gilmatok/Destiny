@@ -149,6 +149,7 @@
         FamilyOpen = 146,
         BbsOperation = 155,
         MovePet = 167,
+        MobAutomaticProvoke = 189,
         NpcMovement = 197,
 
         #region QUESTIONABLE
@@ -171,7 +172,6 @@
         DamageSummon = 0xAB,
         Beholder = 0xAC,
         MobMovement = 0xBC,
-        AutoAggro = 0xBD,
         MobDamageModFriendly = 0xB6,
         MonsterBomb = 0xB7,
         MobDamageMob = 0xB8,

@@ -5,6 +5,7 @@ using Destiny.Maple.Data;
 using Destiny.Maple.Maps;
 using System;
 using System.Collections.Generic;
+using Destiny.Core.Threading;
 
 namespace Destiny.Maple.Life
 {
@@ -19,6 +20,9 @@ namespace Destiny.Maple.Life
         public bool CanDrop { get; set; }
         public List<Loot> Loots { get; private set; }
         public short Foothold { get; set; }
+        public MobSkills Skills { get; private set; }
+        public Dictionary<MobSkill, DateTime> Cooldowns { get; private set; }
+        public List<MobStatus> Buffs { get; private set; }
         public List<int> DeathSummons { get; private set; }
 
         public short Level { get; private set; }
@@ -68,6 +72,8 @@ namespace Destiny.Maple.Life
             }
         }
 
+        public int SpawnEffect { get; set; }
+
         public Mob CachedReference
         {
             get
@@ -111,6 +117,7 @@ namespace Destiny.Maple.Life
             this.ChaseSpeed = (short)datum["chase_speed"];
 
             this.Loots = new List<Loot>();
+            this.Skills = new MobSkills(this);
             this.DeathSummons = new List<int>();
         }
 
@@ -150,9 +157,12 @@ namespace Destiny.Maple.Life
             this.ChaseSpeed = this.CachedReference.ChaseSpeed;
 
             this.Loots = this.CachedReference.Loots;
+            this.Skills = this.CachedReference.Skills;
             this.DeathSummons = this.CachedReference.DeathSummons;
 
             this.Attackers = new Dictionary<Character, uint>();
+            this.Cooldowns = new Dictionary<MobSkill, DateTime>();
+            this.Buffs = new List<MobStatus>();
             this.Stance = 5;
             this.CanDrop = true;
         }
@@ -218,12 +228,11 @@ namespace Destiny.Maple.Life
         public void Move(InPacket iPacket)
         {
             short moveAction = iPacket.ReadShort();
-            byte skilByte = iPacket.ReadByte();
-            byte skill = iPacket.ReadByte();
-            byte skill1 = (byte)(iPacket.ReadByte() & 0xFF);
-            byte skill2 = iPacket.ReadByte();
-            byte skill3 = iPacket.ReadByte();
-            byte skill4 = iPacket.ReadByte();
+            bool useSkill = (iPacket.ReadByte() & 0xF) != 0;
+            int skillUnknown = iPacket.ReadByte() & 0xFF;
+            byte skillID = iPacket.ReadByte();
+            byte skillLevel = iPacket.ReadByte();
+            short delay = iPacket.ReadShort();
             iPacket.Skip(8);
             iPacket.ReadByte();
             iPacket.ReadInt();
@@ -234,15 +243,41 @@ namespace Destiny.Maple.Life
             this.Foothold = movements.Foothold;
             this.Stance = movements.Stance;
 
+            MobSkill skill = null;
+
+            if (useSkill && this.Skills.Count > 0)
+            {
+                skill = this.Skills.Random;
+            }
+            else if ((skillID >= 100 && skillID <= 200) && this.Skills.Contains(skillID, skillLevel)) // TODO: Is this necessary?
+            {
+                skill = this.Skills[skillID];
+            }
+
+            if (skill != null)
+            {
+                if (this.Health * 100 / this.MaxHealth > skill.PercentageLimitHP ||
+                    (this.Cooldowns.ContainsKey(skill) && this.Cooldowns[skill].AddSeconds(skill.Cooldown) >= DateTime.Now) ||
+                    ((MobSkillName)skill.MapleID) == MobSkillName.Summon && this.Map.Mobs.Count >= 100)
+                {
+                    skill = null;
+                }
+            }
+
+            if (skill != null)
+            {
+                skill.Cast(this);
+            }
+
             using (OutPacket oPacket = new OutPacket(ServerOperationCode.MobCtrlAck))
             {
                 oPacket
                     .WriteInt(this.ObjectID)
                     .WriteShort(moveAction)
-                    .WriteBool() // NOTE: Is using ability.
+                    .WriteBool(useSkill)
                     .WriteShort((short)this.Mana)
-                    .WriteByte() // NOTE: Ability ID.
-                    .WriteByte(); // NOTE: Ability level.
+                    .WriteByte((byte)(skill != null ? skill.MapleID : 0))
+                    .WriteByte((byte)(skill != null ? skill.Level : 0));
 
                 this.Controller.Client.Send(oPacket);
             }
@@ -252,15 +287,69 @@ namespace Destiny.Maple.Life
                 oPacket
                     .WriteInt(this.ObjectID)
                     .WriteBool()
-                    .WriteBool() // NOTE: Is using ability.
-                    .WriteByte(skill)
-                    .WriteByte(skill1)
-                    .WriteByte(skill2)
-                    .WriteByte(skill3)
-                    .WriteByte(skill4)
+                    .WriteBool(useSkill)
+                    .WriteByte((byte)skillUnknown)
+                    .WriteByte(skillID)
+                    .WriteByte(skillLevel)
+                    .WriteShort(delay)
                     .WriteBytes(movements.ToByteArray());
 
                 this.Map.Broadcast(oPacket, this.Controller);
+            }
+        }
+
+        public void Buff(MobStatus buff, short value, MobSkill skill)
+        {
+            using (OutPacket oPacket = new OutPacket(ServerOperationCode.MobStatSet))
+            {
+                oPacket
+                    .WriteInt(this.ObjectID)
+                    .WriteLong()
+                    .WriteInt()
+                    .WriteInt((int)buff)
+                    .WriteShort(value)
+                    .WriteShort(skill.MapleID)
+                    .WriteShort(skill.Level)
+                    .WriteShort(-1)
+                    .WriteShort(0) // Delay
+                    .WriteInt();
+
+                this.Map.Broadcast(oPacket);
+            }
+
+            Delay.Execute(() =>
+            {
+                using (OutPacket outPacket = new OutPacket(ServerOperationCode.MobStatReset))
+                {
+                    outPacket
+                        .WriteInt(this.ObjectID)
+                        .WriteLong()
+                        .WriteInt()
+                        .WriteInt((int)buff)
+                        .WriteInt();
+
+                    this.Map.Broadcast(outPacket);
+                }
+
+                this.Buffs.Remove(buff);
+            }, skill.Duration * 1000);
+        }
+
+        public void Heal(uint hp, int range)
+        {
+            this.Health = Math.Min(this.MaxHealth, (uint)(this.Health + hp + Constants.Random.Next(-range / 2, range / 2)));
+
+            using (OutPacket outPacket = new OutPacket(ServerOperationCode.MobDamaged))
+            {
+                outPacket
+                    .WriteInt(this.ObjectID)
+                    .WriteByte()
+                    .WriteInt((int)-hp)
+                    .WriteByte()
+                    .WriteByte()
+                    .WriteByte();
+
+                this.Map.Broadcast(outPacket);
             }
         }
 
@@ -340,7 +429,22 @@ namespace Destiny.Maple.Life
                 .WritePoint(this.Position)
                 .WriteByte((byte)(0x02 | (this.IsFacingLeft ? 0x01 : 0x00)))
                 .WriteShort(this.Foothold)
-                .WriteShort(this.Foothold)
+                .WriteShort(this.Foothold);
+
+            if (this.SpawnEffect > 0)
+            {
+                oPacket
+                    .WriteByte((byte)this.SpawnEffect)
+                    .WriteByte()
+                    .WriteShort();
+
+                if (this.SpawnEffect == 15)
+                {
+                    oPacket.WriteByte();
+                }
+            }
+
+            oPacket
                 .WriteByte((byte)(newSpawn ? -2 : -1))
                 .WriteByte()
                 .WriteByte(byte.MaxValue) // NOTE: Carnival team.

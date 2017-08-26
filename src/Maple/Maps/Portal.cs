@@ -57,8 +57,6 @@ namespace Destiny.Maple.Maps
 
                 character.Client.Send(oPacket);
             }
-
-            character.Release();
         }
 
         public void PlaySoundEffect(Character character)
@@ -66,11 +64,8 @@ namespace Destiny.Maple.Maps
             character.ShowLocalUserEffect(UserEffect.PlayPortalSE);
         }
 
-        public void ShowBalloonMessage(Character character, string text)
+        public void ShowBalloonMessage(Character character, string text, short width, short height)
         {
-            short width = (short)(Math.Floor((double)(text.Length * 10)));
-            short height = 5;
-
             using (OutPacket oPacket = new OutPacket(ServerOperationCode.BalloonMsg))
             {
                 oPacket

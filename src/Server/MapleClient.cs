@@ -351,7 +351,7 @@ namespace Destiny.Server
                     break;
 
                 case ClientOperationCode.ChangeMapSpecial:
-                    this.Character.ChangeMapSpecial(iPacket);
+                    this.Character.EnterPortal(iPacket);
                     break;
 
                 case ClientOperationCode.TrockAction:
@@ -997,10 +997,6 @@ namespace Destiny.Server
 
                 case ClientOperationCode.TouchReactor:
                     this.Character.Map.Reactors.Touch(iPacket, this.Character);
-                    break;
-
-                default:
-                    Log.Warn("Unhandled packet 0x{0:X4} received from {1}.", (short)iPacket.OperationCode, this.Host);
                     break;
             }
         }

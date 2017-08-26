@@ -2288,7 +2288,7 @@ namespace Destiny.Maple.Characters
             }
         }
 
-        public void ChangeMapSpecial(InPacket iPacket)
+        public void EnterPortal(InPacket iPacket)
         {
             byte portals = iPacket.ReadByte();
 
@@ -2311,6 +2311,8 @@ namespace Destiny.Maple.Characters
             }
 
             portal.Enter(this);
+
+            this.Release();
         }
 
         public byte[] ToByteArray()

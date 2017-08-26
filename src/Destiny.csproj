@@ -73,6 +73,8 @@
     <Compile Include="Maple\Characters\CharacterVariables.cs" />
     <Compile Include="Maple\Commands\Commands.cs" />
     <Compile Include="Maple\Commands\Implementation\ClearDropsCommand.cs" />
+    <Compile Include="Maple\Commands\Implementation\TestCommand.cs" />
+    <Compile Include="Maple\Commands\Implementation\ZakumCommand.cs" />
     <Compile Include="Maple\Commands\Implementation\HorntailCommand.cs" />
     <Compile Include="Maple\Commands\Implementation\KillMobsCommand.cs" />
     <Compile Include="Maple\Commands\Implementation\OnlineCommand.cs" />
@@ -99,6 +101,8 @@
     <Compile Include="Maple\InventoryOperation.cs" />
     <Compile Include="Maple\Life\LifeObject.cs" />
     <Compile Include="Maple\Life\Loot.cs" />
+    <Compile Include="Maple\Life\MobSkill.cs" />
+    <Compile Include="Maple\Life\MobSkills.cs" />
     <Compile Include="Maple\Life\Npcs\Npc1002000.cs" />
     <Compile Include="Maple\Life\Npcs\Npc1092010.cs" />
     <Compile Include="Maple\Life\Npcs\Npc1092019.cs" />
@@ -131,6 +135,10 @@
     <Compile Include="Maple\Maps\MapSeats.cs" />
     <Compile Include="Maple\Maps\MapSpawnPoints.cs" />
     <Compile Include="Maple\Maps\Portals\glTutoMsg0.cs" />
+    <Compile Include="Maple\Maps\Portals\infoAttack.cs" />
+    <Compile Include="Maple\Maps\Portals\infoPickup.cs" />
+    <Compile Include="Maple\Maps\Portals\infoReactor.cs" />
+    <Compile Include="Maple\Maps\Portals\infoSkill.cs" />
     <Compile Include="Maple\Maps\Portals\infoMinimap.cs" />
     <Compile Include="Maple\Maps\Portals\tutoChatNPC.cs" />
     <Compile Include="Maple\Maps\Portals\market00.cs" />
