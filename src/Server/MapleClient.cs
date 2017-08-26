@@ -334,6 +334,10 @@ namespace Destiny.Server
                     this.Character.Skills.Cast(iPacket);
                     break;
 
+                case ClientOperationCode.CancelBuff:
+                    this.Character.Buffs.Cancel(iPacket);
+                    break;
+
                 case ClientOperationCode.MesoDrop:
                     this.Character.DropMeso(iPacket);
                     break;

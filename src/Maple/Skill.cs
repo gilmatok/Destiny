@@ -43,7 +43,7 @@ namespace Destiny.Maple
         public short MagicAttack { get; set; }
         public short MagicDefense { get; set; }
         public short Accuracy { get; set; }
-        public short Avoid { get; set; }
+        public short Avoidability { get; set; }
         public short HP { get; set; }
         public short MP { get; set; }
         public short Probability { get; set; }
@@ -238,7 +238,7 @@ namespace Destiny.Maple
                 this.WeaponDefense = (short)datum["weapon_def"];
                 this.MagicDefense = (short)datum["magic_def"];
                 this.Accuracy = (short)datum["accuracy"];
-                this.Avoid = (short)datum["avoid"];
+                this.Avoidability = (short)datum["avoid"];
                 this.HP = (short)datum["hp"];
                 this.MP = (short)datum["mp"];
                 this.Probability = (short)datum["prop"];
@@ -321,7 +321,7 @@ namespace Destiny.Maple
             this.MagicAttack = this.CachedReference.MagicAttack;
             this.MagicDefense = this.CachedReference.MagicDefense;
             this.Accuracy = this.CachedReference.Accuracy;
-            this.Avoid = this.CachedReference.Avoid;
+            this.Avoidability = this.CachedReference.Avoidability;
             this.HP = this.CachedReference.HP;
             this.MP = this.CachedReference.MP;
             this.Probability = this.CachedReference.Probability;
@@ -346,8 +346,14 @@ namespace Destiny.Maple
                 this.CooldownEnd = DateTime.Now.AddSeconds(this.Cooldown);
             }
 
-            // TODO: Buffs.
-            // TODO: Effects.
+            if (this.HasBuff)
+            {
+                this.Character.Buffs.Add(this, 0);
+            }
+            else
+            {
+
+            }
         }
 
         public byte[] ToByteArray()

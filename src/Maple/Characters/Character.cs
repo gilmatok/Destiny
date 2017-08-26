@@ -34,6 +34,7 @@ namespace Destiny.Maple.Characters
         public CharacterItems Items { get; private set; }
         public CharacterSkills Skills { get; private set; }
         public CharacterQuests Quests { get; private set; }
+        public CharacterBuffs Buffs { get; private set; }
         public CharacterKeymap Keymap { get; private set; }
         public CharacterTrocks Trocks { get; private set; }
         public CharacterMemos Memos { get; private set; }
@@ -745,6 +746,7 @@ namespace Destiny.Maple.Characters
             this.Items = new CharacterItems(this, 24, 24, 24, 24, 48);
             this.Skills = new CharacterSkills(this);
             this.Quests = new CharacterQuests(this);
+            this.Buffs = new CharacterBuffs(this);
             this.Keymap = new CharacterKeymap(this);
             this.Trocks = new CharacterTrocks(this);
             this.Memos = new CharacterMemos(this);
@@ -831,6 +833,7 @@ namespace Destiny.Maple.Characters
             {
                 this.Skills.Load();
                 this.Quests.Load();
+                this.Buffs.Load();
                 this.Keymap.Load();
                 this.Trocks.Load();
                 this.Memos.Load();
@@ -894,6 +897,7 @@ namespace Destiny.Maple.Characters
             this.Items.Save();
             this.Skills.Save();
             this.Quests.Save();
+            this.Buffs.Save();
             this.Keymap.Save();
             this.Trocks.Save();
             this.Variables.Save();
