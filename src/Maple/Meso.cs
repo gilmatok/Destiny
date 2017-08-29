@@ -19,7 +19,7 @@ namespace Destiny.Maple
             OutPacket oPacket = new OutPacket(ServerOperationCode.Message);
 
             oPacket
-                .WriteByte()
+                .WriteByte((byte)MessageType.DropPickup)
                 .WriteShort(1)
                 .WriteInt(this.Amount)
                 .WriteShort();

@@ -4,7 +4,6 @@ using Destiny.Maple.Data;
 using System;
 using System.Collections.Generic;
 using Destiny.Maple.Life;
-using System.Linq;
 
 namespace Destiny.Maple.Characters
 {
@@ -286,29 +285,29 @@ namespace Destiny.Maple.Characters
 
             // TODO: Pet rewards.
 
-            if (selection != 0) // NOTE: Selective reward.
+            if (selection != -1) // NOTE: Selective reward.
             {
-                if (selection == -1) // NOTE: Randomized reward.
-                {
-                    KeyValuePair<int, short> item = quest.PostItemRewards.ElementAt(Constants.Random.Next(0, quest.PostItemRewards.Count));
+                //if (selection == -1) // NOTE: Randomized reward.
+                //{
+                //    KeyValuePair<int, short> item = quest.PostItemRewards.ElementAt(Constants.Random.Next(0, quest.PostItemRewards.Count));
 
-                    this.Parent.Items.Add(new Item(item.Key, item.Value));
+                //    this.Parent.Items.Add(new Item(item.Key, item.Value));
 
-                    using (OutPacket oPacket = new OutPacket(ServerOperationCode.Effect))
-                    {
-                        oPacket
-                            .WriteByte((byte)UserEffect.Quest)
-                            .WriteByte(1)
-                            .WriteInt(item.Key)
-                            .WriteInt(item.Value);
+                //    using (OutPacket oPacket = new OutPacket(ServerOperationCode.Effect))
+                //    {
+                //        oPacket
+                //            .WriteByte((byte)UserEffect.Quest)
+                //            .WriteByte(1)
+                //            .WriteInt(item.Key)
+                //            .WriteInt(item.Value);
 
-                        this.Parent.Client.Send(oPacket);
-                    }
-                }
-                else
-                {
-                    // TODO: Selective reward based on selection.
-                }
+                //        this.Parent.Client.Send(oPacket);
+                //    }
+                //}
+                //else
+                //{
+                //    // TODO: Selective reward based on selection.
+                //}
             }
             else
             {
@@ -350,16 +349,7 @@ namespace Destiny.Maple.Characters
         {
             this.Delete(questID);
 
-            using (OutPacket oPacket = new OutPacket(ServerOperationCode.Message))
-            {
-                oPacket
-                    .WriteByte(1)
-                    .WriteUShort(questID)
-                    .WriteByte()
-                    .WriteByte();
-
-                this.Parent.Client.Send(oPacket);
-            }
+            this.Update(questID, QuestStatus.NotStarted);
         }
 
         private void Update(ushort questID, QuestStatus status, string progress = "")

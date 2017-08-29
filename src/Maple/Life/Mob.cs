@@ -228,11 +228,9 @@ namespace Destiny.Maple.Life
         public void Move(InPacket iPacket)
         {
             short moveAction = iPacket.ReadShort();
-            bool useSkill = (iPacket.ReadByte() & 0xF) != 0;
-            int skillUnknown = iPacket.ReadByte() & 0xFF;
-            byte skillID = iPacket.ReadByte();
-            byte skillLevel = iPacket.ReadByte();
-            short delay = iPacket.ReadShort();
+            bool cheatResult = (iPacket.ReadByte() & 0xF) != 0;
+            byte centerSplit = iPacket.ReadByte();
+            int illegalVelocity = iPacket.ReadInt();
             iPacket.Skip(8);
             iPacket.ReadByte();
             iPacket.ReadInt();
@@ -243,17 +241,10 @@ namespace Destiny.Maple.Life
             this.Foothold = movements.Foothold;
             this.Stance = movements.Stance;
 
+            byte skillID = 0;
+            byte skillLevel = 0;
             MobSkill skill = null;
-
-            if (useSkill && this.Skills.Count > 0)
-            {
-                skill = this.Skills.Random;
-            }
-            else if ((skillID >= 100 && skillID <= 200) && this.Skills.Contains(skillID, skillLevel)) // TODO: Is this necessary?
-            {
-                skill = this.Skills[skillID];
-            }
-
+            
             if (skill != null)
             {
                 if (this.Health * 100 / this.MaxHealth > skill.PercentageLimitHP ||
@@ -274,10 +265,10 @@ namespace Destiny.Maple.Life
                 oPacket
                     .WriteInt(this.ObjectID)
                     .WriteShort(moveAction)
-                    .WriteBool(useSkill)
+                    .WriteBool(cheatResult)
                     .WriteShort((short)this.Mana)
-                    .WriteByte((byte)(skill != null ? skill.MapleID : 0))
-                    .WriteByte((byte)(skill != null ? skill.Level : 0));
+                    .WriteByte(skillID)
+                    .WriteByte(skillLevel);
 
                 this.Controller.Client.Send(oPacket);
             }
@@ -287,11 +278,9 @@ namespace Destiny.Maple.Life
                 oPacket
                     .WriteInt(this.ObjectID)
                     .WriteBool()
-                    .WriteBool(useSkill)
-                    .WriteByte((byte)skillUnknown)
-                    .WriteByte(skillID)
-                    .WriteByte(skillLevel)
-                    .WriteShort(delay)
+                    .WriteBool(cheatResult)
+                    .WriteByte(centerSplit)
+                    .WriteInt(illegalVelocity)
                     .WriteBytes(movements.ToByteArray());
 
                 this.Map.Broadcast(oPacket, this.Controller);
@@ -355,7 +344,10 @@ namespace Destiny.Maple.Life
 
         public void Die()
         {
-            this.Map.Mobs.Remove(this);
+            if (!this.Map.Mobs.Remove(this))
+            {
+
+            }
         }
 
         public bool Damage(Character attacker, uint amount)
