@@ -53,7 +53,7 @@ namespace Destiny.Maple.Maps
 
             using (OutPacket oPacket = new OutPacket(ServerOperationCode.TransferFieldReqInogred))
             {
-                oPacket.WriteByte((byte)MapTransferResult.PortalClosed);
+                oPacket.WriteByte((byte)MapTransferResult.NoReason);
 
                 character.Client.Send(oPacket);
             }

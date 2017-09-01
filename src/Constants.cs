@@ -1597,6 +1597,7 @@ namespace Destiny
 
     public enum MapTransferResult : byte
     {
+        NoReason = 0,
         PortalClosed = 1,
         CannotGo = 2,
         ForceOfGround = 3,

@@ -1093,27 +1093,26 @@ namespace Destiny.Maple.Characters
                 return;
             }
 
-            int mode = iPacket.ReadInt();
+            int mapID = iPacket.ReadInt();
             string portalLabel = iPacket.ReadMapleString();
-            iPacket.ReadByte();
-            bool wheel = iPacket.ReadShort() > 0;
+            iPacket.ReadByte(); // NOTE: Unknown.
+            bool wheel = iPacket.ReadBool();
 
-            switch (mode)
+            switch (mapID)
             {
-                case 0:
+                case 0: // NOTE: Death.
                     {
                         if (this.IsAlive)
                         {
                             return;
                         }
 
-                        this.Health = this.MaxHealth;
-
+                        this.Health = 50;
                         this.ChangeMap(this.Map.ReturnMapID);
                     }
                     break;
 
-                case -1:
+                case -1: // NOTE: Portal.
                     {
                         Portal portal;
 
@@ -1126,7 +1125,29 @@ namespace Destiny.Maple.Characters
                             return;
                         }
 
+                        // TODO: Validate player and portal position.
+
+                        if (this.Level < this.Client.Channel.Maps[portal.DestinationMapID].RequiredLevel)
+                        {
+                            // TODO: Send a force of ground portal message.
+
+                            return;
+                        }
+
                         this.ChangeMap(portal.DestinationMapID, portal.Link.ID);
+                    }
+                    break;
+
+                default: // NOTE: Admin '/m' command.
+                    {
+                        if (!this.IsMaster)
+                        {
+                            return;
+                        }
+
+                        // TODO: Validate map ID.
+
+                        this.ChangeMap(mapID);
                     }
                     break;
             }
@@ -1134,34 +1155,11 @@ namespace Destiny.Maple.Characters
 
         public void ChangeMap(int mapID, string portalLabel)
         {
-            Portal portal = this.Client.Channel.Maps[mapID].Portals[portalLabel];
-
-            this.ChangeMap(mapID, portal.ID);
+            this.ChangeMap(mapID, this.Client.Channel.Maps[mapID].Portals[portalLabel].ID);
         }
 
-        public void ChangeMap(int mapID, byte portalID = byte.MaxValue) // NOTE: If a portal isn't specified, a random spawn point will be chosen.
+        public void ChangeMap(int mapID, byte portalID = 0, bool fromPosition = false, Point position = null)
         {
-            Map map = this.Client.Channel.Maps[mapID];
-
-                        if (portalID == byte.MaxValue)
-            {
-                List<Portal> spawnPoints = new List<Portal>();
-
-                foreach (Portal loopPortal in map.Portals)
-                {
-                    if (loopPortal.IsSpawnPoint)
-                    {
-                        spawnPoints.Add(loopPortal);
-                    }
-                }
-
-                this.SpawnPoint = spawnPoints.Count > 0 ? spawnPoints[Constants.Random.Next(0, spawnPoints.Count - 1)].ID : (byte)0;
-            }
-            else
-            {
-                this.SpawnPoint = portalID;
-            }
-
             this.Map.Characters.Remove(this);
 
             using (OutPacket oPacket = new OutPacket(ServerOperationCode.SetField))
@@ -1175,13 +1173,19 @@ namespace Destiny.Maple.Characters
                     .WriteInt(mapID)
                     .WriteByte(this.SpawnPoint)
                     .WriteShort(this.Health)
-                    .WriteBool(false) // NOTE: Follow.
-                    .WriteDateTime(DateTime.Now);
+                    .WriteBool(fromPosition);
+
+                if (fromPosition)
+                {
+                    oPacket.WritePoint(position);
+                }
+
+                oPacket.WriteDateTime(DateTime.Now);
 
                 this.Client.Send(oPacket);
             }
 
-            map.Characters.Add(this);
+            this.Client.Channel.Maps[mapID].Characters.Add(this);
         }
 
         public void AddAbility(StatisticType statistic, short mod, bool isReset)
@@ -2294,9 +2298,14 @@ namespace Destiny.Maple.Characters
                 return;
             }
 
-            portal.Enter(this);
+            if (false) // TODO: Check if portal is onlyOnce and player already used it.
+            {
+                // TODO: Send a "closed for now" portal message.
 
-            this.Release();
+                return;
+            }
+
+            portal.Enter(this);
         }
 
         public void Report(InPacket iPacket)
