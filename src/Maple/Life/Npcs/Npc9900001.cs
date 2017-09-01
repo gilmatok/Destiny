@@ -13,80 +13,53 @@ namespace Destiny.Maple.Life.Npcs
         {
             if (talker.IsMaster)
             {
-                bool result = await this.ShowYesNoDialog(talker, "Would you like to test #binstances#k, #h #?!");
+                bool advanced = talker.Job == Job.SuperGM;
 
-                if (result)
+                foreach (int loopWizetItem in DataProvider.Items.WizetItemIDs)
                 {
-                    string name = "Test";
-
-                    if (talker.Client.Channel.Instances.Contains(name))
+                    if (!talker.Items.Contains(loopWizetItem))
                     {
-                        await this.ShowOkDialog(talker, "I'm sorry, #h #, but there seems someone in already inside. Please try again in a little bit.");
+                        advanced = false;
                     }
-                    else
-                    {
-                        if (talker.Client.Channel.Instances.Create(name, 15 * 1000))
-                        {
-                            talker.Client.Channel.Instances[name].AddCharacter(talker);
+                }
 
-                            talker.ChangeMap(0);
-                        }
-                        else
-                        {
-                            await this.ShowOkDialog(talker, "There seems to be something wrong. Please check again later.");
-                        }
-                    }
+                if (advanced)
+                {
+                    await this.ShowOkDialog(talker, "You have already fully advanced to #bGameMaster#k.");
                 }
                 else
                 {
-                    bool advanced = talker.Job == Job.SuperGM;
+                    if (talker.Job != Job.SuperGM)
+                    {
+                        talker.Job = Job.SuperGM;
+                    }
+
+                    talker.Strength = talker.Dexterity = talker.Intelligence = talker.Luck = 30000;
+                    talker.MaxHealth = talker.MaxMana = 30000;
+                    talker.Health = talker.Mana = 30000;
+
+                    // TODO: Max all skills.
 
                     foreach (int loopWizetItem in DataProvider.Items.WizetItemIDs)
                     {
                         if (!talker.Items.Contains(loopWizetItem))
                         {
-                            advanced = false;
+                            talker.Items.Add(new Item(loopWizetItem));
                         }
                     }
 
-                    if (advanced)
+                    foreach (Item loopItem in talker.Items)
                     {
-                        await this.ShowOkDialog(talker, "You have already fully advanced to #bGameMaster#k.");
-                    }
-                    else
-                    {
-                        if (talker.Job != Job.SuperGM)
-                        {
-                            talker.Job = Job.SuperGM;
-                        }
-
-                        talker.Strength = talker.Dexterity = talker.Intelligence = talker.Luck = 30000;
-                        talker.MaxHealth = talker.MaxMana = 30000;
-                        talker.Health = talker.Mana = 30000;
-
-                        // TODO: Max all skills.
-
                         foreach (int loopWizetItem in DataProvider.Items.WizetItemIDs)
                         {
-                            if (!talker.Items.Contains(loopWizetItem))
+                            if (loopItem.MapleID == loopWizetItem)
                             {
-                                talker.Items.Add(new Item(loopWizetItem));
+                                loopItem.Equip();
                             }
                         }
-
-                        foreach (Item loopItem in talker.Items)
-                        {
-                            foreach (int loopWizetItem in DataProvider.Items.WizetItemIDs)
-                            {
-                                if (loopItem.MapleID == loopWizetItem)
-                                {
-                                    loopItem.Equip();
-                                }
-                            }
-                        }
-
-                        await this.ShowOkDialog(talker, "You have been successfully advanced as a #bGameMaster#k.");
                     }
+
+                    await this.ShowOkDialog(talker, "You have been successfully advanced as a #bGameMaster#k.");
                 }
             }
             else

@@ -1,7 +1,6 @@
 ﻿using Destiny.Core.Data;
 using Destiny.Core.Network;
 using Destiny.Maple.Characters;
-using Destiny.Maple.Instances;
 
 namespace Destiny.Maple.Maps
 {
@@ -40,7 +39,6 @@ namespace Destiny.Maple.Maps
         public MapPortals Portals { get; private set; }
         public MapSpawnPoints SpawnPoints { get; private set; }
         public MapPlayerShops PlayerShops { get; private set; }
-        public Instance Instance { get; set; }
 
         public Map(MapFactory factory, Datum datum)
         {

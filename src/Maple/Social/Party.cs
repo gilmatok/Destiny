@@ -1,7 +1,5 @@
-﻿using Destiny.Core.IO;
-using Destiny.Core.Network;
+﻿using Destiny.Core.Network;
 using Destiny.Maple.Characters;
-using Destiny.Maple.Instances;
 using Destiny.Server;
 using System.Collections.ObjectModel;
 
@@ -13,7 +11,6 @@ namespace Destiny.Maple.Social
 
         public int ID { get; private set; }
         public int LeaderID { get; private set; }
-        public Instance Instance { get; set; }
 
         public bool IsFull
         {
@@ -62,11 +59,6 @@ namespace Destiny.Maple.Social
 
         public void Disband()
         {
-            if (this.Instance != null)
-            {
-                this.Instance.PartyDisband(this);
-            }
-
             using (OutPacket oPacket = new OutPacket(ServerOperationCode.PartyResult))
             {
                 oPacket
@@ -260,11 +252,6 @@ namespace Destiny.Maple.Social
 
             if (item.Character != null)
             {
-                if (item.Character.Instance != null)
-                {
-                    item.Character.Instance.PartyRemoveMember(this, item);
-                }
-
                 item.Character.Party = null;
             }
 
