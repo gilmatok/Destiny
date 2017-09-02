@@ -97,7 +97,6 @@
     <Compile Include="Maple\Interaction\PlayerShop.cs" />
     <Compile Include="Maple\Interaction\PlayerShopItem.cs" />
     <Compile Include="Maple\Interaction\Trade.cs" />
-    <Compile Include="Maple\InventoryOperation.cs" />
     <Compile Include="Maple\Life\LifeObject.cs" />
     <Compile Include="Maple\Life\Loot.cs" />
     <Compile Include="Maple\Life\MobSkill.cs" />

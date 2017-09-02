@@ -1,5 +1,4 @@
-﻿using Destiny.Core.IO;
-using Destiny.Core.Network;
+﻿using Destiny.Core.Network;
 using Destiny.Core.Data;
 using Destiny.Maple.Characters;
 using Destiny.Maple.Data;
@@ -1160,7 +1159,7 @@ namespace Destiny.Maple
 
             oPacket
                 .WriteByte((byte)MessageType.DropPickup)
-                .WriteByte()
+                .WriteBool(false)
                 .WriteInt(this.MapleID)
                 .WriteInt(this.Quantity)
                 .WriteInt()

@@ -1,5 +1,4 @@
 ﻿using Destiny.Maple.Maps;
-using Destiny.Core.IO;
 using Destiny.Core.Network;
 
 namespace Destiny.Maple
@@ -20,7 +19,8 @@ namespace Destiny.Maple
 
             oPacket
                 .WriteByte((byte)MessageType.DropPickup)
-                .WriteShort(1)
+                .WriteBool(true)
+                .WriteByte() // NOTE: Unknown.
                 .WriteInt(this.Amount)
                 .WriteShort();
 

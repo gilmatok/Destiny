@@ -323,6 +323,13 @@ namespace Destiny
         Count = 6
     }
 
+    public enum InventoryOperationType : byte
+    {
+        AddItem,
+        ModifyQuantity,
+        ModifySlot,
+        RemoveItem
+    }
 
     public enum MemoAction : byte
     {
