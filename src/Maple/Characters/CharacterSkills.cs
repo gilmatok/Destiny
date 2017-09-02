@@ -53,7 +53,28 @@ namespace Destiny.Maple.Characters
             }
 
             skill.Recalculate();
-            skill.Cast(iPacket);
+            skill.Cast();
+
+            switch (skill.MapleID)
+            {
+                case (int)SkillNames.SuperGM.Resurrection:
+                    {
+                        byte targets = iPacket.ReadByte();
+
+                        while (targets-- > 0)
+                        {
+                            int targetID = iPacket.ReadInt();
+
+                            Character target = this.Parent.Map.Characters[targetID];
+
+                            if (!target.IsAlive)
+                            {
+                                target.Health = target.MaxHealth;
+                            }
+                        }
+                    }
+                    break;
+            }
         }
 
         public byte[] ToByteArray()

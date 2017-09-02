@@ -1359,7 +1359,7 @@ namespace Destiny.Maple.Characters
             {
                 skill = this.Skills[attack.SkillID];
 
-                skill.Cast(iPacket);
+                skill.Cast();
             }
 
             // TODO: Modify packet based on attack type.
