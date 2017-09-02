@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using Destiny.Maple.Social;
 using Destiny.Maple.Life;
+using Destiny.Core.Threading;
 
 namespace Destiny.Maple
 {
@@ -118,19 +119,6 @@ namespace Destiny.Maple
             }
         }
 
-        public bool IsGmBuff
-        {
-            get
-            {
-                return this.MapleID == (int)SkillNames.SuperGM.HealPlusDispel ||
-                       this.MapleID == (int)SkillNames.SuperGM.Haste ||
-                       this.MapleID == (int)SkillNames.SuperGM.HolySymbol ||
-                       this.MapleID == (int)SkillNames.SuperGM.Bless ||
-                       this.MapleID == (int)SkillNames.SuperGM.Resurrection ||
-                       this.MapleID == (int)SkillNames.SuperGM.HyperBody;
-            }
-        }
-
         public bool IsFromFourthJob
         {
             get
@@ -175,24 +163,26 @@ namespace Destiny.Maple
 
                 if (this.IsCoolingDown)
                 {
-                    //using (Packet outPacket = new Packet(MapleServerOperationCode.Cooldown))
-                    //{
-                    //    outPacket.WriteInt(this.MapleID);
-                    //    outPacket.WriteShort((short)this.RemainingCooldownSeconds);
+                    using (OutPacket oPacket = new OutPacket(ServerOperationCode.Cooldown))
+                    {
+                        oPacket
+                            .WriteInt(this.MapleID)
+                            .WriteShort((short)this.RemainingCooldownSeconds);
 
-                    //    this.Character.Client.Send(outPacket);
-                    //}
+                        this.Character.Client.Send(oPacket);
+                    }
 
-                    //Delay.Execute(this.RemainingCooldownSeconds * 1000, () =>
-                    //{
-                    //    using (Packet outPacket = new Packet(MapleServerOperationCode.Cooldown))
-                    //    {
-                    //        outPacket.WriteInt(this.MapleID);
-                    //        outPacket.WriteShort(0);
+                    Delay.Execute(() =>
+                    {
+                        using (OutPacket oPacket = new OutPacket(ServerOperationCode.Cooldown))
+                        {
+                            oPacket
+                                .WriteInt(this.MapleID)
+                                .WriteShort(0);
 
-                    //        this.Character.Client.Send(outPacket);
-                    //    }
-                    //});
+                            this.Character.Client.Send(oPacket);
+                        }
+                    }, (this.RemainingCooldownSeconds * 1000));
                 }
             }
         }
