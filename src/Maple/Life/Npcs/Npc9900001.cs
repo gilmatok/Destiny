@@ -2,6 +2,8 @@
 using Destiny.Core.Data;
 using Destiny.Maple.Characters;
 using Destiny.Maple.Data;
+using System.Collections.Generic;
+using System;
 
 namespace Destiny.Maple.Life.Npcs
 {
@@ -38,7 +40,27 @@ namespace Destiny.Maple.Life.Npcs
                     talker.MaxHealth = talker.MaxMana = 30000;
                     talker.Health = talker.Mana = 30000;
 
-                    // TODO: Max all skills.
+                    List<Tuple<int, byte>> skills = new List<Tuple<int, byte>>()
+                    {
+                        new Tuple<int, byte>(8, 1),
+                        new Tuple<int, byte>(12, 20),
+                        new Tuple<int, byte>(1003, 1),
+                        new Tuple<int, byte>(1004, 1),
+                        new Tuple<int, byte>(1005, 1),
+                        new Tuple<int, byte>(1002, 1),
+                        new Tuple<int, byte>(1001, 1),
+                        new Tuple<int, byte>(1000, 3)
+                    };
+
+                    foreach (Tuple<int, byte> skill in skills)
+                    {
+                        if (!talker.Skills.Contains(skill.Item1))
+                        {
+                            talker.Skills.Add(new Skill(skill.Item1));
+                        }
+
+                        talker.Skills[skill.Item1].CurrentLevel = skill.Item2;
+                    }
 
                     foreach (int loopWizetItem in DataProvider.Items.WizetItemIDs)
                     {

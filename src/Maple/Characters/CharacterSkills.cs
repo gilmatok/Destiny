@@ -43,9 +43,9 @@ namespace Destiny.Maple.Characters
         {
             iPacket.ReadInt(); // NOTE: Ticks.
             int mapleID = iPacket.ReadInt();
+            byte level = iPacket.ReadByte();
 
             Skill skill = this[mapleID];
-            int level = iPacket.ReadByte();
 
             if (level != skill.CurrentLevel)
             {
@@ -53,7 +53,7 @@ namespace Destiny.Maple.Characters
             }
 
             skill.Recalculate();
-            skill.Cast();
+            skill.Cast(iPacket);
         }
 
         public byte[] ToByteArray()

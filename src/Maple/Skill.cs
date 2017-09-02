@@ -360,11 +360,23 @@ namespace Destiny.Maple
             this.Cooldown = this.CachedReference.Cooldown;
         }
 
-        public void Cast()
+        public void Cast(InPacket iPacket)
         {
+            if (!this.Character.IsAlive)
+            {
+                return;
+            }
+
             if (this.IsCoolingDown)
             {
                 return;
+            }
+
+            if (this.MapleID == (int)SkillNames.Priest.MysticDoor)
+            {
+                Point origin = iPacket.ReadPoint();
+
+                // TODO: Open mystic door.
             }
 
             this.Character.Health -= this.CostHP;
@@ -375,45 +387,133 @@ namespace Destiny.Maple
                 this.CooldownEnd = DateTime.Now.AddSeconds(this.Cooldown);
             }
 
-            if (this.HasBuff)
+            // TODO: Money cost.
+
+            byte type = 0;
+            byte direction = 0;
+            short addedInfo = 0;
+
+            switch (this.MapleID)
             {
-                this.Character.Buffs.Add(this, 0);
-
-                using (OutPacket oPacket = new OutPacket(ServerOperationCode.Effect))
-                {
-                    oPacket
-                        .WriteByte((byte)UserEffect.SkillUse)
-                        .WriteInt(this.MapleID)
-                        .WriteByte(1)
-                        .WriteByte(1);
-
-                    this.Character.Client.Send(oPacket);
-                }
-
-                using (OutPacket oPacket = new OutPacket(ServerOperationCode.RemoteEffect))
-                {
-                    oPacket
-                        .WriteInt(Character.ID)
-                        .WriteByte((byte)UserEffect.SkillUse)
-                        .WriteInt(this.MapleID)
-                        .WriteByte(1)
-                        .WriteByte(1);
-
-                    this.Character.Map.Broadcast(oPacket, this.Character);
-                }
-
-                if (this.IsGmBuff)
-                {
-                    foreach (Character character in this.Character.Map.Characters.GetInRange(this.Character, 200)) // TOOD: Real value.
+                case (int)SkillNames.SuperGM.Haste:
+                case (int)SkillNames.SuperGM.HolySymbol:
+                case (int)SkillNames.SuperGM.Bless:
+                case (int)SkillNames.SuperGM.HyperBody:
+                case (int)SkillNames.SuperGM.HealPlusDispel:
+                case (int)SkillNames.SuperGM.Resurrection:
                     {
-                        if (character != this.Character)
-                        {
-                            character.Buffs.Add(this, 0);
+                        byte targets = iPacket.ReadByte();
+                        Func<Character, bool> condition = null;
+                        Action<Character> action = null;
 
-                            // TODO: Effects.
+                        switch (this.MapleID)
+                        {
+                            case (int)SkillNames.SuperGM.HealPlusDispel:
+                                {
+                                    condition = new Func<Character, bool>((target) => target.IsAlive);
+                                    action = new Action<Character>((target) =>
+                                    {
+                                        target.Health = target.MaxHealth;
+                                        target.Mana = target.MaxMana;
+
+                                        // TODO: Use dispell.
+                                    });
+                                }
+                                break;
+
+                            case (int)SkillNames.SuperGM.Resurrection:
+                                {
+                                    condition = new Func<Character, bool>((target) => !target.IsAlive);
+                                    action = new Action<Character>((target) =>
+                                    {
+                                        target.Health = target.MaxHealth;
+                                    });
+                                }
+                                break;
+
+                            default:
+                                {
+                                    condition = new Func<Character, bool>((target) => true);
+                                    action = new Action<Character>((target) =>
+                                    {
+                                        target.Buffs.Add(this, 0);
+                                    });
+                                }
+                                break;
+                        }
+
+                        for (byte i = 0; i < targets; i++)
+                        {
+                            int targetID = iPacket.ReadInt();
+
+                            Character target = this.Character.Map.Characters[targetID];
+
+                            if (condition(target))
+                            {
+                                using (OutPacket oPacket = new OutPacket(ServerOperationCode.Effect))
+                                {
+                                    oPacket
+                                        .WriteByte((byte)UserEffect.SkillAffected)
+                                        .WriteInt(this.MapleID)
+                                        .WriteByte(1)
+                                        .WriteByte(1);
+
+                                    target.Client.Send(oPacket);
+                                }
+
+                                using (OutPacket oPacket = new OutPacket(ServerOperationCode.RemoteEffect))
+                                {
+                                    oPacket
+                                        .WriteInt(Character.ID)
+                                        .WriteByte((byte)UserEffect.SkillAffected)
+                                        .WriteInt(this.MapleID)
+                                        .WriteByte(1)
+                                        .WriteByte(1);
+
+                                    target.Map.Broadcast(oPacket, target);
+                                }
+
+                                action(target);
+                            }
                         }
                     }
-                }
+                    break;
+
+                default:
+                    {
+                        type = iPacket.ReadByte();
+
+                        switch (type)
+                        {
+                            case 0x80:
+                                addedInfo = iPacket.ReadShort();
+                                break;
+                        }
+                    }
+                    break;
+            }
+
+            using (OutPacket oPacket = new OutPacket(ServerOperationCode.Effect))
+            {
+                oPacket
+                    .WriteByte((byte)UserEffect.SkillUse)
+                    .WriteInt(this.MapleID)
+                    .WriteByte(1)
+                    .WriteByte(1);
+
+                this.Character.Client.Send(oPacket);
+            }
+
+            using (OutPacket oPacket = new OutPacket(ServerOperationCode.RemoteEffect))
+            {
+                oPacket
+                    .WriteInt(Character.ID)
+                    .WriteByte((byte)UserEffect.SkillUse)
+                    .WriteInt(this.MapleID)
+                    .WriteByte(1)
+                    .WriteByte(1);
+
+                this.Character.Map.Broadcast(oPacket, this.Character);
             }
         }
 
