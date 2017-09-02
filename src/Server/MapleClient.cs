@@ -1070,15 +1070,15 @@ namespace Destiny.Server
                     oPacket
                         .WriteInt(this.Account.ID)
                         .WriteByte((byte)this.Account.Gender)
-                        .WriteBool() // NOTE: Is Admin
-                        .WriteByte() // NOTE: Admin byte
-                        .WriteBool()
+                        .WriteByte() // NOTE: Grade code.
+                        .WriteByte() // NOTE: Subgrade code.
+                        .WriteByte() // NOTE: Country code.
                         .WriteMapleString(this.Account.Username)
-                        .WriteByte()
-                        .WriteBool()
-                        .WriteLong()
-                        .WriteLong()
-                        .WriteInt()
+                        .WriteByte() // NOTE: Unknown.
+                        .WriteByte() // NOTE: Quiet ban reason. 
+                        .WriteLong() // NOTE: Quiet ban lift date.
+                        .WriteDateTime(this.Account.Creation) 
+                        .WriteInt() // NOTE: Unknown.
                         .WriteByte((byte)(MasterServer.Login.RequestPin ? 0 : 2)) // NOTE: 1 seems to not do anything.
                         .WriteByte((byte)(MasterServer.Login.RequestPic ? (string.IsNullOrEmpty(this.Account.Pic) ? 0 : 1) : 2));
                 }

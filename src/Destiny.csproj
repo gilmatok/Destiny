@@ -73,6 +73,7 @@
     <Compile Include="Maple\Characters\CharacterVariables.cs" />
     <Compile Include="Maple\Commands\Commands.cs" />
     <Compile Include="Maple\Commands\Implementation\ClearDropsCommand.cs" />
+    <Compile Include="Maple\Commands\Implementation\KillCommand.cs" />
     <Compile Include="Maple\Commands\Implementation\TestCommand.cs" />
     <Compile Include="Maple\Commands\Implementation\ZakumCommand.cs" />
     <Compile Include="Maple\Commands\Implementation\HorntailCommand.cs" />
