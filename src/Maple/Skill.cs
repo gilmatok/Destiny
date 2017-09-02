@@ -696,7 +696,8 @@ namespace Destiny.Maple
                     }
                     break;
 
-
+                case (int)SkillNames.Beginner.EchoOfHero:
+                case (int)SkillNames.Noblesse.EchoOfHero:
                 case (int)SkillNames.SuperGM.Haste:
                 case (int)SkillNames.SuperGM.HolySymbol:
                 case (int)SkillNames.SuperGM.Bless:
