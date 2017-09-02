@@ -1,5 +1,4 @@
 ﻿using Destiny.Maple.Characters;
-using Destiny.Maple.Maps;
 using System.Collections.Generic;
 
 namespace Destiny.Maple.Commands.Implementation
