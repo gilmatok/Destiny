@@ -448,7 +448,7 @@ namespace Destiny.Maple
 
                             Character target = this.Character.Map.Characters[targetID];
 
-                            if (condition(target))
+                            if (target != this.Character && condition(target))
                             {
                                 using (OutPacket oPacket = new OutPacket(ServerOperationCode.Effect))
                                 {
@@ -464,7 +464,7 @@ namespace Destiny.Maple
                                 using (OutPacket oPacket = new OutPacket(ServerOperationCode.RemoteEffect))
                                 {
                                     oPacket
-                                        .WriteInt(Character.ID)
+                                        .WriteInt(target.ID)
                                         .WriteByte((byte)UserEffect.SkillAffected)
                                         .WriteInt(this.MapleID)
                                         .WriteByte(1)
@@ -514,6 +514,11 @@ namespace Destiny.Maple
                     .WriteByte(1);
 
                 this.Character.Map.Broadcast(oPacket, this.Character);
+            }
+
+            if (this.HasBuff)
+            {
+                this.Character.Buffs.Add(this, 0);
             }
         }
 
