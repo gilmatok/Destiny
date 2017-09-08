@@ -46,6 +46,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Maple\Migration.cs" />
+    <Compile Include="Maple\Migrations.cs" />
     <Compile Include="Maple\World.cs" />
     <Compile Include="Maple\Worlds.cs" />
     <Compile Include="WvsCenter.cs" />

@@ -109,6 +109,10 @@ namespace Destiny.Interoperability
                 case InteroperabilityOperationCode.CharacterCreationResponse:
                     this.CreateCharacter(inPacket);
                     break;
+
+                case InteroperabilityOperationCode.MigrationRegisterResponse:
+                    this.Migrate(inPacket);
+                    break;
             }
         }
 
@@ -238,6 +242,31 @@ namespace Destiny.Interoperability
             }
 
             return this.CharacterCreationPool.Dequeue(accountID);
+        }
+
+        private PendingKeyedQueue<string, bool> MigrationPool = new PendingKeyedQueue<string, bool>();
+
+        public bool Migrate(string host, int accountID, int characterID)
+        {
+            using (Packet outPacket = new Packet(InteroperabilityOperationCode.MigrationRegisterRequest))
+            {
+                outPacket
+                    .WriteString(host)
+                    .WriteInt(accountID)
+                    .WriteInt(characterID);
+
+                this.Send(outPacket);
+            }
+
+            return this.MigrationPool.Dequeue(host);
+        }
+
+        private void Migrate(Packet inPacket)
+        {
+            string host = inPacket.ReadString();
+            bool valid = inPacket.ReadBool();
+
+            this.MigrationPool.Enqueue(host, valid);
         }
     }
 }

@@ -117,6 +117,14 @@ namespace Destiny.Network
                     this.CharacterCreationResponse(inPacket);
                     break;
 
+                case InteroperabilityOperationCode.MigrationRegisterRequest:
+                    this.Migrate(inPacket);
+                    break;
+
+                case InteroperabilityOperationCode.MigrationRequest:
+                    this.MigrateRequest(inPacket);
+                    break;
+
                 case InteroperabilityOperationCode.ChannelPortRequest:
                     this.ChannelPortRequest(inPacket);
                     break;
@@ -392,6 +400,52 @@ namespace Destiny.Network
                 outPacket.WriteBytes(characterData);
 
                 WvsCenter.Login.Send(outPacket);
+            }
+        }
+
+        private void Migrate(Packet inPacket)
+        {
+            string host = inPacket.ReadString();
+            int accountID = inPacket.ReadInt();
+            int characterID = inPacket.ReadInt();
+
+            bool valid;
+
+            if (WvsCenter.Migrations.Contains(host))
+            {
+                valid = false;
+            }
+            else
+            {
+                valid = true;
+
+                WvsCenter.Migrations.Add(new Migration(host, accountID, characterID));
+            }
+
+            using (Packet outPacket = new Packet(InteroperabilityOperationCode.MigrationRegisterResponse))
+            {
+                outPacket
+                    .WriteString(host)
+                    .WriteBool(valid);
+
+                this.Send(outPacket);
+            }
+        }
+
+        private void MigrateRequest(Packet inPacket)
+        {
+            string host = inPacket.ReadString();
+            int characterID = inPacket.ReadInt();
+
+            int accountID =  WvsCenter.Migrations.Validate(host, characterID);
+
+            using (Packet outPacket = new Packet(InteroperabilityOperationCode.MigrationResponse))
+            {
+                outPacket
+                    .WriteString(host)
+                    .WriteInt(accountID);
+
+                this.Send(outPacket);
             }
         }
 

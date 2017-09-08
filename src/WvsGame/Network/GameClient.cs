@@ -30,6 +30,13 @@ namespace Destiny.Network
             int accountID;
             int characterID = inPacket.ReadInt();
 
+            if ((accountID = WvsGame.CenterConnection.ValidateMigration(this.RemoteEndPoint.Address.ToString(), characterID)) == 0)
+            {
+                this.Stop();
+
+                return;
+            }
+
             this.Character = new Character(characterID, this);
             this.Character.Load();
             this.Character.Initialize();

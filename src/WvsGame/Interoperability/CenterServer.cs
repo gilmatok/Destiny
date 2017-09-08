@@ -92,6 +92,10 @@ namespace Destiny.Interoperability
                     this.CreateCharacter(inPacket);
                     break;
 
+                case InteroperabilityOperationCode.MigrationResponse:
+                    this.Migrate(inPacket);
+                    break;
+
                 case InteroperabilityOperationCode.ChannelPortResponse:
                     this.ChannelPortResponse(inPacket);
                     break;
@@ -360,6 +364,30 @@ namespace Destiny.Interoperability
             }
 
             return this.ChannelPortPool.Dequeue(channelID);
+        }
+
+        private PendingKeyedQueue<string, int> MigrationValidationPool = new PendingKeyedQueue<string, int>();
+
+        public int ValidateMigration(string host, int characterID)
+        {
+            using (Packet outPacket = new Packet(InteroperabilityOperationCode.MigrationRequest))
+            {
+                outPacket
+                    .WriteString(host)
+                    .WriteInt(characterID);
+
+                this.Send(outPacket);
+            }
+
+            return this.MigrationValidationPool.Dequeue(host);
+        }
+
+        private void Migrate(Packet inPacket)
+        {
+            string host = inPacket.ReadString();
+            int accountID = inPacket.ReadInt();
+
+            this.MigrationValidationPool.Enqueue(host, accountID);
         }
     }
 }

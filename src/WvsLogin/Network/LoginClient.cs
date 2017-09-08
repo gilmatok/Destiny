@@ -617,7 +617,12 @@ namespace Destiny.Network
 
             if (!requestPic || SHACryptograph.Encrypt(SHAMode.SHA256, pic) == this.Account.Pic)
             {
-                // TOOD: Add migration.
+                if (!WvsLogin.CenterConnection.Migrate(this.RemoteEndPoint.Address.ToString(), this.Account.ID, characterID))
+                {
+                    this.Stop();
+
+                    return;
+                }
 
                 using (Packet oPacket = new Packet(ServerOperationCode.SelectCharacterResult))
                 {

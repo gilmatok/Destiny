@@ -17,6 +17,7 @@ namespace Destiny
 
         public static CenterClient Login { get; set; }
         public static Worlds Worlds { get; private set; }
+        public static Migrations Migrations { get; private set; }
 
         public static TcpListener Listener { get; private set; }
         public static List<CenterClient> Clients { get; private set; }
@@ -46,6 +47,7 @@ namespace Destiny
             }
 
             WvsCenter.Worlds = new Worlds();
+            WvsCenter.Migrations = new Migrations();
             WvsCenter.Clients = new List<CenterClient>();
 
             Log.Entitle("WvsCenter v.{0}.{1}", Application.MapleVersion, Application.PatchVersion);
