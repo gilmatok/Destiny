@@ -105,17 +105,14 @@ namespace Destiny.Network
             }
         }
 
-        // TODO: Merge all the login packets into one.
         private void Login(Packet iPacket)
         {
             string username = iPacket.ReadString();
             string password = iPacket.ReadString();
 
-            LoginResult result = LoginResult.Valid;
-
             if (!username.IsAlphaNumeric())
             {
-                result = LoginResult.InvalidUsername;
+                this.SendLoginResult(LoginResult.InvalidUsername);
             }
             else
             {
@@ -127,18 +124,20 @@ namespace Destiny.Network
 
                     if (SHACryptograph.Encrypt(SHAMode.SHA512, password + this.Account.Salt) != this.Account.Password)
                     {
-                        result = LoginResult.InvalidPassword;
+                        this.SendLoginResult(LoginResult.InvalidPassword);
                     }
                     else if (this.Account.IsBanned)
                     {
-                        result = LoginResult.Banned;
+                        this.SendLoginResult(LoginResult.Banned);
                     }
                     else if (!this.Account.EULA)
                     {
-                        result = LoginResult.EULA;
+                        this.SendLoginResult(LoginResult.EULA);
                     }
-
-                    // TODO: Add more scenarios (require master IP, check banned IP, check logged in).
+                    else // TODO: Add more scenarios (require master IP, check banned IP, check logged in).
+                    {
+                        this.SendLoginResult(LoginResult.Valid);
+                    }
                 }
                 catch (NoAccountException)
                 {
@@ -161,14 +160,17 @@ namespace Destiny.Network
                     }
                     else
                     {
-                        result = LoginResult.InvalidUsername;
+                        this.SendLoginResult(LoginResult.InvalidUsername);
 
                         this.LastUsername = username;
                         this.LastPassword = password;
                     }
                 }
             }
+        }
 
+        private void SendLoginResult(LoginResult result)
+        {
             using (Packet oPacket = new Packet(ServerOperationCode.CheckPasswordResult))
             {
                 oPacket
@@ -212,28 +214,7 @@ namespace Destiny.Network
 
                 datum.Update("ID = {0}", this.Account.ID);
 
-                using (Packet oPacket = new Packet(ServerOperationCode.CheckPasswordResult))
-                {
-                    oPacket
-                        .WriteInt()
-                        .WriteByte()
-                        .WriteByte()
-                        .WriteInt(this.Account.ID)
-                        .WriteByte((byte)this.Account.Gender)
-                        .WriteBool(false)
-                        .WriteByte()
-                        .WriteByte()
-                        .WriteString(this.Account.Username)
-                        .WriteByte()
-                        .WriteBool(false)
-                        .WriteLong()
-                        .WriteLong()
-                        .WriteInt()
-                        .WriteByte((byte)(WvsLogin.RequestPin ? 0 : 2)) // NOTE: 1 seems to not do anything.
-                        .WriteByte((byte)(WvsLogin.RequestPic ? (string.IsNullOrEmpty(this.Account.Pic) ? 0 : 1) : 2));
-
-                    this.Send(oPacket);
-                }
+                this.SendLoginResult(LoginResult.Valid);
             }
             else
             {
@@ -262,28 +243,7 @@ namespace Destiny.Network
 
                 datum.Update("ID = {0}", this.Account.ID);
 
-                using (Packet oPacket = new Packet(ServerOperationCode.CheckPasswordResult))
-                {
-                    oPacket
-                        .WriteInt()
-                        .WriteByte()
-                        .WriteByte()
-                        .WriteInt(this.Account.ID)
-                        .WriteByte((byte)this.Account.Gender)
-                        .WriteBool(false)
-                        .WriteByte()
-                        .WriteByte()
-                        .WriteString(this.Account.Username)
-                        .WriteByte()
-                        .WriteBool(false)
-                        .WriteLong()
-                        .WriteLong()
-                        .WriteInt()
-                        .WriteByte((byte)(WvsLogin.RequestPin ? 0 : 2)) // NOTE: 1 seems to not do anything.
-                        .WriteByte((byte)(WvsLogin.RequestPic ? (string.IsNullOrEmpty(this.Account.Pic) ? 0 : 1) : 2));
-
-                    this.Send(oPacket);
-                }
+                this.SendLoginResult(LoginResult.Valid);
             }
         }
 
@@ -591,13 +551,6 @@ namespace Destiny.Network
             string pic = iPacket.ReadString();
             int characterID = iPacket.ReadInt();
 
-            if (!Database.Exists("characters", "ID = {0} AND AccountID = {1}", characterID, this.Account.ID))
-            {
-                this.Terminate();
-
-                return;
-            }
-
             CharacterDeletionResult result;
 
             if (SHACryptograph.Encrypt(SHAMode.SHA256, pic) == this.Account.Pic || !WvsLogin.RequestPic)
@@ -636,13 +589,6 @@ namespace Destiny.Network
             }
 
             int characterID = iPacket.ReadInt();
-
-            if (!Database.Exists("characters", "ID = {0} AND AccountID = {1}", characterID, this.Account.ID))
-            {
-                this.Terminate();
-
-                return;
-            }
 
             //if (this.IsInViewAllChar)
             //{
