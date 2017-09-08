@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using Destiny.Collections;
+using System.Collections.ObjectModel;
 
 namespace Destiny.Maple
 {
@@ -42,6 +43,15 @@ namespace Destiny.Maple
                 }
 
                 return population;
+            }
+        }
+
+
+        public Channel RandomChannel
+        {
+            get
+            {
+                return this[Application.Random.Next(this.Count)];
             }
         }
 

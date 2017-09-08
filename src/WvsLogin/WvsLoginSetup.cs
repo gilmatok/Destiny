@@ -69,11 +69,6 @@ namespace Destiny
                               `Creation` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
                               `MaxCharacters` int(11) NOT NULL DEFAULT '3'
                             ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-                            DROP TRIGGER IF EXISTS `TR_accounts_CreateStorage`;
-                            DELIMITER $$
-                            CREATE TRIGGER `TR_accounts_CreateStorage` AFTER INSERT ON `accounts` FOR EACH ROW INSERT INTO storages (AccountID) VALUES (NEW.ID)
-                            $$
-                            DELIMITER ;
 
 							  DROP TABLE IF EXISTS `banned_ip`;
                             CREATE TABLE `banned_ip` (
@@ -249,13 +244,13 @@ namespace Destiny
 				[Center]
 				IP={7}
 				Port=8485
-				SecurityCode={7}
+				SecurityCode={8}
 				
 				[Database]
-				Host={8}
-				Schema={9}
-				Username={10}
-				Password={11}",
+				Host={9}
+				Schema={10}
+				Username={11}
+				Password={12}",
                 logLevel, autoRegister, requestPin, requestPic,
                 maxCharacters, requireStaffIP, worldCount, centerIP, securityCode, databaseHost, databaseSchema,
                 databaseUsername, databasePassword).Replace("	", "");

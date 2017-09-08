@@ -98,6 +98,10 @@ namespace Destiny.Interoperability
                     this.UpdateChannelPopulation(inPacket);
                     break;
 
+                case InteroperabilityOperationCode.CharacterNameCheckResponse:
+                    this.CheckCharacterName(inPacket);
+                    break;
+
                 case InteroperabilityOperationCode.CharacterEntriesResponse:
                     this.GetCharacters(inPacket);
                     break;
@@ -132,7 +136,7 @@ namespace Destiny.Interoperability
                     break;
             }
         }
-        
+
         private void UpdateChannel(Packet inPacket)
         {
             byte worldID = inPacket.ReadByte();
@@ -159,6 +163,14 @@ namespace Destiny.Interoperability
             int population = inPacket.ReadInt();
 
             WvsLogin.Worlds[worldID][channelID].Population = population;
+        }
+
+        private void CheckCharacterName(Packet inPacket)
+        {
+            string name = inPacket.ReadString();
+            bool unusable = inPacket.ReadBool();
+
+            this.NameCheckPool.Enqueue(name, unusable);
         }
 
         private PendingKeyedQueue<int, List<byte[]>> CharacterEntriesPool = new PendingKeyedQueue<int, List<byte[]>>();
@@ -188,6 +200,20 @@ namespace Destiny.Interoperability
             }
 
             return this.CharacterEntriesPool.Dequeue(accountID);
+        }
+
+        private PendingKeyedQueue<string, bool> NameCheckPool = new PendingKeyedQueue<string, bool>();
+
+        public bool IsNameTaken(string name)
+        {
+            using (Packet outPacket = new Packet(InteroperabilityOperationCode.CharacterNameCheckRequest))
+            {
+                outPacket.WriteString(name);
+
+                this.Send(outPacket);
+            }
+
+            return this.NameCheckPool.Dequeue(name);
         }
 
         private PendingKeyedQueue<int, byte[]> CharacterCreationPool = new PendingKeyedQueue<int, byte[]>();

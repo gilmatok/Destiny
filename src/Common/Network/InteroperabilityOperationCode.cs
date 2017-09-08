@@ -13,7 +13,11 @@
         CharacterCreationResponse,
         MigrationRegisterRequest,
         MigrationRegisterResponse,
+        CharacterNameCheckRequest,
+        CharacterNameCheckResponse,
         MigrationRequest,
-        MigrationResponse
+        MigrationResponse,
+        ChannelPortRequest,
+        ChannelPortResponse
     }
 }

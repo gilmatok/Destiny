@@ -560,7 +560,7 @@ namespace Destiny.Network
         private void CheckCharacterName(Packet iPacket)
         {
             string name = iPacket.ReadString();
-            bool unusable = Database.Exists("characters", "Name = {0}", name);
+            bool unusable = WvsLogin.CenterConnection.IsNameTaken(name);
 
             using (Packet oPacket = new Packet(ServerOperationCode.CheckDuplicatedIDResult))
             {

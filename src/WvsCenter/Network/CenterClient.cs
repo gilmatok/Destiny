@@ -93,6 +93,14 @@ namespace Destiny.Network
                     this.UpdateChannelPopulation(inPacket);
                     break;
 
+                case InteroperabilityOperationCode.CharacterNameCheckRequest:
+                    this.CharacterNameCheckRequest(inPacket);
+                    break;
+
+                case InteroperabilityOperationCode.CharacterNameCheckResponse:
+                    this.CharacterNameCheckResponse(inPacket);
+                    break;
+
                 case InteroperabilityOperationCode.CharacterEntriesRequest:
                     this.CharacterEntriesRequest(inPacket);
                     break;
@@ -107,6 +115,10 @@ namespace Destiny.Network
 
                 case InteroperabilityOperationCode.CharacterCreationResponse:
                     this.CharacterCreationResponse(inPacket);
+                    break;
+
+                case InteroperabilityOperationCode.ChannelPortRequest:
+                    this.ChannelPortRequest(inPacket);
                     break;
             }
         }
@@ -208,7 +220,7 @@ namespace Destiny.Network
 
                 this.Send(Packet);
             }
-            
+
             if (valid)
             {
                 this.Type = type;
@@ -290,6 +302,33 @@ namespace Destiny.Network
             }
         }
 
+        private void CharacterNameCheckRequest(Packet inPacket)
+        {
+            string name = inPacket.ReadString();
+
+            using (Packet outPacket = new Packet(InteroperabilityOperationCode.CharacterNameCheckRequest))
+            {
+                outPacket.WriteString(name);
+
+                WvsCenter.Worlds[0][0].Send(outPacket);
+            }
+        }
+
+        private void CharacterNameCheckResponse(Packet inPacket)
+        {
+            string name = inPacket.ReadString();
+            bool unusable = inPacket.ReadBool();
+
+            using (Packet outPacket = new Packet(InteroperabilityOperationCode.CharacterNameCheckResponse))
+            {
+                outPacket
+                    .WriteString(name)
+                    .WriteBool(unusable);
+
+                WvsCenter.Login.Send(outPacket);
+            }
+        }
+
         private void CharacterEntriesRequest(Packet inPacket)
         {
             byte worldID = inPacket.ReadByte();
@@ -353,6 +392,19 @@ namespace Destiny.Network
                 outPacket.WriteBytes(characterData);
 
                 WvsCenter.Login.Send(outPacket);
+            }
+        }
+
+        private void ChannelPortRequest(Packet inPacket)
+        {
+            byte id = inPacket.ReadByte();
+
+            using (Packet outPacket = new Packet(InteroperabilityOperationCode.ChannelPortResponse))
+            {
+                outPacket.WriteByte(id);
+                outPacket.WriteUShort(this.World[id].Port);
+
+                this.Send(outPacket);
             }
         }
     }

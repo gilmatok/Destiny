@@ -1,4 +1,5 @@
-﻿using Destiny.Core.Data;
+﻿using Destiny.Collections;
+using Destiny.Core.Data;
 using Destiny.Core.IO;
 using Destiny.Maple;
 using Destiny.Maple.Characters;
@@ -79,12 +80,20 @@ namespace Destiny.Interoperability
                     this.UpdateChannelID(inPacket);
                     break;
 
+                case InteroperabilityOperationCode.CharacterNameCheckRequest:
+                    this.CheckCharacterName(inPacket);
+                    break;
+
                 case InteroperabilityOperationCode.CharacterEntriesRequest:
                     this.SendCharacters(inPacket);
                     break;
 
                 case InteroperabilityOperationCode.CharacterCreationRequest:
                     this.CreateCharacter(inPacket);
+                    break;
+
+                case InteroperabilityOperationCode.ChannelPortResponse:
+                    this.ChannelPortResponse(inPacket);
                     break;
             }
         }
@@ -103,7 +112,7 @@ namespace Destiny.Interoperability
                         WvsGame.ChannelID = inPacket.ReadByte();
                         WvsGame.RemoteEndPoint = new IPEndPoint(IPAddress.Loopback, inPacket.ReadUShort());
                         WvsGame.Listen();
-                        
+
                         WvsGame.AllowMultiLeveling = inPacket.ReadBool();
                         Log.Inform("Characters will {0}be able to continuously level-up.", WvsGame.AllowMultiLeveling ? "" : "not ");
 
@@ -138,6 +147,21 @@ namespace Destiny.Interoperability
         private void UpdateChannelID(Packet inPacket)
         {
             WvsGame.ChannelID = inPacket.ReadByte();
+        }
+
+        private void CheckCharacterName(Packet inPacket)
+        {
+            string name = inPacket.ReadString();
+            bool unusable = Database.Exists("characters", "Name = {0}", name);
+
+            using (Packet outPacket = new Packet(InteroperabilityOperationCode.CharacterNameCheckResponse))
+            {
+                outPacket
+                    .WriteString(name)
+                    .WriteBool(unusable);
+
+                this.Send(outPacket);
+            }
         }
 
         private void SendCharacters(Packet inPacket)
@@ -306,6 +330,14 @@ namespace Destiny.Interoperability
             }
         }
 
+        private void ChannelPortResponse(Packet inPacket)
+        {
+            byte id = inPacket.ReadByte();
+            ushort port = inPacket.ReadUShort();
+
+            this.ChannelPortPool.Enqueue(id, port);
+        }
+
         public void UpdatePopulation(int population)
         {
             using (Packet outPacket = new Packet(InteroperabilityOperationCode.UpdateChannelPopulation))
@@ -314,6 +346,20 @@ namespace Destiny.Interoperability
 
                 this.Send(outPacket);
             }
+        }
+
+        private PendingKeyedQueue<byte, ushort> ChannelPortPool = new PendingKeyedQueue<byte, ushort>();
+
+        public ushort GetChannelPort(byte channelID)
+        {
+            using (Packet outPacket = new Packet(InteroperabilityOperationCode.ChannelPortRequest))
+            {
+                outPacket.WriteByte(channelID);
+
+                this.Send(outPacket);
+            }
+
+            return this.ChannelPortPool.Dequeue(channelID);
         }
     }
 }

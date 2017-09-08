@@ -128,7 +128,7 @@ namespace Destiny.Network
                 case ClientOperationCode.Storage:
                     this.Character.Storage.Handle(iPacket);
                     break;
-                    
+
                 case ClientOperationCode.InventorySort:
                     this.Character.Items.Sort(iPacket);
                     break;
@@ -192,7 +192,7 @@ namespace Destiny.Network
                 case ClientOperationCode.PlayerInformation:
                     this.Character.InformOnCharacter(iPacket);
                     break;
-                    
+
                 case ClientOperationCode.ChangeMapSpecial:
                     this.Character.EnterPortal(iPacket);
                     break;
@@ -216,11 +216,11 @@ namespace Destiny.Network
                 case ClientOperationCode.Command:
                     this.Character.UseCommand(iPacket);
                     break;
-                    
+
                 case ClientOperationCode.PlayerInteraction:
                     this.Character.Interact(iPacket);
                     break;
-                    
+
                 case ClientOperationCode.AdminCommand:
                     this.Character.UseAdminCommand(iPacket);
                     break;
@@ -261,7 +261,16 @@ namespace Destiny.Network
 
         private void ChangeChannel(Packet inPacket)
         {
+            byte channelID = inPacket.ReadByte();
 
+            using (Packet outPacket = new Packet(ServerOperationCode.MigrateCommand))
+            {
+                outPacket.WriteBool(true);
+                outPacket.WriteBytes(127, 0, 0, 1);
+                outPacket.WriteUShort(WvsGame.CenterConnection.GetChannelPort(channelID));
+
+                this.Send(outPacket);
+            }
         }
     }
 }
