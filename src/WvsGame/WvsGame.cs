@@ -3,7 +3,9 @@ using Destiny.Core.IO;
 using Destiny.Interoperability;
 using Destiny.Maple.Data;
 using Destiny.Network;
+using Destiny.Shell;
 using System;
+using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
@@ -69,9 +71,15 @@ namespace Destiny
             }
         }
 
+        [STAThread]
         private static void Main(string[] args)
         {
-    start:
+            if (args.Length == 1 && args[0].ToLower() == "setup" || !File.Exists(Application.ExecutablePath + "WvsGame.ini"))
+            {
+                WvsGameSetup.Run();
+            }
+
+            start:
             WvsGame.Clients = new GameClients();
 
             Log.Entitle("WvsGame v.{0}.{1}", Application.MapleVersion, Application.PatchVersion);
@@ -82,6 +90,8 @@ namespace Destiny
 
                 Database.Test();
                 Database.Analyze(true);
+
+                Shortcuts.Apply();
 
                 WvsGame.AutoRestartTime = Settings.GetInt("Server/AutoRestartTime");
                 Log.Inform("Automatic restart time set to {0} seconds.", WvsGame.AutoRestartTime);

@@ -21,6 +21,42 @@ namespace Destiny.Maple.Data
         {
             using (Database.TemporarySchema("mcdb"))
             {
+                DataProvider.IsInitialized = false;
+
+                if (DataProvider.Styles != null)
+                {
+                    DataProvider.Styles.Skins.Clear();
+                    DataProvider.Styles.MaleHairs.Clear();
+                    DataProvider.Styles.MaleFaces.Clear();
+                    DataProvider.Styles.FemaleHairs.Clear();
+                    DataProvider.Styles.FemaleFaces.Clear();
+                }
+
+                if (DataProvider.Items != null)
+                {
+                    DataProvider.Items.Clear();
+                }
+
+                if (DataProvider.Skills != null)
+                {
+                    DataProvider.Skills.Clear();
+                }
+
+                if (DataProvider.Mobs != null)
+                {
+                    DataProvider.Mobs.Clear();
+                }
+
+                if (DataProvider.Maps != null)
+                {
+                    DataProvider.Maps.Clear();
+                }
+
+                if (DataProvider.Quests != null)
+                {
+                    DataProvider.Quests.Clear();
+                }
+
                 Database.Test();
 
                 Stopwatch sw = new Stopwatch();

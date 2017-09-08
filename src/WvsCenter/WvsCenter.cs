@@ -1,5 +1,6 @@
 ﻿using Destiny.Core.IO;
 using Destiny.Maple;
+using Destiny.Network;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -7,7 +8,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 
-namespace Destiny.Network
+namespace Destiny
 {
     public static class WvsCenter
     {
@@ -41,7 +42,7 @@ namespace Destiny.Network
         {
             if (args.Length == 1 && args[0].ToLower() == "setup" || !File.Exists(Application.ExecutablePath + "WvsCenter.ini"))
             {
-                Setup.Run();
+                WvsCenterSetup.Run();
             }
 
             WvsCenter.Worlds = new Worlds();
