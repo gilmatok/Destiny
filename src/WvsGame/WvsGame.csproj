@@ -1,0 +1,212 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{78C8700F-4B83-4B4F-A4BB-8CAC52C4D0E2}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>Destiny</RootNamespace>
+    <AssemblyName>WvsGame</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\..\bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>Destiny.WvsGame</StartupObject>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Interoperability\CenterServer.cs" />
+    <Compile Include="Maple\Account.cs" />
+    <Compile Include="Maple\Attack.cs" />
+    <Compile Include="Maple\Buff.cs" />
+    <Compile Include="Maple\Characters\Character.cs" />
+    <Compile Include="Maple\Characters\CharacterBuffs.cs" />
+    <Compile Include="Maple\Characters\CharacterItems.cs" />
+    <Compile Include="Maple\Characters\CharacterKeymap.cs" />
+    <Compile Include="Maple\Characters\CharacterMemos.cs" />
+    <Compile Include="Maple\Characters\CharacterQuests.cs" />
+    <Compile Include="Maple\Characters\CharacterSkills.cs" />
+    <Compile Include="Maple\Characters\CharacterStorage.cs" />
+    <Compile Include="Maple\Characters\CharacterTrocks.cs" />
+    <Compile Include="Maple\Characters\CharacterVariables.cs" />
+    <Compile Include="Maple\Characters\ControlledMobs.cs" />
+    <Compile Include="Maple\Characters\ControlledNpcs.cs" />
+    <Compile Include="Maple\Commands\Command.cs" />
+    <Compile Include="Maple\Commands\CommandFactory.cs" />
+    <Compile Include="Maple\Commands\Commands.cs" />
+    <Compile Include="Maple\Commands\Implementation\AdminShopCommand.cs" />
+    <Compile Include="Maple\Commands\Implementation\ClearDropsCommand.cs" />
+    <Compile Include="Maple\Commands\Implementation\HelpCommand.cs" />
+    <Compile Include="Maple\Commands\Implementation\HorntailCommand.cs" />
+    <Compile Include="Maple\Commands\Implementation\ItemCommand.cs" />
+    <Compile Include="Maple\Commands\Implementation\JobCommand.cs" />
+    <Compile Include="Maple\Commands\Implementation\KickCommand.cs" />
+    <Compile Include="Maple\Commands\Implementation\KillCommand.cs" />
+    <Compile Include="Maple\Commands\Implementation\KillMobsCommand.cs" />
+    <Compile Include="Maple\Commands\Implementation\LevelCommand.cs" />
+    <Compile Include="Maple\Commands\Implementation\MapCommand.cs" />
+    <Compile Include="Maple\Commands\Implementation\MesoCommand.cs" />
+    <Compile Include="Maple\Commands\Implementation\NoticeCommand.cs" />
+    <Compile Include="Maple\Commands\Implementation\OnlineCommand.cs" />
+    <Compile Include="Maple\Commands\Implementation\ReleaseCommand.cs" />
+    <Compile Include="Maple\Commands\Implementation\SayCommand.cs" />
+    <Compile Include="Maple\Commands\Implementation\SearchCommand.cs" />
+    <Compile Include="Maple\Commands\Implementation\ShopCommand.cs" />
+    <Compile Include="Maple\Commands\Implementation\SpawnCommand.cs" />
+    <Compile Include="Maple\Commands\Implementation\TestCommand.cs" />
+    <Compile Include="Maple\Commands\Implementation\TickerCommand.cs" />
+    <Compile Include="Maple\Commands\Implementation\ZakumCommand.cs" />
+    <Compile Include="Maple\Data\AvailableStyles.cs" />
+    <Compile Include="Maple\Data\CachedItems.cs" />
+    <Compile Include="Maple\Data\CachedMaps.cs" />
+    <Compile Include="Maple\Data\CachedMobs.cs" />
+    <Compile Include="Maple\Data\CachedQuests.cs" />
+    <Compile Include="Maple\Data\CachedReactors.cs" />
+    <Compile Include="Maple\Data\CachedSkills.cs" />
+    <Compile Include="Maple\Data\CreationData.cs" />
+    <Compile Include="Maple\Data\DataProvider.cs" />
+    <Compile Include="Maple\IControllable.cs" />
+    <Compile Include="Maple\IMoveable.cs" />
+    <Compile Include="Maple\Interaction\PlayerShop.cs" />
+    <Compile Include="Maple\Interaction\PlayerShopItem.cs" />
+    <Compile Include="Maple\Interaction\Trade.cs" />
+    <Compile Include="Maple\InventoryFullException.cs" />
+    <Compile Include="Maple\ISpawnable.cs" />
+    <Compile Include="Maple\Item.cs" />
+    <Compile Include="Maple\Life\LifeObject.cs" />
+    <Compile Include="Maple\Life\Loot.cs" />
+    <Compile Include="Maple\Life\Mob.cs" />
+    <Compile Include="Maple\Life\MobSkill.cs" />
+    <Compile Include="Maple\Life\MobSkills.cs" />
+    <Compile Include="Maple\Life\Npc.cs" />
+    <Compile Include="Maple\Life\Npcs\Npc1002000.cs" />
+    <Compile Include="Maple\Life\Npcs\Npc1092007.cs" />
+    <Compile Include="Maple\Life\Npcs\Npc1092010.cs" />
+    <Compile Include="Maple\Life\Npcs\Npc1092019.cs" />
+    <Compile Include="Maple\Life\Npcs\Npc1094000.cs" />
+    <Compile Include="Maple\Life\Npcs\Npc1096001.cs" />
+    <Compile Include="Maple\Life\Npcs\Npc1100003.cs" />
+    <Compile Include="Maple\Life\Npcs\Npc1101001.cs" />
+    <Compile Include="Maple\Life\Npcs\Npc2000.cs" />
+    <Compile Include="Maple\Life\Npcs\Npc2007.cs" />
+    <Compile Include="Maple\Life\Npcs\Npc2010007.cs" />
+    <Compile Include="Maple\Life\Npcs\Npc2010008.cs" />
+    <Compile Include="Maple\Life\Npcs\Npc2101000.cs" />
+    <Compile Include="Maple\Life\Npcs\Npc2101001.cs" />
+    <Compile Include="Maple\Life\Npcs\Npc22000.cs" />
+    <Compile Include="Maple\Life\Npcs\Npc9100100.cs" />
+    <Compile Include="Maple\Life\Npcs\Npc9201001.cs" />
+    <Compile Include="Maple\Life\Npcs\Npc9270043.cs" />
+    <Compile Include="Maple\Life\Npcs\Npc9900000.cs" />
+    <Compile Include="Maple\Life\Npcs\Npc9900001.cs" />
+    <Compile Include="Maple\Life\Npcs\NpcTemplate.cs" />
+    <Compile Include="Maple\Life\Reactor.cs" />
+    <Compile Include="Maple\Life\ReactorState.cs" />
+    <Compile Include="Maple\Life\SpawnPoint.cs" />
+    <Compile Include="Maple\Line.cs" />
+    <Compile Include="Maple\Maps\Drop.cs" />
+    <Compile Include="Maple\Maps\Foothold.cs" />
+    <Compile Include="Maple\Maps\Map.cs" />
+    <Compile Include="Maple\Maps\MapCharacters.cs" />
+    <Compile Include="Maple\Maps\MapDrops.cs" />
+    <Compile Include="Maple\Maps\MapFootholds.cs" />
+    <Compile Include="Maple\Maps\MapMobs.cs" />
+    <Compile Include="Maple\Maps\MapNpcs.cs" />
+    <Compile Include="Maple\Maps\MapObject.cs" />
+    <Compile Include="Maple\Maps\MapObjects.cs" />
+    <Compile Include="Maple\Maps\MapPlayerShops.cs" />
+    <Compile Include="Maple\Maps\MapPortals.cs" />
+    <Compile Include="Maple\Maps\MapReactors.cs" />
+    <Compile Include="Maple\Maps\MapSeats.cs" />
+    <Compile Include="Maple\Maps\MapSpawnPoints.cs" />
+    <Compile Include="Maple\Maps\Portal.cs" />
+    <Compile Include="Maple\Maps\Portals\glTutoMsg0.cs" />
+    <Compile Include="Maple\Maps\Portals\infoAttack.cs" />
+    <Compile Include="Maple\Maps\Portals\infoMinimap.cs" />
+    <Compile Include="Maple\Maps\Portals\infoPickup.cs" />
+    <Compile Include="Maple\Maps\Portals\infoReactor.cs" />
+    <Compile Include="Maple\Maps\Portals\infoSkill.cs" />
+    <Compile Include="Maple\Maps\Portals\market00.cs" />
+    <Compile Include="Maple\Maps\Portals\market01.cs" />
+    <Compile Include="Maple\Maps\Portals\market02.cs" />
+    <Compile Include="Maple\Maps\Portals\market03.cs" />
+    <Compile Include="Maple\Maps\Portals\market04.cs" />
+    <Compile Include="Maple\Maps\Portals\market05.cs" />
+    <Compile Include="Maple\Maps\Portals\market06.cs" />
+    <Compile Include="Maple\Maps\Portals\market07.cs" />
+    <Compile Include="Maple\Maps\Portals\market08.cs" />
+    <Compile Include="Maple\Maps\Portals\market09.cs" />
+    <Compile Include="Maple\Maps\Portals\market10.cs" />
+    <Compile Include="Maple\Maps\Portals\market11.cs" />
+    <Compile Include="Maple\Maps\Portals\market12.cs" />
+    <Compile Include="Maple\Maps\Portals\market13.cs" />
+    <Compile Include="Maple\Maps\Portals\market14.cs" />
+    <Compile Include="Maple\Maps\Portals\market15.cs" />
+    <Compile Include="Maple\Maps\Portals\market16.cs" />
+    <Compile Include="Maple\Maps\Portals\market17.cs" />
+    <Compile Include="Maple\Maps\Portals\market18.cs" />
+    <Compile Include="Maple\Maps\Portals\market19.cs" />
+    <Compile Include="Maple\Maps\Portals\market20.cs" />
+    <Compile Include="Maple\Maps\Portals\market21.cs" />
+    <Compile Include="Maple\Maps\Portals\market22.cs" />
+    <Compile Include="Maple\Maps\Portals\tutoChatNPC.cs" />
+    <Compile Include="Maple\Maps\Seat.cs" />
+    <Compile Include="Maple\Memo.cs" />
+    <Compile Include="Maple\Meso.cs" />
+    <Compile Include="Maple\Movements.cs" />
+    <Compile Include="Maple\NoAccountException.cs" />
+    <Compile Include="Maple\Point.cs" />
+    <Compile Include="Maple\Quest.cs" />
+    <Compile Include="Maple\Rectangle.cs" />
+    <Compile Include="Maple\Shops\Shop.cs" />
+    <Compile Include="Maple\Shops\ShopItem.cs" />
+    <Compile Include="Maple\Shortcut.cs" />
+    <Compile Include="Maple\Skill.cs" />
+    <Compile Include="Maple\StyleUnavailableException.cs" />
+    <Compile Include="Maple\Variable.cs" />
+    <Compile Include="Network\GameClient.cs" />
+    <Compile Include="Network\GameClients.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="WvsGame.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Maple\Social\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj">
+      <Project>{aa849096-96f3-47fe-92c2-c79fdf0ad5ad}</Project>
+      <Name>Common</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
