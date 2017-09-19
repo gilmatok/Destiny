@@ -1,4 +1,5 @@
 ﻿using Destiny.Collections;
+using Destiny.Core.IO;
 using System.Collections.ObjectModel;
 
 namespace Destiny.Maple
@@ -59,23 +60,25 @@ namespace Destiny.Maple
         {
             this.ID = id;
 
-            // TODO: Get from settings based on ID.
+            string configSection = "World" + this.ID.ToString();
 
-            this.Name = "Scania";
-            this.Port = 8585;
+            // TODO: Get the hardcoded values from config settings
+
+            this.Name = Settings.GetString(configSection + "/Name");
+            this.Port = (ushort)(8585 + 100 * this.ID);
             this.ShopPort = 9000;
-            this.Channels = 2;
-            this.Flag = WorldFlag.New;
-            this.EventMessage = "Welcome to Scania!";
-            this.TickerMessage = "Welcome to Scania (Game)!";
+            this.Channels = Settings.GetByte(configSection + "/Channels");
+            this.Flag = Settings.GetEnum<WorldFlag>(configSection + "/Flag");
+            this.EventMessage = Settings.GetString(configSection + "/EventMessage");
+            this.TickerMessage = Settings.GetString(configSection + "/TickerMessage");
             this.AllowMultiLeveling = true;
             this.DefaultCreationSlots = 3;
             this.DisableCharacterCreation = false;
-            this.ExperienceRate = 1;
-            this.QuestExperienceRate = 1;
-            this.PartyQuestExperienceRate = 1;
-            this.MesoRate = 1;
-            this.DropRate = 1;
+            this.ExperienceRate = Settings.GetInt(configSection + "/ExperienceRate");
+            this.QuestExperienceRate = Settings.GetInt(configSection + "/QuestExperienceRate");
+            this.PartyQuestExperienceRate = Settings.GetInt(configSection + "/PartyQuestExperienceRate");
+            this.MesoRate = Settings.GetInt(configSection + "/MesoDropRate");
+            this.DropRate = Settings.GetInt(configSection + "/ItemDropRate");
         }
 
         protected override void InsertItem(int index, Channel item)

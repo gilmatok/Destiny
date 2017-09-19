@@ -224,7 +224,7 @@ namespace Destiny
 
             Log.Entitle("Please wait...");
 
-            Log.Inform("Applying settings to 'Configuration.ini'...");
+            Log.Inform("Applying settings to 'WvsLogin.ini'...");
 
             string lines = string.Format(
                 @"[Log]

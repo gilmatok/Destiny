@@ -112,6 +112,16 @@ namespace Destiny
                 new Thread(new ThreadStart(CenterServer.Main)).Start();
 
                 WvsGame.CenterConnectionDone.WaitOne();
+
+#if DEBUG
+                string linkPath = Path.Combine(Application.ExecutablePath, "LaunchClient.lnk");
+                if (File.Exists(linkPath) && WvsGame.WorldID == 0 && WvsGame.ChannelID == 0) //Only for the first WvsGame instance, and only if shortcut exists
+                {
+                    System.Diagnostics.Process proc = new System.Diagnostics.Process();
+                    proc.StartInfo.FileName = linkPath;
+                    proc.Start();
+                }
+#endif
             }
             else
             {

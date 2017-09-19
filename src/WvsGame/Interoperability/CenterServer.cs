@@ -132,7 +132,7 @@ namespace Destiny.Interoperability
                             WvsGame.MesoRate,
                             WvsGame.DropRate);
 
-                        Log.Success("Registered Channel Server ({0}-{1}).", WvsGame.WorldName, WvsGame.WorldID);
+                        Log.Success("Registered Channel Server ({0} [{1}]-{2}).", WvsGame.WorldName, WvsGame.WorldID, WvsGame.ChannelID);
                     }
                     break;
 
