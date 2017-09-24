@@ -71,6 +71,7 @@
     <Compile Include="Network\ServerOperationCode.cs" />
     <Compile Include="Network\Packet.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Scripting\LuaScriptable.cs" />
     <Compile Include="Security\AesCryptograph.cs" />
     <Compile Include="Security\BlankCryptograph.cs" />
     <Compile Include="Security\BlurCryptograph.cs" />

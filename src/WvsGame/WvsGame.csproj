@@ -192,6 +192,8 @@
     <Compile Include="Maple\Point.cs" />
     <Compile Include="Maple\Quest.cs" />
     <Compile Include="Maple\Rectangle.cs" />
+    <Compile Include="Maple\Scripting\PortalScript.cs" />
+    <Compile Include="Maple\Scripting\ScriptBase.cs" />
     <Compile Include="Maple\Shops\Shop.cs" />
     <Compile Include="Maple\Shops\ShopItem.cs" />
     <Compile Include="Maple\Shortcut.cs" />

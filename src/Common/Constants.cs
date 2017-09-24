@@ -878,6 +878,12 @@ namespace Destiny
         ITC
     }
 
+    public enum ScriptType
+    {
+        Npc,
+        Portal
+    }
+
     public enum NoticeType : byte
     {
         Notice,

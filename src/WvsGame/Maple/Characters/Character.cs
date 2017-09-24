@@ -8,6 +8,7 @@ using Destiny.Maple.Data;
 using Destiny.Maple.Interaction;
 using Destiny.Network;
 using Destiny.IO;
+using Destiny.Maple.Scripting;
 
 namespace Destiny.Maple.Characters
 {
@@ -2212,7 +2213,14 @@ namespace Destiny.Maple.Characters
                 return;
             }
 
-            portal.Enter(this);
+            try
+            {
+                new PortalScript(portal, this).Execute();
+            }
+            catch (Exception ex)
+            {
+                Log.Error("Script error: {0}", ex.ToString());
+            }
         }
 
         public void Report(Packet iPacket)
@@ -2298,7 +2306,7 @@ namespace Destiny.Maple.Characters
                         .WriteInt()
                         .WriteInt();
                 }
-                
+
                 oPacket.Flip();
                 return oPacket.GetContent();
             }
