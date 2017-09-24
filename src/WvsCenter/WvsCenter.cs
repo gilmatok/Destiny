@@ -1,4 +1,5 @@
-﻿using Destiny.Core.IO;
+﻿using Destiny.Core.Data;
+using Destiny.Core.IO;
 using Destiny.Maple;
 using Destiny.Network;
 using System;
@@ -55,6 +56,9 @@ namespace Destiny
             try
             {
                 Settings.Initialize(Application.ExecutablePath + "WvsCenter.ini");
+
+                Database.Test();
+                Database.Analyze(false);
 
                 CenterClient.SecurityCode = Settings.GetString("Server/SecurityCode");
                 Log.Inform("Cross-servers code '{0}' assigned.", Log.MaskString(CenterClient.SecurityCode));
