@@ -2,24 +2,25 @@
 using Destiny.Network;
 using Destiny.Core.Data;
 using Destiny.Maple.Shops;
-using System.Threading.Tasks;
 using System.Collections.Generic;
-using Destiny.Maple.Data;
+using Destiny.Maple.Scripting;
+using System;
 
 namespace Destiny.Maple.Life
 {
     public class Npc : LifeObject, ISpawnable, IControllable
     {
-        public Npc(Datum datum) : base(datum) { }
+        public Npc(Datum datum)
+            : base(datum)
+        {
+            this.Scripts = new Dictionary<Character, NpcScript>();
+        }
 
         public Character Controller { get; set; }
 
         public Shop Shop { get; set; }
         public int StorageCost { get; set; }
-
-        public Dictionary<Character, TaskCompletionSource<bool>> Responses = new Dictionary<Character, TaskCompletionSource<bool>>();
-        public Dictionary<Character, TaskCompletionSource<int>> Choices = new Dictionary<Character, TaskCompletionSource<int>>();
-        public Dictionary<Character, int[]> StyleSelectionHelpers = new Dictionary<Character, int[]>();
+        public Dictionary<Character, NpcScript> Scripts { get; private set; }
 
         public void Move(Packet iPacket)
         {
@@ -49,7 +50,7 @@ namespace Destiny.Maple.Life
             }
         }
 
-        public virtual async Task Converse(Character talker)
+        public void Converse(Character talker)
         {
             if (this.Shop != null)
             {
@@ -61,9 +62,18 @@ namespace Destiny.Maple.Life
             }
             else
             {
-                Log.Warn("'{0}' attempted to converse with unimplemented NPC {1}.", talker.Name, this.MapleID);
+                var script = new NpcScript(this, talker);
 
-                await this.ShowOkDialog(talker, ". . .");
+                this.Scripts[talker] = script;
+
+                try
+                {
+                    script.Execute();
+                }
+                catch (Exception ex)
+                {
+
+                }
             }
         }
 
@@ -105,16 +115,16 @@ namespace Destiny.Maple.Life
 
                 if (lastMessageType == NpcMessageType.RequestStyle)
                 {
-                    selection = this.StyleSelectionHelpers[talker][selection];
+                    //selection = this.StyleSelectionHelpers[talker][selection];
                 }
 
                 if (selection != -1)
                 {
-                    this.Choices[talker].SetResult(selection);
+                    this.Scripts[talker].SetIntegerResult(selection);
                 }
                 else
                 {
-                    this.Responses[talker].SetResult(action == 1 ? true : false);
+                    this.Scripts[talker].SetBooleanResult(action == 1);
                 }
             }
             else
@@ -146,133 +156,6 @@ namespace Destiny.Maple.Life
                 {
                     newController.ControlledNpcs.Add(this);
                 }
-            }
-        }
-
-        public async Task<bool> ShowOkDialog(Character talker, string text)
-        {
-            this.Responses[talker] = new TaskCompletionSource<bool>();
-
-            this.SendDialog(talker, text, NpcMessageType.Standard, 0, 0);
-
-            return await this.Responses[talker].Task;
-        }
-
-        public async Task<bool> ShowNextDialog(Character talker, string text)
-        {
-            this.Responses[talker] = new TaskCompletionSource<bool>();
-
-            this.SendDialog(talker, text, NpcMessageType.Standard, 0, 1);
-
-            return await this.Responses[talker].Task;
-        }
-
-        public async Task<bool> ShowNextPreviousDialog(Character talker, string text)
-        {
-            this.Responses[talker] = new TaskCompletionSource<bool>();
-
-            this.SendDialog(talker, text, NpcMessageType.Standard, 1, 1);
-
-            return await this.Responses[talker].Task;
-        }
-
-        public async Task<bool> ShowPreviousOkDialog(Character talker, string text)
-        {
-            this.Responses[talker] = new TaskCompletionSource<bool>();
-
-            this.SendDialog(talker, text, NpcMessageType.Standard, 1, 0);
-
-            return await this.Responses[talker].Task;
-        }
-
-        public async Task<bool> ShowYesNoDialog(Character talker, string text)
-        {
-            this.Responses[talker] = new TaskCompletionSource<bool>();
-
-            this.SendDialog(talker, text, NpcMessageType.YesNo);
-
-            return await this.Responses[talker].Task;
-        }
-
-        public async Task<bool> ShowAcceptDeclineDialog(Character talker, string text)
-        {
-            this.Responses[talker] = new TaskCompletionSource<bool>();
-
-            this.SendDialog(talker, text, NpcMessageType.AcceptDecline);
-
-            return await this.Responses[talker].Task;
-        }
-
-        public async Task<int> ShowChoiceDialog(Character talker, string text, params string[] choices)
-        {
-            this.Choices[talker] = new TaskCompletionSource<int>();
-
-            text += "#b\r\n";
-
-            for (int i = 0; i < choices.Length; i++)
-            {
-                text += string.Format("#L{0}#{1}#l\r\n", i, choices[i]);
-            }
-
-            this.SendDialog(talker, text, NpcMessageType.Choice);
-
-            return await this.Choices[talker].Task;
-        }
-
-        public async Task<int> ShowStyleRequestDialog(Character talker, string text, params int[] styleChoices)
-        {
-            this.Choices[talker] = new TaskCompletionSource<int>();
-
-            List<int> validStyles = new List<int>();
-
-            foreach (int loopStyle in styleChoices)
-            {
-                if (DataProvider.Styles.Skins.Contains((byte)loopStyle) ||
-                    DataProvider.Styles.MaleHairs.Contains(loopStyle) ||
-                    DataProvider.Styles.FemaleHairs.Contains(loopStyle) ||
-                    DataProvider.Styles.MaleFaces.Contains(loopStyle) ||
-                    DataProvider.Styles.FemaleFaces.Contains(loopStyle))
-                {
-                    validStyles.Add(loopStyle);
-                }
-            }
-
-            using (Packet oPacket = new Packet(ServerOperationCode.ScriptMessage))
-            {
-                oPacket
-                     .WriteByte(4) // NOTE: Unknown.
-                     .WriteInt(this.MapleID)
-                     .WriteByte((byte)NpcMessageType.RequestStyle)
-                     .WriteByte() // NOTE: Speaker.
-                     .WriteString(text)
-                     .WriteByte((byte)validStyles.Count);
-
-                foreach (int loopStyle in validStyles)
-                {
-                    oPacket.WriteInt(loopStyle);
-                }
-
-                talker.Client.Send(oPacket);
-            }
-
-            this.StyleSelectionHelpers[talker] = validStyles.ToArray();
-
-            return await this.Choices[talker].Task;
-        }
-
-        private void SendDialog(Character talker, string text, NpcMessageType messageType, params byte[] footer)
-        {
-            using (Packet oPacket = new Packet(ServerOperationCode.ScriptMessage))
-            {
-                oPacket
-                    .WriteByte(4) // NOTE: Unknown.
-                    .WriteInt(this.MapleID)
-                    .WriteByte((byte)messageType)
-                    .WriteByte() // NOTE: Speaker.
-                    .WriteString(text)
-                    .WriteBytes(footer);
-
-                talker.Client.Send(oPacket);
             }
         }
 
@@ -321,6 +204,21 @@ namespace Destiny.Maple.Life
             oPacket
                 .WriteBool(false)
                 .WriteInt(this.ObjectID);
+
+            return oPacket;
+        }
+
+        public Packet GetDialogPacket(string text, NpcMessageType messageType, params byte[] footer)
+        {
+            Packet oPacket = new Packet(ServerOperationCode.ScriptMessage);
+
+            oPacket
+                .WriteByte(4) // NOTE: Unknown.
+                .WriteInt(this.MapleID)
+                .WriteByte((byte)messageType)
+                .WriteByte() // NOTE: Speaker.
+                .WriteString(text)
+                .WriteBytes(footer);
 
             return oPacket;
         }

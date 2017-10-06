@@ -1,9 +1,7 @@
 ﻿using Destiny.Core.Data;
 using Destiny.Maple.Life;
 using Destiny.Maple.Maps;
-using System;
 using System.Collections.ObjectModel;
-using System.Reflection;
 
 namespace Destiny.Maple.Data
 {
@@ -43,16 +41,7 @@ namespace Destiny.Maple.Data
 
                         foreach (Datum datum in new Datums("map_portals").Populate("mapid = {0}", key))
                         {
-                            Type implementedType = Assembly.GetExecutingAssembly().GetType("Destiny.Maple.Maps.Portals." + (string)datum["script"]);
-
-                            if (implementedType != null)
-                            {
-                                this[key].Portals.Add((Portal)Activator.CreateInstance(implementedType, datum));
-                            }
-                            else
-                            {
-                                this[key].Portals.Add(new Portal(datum));
-                            }
+                            this[key].Portals.Add(new Portal(datum));
                         }
 
                         foreach (Datum datum in new Datums("map_life").Populate("mapid = {0}", key))
@@ -61,16 +50,7 @@ namespace Destiny.Maple.Data
                             {
                                 case "npc":
                                     {
-                                        Type implementedType = Assembly.GetExecutingAssembly().GetType("Destiny.Maple.Life.Npcs.Npc" + (int)datum["lifeid"]);
-
-                                        if (implementedType != null)
-                                        {
-                                            this[key].Npcs.Add((Npc)Activator.CreateInstance(implementedType, datum));
-                                        }
-                                        else
-                                        {
-                                            this[key].Npcs.Add(new Npc(datum));
-                                        }
+                                        this[key].Npcs.Add(new Npc(datum));
                                     }
                                     break;
 

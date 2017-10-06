@@ -86,6 +86,7 @@
     <Compile Include="Security\ShandaCryptograph.cs" />
     <Compile Include="Shell\Shortcuts.cs" />
     <Compile Include="Threading\Delay.cs" />
+    <Compile Include="Threading\WaitableResult.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

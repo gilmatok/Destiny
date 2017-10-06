@@ -595,21 +595,11 @@ namespace Destiny.Maple.Characters
             }
             set
             {
-                if (lastNpc != null)
+                if (value == null)
                 {
-                    if (lastNpc.Responses.ContainsKey(this))
+                    if (value.Scripts.ContainsKey(this))
                     {
-                        lastNpc.Responses.Remove(this);
-                    }
-
-                    if (lastNpc.Choices.ContainsKey(this))
-                    {
-                        lastNpc.Choices.Remove(this);
-                    }
-
-                    if (lastNpc.StyleSelectionHelpers.ContainsKey(this))
-                    {
-                        lastNpc.StyleSelectionHelpers.Remove(this);
+                        value.Scripts.Remove(this);
                     }
                 }
 
@@ -1582,12 +1572,12 @@ namespace Destiny.Maple.Characters
             this.Converse(this.Map.Npcs[objectID]);
         }
 
-        public async void Converse(Npc npc, Quest quest = null)
+        public void Converse(Npc npc, Quest quest = null)
         {
             this.LastNpc = npc;
             this.LastQuest = quest;
 
-            await this.LastNpc.Converse(this);
+            this.LastNpc.Converse(this);
         }
 
         public void DistributeAP(StatisticType type, short amount = 1)
