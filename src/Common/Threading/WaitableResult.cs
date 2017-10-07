@@ -20,9 +20,9 @@ namespace Destiny.Threading
 
         public void Set(T value)
         {
-            mEvent.Set();
-
             mValue = value;
+
+            mEvent.Set();
         }
 
         public T Value { get { return mValue; } }

@@ -1,5 +1,10 @@
-addText('Hey, this is a test!')
-sendNext()
+addText('Do you like Destiny scripting interface?')
+answer = askYesNo()
 
-addText('Well, see ya!')
+if answer == answer_yes then
+    addText('Thanks!')
+else
+    addText('Boo!')
+end
+
 sendOk()

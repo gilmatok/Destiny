@@ -10,11 +10,10 @@ namespace Destiny.Maple.Scripting
     {
         private Npc mNpc;
         private string mText;
-        private WaitableResult<bool> mBooleanResult;
-        private WaitableResult<int> mIntegerResult;
+        private WaitableResult<int> mResult;
 
         public NpcScript(Npc npc, Character character)
-            : base(ScriptType.Npc, npc.MapleID.ToString(), character, true)
+            : base(ScriptType.Npc, npc.MapleID.ToString(), character, true) // TODO: Use actual npc script instead of ID.
         {
             mNpc = npc;
 
@@ -29,20 +28,17 @@ namespace Destiny.Maple.Scripting
             this.Expose("quiz_item", 2);
 
             this.Expose("addText", new Action<string>(this.AddText));
-            this.Expose("sendOk", new Func<bool>(this.SendOk));
-            this.Expose("sendNext", new Func<bool>(this.SendNext));
-            this.Expose("sendBackNext", new Func<bool>(this.SendBackNext));
-            this.Expose("sendBackOk", new Func<bool>(this.SendBackOk));
+            this.Expose("sendOk", new Func<int>(this.SendOk));
+            this.Expose("sendNext", new Func<int>(this.SendNext));
+            this.Expose("sendBackNext", new Func<int>(this.SendBackNext));
+            this.Expose("sendBackOk", new Func<int>(this.SendBackOk));
+            this.Expose("askYesNo", new Func<int>(this.AskYesNo));
+            this.Expose("askAcceptDecline", new Func<int>(this.AskAcceptDecline));
         }
 
-        public void SetBooleanResult(bool value)
+        public void SetResult(int value)
         {
-            mBooleanResult.Set(value);
-        }
-
-        public void SetIntegerResult(int value)
-        {
-            mIntegerResult.Set(value);
+            mResult.Set(value);
         }
 
         private void AddText(string text)
@@ -50,9 +46,9 @@ namespace Destiny.Maple.Scripting
             mText += text;
         }
 
-        private bool SendOk()
+        private int SendOk()
         {
-            mBooleanResult = new WaitableResult<bool>();
+            mResult = new WaitableResult<int>();
 
             using (Packet oPacket = mNpc.GetDialogPacket(mText, NpcMessageType.Standard, 0, 0))
             {
@@ -61,14 +57,14 @@ namespace Destiny.Maple.Scripting
 
             mText = string.Empty;
 
-            mBooleanResult.Wait();
+            mResult.Wait();
 
-            return mBooleanResult.Value;
+            return mResult.Value;
         }
 
-        private bool SendNext()
+        private int SendNext()
         {
-            mBooleanResult = new WaitableResult<bool>();
+            mResult = new WaitableResult<int>();
 
             using (Packet oPacket = mNpc.GetDialogPacket(mText, NpcMessageType.Standard, 0, 1))
             {
@@ -77,14 +73,14 @@ namespace Destiny.Maple.Scripting
 
             mText = string.Empty;
 
-            mBooleanResult.Wait();
+            mResult.Wait();
 
-            return mBooleanResult.Value;
+            return mResult.Value;
         }
 
-        private bool SendBackOk()
+        private int SendBackOk()
         {
-            mBooleanResult = new WaitableResult<bool>();
+            mResult = new WaitableResult<int>();
 
             using (Packet oPacket = mNpc.GetDialogPacket(mText, NpcMessageType.Standard, 1, 0))
             {
@@ -93,14 +89,14 @@ namespace Destiny.Maple.Scripting
 
             mText = string.Empty;
 
-            mBooleanResult.Wait();
+            mResult.Wait();
 
-            return mBooleanResult.Value;
+            return mResult.Value;
         }
 
-        private bool SendBackNext()
+        private int SendBackNext()
         {
-            mBooleanResult = new WaitableResult<bool>();
+            mResult = new WaitableResult<int>();
 
             using (Packet oPacket = mNpc.GetDialogPacket(mText, NpcMessageType.Standard, 1, 1))
             {
@@ -109,19 +105,41 @@ namespace Destiny.Maple.Scripting
 
             mText = string.Empty;
 
-            mBooleanResult.Wait();
+            mResult.Wait();
 
-            return mBooleanResult.Value;
+            return mResult.Value;
         }
 
-        private void AskYesNo()
+        private int AskYesNo()
         {
+            mResult = new WaitableResult<int>();
 
+            using (Packet oPacket = mNpc.GetDialogPacket(mText, NpcMessageType.YesNo))
+            {
+                mCharacter.Client.Send(oPacket);
+            }
+
+            mText = string.Empty;
+
+            mResult.Wait();
+
+            return mResult.Value;
         }
 
-        private void AskAcceptDecline()
+        private int AskAcceptDecline()
         {
+            mResult = new WaitableResult<int>();
 
+            using (Packet oPacket = mNpc.GetDialogPacket(mText, NpcMessageType.AcceptDecline))
+            {
+                mCharacter.Client.Send(oPacket);
+            }
+
+            mText = string.Empty;
+
+            mResult.Wait();
+
+            return mResult.Value;
         }
 
         private void AskChoice()

@@ -79,6 +79,11 @@ namespace Destiny.Maple.Life
 
         public void Handle(Character talker, Packet iPacket)
         {
+            if (talker.LastNpc == null)
+            {
+                return;
+            }
+
             NpcMessageType lastMessageType = (NpcMessageType)iPacket.ReadByte();
             byte action = iPacket.ReadByte();
 
@@ -120,11 +125,11 @@ namespace Destiny.Maple.Life
 
                 if (selection != -1)
                 {
-                    this.Scripts[talker].SetIntegerResult(selection);
+                    this.Scripts[talker].SetResult(selection);
                 }
                 else
                 {
-                    this.Scripts[talker].SetBooleanResult(action == 1);
+                    this.Scripts[talker].SetResult(action);
                 }
             }
             else
