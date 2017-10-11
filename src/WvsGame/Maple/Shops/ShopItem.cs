@@ -1,7 +1,8 @@
-﻿using Destiny.Core.Data;
+﻿using Destiny.Data;
 using Destiny.Maple.Data;
 using System;
 using Destiny.IO;
+using Destiny.Data;
 
 namespace Destiny.Maple.Shops
 {

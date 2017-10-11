@@ -1,10 +1,10 @@
-﻿using Destiny.Core.IO;
+﻿using Destiny.IO;
 using MySql.Data.MySqlClient;
 using System;
 using System.IO;
 using System.Linq;
 
-namespace Destiny.Core.Data
+namespace Destiny.Data
 {
     public class TemporaryConnection : IDisposable
     {

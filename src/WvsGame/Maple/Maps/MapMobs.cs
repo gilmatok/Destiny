@@ -1,10 +1,10 @@
 ﻿using Destiny.Network;
-using Destiny.Core.Threading;
 using Destiny.Maple.Characters;
 using Destiny.Maple.Data;
 using Destiny.Maple.Life;
 using System;
 using System.Collections.Generic;
+using Destiny.Threading;
 
 namespace Destiny.Maple.Maps
 {

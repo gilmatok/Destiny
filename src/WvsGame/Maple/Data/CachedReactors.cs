@@ -1,4 +1,5 @@
-﻿using Destiny.Core.Data;
+﻿using Destiny.Data;
+using Destiny.IO;
 using Destiny.Maple.Life;
 using System.Collections.ObjectModel;
 

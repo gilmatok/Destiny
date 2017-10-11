@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
 
-namespace Destiny.Core.Threading
+namespace Destiny.Threading
 {
     public sealed class Delay : IDisposable
     {

@@ -1,6 +1,6 @@
 ﻿using Destiny.Maple.Characters;
 using Destiny.Network;
-using Destiny.Core.Data;
+using Destiny.Data;
 using Destiny.Maple.Shops;
 using System.Collections.Generic;
 using Destiny.Maple.Scripting;

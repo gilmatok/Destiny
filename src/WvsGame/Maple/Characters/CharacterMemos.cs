@@ -1,5 +1,5 @@
 ﻿using Destiny.Network;
-using Destiny.Core.Data;
+using Destiny.Data;
 using System.Collections.ObjectModel;
 
 namespace Destiny.Maple.Characters

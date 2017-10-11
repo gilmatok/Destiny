@@ -1,5 +1,4 @@
-﻿using Destiny.Collections;
-using Destiny.Core.IO;
+﻿using Destiny.IO;
 using System.Collections.ObjectModel;
 
 namespace Destiny.Maple

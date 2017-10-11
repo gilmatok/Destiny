@@ -1,8 +1,9 @@
-﻿using Destiny.Core.Data;
+﻿using Destiny.Data;
 using Destiny.Network;
 using Destiny.Maple.Characters;
 using System;
 using Destiny.Maple.Data;
+using Destiny.IO;
 
 namespace Destiny.Maple.Maps
 {

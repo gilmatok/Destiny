@@ -1,10 +1,10 @@
 ﻿using Destiny.Network;
-using Destiny.Core.Data;
+using Destiny.Data;
 using Destiny.Maple.Characters;
 using Destiny.Maple.Data;
 using System;
-using Destiny.Core.Threading;
 using Destiny.IO;
+using Destiny.Threading;
 
 namespace Destiny.Maple
 {

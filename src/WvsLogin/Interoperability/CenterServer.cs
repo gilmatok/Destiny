@@ -1,5 +1,5 @@
 ﻿using Destiny.Collections;
-using Destiny.Core.IO;
+using Destiny.IO;
 using Destiny.Maple;
 using Destiny.Network;
 using Destiny.Security;

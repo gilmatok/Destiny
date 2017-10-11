@@ -1,6 +1,6 @@
-﻿using Destiny.Core.Data;
-using Destiny.Core.Security;
+﻿using Destiny.Data;
 using Destiny.Maple;
+using Destiny.Security;
 using System;
 using System.Collections.Generic;
 using System.Net.Sockets;

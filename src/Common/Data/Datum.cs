@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 
-namespace Destiny.Core.Data
+namespace Destiny.Data
 {
     public sealed class Datums : IEnumerable<Datum>
     {

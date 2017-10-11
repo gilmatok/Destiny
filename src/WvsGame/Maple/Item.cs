@@ -1,11 +1,12 @@
 ﻿using Destiny.Network;
-using Destiny.Core.Data;
+using Destiny.Data;
 using Destiny.Maple.Characters;
 using Destiny.Maple.Data;
 using Destiny.Maple.Maps;
 using System;
 using System.Collections.Generic;
 using Destiny.IO;
+using Destiny.Data;
 
 namespace Destiny.Maple
 {

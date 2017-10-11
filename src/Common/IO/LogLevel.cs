@@ -1,4 +1,4 @@
-﻿namespace Destiny
+﻿namespace Destiny.IO
 {
     public enum LogLevel : byte
     {

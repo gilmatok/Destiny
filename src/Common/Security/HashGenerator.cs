@@ -2,7 +2,7 @@
 using System.Security.Cryptography;
 using System.Text;
 
-namespace Destiny.Core.Security
+namespace Destiny.Security
 {
     public static class HashGenerator
     {

@@ -1,6 +1,6 @@
 ﻿using Destiny.Maple.Characters;
-using Destiny.Core.Threading;
 using Destiny.Network;
+using Destiny.Threading;
 
 namespace Destiny.Maple.Maps
 {

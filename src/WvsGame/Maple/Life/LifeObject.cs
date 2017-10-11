@@ -1,4 +1,4 @@
-﻿using Destiny.Core.Data;
+﻿using Destiny.Data;
 using Destiny.Maple.Maps;
 
 namespace Destiny.Maple.Life

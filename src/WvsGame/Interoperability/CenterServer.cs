@@ -1,6 +1,6 @@
 ﻿using Destiny.Collections;
-using Destiny.Core.Data;
-using Destiny.Core.IO;
+using Destiny.Data;
+using Destiny.IO;
 using Destiny.Maple;
 using Destiny.Maple.Characters;
 using Destiny.Maple.Data;

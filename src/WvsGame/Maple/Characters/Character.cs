@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using Destiny.Maple.Commands;
 using Destiny.Maple.Life;
-using Destiny.Core.Data;
+using Destiny.Data;
 using Destiny.Maple.Data;
 using Destiny.Maple.Interaction;
 using Destiny.Network;

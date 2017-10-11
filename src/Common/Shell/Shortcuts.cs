@@ -1,4 +1,4 @@
-﻿using Destiny.Core.IO;
+﻿using Destiny.IO;
 using System;
 using System.Windows.Shell;
 

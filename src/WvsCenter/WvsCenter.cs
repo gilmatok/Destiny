@@ -1,5 +1,5 @@
-﻿using Destiny.Core.Data;
-using Destiny.Core.IO;
+﻿using Destiny.Data;
+using Destiny.IO;
 using Destiny.Maple;
 using Destiny.Network;
 using System;

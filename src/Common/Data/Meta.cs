@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using Destiny.IO;
+using System.Collections.Generic;
 
-namespace Destiny.Core.Data
+namespace Destiny.Data
 {
     public static class Meta
     {

@@ -4,7 +4,7 @@ using System.Text;
 using System.IO;
 using System.Diagnostics;
 
-namespace Destiny
+namespace Destiny.IO
 {
     public static class Log
     {

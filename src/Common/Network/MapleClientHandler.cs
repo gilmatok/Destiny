@@ -1,4 +1,5 @@
-﻿using Destiny.Security;
+﻿using Destiny.IO;
+using Destiny.Security;
 using System.Net.Sockets;
 
 namespace Destiny.Network

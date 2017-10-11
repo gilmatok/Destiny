@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System;
 using System.Collections;
-using Destiny.Core.Data;
+using Destiny.Data;
 using Destiny.Network;
 using System.Linq;
 using Destiny.Maple.Data;

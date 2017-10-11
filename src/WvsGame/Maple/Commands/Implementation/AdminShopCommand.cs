@@ -1,5 +1,4 @@
 ﻿using Destiny.Maple.Characters;
-using Destiny.Core.IO;
 using Destiny.Network;
 using System;
 using System.Collections.Generic;

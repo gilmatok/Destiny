@@ -1,11 +1,11 @@
-﻿using Destiny.Core.Data;
+﻿using Destiny.Data;
 using Destiny.Network;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
 
-namespace Destiny.Core.IO
+namespace Destiny.IO
 {
     public static class Settings
     {

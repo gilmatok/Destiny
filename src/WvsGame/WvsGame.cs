@@ -1,6 +1,6 @@
-﻿using Destiny.Core.Data;
-using Destiny.Core.IO;
+﻿using Destiny.Data;
 using Destiny.Interoperability;
+using Destiny.IO;
 using Destiny.Maple.Data;
 using Destiny.Network;
 using Destiny.Shell;

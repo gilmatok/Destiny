@@ -1,4 +1,5 @@
-﻿using Destiny.Core.Data;
+﻿using Destiny.Data;
+using Destiny.Data;
 using Destiny.Maple.Data;
 using System.Collections.Generic;
 
