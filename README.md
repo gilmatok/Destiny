@@ -7,6 +7,6 @@ Destiny is an open-source MMORPG server emulation software for the client of Map
 2. **Download and install Visual Studio**: The community version is offered for free on Microsoft website.
 3. **Download and install MySQL**: Install a SQL server of your choice (pref. WampServer).
 4. **Build the Destiny solution provided with Visual Studio**
-5. **Run Destiny**
+5. **Run Destiny**: Execute the servers in order: WvsCenter -> WvsLogin -> WvsGame(s).
 
-The server will guide you through the process of configuring Destiny automatically.
+Each server will guide you through the process of configuring it automatically.
