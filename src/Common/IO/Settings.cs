@@ -67,6 +67,17 @@ namespace Destiny.IO
 
                 Database.Host = Settings.GetString("Database/Host");
                 Database.Schema = Settings.GetString("Database/Schema");
+
+                // This is only available from WvsGame, so it's better to not have errors thrown in-case it's ran from somewhere else.
+                // Obviously this isn't the best way to do that, but feedback is welcomed.
+                try
+                {
+                    Database.SchemaMCDB = Settings.GetString("Database/SchemaMCDB");
+                }
+
+                catch
+                { }
+
                 Database.Username = Settings.GetString("Database/Username");
                 Database.Password = Settings.GetString("Database/Password");
             }

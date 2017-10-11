@@ -58,7 +58,7 @@ namespace Destiny.Maple.Commands.Implementation
 
                     caller.Notify("[Results]");
 
-                    using (Database.TemporarySchema("mcdb"))
+                    using (Database.TemporarySchema(Database.SchemaMCDB))
                     {
                         foreach (Datum datum in new Datums("strings").Populate("`label` LIKE '%{0}%'", query))
                         {

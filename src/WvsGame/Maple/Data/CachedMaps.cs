@@ -23,29 +23,29 @@ namespace Destiny.Maple.Data
             {
                 if (!base.Contains(key))
                 {
-                    using (Database.TemporarySchema("mcdb"))
+                    using (Database.TemporarySchema(Database.SchemaMCDB))
                     {
-                        foreach (Datum datum in new Datums("map_data").Populate("mapid = {0}", key))
+                        foreach (Datum datum in new Datums("map_data", Database.SchemaMCDB).Populate("mapid = {0}", key))
                         {
                             this.Add(new Map(datum));
                         }
 
-                        foreach (Datum datum in new Datums("map_footholds").Populate("mapid = {0}", key))
+                        foreach (Datum datum in new Datums("map_footholds", Database.SchemaMCDB).Populate("mapid = {0}", key))
                         {
                             this[key].Footholds.Add(new Foothold(datum));
                         }
 
-                        foreach (Datum datum in new Datums("map_seats").Populate("mapid = {0}", key))
+                        foreach (Datum datum in new Datums("map_seats", Database.SchemaMCDB).Populate("mapid = {0}", key))
                         {
                             this[key].Seats.Add(new Seat(datum));
                         }
 
-                        foreach (Datum datum in new Datums("map_portals").Populate("mapid = {0}", key))
+                        foreach (Datum datum in new Datums("map_portals", Database.SchemaMCDB).Populate("mapid = {0}", key))
                         {
                             this[key].Portals.Add(new Portal(datum));
                         }
 
-                        foreach (Datum datum in new Datums("map_life").Populate("mapid = {0}", key))
+                        foreach (Datum datum in new Datums("map_life", Database.SchemaMCDB).Populate("mapid = {0}", key))
                         {
                             switch ((string)datum["life_type"])
                             {

@@ -20,7 +20,7 @@ namespace Destiny.Maple.Data
 
         public static void Initialize()
         {
-            using (Database.TemporarySchema("mcdb"))
+            using (Database.TemporarySchema(Database.SchemaMCDB))
             {
                 DataProvider.IsInitialized = false;
 

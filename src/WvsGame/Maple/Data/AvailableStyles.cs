@@ -22,12 +22,12 @@ namespace Destiny.Maple.Data
 
             using (Log.Load("Styles"))
             {
-                foreach (Datum datum in new Datums("character_skin_data").Populate())
+                foreach (Datum datum in new Datums("character_skin_data", Database.SchemaMCDB).Populate())
                 {
                     this.Skins.Add((byte)(sbyte)datum["skinid"]);
                 }
 
-                foreach (Datum datum in new Datums("character_hair_data").Populate())
+                foreach (Datum datum in new Datums("character_hair_data", Database.SchemaMCDB).Populate())
                 {
                     switch ((string)datum["gender"])
                     {
@@ -41,7 +41,7 @@ namespace Destiny.Maple.Data
                     }
                 }
 
-                foreach (Datum datum in new Datums("character_face_data").Populate())
+                foreach (Datum datum in new Datums("character_face_data", Database.SchemaMCDB).Populate())
                 {
                     switch ((string)datum["gender"])
                     {
