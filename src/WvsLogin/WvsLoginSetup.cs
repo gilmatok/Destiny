@@ -247,7 +247,7 @@ namespace Destiny
 
 					        DROP TABLE IF EXISTS `accounts`;
                             CREATE TABLE `accounts` (
-                              `ID` int(10) NOT NULL,
+                              `ID` int(10) NOT NULL AUTO_INCREMENT,
                               `Username` varchar(12) NOT NULL,
                               `Password` varchar(128) NOT NULL,
                               `Salt` varchar(32) NOT NULL,
