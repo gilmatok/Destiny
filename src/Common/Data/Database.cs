@@ -13,10 +13,10 @@ namespace Destiny.Data
         private string oldUsername;
         private string oldPassword;
 
-        internal TemporaryConnection(string host, string schema, string username, string password)
+        internal TemporaryConnection(string host, string schema, string username, string password, bool mcdb = false)
         {
             this.oldHost = Database.Host;
-            this.oldSchema = Database.Schema;
+            this.oldSchema = mcdb ? Database.Schema : Database.SchemaMCDB;
             this.oldUsername = Database.Username;
             this.oldPassword = Database.Password;
 
@@ -55,6 +55,7 @@ namespace Destiny.Data
     {
         public static string Host { get; set; }
         public static string Schema { get; set; }
+        public static string SchemaMCDB { get; set; }
         public static string Username { get; set; }
         public static string Password { get; set; }
 
@@ -226,9 +227,9 @@ namespace Destiny.Data
             }
         }
 
-        public static TemporaryConnection TemporaryConnection(string host, string schema, string username, string password)
+        public static TemporaryConnection TemporaryConnection(string host, string schema, string username, string password, bool mcdb = false)
         {
-            return new TemporaryConnection(host, schema, username, password);
+            return new TemporaryConnection(host, schema, username, password, mcdb);
         }
 
         public static TemporarySchema TemporarySchema(string schema)

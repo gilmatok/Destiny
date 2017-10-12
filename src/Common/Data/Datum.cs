@@ -10,17 +10,29 @@ namespace Destiny.Data
     {
         private string Table { get; set; }
         private List<Datum> Values { get; set; }
+        private string ConnectionString { get; set; }
 
         public Datums(string table)
         {
             this.Table = table;
+            this.ConnectionString = Database.ConnectionString;
+        }
+
+        public Datums(string table, string schema)
+        {
+            this.Table = table;
+            this.ConnectionString = string.Format("server={0}; database={1}; uid={2}; password={3}; convertzerodatetime=yes;",
+                Database.Host,
+                schema,
+                Database.Username,
+                Database.Password);
         }
 
         private void PopulateInternal(string fields, string constraints, params object[] args)
         {
             this.Values = new List<Datum>();
 
-            using (MySqlConnection connection = new MySqlConnection(Database.ConnectionString))
+            using (MySqlConnection connection = new MySqlConnection(this.ConnectionString))
             {
                 connection.Open();
                 using (MySqlCommand command = Database.GetCommand(connection, constraints, args))
@@ -92,6 +104,7 @@ namespace Destiny.Data
     {
         public string Table { get; private set; }
         public Dictionary<string, Object> Dictionary { get; set; }
+        private string ConnectionString { get; set; }
 
         public object this[string name]
         {
@@ -130,12 +143,36 @@ namespace Destiny.Data
         {
             this.Table = table;
             this.Dictionary = new Dictionary<string, object>();
+            this.ConnectionString = Database.ConnectionString;
+        }
+
+        public Datum(string table, string schema)
+        {
+            this.Table = table;
+            this.Dictionary = new Dictionary<string, object>();
+            this.ConnectionString = string.Format("server={0}; database={1}; uid={2}; password={3}; convertzerodatetime=yes;",
+                Database.Host,
+                schema,
+                Database.Username,
+                Database.Password);
         }
 
         public Datum(string table, Dictionary<string, object> dictionary)
         {
             this.Table = table;
             this.Dictionary = dictionary;
+            this.ConnectionString = Database.ConnectionString;
+        }
+
+        public Datum(string table, string schema, Dictionary<string, object> dictionary)
+        {
+            this.Table = table;
+            this.Dictionary = dictionary;
+            this.ConnectionString = string.Format("server={0}; database={1}; uid={2}; password={3}; convertzerodatetime=yes;",
+                Database.Host,
+                schema,
+                Database.Username,
+                Database.Password);
         }
 
         public Datum Populate(string constraints, params object[] args)
@@ -147,7 +184,7 @@ namespace Destiny.Data
 
         public Datum PopulateWith(string fields, string constraints, params object[] args)
         {
-            using (MySqlConnection connection = new MySqlConnection(Database.ConnectionString))
+            using (MySqlConnection connection = new MySqlConnection(this.ConnectionString))
             {
                 connection.Open();
                 using (MySqlCommand command = Database.GetCommand(connection, constraints, args))
@@ -244,7 +281,7 @@ namespace Destiny.Data
                 }
             }
 
-            using (MySqlConnection connection = new MySqlConnection(Database.ConnectionString))
+            using (MySqlConnection connection = new MySqlConnection(this.ConnectionString))
             {
                 connection.Open();
                 using (MySqlCommand command = Database.GetCommand(connection, constraints, args))

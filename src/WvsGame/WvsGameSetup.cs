@@ -11,6 +11,12 @@ namespace Destiny
     {
         private const string McdbFileName = @"..\..\sql\MCDB.sql";
 
+        private static string databaseHost = string.Empty;
+        private static string databaseSchema = string.Empty;
+        private static string databaseSchemaMCDB = string.Empty;
+        private static string databaseUsername = string.Empty;
+        private static string databasePassword = string.Empty;
+
         public static void Run()
         {
             Log.Entitle("WvsGame Setup");
@@ -18,11 +24,6 @@ namespace Destiny
             Log.Inform("If you do not know a value, leave the field blank to apply default.");
 
             Log.Entitle("Database Setup");
-
-            string databaseHost = string.Empty;
-            string databaseSchema = string.Empty;
-            string databaseUsername = string.Empty;
-            string databasePassword = string.Empty;
 
             databaseConfiguration:
 
@@ -34,12 +35,18 @@ namespace Destiny
             {
                 databaseHost = Log.Input("Host: ", "localhost");
                 databaseSchema = Log.Input("Schema: ", "game");
-                databaseUsername = Log.Input("Username: ", "root");
+                databaseSchemaMCDB = Log.Input("MCDB Schema: ", "mcdb");
+                databaseUsername = Log.Input("Username (that can access both databases): ", "root");
                 databasePassword = Log.Input("Password: ", "");
 
                 using (Database.TemporaryConnection(databaseHost, databaseSchema, databaseUsername, databasePassword))
                 {
                     Database.Test();
+
+                    if (Log.YesNo("Populate the " + databaseSchema + " database? ", true))
+                    {
+                        PopulateDatabase();
+                    }
                 }
             }
             catch (MySqlException e)
@@ -56,7 +63,159 @@ namespace Destiny
                     {
                         Log.Inform("Please wait...");
 
-                        Database.ExecuteScript(databaseHost, databaseUsername, databasePassword, @"
+                        PopulateDatabase();
+
+                        Log.Inform("Database '{0}' created.", databaseSchema);
+                    }
+                    catch (Exception mcdbE)
+                    {
+                        Log.Error("Error while creating '{0}': ", mcdbE, databaseSchema);
+
+                        goto mcdbConfiguration;
+                    }
+                }
+                else
+                {
+                    goto databaseConfiguration;
+                }
+            }
+            catch
+            {
+                Log.SkipLine();
+
+                goto databaseConfiguration;
+            }
+
+            Log.SkipLine();
+
+            mcdbConfiguration:
+            Log.Inform("The setup will now check for a MapleStory database.");
+
+            try
+            {
+                using (Database.TemporaryConnection(databaseHost, databaseSchemaMCDB, databaseUsername, databasePassword, true))
+                {
+                    Database.Test();
+
+                    if (Log.YesNo($"Populate the '{databaseSchemaMCDB}' database? ", true))
+                    {
+                        Database.ExecuteFile(databaseHost, databaseUsername, databasePassword, Application.ExecutablePath + McdbFileName);
+                    }
+                }
+            }
+            catch (MySqlException e)
+            {
+                Log.Error(e);
+
+                Log.SkipLine();
+
+                if (e.Message.Contains("Unknown database") && Log.YesNo($"Create and populate the '{databaseSchemaMCDB}' database? ", true))
+                {
+                    try
+                    {
+                        Log.Inform("Please wait...");
+
+                        Database.ExecuteFile(databaseHost, databaseUsername, databasePassword, Application.ExecutablePath + McdbFileName);
+
+                        Log.Inform($"Database '{databaseSchemaMCDB}' created.");
+                    }
+                    catch (Exception mcdbE)
+                    {
+                        Log.Error($"Error while creating '{databaseSchemaMCDB}': ", mcdbE);
+
+                        goto mcdbConfiguration;
+                    }
+                }
+                else
+                {
+                    Log.SkipLine();
+
+                    goto mcdbConfiguration;
+                }
+            }
+
+            Log.SkipLine();
+
+            Log.Success("Database configured!");
+
+            Log.Entitle("Server Configuration");
+
+            IPAddress centerIP = Log.Input("Enter the IP of the center server: ", IPAddress.Loopback);
+            string securityCode = Log.Input("Assign the security code between servers: ", "");
+            int autoRestartTime = Log.Input("Automatic restart time (leave blank for none): ", 15);
+
+            Log.SkipLine();
+
+            Log.Success("Server configured!");
+
+            Log.Entitle("User Profile");
+
+            Log.Inform("Please choose what information to display.\n  A. Hide packets (recommended)\n  B. Show names\n  C. Show content");
+            Log.SkipLine();
+
+            LogLevel logLevel;
+
+            multipleChoice:
+            switch (Log.Input("Please enter your choice: ", "Hide").ToLower())
+            {
+                case "a":
+                case "hide":
+                    logLevel = LogLevel.None;
+                    break;
+
+                case "b":
+                case "names":
+                    logLevel = LogLevel.Name;
+                    break;
+
+                case "c":
+                case "content":
+                    logLevel = LogLevel.Full;
+                    break;
+
+                default:
+                    goto multipleChoice;
+            }
+
+            Log.Entitle("Please wait...");
+
+            Log.Inform("Applying settings to 'WvsGame.ini'...");
+
+            string lines = string.Format(
+                @"[Log]
+                Packets={0}
+                StackTrace=False
+                LoadTime=False
+                JumpLists=3
+    
+                [Server]
+                AutoRestartTime={1}
+
+                [Center]
+                IP={2}
+                Port=8485
+                SecurityCode={3}
+    
+                [Database]
+                Host={4}
+                Schema={5}
+                SchemaMCDB={6}
+                Username={7}
+                Password={8}",
+                logLevel, autoRestartTime, centerIP, securityCode, databaseHost,
+                databaseSchema, databaseSchemaMCDB, databaseUsername, databasePassword).Replace("  ", "");
+
+            using (StreamWriter file = new StreamWriter(Application.ExecutablePath + "WvsGame.ini"))
+            {
+                file.WriteLine(lines);
+            }
+
+            Log.Success("Configuration done!");
+        }
+
+        private static void PopulateDatabase()
+        {
+            Database.ExecuteScript(databaseHost, databaseUsername, databasePassword, @"
 							CREATE DATABASE IF NOT EXISTS `{0}` DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
                             USE `{0}`;
                           
@@ -228,6 +387,13 @@ namespace Destiny
                               `Map` int(11) NOT NULL DEFAULT '0'
                             ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+                            DROP TABLE IF EXISTS `variables`;
+                            CREATE TABLE `variables` (
+                              `CharacterID` int(11) NOT NULL,
+                              `Key` varchar(13) NOT NULL DEFAULT '0',
+                              `Value` varchar(13) NOT NULL DEFAULT '0'
+                            ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
                             ALTER TABLE `buffs`
                               ADD PRIMARY KEY (`ID`),
                               ADD KEY `CharacterID` (`CharacterID`);
@@ -329,147 +495,6 @@ namespace Destiny
                             ALTER TABLE `variables`
                               ADD CONSTRAINT `variables_ibfk_1` FOREIGN KEY (`CharacterID`) REFERENCES `characters` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
                             ", databaseSchema);
-
-                        Log.Inform("Database '{0}' created.", databaseSchema);
-                    }
-                    catch (Exception mcdbE)
-                    {
-                        Log.Error("Error while creating '{0}': ", mcdbE, databaseSchema);
-
-                        goto mcdbConfiguration;
-                    }
-                }
-                else
-                {
-                    goto databaseConfiguration;
-                }
-            }
-            catch
-            {
-                Log.SkipLine();
-
-                goto databaseConfiguration;
-            }
-
-            Log.SkipLine();
-
-            mcdbConfiguration:
-            Log.Inform("The setup will now check for a MapleStory database.");
-
-            try
-            {
-                using (Database.TemporaryConnection(databaseHost, "mcdb", databaseUsername, databasePassword))
-                {
-                    Database.Test();
-                }
-            }
-            catch (MySqlException e)
-            {
-                Log.Error(e);
-
-                Log.SkipLine();
-
-                if (e.Message.Contains("Unknown database") && Log.YesNo("Create and populate the MCDB database? ", true))
-                {
-                    try
-                    {
-                        Log.Inform("Please wait...");
-
-                        Database.ExecuteFile(databaseHost, databaseUsername, databasePassword, Application.ExecutablePath + WvsGameSetup.McdbFileName);
-
-                        Log.Inform("Database 'mcdb' created.");
-                    }
-                    catch (Exception mcdbE)
-                    {
-                        Log.Error("Error while creating 'mcdb': ", mcdbE);
-
-                        goto mcdbConfiguration;
-                    }
-                }
-                else
-                {
-                    Log.SkipLine();
-
-                    goto mcdbConfiguration;
-                }
-            }
-
-            Log.SkipLine();
-
-            Log.Success("Database configured!");
-
-            Log.Entitle("Server Configuration");
-
-            IPAddress centerIP = Log.Input("Enter the IP of the center server: ", IPAddress.Loopback);
-            string securityCode = Log.Input("Assign the security code between servers: ", "");
-            int autoRestartTime = Log.Input("Automatic restart time (leave blank for none): ", 15);
-
-            Log.SkipLine();
-
-            Log.Success("Server configured!");
-
-            Log.Entitle("User Profile");
-
-            Log.Inform("Please choose what information to display.\n  A. Hide packets (recommended)\n  B. Show names\n  C. Show content");
-            Log.SkipLine();
-
-            LogLevel logLevel;
-
-            multipleChoice:
-            switch (Log.Input("Please enter your choice: ", "Hide").ToLower())
-            {
-                case "a":
-                case "hide":
-                    logLevel = LogLevel.None;
-                    break;
-
-                case "b":
-                case "names":
-                    logLevel = LogLevel.Name;
-                    break;
-
-                case "c":
-                case "content":
-                    logLevel = LogLevel.Full;
-                    break;
-
-                default:
-                    goto multipleChoice;
-            }
-
-            Log.Entitle("Please wait...");
-
-            Log.Inform("Applying settings to 'WvsGame.ini'...");
-
-            string lines = string.Format(
-                @"[Log]
-                Packets={0}
-                StackTrace=False
-                LoadTime=False
-                JumpLists=3
-    
-                [Server]
-                AutoRestartTime={1}
-
-                [Center]
-                IP={2}
-                Port=8485
-                SecurityCode={3}
-    
-                [Database]
-                Host={4}
-                Schema={5}
-                Username={6}
-                Password={7}",
-                logLevel, autoRestartTime, centerIP, securityCode, databaseHost,
-                databaseSchema, databaseUsername, databasePassword).Replace("  ", "");
-
-            using (StreamWriter file = new StreamWriter(Application.ExecutablePath + "WvsGame.ini"))
-            {
-                file.WriteLine(lines);
-            }
-
-            Log.Success("Configuration done!");
         }
     }
 }
