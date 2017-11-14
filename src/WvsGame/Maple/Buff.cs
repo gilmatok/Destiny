@@ -226,7 +226,7 @@ namespace Destiny.Maple
 
             if (skill.MagicDefense > 0)
             {
-                this.SecondaryStatups.Add(SecondaryBuffStat.MagicDefense, skill.MagicAttack);
+                this.SecondaryStatups.Add(SecondaryBuffStat.MagicDefense, skill.MagicDefense);
             }
 
             if (skill.Accuracy > 0)
