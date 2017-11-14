@@ -616,7 +616,7 @@ namespace Destiny.Maple
             this.CWeaponAttack = (short)datum["weapon_attack"];
             this.CMagicAttack = (short)datum["magic_attack"];
             this.CWeaponDefense = (short)datum["weapon_defense"];
-            this.CMagicAttack = (short)datum["magic_attack"];
+            this.CMagicDefense = (short)datum["magic_defense"];
             this.CAccuracy = (short)datum["accuracy"];
             this.CAvoid = (short)datum["avoid"];
             this.CSpeed = (short)datum["speed"];
