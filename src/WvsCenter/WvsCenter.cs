@@ -71,13 +71,16 @@ namespace Destiny
             }
             catch (Exception e)
             {
+                Log.SkipLine();
                 Log.Error(e);
+                Log.SkipLine();
             }
-
 
             if (WvsCenter.IsAlive)
             {
+                Log.SkipLine();
                 Log.Success("WvsCenter started on thread {0}.", Thread.CurrentThread.ManagedThreadId);
+                Log.SkipLine();
             }
             else
             {
@@ -87,9 +90,7 @@ namespace Destiny
             while (WvsCenter.IsAlive)
             {
                 WvsCenter.AcceptDone.Reset();
-
                 WvsCenter.Listener.BeginAcceptSocket(new AsyncCallback(WvsCenter.OnAcceptSocket), null);
-
                 WvsCenter.AcceptDone.WaitOne();
             }
 
@@ -102,6 +103,7 @@ namespace Destiny
 
             WvsCenter.Dispose();
 
+            Log.SkipLine();
             Log.Warn("Server stopped.");
 
             Console.Read();
@@ -126,6 +128,7 @@ namespace Destiny
                 WvsCenter.Listener.Stop();
             }
 
+            Log.SkipLine();
             Log.Inform("Server disposed from thread {0}.", Thread.CurrentThread.ManagedThreadId);
         }
     }

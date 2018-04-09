@@ -46,7 +46,9 @@ namespace Destiny.Network
                     {
                         WvsCenter.Login = null;
 
+                        Log.SkipLine();
                         Log.Warn("Unregistered Login Server.");
+                        Log.SkipLine();
                     }
                     break;
 
@@ -62,8 +64,9 @@ namespace Destiny.Network
 
                             WvsCenter.Login?.Send(Packet);
                         }
-
-                        Log.Warn("Unregistered Channel Server ({0}-{1}).", this.World.Name, this.ID);
+                        Log.SkipLine();
+                        Log.Warn("Unregistered Channel Server ({0}-{1}).", this.World.Name, (this.ID + 1));
+                        Log.SkipLine();
                     }
                     break;
 
@@ -71,7 +74,10 @@ namespace Destiny.Network
                     {
                         this.World.Shop = null;
 
+                        Log.SkipLine();
                         Log.Warn("Unregistered Shop Server ({0}).", this.World.Name);
+                        Log.SkipLine();
+
                         break;
                     }
             }
@@ -266,8 +272,9 @@ namespace Destiny.Network
                                     }
                                 }
                             }
-
+                            Log.SkipLine();
                             Log.Success("Registered Login Server.");
+                            Log.SkipLine();
                         }
                         break;
 
@@ -283,14 +290,17 @@ namespace Destiny.Network
 
                                 WvsCenter.Login.Send(Packet);
                             }
-
-                            Log.Success("Registered Channel Server ({0}-{1}).", this.World.Name, this.ID);
+                            Log.SkipLine();
+                            Log.Success("Registered Channel Server ({0}-{1}).", this.World.Name, (this.ID + 1));
+                            Log.SkipLine();
                         }
                         break;
 
                     case ServerType.Shop:
                         {
+                            Log.SkipLine();
                             Log.Success("Registered Shop Server ({0}).", this.World.Name);
+                            Log.SkipLine();
                         }
                         break;
                 }

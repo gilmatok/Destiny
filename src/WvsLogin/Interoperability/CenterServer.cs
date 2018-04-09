@@ -127,7 +127,9 @@ namespace Destiny.Interoperability
                         WvsLogin.Listen();
                         WvsLogin.CenterConnectionDone.Set();
 
+                        Log.SkipLine();
                         Log.Success("Registered Login Server.");
+                        Log.SkipLine();
                     }
                     break;
 

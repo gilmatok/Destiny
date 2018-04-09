@@ -94,22 +94,19 @@ namespace Destiny.Network
             if (WvsLogin.IsAlive)
             {
                 WvsLogin.CenterConnectionDone.Reset();
-
                 new Thread(new ThreadStart(CenterServer.Main)).Start();
-
                 WvsLogin.CenterConnectionDone.WaitOne();
             }
             else
             {
+                Log.SkipLine();
                 Log.Inform("Could not start server because of errors.");
             }
 
             while (WvsLogin.IsAlive)
             {
                 WvsLogin.AcceptDone.Reset();
-
                 WvsLogin.Listener.BeginAcceptSocket(new AsyncCallback(WvsLogin.OnAcceptSocket), null);
-
                 WvsLogin.AcceptDone.WaitOne();
             }
 
@@ -120,6 +117,7 @@ namespace Destiny.Network
 
             WvsLogin.Dispose();
 
+            Log.SkipLine();
             Log.Warn("Server stopped.");
 
             Console.Read();
@@ -155,6 +153,7 @@ namespace Destiny.Network
                 WvsLogin.Listener.Stop();
             }
 
+            Log.SkipLine();
             Log.Inform("Server disposed.", Thread.CurrentThread.ManagedThreadId);
         }
     }

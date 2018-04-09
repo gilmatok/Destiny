@@ -140,7 +140,8 @@ namespace Destiny.Data
             using (MySqlConnection connection = new MySqlConnection(Database.ConnectionString))
             {
                 connection.Open();
-                Log.Inform("Able to connect to database '{0}'.", connection.Database);
+                Log.SkipLine();
+                Log.Inform("Was able to connect to database '{0}'.", connection.Database);
                 connection.Close();
             }
         }

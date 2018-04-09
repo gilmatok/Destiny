@@ -19,59 +19,64 @@ namespace Destiny
 
         public static void Run()
         {
-            Log.Entitle("WvsGame Setup");
+            Log.Entitle("Welcome to WvsGame server Setup");
 
-            Log.Inform("If you do not know a value, leave the field blank to apply default.");
+            Log.Inform("If you do not know what value to put in as your database credentials, leave the field blank to apply default option.");
+            Log.SkipLine();
+            Log.Inform("Default options are:\n DB Host: localhost;\n Game server DB Schema: game;\n MapleStory DB(MCDB) Schema: mcdb;\n DB Username: root;\n DB Password: ;");
+            Log.SkipLine();
+            Log.Inform("Your advised not to use default username and none password,           not that we care :) ");
 
-            Log.Entitle("Database Setup");
+            Log.Entitle("Game Database Setup");
 
             databaseConfiguration:
-
-            Log.Inform("Please enter your database credentials: ");
-
+            Log.Inform("Please enter your game database credentials: ");
             Log.SkipLine();
 
             try
             {
-                databaseHost = Log.Input("Host: ", "localhost");
-                databaseSchema = Log.Input("Schema: ", "game");
-                databaseSchemaMCDB = Log.Input("MCDB Schema: ", "mcdb");
-                databaseUsername = Log.Input("Username (that can access both databases): ", "root");
-                databasePassword = Log.Input("Password: ", "");
+                databaseHost = Log.Input("DB Host: ", "localhost");
+                databaseSchema = Log.Input("Game server DB Schema: ", "game");
+                databaseSchemaMCDB = Log.Input("MapleStory DB(MCDB) Schema: ", "mcdb");
+                databaseUsername = Log.Input("DB Username (that can access both databases): ", "root");
+                databasePassword = Log.Input("DB Password: ", "");
 
                 using (Database.TemporaryConnection(databaseHost, databaseSchema, databaseUsername, databasePassword))
                 {
                     Database.Test();
+                    Log.SkipLine();
+                    Log.Success("Connection to game database was tested and is ready to be populated with data!");
+                    Log.SkipLine();
 
-                    if (Log.YesNo("Populate the " + databaseSchema + " database? ", true))
+                    if (Log.YesNo("Populate the " + databaseSchema + " database as your game server DB? ", true))
                     {
-                        PopulateDatabase();
+                        Log.SkipLine();
+                        Log.Inform("Please wait...");
+                        PopulateGameDatabase();
+                        Log.Inform("Done populating game database '{0}'!", databaseSchema);
                     }
                 }
             }
             catch (MySqlException e)
             {
                 Log.SkipLine();
-
                 Log.Error(e);
-
                 Log.SkipLine();
 
-                if (e.Message.Contains("Unknown database") && Log.YesNo("Create and populate the " + databaseSchema + " database? ", true))
+                if (e.Message.Contains("Unknown database") && Log.YesNo("Create and populate the " + databaseSchema + " database as your game server DB? ", true))
                 {
                     try
                     {
+                        Log.SkipLine();
                         Log.Inform("Please wait...");
-
-                        PopulateDatabase();
-
+                        PopulateGameDatabase();
                         Log.Inform("Database '{0}' created.", databaseSchema);
                     }
-                    catch (Exception mcdbE)
+                    catch (Exception gamedbE)
                     {
-                        Log.Error("Error while creating '{0}': ", mcdbE, databaseSchema);
-
-                        goto mcdbConfiguration;
+                        Log.SkipLine();
+                        Log.Error("Error while creating '{0}': ", gamedbE, databaseSchema);
+                        goto databaseConfiguration;
                     }
                 }
                 else
@@ -82,75 +87,81 @@ namespace Destiny
             catch
             {
                 Log.SkipLine();
-
                 goto databaseConfiguration;
             }
 
             Log.SkipLine();
+            Log.Success("Game database configured!");
+
+            Log.Entitle("MapleStory Database Setup");
 
             mcdbConfiguration:
-            Log.Inform("The setup will now check for a MapleStory database.");
+            Log.Inform("The setup will now check for a MapleStory database(MCDB).");
+            Log.Inform("It is assumed that the file for creation of MapleStory database(MCDB) is present at path: " + McdbFileName + "");
+            Log.SkipLine();
 
             try
             {
                 using (Database.TemporaryConnection(databaseHost, databaseSchemaMCDB, databaseUsername, databasePassword, true))
                 {
                     Database.Test();
+                    Log.SkipLine();
+                    Log.Success("Connection to MapleStory database was tested and is ready to be populated with data!");
+                    Log.SkipLine();
 
-                    if (Log.YesNo($"Populate the '{databaseSchemaMCDB}' database? ", true))
+                    if (Log.YesNo("Populate the " + databaseSchemaMCDB + " database as your MapleStory DB? ", true))
                     {
-                        Database.ExecuteFile(databaseHost, databaseUsername, databasePassword, Application.ExecutablePath + McdbFileName);
+                        Log.SkipLine();
+                        Log.Inform("Please wait...");
+                        PopulateMapleStoryDatabase();
+                        Log.Inform("Database '{0}' created.", databaseSchemaMCDB);
                     }
                 }
             }
             catch (MySqlException e)
             {
                 Log.Error(e);
-
                 Log.SkipLine();
 
-                if (e.Message.Contains("Unknown database") && Log.YesNo($"Create and populate the '{databaseSchemaMCDB}' database? ", true))
+                if (e.Message.Contains("Unknown database") && Log.YesNo("Create and populate the " + databaseSchemaMCDB + " database as your MapleStory DB? ", true))
                 {
                     try
                     {
+                        Log.SkipLine();
                         Log.Inform("Please wait...");
-
-                        Database.ExecuteFile(databaseHost, databaseUsername, databasePassword, Application.ExecutablePath + McdbFileName);
-
-                        Log.Inform($"Database '{databaseSchemaMCDB}' created.");
+                        PopulateMapleStoryDatabase();
+                        Log.Inform("Database '{0}' created.", databaseSchemaMCDB);
                     }
                     catch (Exception mcdbE)
                     {
-                        Log.Error($"Error while creating '{databaseSchemaMCDB}': ", mcdbE);
-
+                        Log.SkipLine();
+                        Log.Error("Error while creating '{0}': ", mcdbE, databaseSchemaMCDB);
                         goto mcdbConfiguration;
                     }
                 }
                 else
                 {
                     Log.SkipLine();
-
                     goto mcdbConfiguration;
                 }
             }
 
             Log.SkipLine();
+            Log.Success("MapleStory database configured!");
 
-            Log.Success("Database configured!");
-
-            Log.Entitle("Server Configuration");
-
-            IPAddress centerIP = Log.Input("Enter the IP of the center server: ", IPAddress.Loopback);
-            string securityCode = Log.Input("Assign the security code between servers: ", "");
-            int autoRestartTime = Log.Input("Automatic restart time (leave blank for none): ", 15);
-
+            Log.Entitle("Game Server Configuration");
+            Log.Inform("Again you can leave the fields blank to apply default option.");
             Log.SkipLine();
 
-            Log.Success("Server configured!");
+            IPAddress centerIP = Log.Input("Enter the IP of the center server[Default: IPAddress.Loopback]: ", IPAddress.Loopback);
+            string securityCode = Log.Input("Assign the security code between servers[Default: ]: ", "");
+            int autoRestartTime = Log.Input("Automatic restart time in seconds[Default: 15]: ", 15);
 
-            Log.Entitle("User Profile");
+            Log.SkipLine();
+            Log.Success("Game server configured!");
 
-            Log.Inform("Please choose what information to display.\n  A. Hide packets (recommended)\n  B. Show names\n  C. Show content");
+            Log.Entitle("User Profile Setup");
+            Log.Inform("Please choose what detail of debug information you want to display.\n  A. Hide packets (recommended)\n  B. Show names\n  C. Show content (expert usage, spam)");
             Log.SkipLine();
 
             LogLevel logLevel;
@@ -178,8 +189,7 @@ namespace Destiny
             }
 
             Log.Entitle("Please wait...");
-
-            Log.Inform("Applying settings to 'WvsGame.ini'...");
+            Log.Inform("Writing settings to 'WvsGame.ini'...");
 
             string lines = string.Format(
                 @"[Log]
@@ -210,10 +220,17 @@ namespace Destiny
                 file.WriteLine(lines);
             }
 
-            Log.Success("Configuration done!");
+            Log.SkipLine();
+            Log.Success("Configuration is done! Game server set up for use succesfully.");
         }
 
-        private static void PopulateDatabase()
+
+        private static void PopulateMapleStoryDatabase()
+        {
+            Database.ExecuteFile(databaseHost, databaseUsername, databasePassword, Application.ExecutablePath + McdbFileName);
+        }
+
+        private static void PopulateGameDatabase()
         {
             Database.ExecuteScript(databaseHost, databaseUsername, databasePassword, @"
 							CREATE DATABASE IF NOT EXISTS `{0}` DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;

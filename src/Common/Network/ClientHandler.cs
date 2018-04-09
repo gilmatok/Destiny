@@ -27,7 +27,9 @@ namespace Destiny.Network
 
             this.Prepare(args);
 
+            Log.SkipLine();
             Log.Success(string.Format("{0} connected from {1}.", this.Title, this.RemoteEndPoint.Address));
+            Log.SkipLine();
 
             this.Initialize();
 
@@ -202,7 +204,9 @@ namespace Destiny.Network
             }
             catch (Exception e)
             {
+                Log.SkipLine();
                 Log.Error("Termination error on {0}: ", e, this.Title);
+                Log.SkipLine();
             }
 
             this.Socket.Dispose();
