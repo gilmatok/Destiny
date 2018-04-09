@@ -1,4 +1,5 @@
-﻿using Destiny.Maple.Characters;
+﻿using System;
+using Destiny.Maple.Characters;
 using Destiny.Maple.Maps;
 using Destiny.Network;
 
@@ -12,6 +13,29 @@ namespace Destiny.Maple
              : base()
         {
             this.Amount = amount;
+        }
+
+        public static void giveMesos(Character character, int mesos)
+        {
+            long myPlusGivenMeso = (long)character.Meso + (long)mesos;
+
+            if (myPlusGivenMeso > Int32.MaxValue)
+            {
+                character.Meso = Int32.MaxValue;
+            }
+            else
+            {
+                character.Meso += mesos;
+
+                Packet oPacket = new Packet(ServerOperationCode.Message);
+                oPacket
+                    .WriteByte((byte)MessageType.DropPickup)
+                    .WriteBool(true)
+                    .WriteByte() // NOTE: Unknown.
+                    .WriteInt(mesos)
+                    .WriteShort();
+                character.Client.Send(oPacket);
+            }
         }
 
         public override Packet GetShowGainPacket()

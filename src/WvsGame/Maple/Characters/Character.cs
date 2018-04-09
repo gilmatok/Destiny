@@ -199,24 +199,26 @@ namespace Destiny.Maple.Characters
             // increase level
             level++;
 
-            Random r = new Random();
+            // update stats
+            this.Update(StatisticType.Level);
 
+            // generate randomized HP && MP bonus
+            Random r = new Random();
             if (this.Job == Job.Beginner || this.Job == Job.Noblesse || this.Job == Job.Legend)
             {
             short rndHPbonus = Convert.ToInt16(r.Next(10, 16));
             short rndMPbonus = Convert.ToInt16(r.Next(10, 12));
-
             this.MaxHealth += rndHPbonus;
             this.MaxMana += rndMPbonus;
             }
             // TODO: Health/Mana improvement.  
-            //warrior && dawnwarrior case
-            //magician && blazewizard case
-            //bowman && theif case
-            //pirate && thunderbreaker case
-            //aran case
-            //gm case
-            //skills, improved MP && HP case
+            // warrior && dawnwarrior case
+            // magician && blazewizard case
+            // bowman && theif case
+            // pirate && thunderbreaker case
+            // aran case
+            // gm && supergm case
+            // skills, improved MP && HP case
 
             //TODO: edge cases when overlevling job adv
             // give AP
@@ -224,9 +226,29 @@ namespace Destiny.Maple.Characters
             {
                 this.AbilityPoints += 6;
             }
+            else if (this.Job == Job.Beginner && this.Level < 8)
+            {
+                this.AbilityPoints += 0;
+
+                if (this.Level < 6)
+                {
+                    this.Strength += 5;
+                }
+                else if (this.Level >= 6 && this.Level < 8)
+                {
+                    this.Strength += 4;
+                    this.Dexterity += 1;
+                }
+            }
+            else if (this.Job == Job.Beginner && this.Level == 8)
+            {
+                this.Strength = 4;
+                this.Dexterity = 4;
+                this.AbilityPoints += 35;    
+            }
             else
             {
-                this.AbilityPoints += 5;
+                this.AbilityPoints += 5; 
             }
 
             // give SP
@@ -238,13 +260,12 @@ namespace Destiny.Maple.Characters
             {
                 this.SkillPoints += 3;
             }
-            this.Update(StatisticType.Level);
 
             if (PlayEffect)
             {
                 this.ShowRemoteUserEffect(UserEffect.LevelUp);
             }
-        }
+         }
 
         // TODO: Update party's properties.
         public byte Level

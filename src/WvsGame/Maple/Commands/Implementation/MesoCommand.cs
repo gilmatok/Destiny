@@ -36,7 +36,7 @@ namespace Destiny.Maple.Commands.Implementation
             }
             else
             {
-                caller.Meso += int.Parse(args[0]);
+                Meso.giveMesos(caller, int.Parse(args[0]));
             }
         }
     }

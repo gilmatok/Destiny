@@ -1,6 +1,7 @@
 ﻿using Destiny.IO;
 using Destiny.Maple.Characters;
 using System;
+using System.Linq;
 using System.Reflection;
 
 namespace Destiny.Maple.Commands
@@ -13,12 +14,9 @@ namespace Destiny.Maple.Commands
         {
             CommandFactory.Commands = new Commands();
 
-            foreach (Type type in Assembly.GetExecutingAssembly().GetTypes())
+            foreach (var type in Assembly.GetExecutingAssembly().GetTypes().Where(type => type.IsSubclassOf(typeof(Command))))
             {
-                if (type.IsSubclassOf(typeof(Command)))
-                {
-                    CommandFactory.Commands.Add((Command)Activator.CreateInstance(type));
-                }
+                CommandFactory.Commands.Add((Command)Activator.CreateInstance(type));
             }
         }
 
@@ -50,7 +48,10 @@ namespace Destiny.Maple.Commands
                     catch (Exception e)
                     {
                         caller.Notify("[Command] Unknown error: " + e.Message);
+
+                        Log.SkipLine();
                         Log.Error("{0} error by {1}: ", e, command.GetType().Name, caller.Name);
+                        Log.SkipLine();
                     }
                 }
                 else

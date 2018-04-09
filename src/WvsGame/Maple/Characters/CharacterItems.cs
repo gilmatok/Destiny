@@ -834,7 +834,16 @@ namespace Destiny.Maple.Characters
 
                     if (drop is Meso)
                     {
-                        this.Parent.Meso += ((Meso)drop).Amount; // TODO: Check for max meso.
+                        long myPlusDropMeso = (long)this.Parent.Meso + (long)((Meso)drop).Amount;
+
+                        if (myPlusDropMeso > Int32.MaxValue)
+                        {
+                            this.Parent.Meso = Int32.MaxValue;
+                        }
+                        else
+                        {
+                            this.Parent.Meso += ((Meso)drop).Amount;
+                        }
                     }
                     else if (drop is Item)
                     {
