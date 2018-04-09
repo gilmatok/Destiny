@@ -1,4 +1,5 @@
-﻿using Destiny.Maple.Maps;
+﻿using Destiny.Maple.Characters;
+using Destiny.Maple.Maps;
 using Destiny.Network;
 
 namespace Destiny.Maple
@@ -26,5 +27,11 @@ namespace Destiny.Maple
 
             return oPacket;
         }
+
+        /*public static Packet GetShowMesoGainPacket(bool white, int ammount, bool inChat)
+        {
+            return Character.GetShowSidebarInfoPacket(MessageType.DropPickup, white, 0, ammount, inChat, 0, 0);
+        }*/
+
     }
 }

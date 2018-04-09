@@ -841,7 +841,6 @@ namespace Destiny.Maple.Characters
                         if (((Item)drop).OnlyOne)
                         {
                             // TODO: Appropriate message.
-
                             return;
                         }
 
@@ -849,12 +848,11 @@ namespace Destiny.Maple.Characters
                         this.Add((Item)drop, true);
                     }
 
-                    this.Parent.Map.Drops.Remove(drop);
-
+                    this.Parent.Map.Drops.Remove(drop);                
                     using (Packet oPacket = drop.GetShowGainPacket())
                     {
                         drop.Picker.Client.Send(oPacket);
-                    }
+                    }                      
                 }
                 catch (InventoryFullException)
                 {

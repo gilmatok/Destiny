@@ -5,6 +5,7 @@ using Destiny.Maple.Shops;
 using System.Collections.Generic;
 using Destiny.Maple.Scripting;
 using System;
+using Destiny.IO;
 
 namespace Destiny.Maple.Life
 {
@@ -72,7 +73,7 @@ namespace Destiny.Maple.Life
                 }
                 catch (Exception ex)
                 {
-
+                    //Log.Error("Error in NPC conversation: {0}", ex);
                 }
             }
         }
