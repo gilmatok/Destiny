@@ -157,6 +157,8 @@ namespace Destiny.Network
                         this.Account.MaxCharacters = WvsLogin.MaxCharacters;
 
                         this.Account.Save();
+
+                        this.SendLoginResult(LoginResult.Valid);
                     }
                     else
                     {
