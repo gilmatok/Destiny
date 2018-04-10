@@ -95,8 +95,7 @@ namespace Destiny.Maple.Maps
         }
 
         // TODO: Refactor this.
-
-        private int mObjectIDs = 0;
+        private int mObjectIDs;
 
         public int AssignObjectID()
         {

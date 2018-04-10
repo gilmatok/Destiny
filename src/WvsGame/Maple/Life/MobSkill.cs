@@ -55,7 +55,7 @@ namespace Destiny.Maple.Life
             MobStatus status = MobStatus.None;
             CharacterDisease disease = CharacterDisease.None;
             bool heal = false;
-            bool banish = false;
+            //bool banish = false;
             bool dispel = false;
 
             switch ((MobSkillName)this.MapleID)
@@ -195,10 +195,12 @@ namespace Destiny.Maple.Life
                     //affectedCharacter.Dispel();
                 }
 
+                /*
                 if (banish)
                 {
                     affectedCharacter.ChangeMap(affectedCharacter.Map.ReturnMapID);
                 }
+                */
 
                 if (disease != CharacterDisease.None)
                 {

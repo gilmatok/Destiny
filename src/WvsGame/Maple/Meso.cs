@@ -1,5 +1,4 @@
-﻿using System;
-using Destiny.Maple.Characters;
+﻿using Destiny.Maple.Characters;
 using Destiny.Maple.Maps;
 using Destiny.Network;
 
@@ -19,9 +18,9 @@ namespace Destiny.Maple
         {
             long myPlusGivenMeso = (long)character.Meso + (long)mesos;
 
-            if (myPlusGivenMeso > Int32.MaxValue)
+            if (myPlusGivenMeso > int.MaxValue)
             {
-                character.Meso = Int32.MaxValue;
+                character.Meso = int.MaxValue;
             }
             else
             {

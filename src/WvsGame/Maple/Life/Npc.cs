@@ -5,7 +5,6 @@ using Destiny.Maple.Shops;
 using System.Collections.Generic;
 using Destiny.Maple.Scripting;
 using System;
-using Destiny.IO;
 
 namespace Destiny.Maple.Life
 {

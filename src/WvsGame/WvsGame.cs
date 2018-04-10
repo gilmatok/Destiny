@@ -172,7 +172,7 @@ namespace Destiny
 
             try
             {
-                new GameClient(WvsGame.Listener.EndAcceptSocket(asyncResult));
+                var gameClient = new GameClient(WvsGame.Listener.EndAcceptSocket(asyncResult));
             }
             catch (ObjectDisposedException) { } // TODO: Figure out why this crashes.
         }

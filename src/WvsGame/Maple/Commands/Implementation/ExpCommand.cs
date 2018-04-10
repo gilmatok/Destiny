@@ -2,13 +2,13 @@
 
 namespace Destiny.Maple.Commands.Implementation
 {
-    public sealed class TestCommand : Command
+    public sealed class ExpCommand : Command
     {
         public override string Name
         {
             get
             {
-                return "test";
+                return "exp";
             }
         }
 
@@ -16,7 +16,7 @@ namespace Destiny.Maple.Commands.Implementation
         {
             get
             {
-                return string.Empty;
+                return "amount";
             }
         }
 
@@ -30,14 +30,16 @@ namespace Destiny.Maple.Commands.Implementation
 
         public override void Execute(Character caller, string[] args)
         {
-            if (args.Length != 0)
+            if (args.Length != 1)
             {
                 this.ShowSyntax(caller);
             }
             else
             {
-               
+                Experience.giveExp(caller, int.Parse(args[0]));
             }
         }
+
+
     }
 }

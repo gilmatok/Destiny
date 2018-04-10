@@ -11,14 +11,15 @@ namespace Destiny.Maple.Shops
         public static void LoadRechargeTiers()
         {
             Shop.RechargeTiers = new Dictionary<byte, Dictionary<int, double>>();
-
+            // TODO: fix
             foreach (Datum datum in new Datums("shop_recharge_data").Populate())
             {
                 if (!Shop.RechargeTiers.ContainsKey((byte)(int)datum["tierid"]))
                 {
+                    // o.o this cast looks like possible System.InvalidCastException
                     Shop.RechargeTiers.Add((byte)(int)datum["tierid"], new Dictionary<int, double>());
                 }
-
+                // o.o this cast looks like possible System.InvalidCastException
                 Shop.RechargeTiers[(byte)(int)datum["tierid"]].Add((int)datum["itemid"], (double)datum["price"]);
             }
         }

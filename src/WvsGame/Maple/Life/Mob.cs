@@ -210,7 +210,12 @@ namespace Destiny.Maple.Life
 
                     try
                     {
-                        newController.ControlledMobs.Add(this);
+                        if (!newController.ControlledMobs.Contains(this.ObjectID))
+                        {
+                            newController.ControlledMobs.Add(this);
+                        }
+
+                        Log.Inform("ERROR: failed to add mob: {0}, its already in ControlledMobs!", this.ObjectID);
                     }
                     catch (Exception e)
                     {

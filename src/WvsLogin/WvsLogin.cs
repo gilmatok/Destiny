@@ -136,7 +136,7 @@ namespace Destiny.Network
 
             try
             {
-                new LoginClient(WvsLogin.Listener.EndAcceptSocket(ar));
+                var loginClient = new LoginClient(WvsLogin.Listener.EndAcceptSocket(ar));
             }
             catch (ObjectDisposedException) { } // TODO: Figure out why this crashes.
         }

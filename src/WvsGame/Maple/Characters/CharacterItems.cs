@@ -966,28 +966,31 @@ namespace Destiny.Maple.Characters
         {
             foreach (Item loopItem in this.Items)
             {
-                if (loopItem.IsEquipped)
+                if (!loopItem.IsEquipped) continue;
+
+                switch (mode)
                 {
-                    switch (mode)
-                    {
-                        case EquippedQueryMode.Any:
+                    case EquippedQueryMode.Any:
+                        yield return loopItem;
+
+                        break;
+
+                    case EquippedQueryMode.Normal:
+                        if (loopItem.Slot > -100)
+                        {
                             yield return loopItem;
-                            break;
+                        }
+                        break;
 
-                        case EquippedQueryMode.Normal:
-                            if (loopItem.Slot > -100)
-                            {
-                                yield return loopItem;
-                            }
-                            break;
+                    case EquippedQueryMode.Cash:
+                        if (loopItem.Slot < -100)
+                        {
+                            yield return loopItem;
+                        }
+                        break;
 
-                        case EquippedQueryMode.Cash:
-                            if (loopItem.Slot < -100)
-                            {
-                                yield return loopItem;
-                            }
-                            break;
-                    }
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(mode), mode, null);
                 }
             }
         }

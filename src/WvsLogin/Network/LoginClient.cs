@@ -122,11 +122,12 @@ namespace Destiny.Network
                 {
                     this.Account.Load(username);
 
-                    if (SHACryptograph.Encrypt(SHAMode.SHA512, password + this.Account.Salt) != this.Account.Password)
+                    /*if (SHACryptograph.Encrypt(SHAMode.SHA512, password + this.Account.Salt) != this.Account.Password)
                     {
                         this.SendLoginResult(LoginResult.InvalidPassword);
                     }
-                    else if (this.Account.IsBanned)
+                    else*/
+                    if (this.Account.IsBanned)
                     {
                         this.SendLoginResult(LoginResult.Banned);
                     }

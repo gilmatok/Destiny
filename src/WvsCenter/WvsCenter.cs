@@ -113,7 +113,7 @@ namespace Destiny
         {
             WvsCenter.AcceptDone.Set();
 
-            new CenterClient(WvsCenter.Listener.EndAcceptSocket(ar));
+            var centerClient = new CenterClient(WvsCenter.Listener.EndAcceptSocket(ar));
         }
 
         public static void Stop()

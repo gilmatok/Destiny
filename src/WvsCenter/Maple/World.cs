@@ -1,6 +1,5 @@
 ﻿using Destiny.Network;
 using System.Collections.ObjectModel;
-using System.Linq;
 
 namespace Destiny.Maple
 {
