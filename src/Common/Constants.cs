@@ -95,6 +95,7 @@ namespace Destiny
         Outlaw,
         Corsair,
 
+        MapleleafBrigadier = 800,
         GM = 900,
         SuperGM = 910,
 
@@ -102,25 +103,35 @@ namespace Destiny
 
         DawnWarrior1 = 1100,
         DawnWarrior2 = 1110,
-        DawnWarrior3 = 1111,
+        DawnWarrior3,
+        DawnWarrior4,
 
         BlazeWizard1 = 1200,
         BlazeWizard2 = 1210,
-        BlazeWizard3 = 1211,
+        BlazeWizard3,
+        BlazeWizard4,
 
         WindArcher1 = 1300,
         WindArcher2 = 1310,
-        WindArcher3 = 1311,
+        WindArcher3,
+        WindArcher4,
 
         NightWalker1 = 1400,
         NightWalker2 = 1410,
-        NightWalker3 = 1411,
+        NightWalker3,
+        NightWalker4,
 
         ThunderBreaker1 = 1500,
         ThunderBreaker2 = 1510,
-        ThunderBreaker3 = 1511,
+        ThunderBreaker3,
+        ThunderBreaker4,
 
-        Legend = 2000
+        Legend = 2000,
+
+        Aran1 = 2100,
+        Aran2 = 2110,
+        Aran3,
+        Aran4
     }
 
     public enum JobType
@@ -222,7 +233,7 @@ namespace Destiny
         SetObjectState = 34
     }
 
-    public enum CharacterDisease : long
+    public enum CharacterDisease : ulong
     {
         None,
         Slow = 0x1,
@@ -233,7 +244,8 @@ namespace Destiny
         Poison = 0x4000000000000,
         Sealed = 0x8000000000000,
         Darkness = 0x10000000000000,
-        Weaken = 0x4000000000000000
+        Weaken = 0x4000000000000000,
+        Curse =  0x8000000000000000
     }
 
     public enum ReportType : byte
@@ -664,7 +676,7 @@ namespace Destiny
         Poisoned = 0x200,
         Sealed = 0x400,
 
-        Unknown1 = 0x800,
+        ShowDown = 0x800,
 
         WeaponAttackUp = 0x1000,
         WeaponDefenseUp = 0x2000,

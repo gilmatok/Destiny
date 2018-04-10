@@ -122,12 +122,11 @@ namespace Destiny.Network
                 {
                     this.Account.Load(username);
 
-                    /*if (SHACryptograph.Encrypt(SHAMode.SHA512, password + this.Account.Salt) != this.Account.Password)
+                    if (SHACryptograph.Encrypt(SHAMode.SHA512, password + this.Account.Salt) != this.Account.Password)
                     {
                         this.SendLoginResult(LoginResult.InvalidPassword);
-                    }
-                    else*/
-                    if (this.Account.IsBanned)
+                    }                  
+                    else if (this.Account.IsBanned)
                     {
                         this.SendLoginResult(LoginResult.Banned);
                     }
@@ -145,8 +144,8 @@ namespace Destiny.Network
                     if (WvsLogin.AutoRegister && username == this.LastUsername && password == this.LastPassword)
                     {
                         this.Account.Username = username;
-                        this.Account.Password = SHACryptograph.Encrypt(SHAMode.SHA512, password + this.Account.Salt);
                         this.Account.Salt = HashGenerator.GenerateMD5();
+                        this.Account.Password = SHACryptograph.Encrypt(SHAMode.SHA512, password + this.Account.Salt);
                         this.Account.EULA = false;
                         this.Account.Gender = Gender.Unset;
                         this.Account.Pin = string.Empty;
