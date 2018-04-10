@@ -2,7 +2,6 @@
 using Destiny.Maple.Data;
 using System;
 using Destiny.IO;
-using Destiny.Data;
 
 namespace Destiny.Maple.Shops
 {

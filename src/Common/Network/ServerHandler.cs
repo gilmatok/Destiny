@@ -51,10 +51,13 @@ namespace Destiny.Network
 
             if (!connected)
             {
+                Log.SkipLine();
                 throw new NetworkException(string.Format("{0} connection failed.", this.Title));
             }
 
+            Log.SkipLine();
             Log.Success("Connected to {0} on thread {1}.", this.Title.ToLower(), Thread.CurrentThread.ManagedThreadId);
+            Log.SkipLine();
 
             this.Initialize(args);
         }

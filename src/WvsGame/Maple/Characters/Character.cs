@@ -194,6 +194,79 @@ namespace Destiny.Maple.Characters
             }
         }
 
+        public void LevelUP(bool PlayEffect)
+        {
+            // increase level
+            level++;
+
+            // update stats
+            this.Update(StatisticType.Level);
+
+            // generate randomized HP && MP bonus
+            Random r = new Random();
+            if (this.Job == Job.Beginner || this.Job == Job.Noblesse || this.Job == Job.Legend)
+            {
+            short rndHPbonus = Convert.ToInt16(r.Next(10, 16));
+            short rndMPbonus = Convert.ToInt16(r.Next(10, 12));
+            this.MaxHealth += rndHPbonus;
+            this.MaxMana += rndMPbonus;
+            }
+            // TODO: Health/Mana improvement.  
+            // warrior && dawnwarrior case
+            // magician && blazewizard case
+            // bowman && theif case
+            // pirate && thunderbreaker case
+            // aran case
+            // gm && supergm case
+            // skills, improved MP && HP case
+
+            //TODO: edge cases when overlevling job adv
+            // give AP
+            if (this.IsCygnus && this.Level < 70)
+            {
+                this.AbilityPoints += 6;
+            }
+            else if (this.Job == Job.Beginner && this.Level < 8)
+            {
+                this.AbilityPoints += 0;
+
+                if (this.Level < 6)
+                {
+                    this.Strength += 5;
+                }
+                else if (this.Level >= 6 && this.Level < 8)
+                {
+                    this.Strength += 4;
+                    this.Dexterity += 1;
+                }
+            }
+            else if (this.Job == Job.Beginner && this.Level == 8)
+            {
+                this.Strength = 4;
+                this.Dexterity = 4;
+                this.AbilityPoints += 35;    
+            }
+            else
+            {
+                this.AbilityPoints += 5; 
+            }
+
+            // give SP
+            if (this.Job == Job.Beginner || this.Job == Job.Noblesse || this.Job == Job.Legend)
+            {
+                this.SkillPoints += 1;
+            }
+            else
+            {
+                this.SkillPoints += 3;
+            }
+
+            if (PlayEffect)
+            {
+                this.ShowRemoteUserEffect(UserEffect.LevelUp);
+            }
+         }
+
         // TODO: Update party's properties.
         public byte Level
         {
@@ -226,29 +299,10 @@ namespace Destiny.Maple.Characters
                     {
                         for (int i = 0; i < delta; i++)
                         {
-                            // TODO: Health/Mana improvement.
-
-                            level++;
-
-                            if (this.IsCygnus)
-                            {
-                                this.AbilityPoints += 6;
-                            }
-                            else
-                            {
-                                this.AbilityPoints += 5;
-                            }
-
-                            if (this.Job != Job.Beginner && this.Job != Job.Noblesse && this.Job != Job.Legend)
-                            {
-                                this.SkillPoints += 3;
-                            }
-
-                            this.Update(StatisticType.Level);
-
-                            this.ShowRemoteUserEffect(UserEffect.LevelUp);
+                            LevelUP(true);
                         }
 
+                        //heal up
                         this.Health = this.MaxHealth;
                         this.Mana = this.MaxMana;
                     }
@@ -477,7 +531,6 @@ namespace Destiny.Maple.Characters
             set
             {
                 int delta = value - experience;
-
                 experience = value;
 
                 if (true) // NOTE: A server setting for multi-leveling.
@@ -558,7 +611,8 @@ namespace Destiny.Maple.Characters
             get
             {
                 //TODO: Add GM levels and/or character-specific GM rank
-                return Client.Account != null ? Client.Account.IsMaster : false;
+                //TODO: Check for data in login DB
+                return true;
             }
         }
 
@@ -2443,6 +2497,65 @@ namespace Destiny.Maple.Characters
             }
         }
 
+        //TODO: theoreticly this could handle all kinds of messages to player like drops, mesos, guild points etc....
+        public static Packet GetShowSidebarInfoPacket(MessageType type, bool white, int itemID, int ammount,
+            bool inChat, int partyBonus, int equipBonus)
+        {
+            Packet oPacket = new Packet(ServerOperationCode.Message);
+
+            //the mesos work, drops dont idk why
+            /*if (type == MessageType.DropPickup && itemID == 0)
+            {
+                oPacket
+                    .WriteByte((byte) type)
+                    .WriteBool(white)
+                    .WriteByte(0) // NOTE: Unknown.
+                    .WriteInt(ammount)
+                    .WriteShort(0);
+            }
+
+            else if (type == MessageType.DropPickup && itemID > 0)
+            {
+                oPacket
+                    .WriteByte((byte) type) 
+                    .WriteBool(false)
+                    .WriteInt(itemID)
+                    .WriteInt(ammount)
+                    .WriteInt(0)
+                    .WriteInt(0);
+            }else*/
+
+            if (type == MessageType.IncreaseEXP)
+            {
+                oPacket
+                    .WriteByte((byte) type) // NOTE: enum MessageType 
+                    .WriteBool(white) // NOTE: white is default as 1, 0 = yellow
+                    .WriteInt(ammount)
+                    .WriteBool(inChat) // NOTE: display message in chat box
+                    .WriteInt(0) // NOTE: monster book bonus (Bonus Event Exp)
+                    .WriteShort(0) // NOTE: unknown
+                    .WriteInt(0) // NOTE: wedding bonus
+                    .WriteByte(0) // NOTE: 0 = party bonus, 1 = Bonus Event party Exp () x0
+                    .WriteInt(partyBonus)
+                    .WriteInt(equipBonus)
+                    .WriteInt(0) // NOTE: Internet Cafe Bonus
+                    .WriteInt(0); // NOTE: Rainbow Week Bonus          
+
+                if (inChat) //is this necessary?
+                {
+                oPacket
+                    .WriteByte(0);
+                }
+            }
+
+            else
+            {
+                Log.Inform("ERROR: unhandled MessageType: {0} encountered", type);
+            }
+
+            return oPacket;
+        }
+           
         public Packet GetCreatePacket()
         {
             return this.GetSpawnPacket();

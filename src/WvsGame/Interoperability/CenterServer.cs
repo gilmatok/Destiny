@@ -132,13 +132,17 @@ namespace Destiny.Interoperability
                             WvsGame.MesoRate,
                             WvsGame.DropRate);
 
-                        Log.Success("Registered Channel Server ({0} [{1}]-{2}).", WvsGame.WorldName, WvsGame.WorldID, WvsGame.ChannelID);
+                        Log.SkipLine();
+                        Log.Success("Registered Channel: {0}-{2} on World: {0}-{1}.", WvsGame.WorldName, WvsGame.WorldID, (WvsGame.ChannelID + 1));
+                        Log.SkipLine();
                     }
                     break;
 
                 default:
                     {
+                        Log.SkipLine();
                         Log.Error("Unable to register as Channel Server: {0}", ServerRegistrationResponseResolver.Explain(response));
+                        Log.SkipLine();
 
                         WvsGame.Stop();
                     }

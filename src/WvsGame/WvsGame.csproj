@@ -70,6 +70,7 @@
     <Compile Include="Maple\Commands\Commands.cs" />
     <Compile Include="Maple\Commands\Implementation\AdminShopCommand.cs" />
     <Compile Include="Maple\Commands\Implementation\ClearDropsCommand.cs" />
+    <Compile Include="Maple\Commands\Implementation\ExpCommand.cs" />
     <Compile Include="Maple\Commands\Implementation\HelpCommand.cs" />
     <Compile Include="Maple\Commands\Implementation\HorntailCommand.cs" />
     <Compile Include="Maple\Commands\Implementation\ItemCommand.cs" />
@@ -99,6 +100,7 @@
     <Compile Include="Maple\Data\CachedSkills.cs" />
     <Compile Include="Maple\Data\CreationData.cs" />
     <Compile Include="Maple\Data\DataProvider.cs" />
+    <Compile Include="Maple\Experience.cs" />
     <Compile Include="Maple\IControllable.cs" />
     <Compile Include="Maple\IMoveable.cs" />
     <Compile Include="Maple\Interaction\PlayerShop.cs" />

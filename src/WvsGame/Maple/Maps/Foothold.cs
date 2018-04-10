@@ -1,5 +1,4 @@
 ﻿using Destiny.Data;
-using Destiny.Data;
 
 namespace Destiny.Maple.Maps
 {

@@ -834,14 +834,22 @@ namespace Destiny.Maple.Characters
 
                     if (drop is Meso)
                     {
-                        this.Parent.Meso += ((Meso)drop).Amount; // TODO: Check for max meso.
+                        long myPlusDropMeso = (long)this.Parent.Meso + (long)((Meso)drop).Amount;
+
+                        if (myPlusDropMeso > Int32.MaxValue)
+                        {
+                            this.Parent.Meso = Int32.MaxValue;
+                        }
+                        else
+                        {
+                            this.Parent.Meso += ((Meso)drop).Amount;
+                        }
                     }
                     else if (drop is Item)
                     {
                         if (((Item)drop).OnlyOne)
                         {
                             // TODO: Appropriate message.
-
                             return;
                         }
 
@@ -849,12 +857,11 @@ namespace Destiny.Maple.Characters
                         this.Add((Item)drop, true);
                     }
 
-                    this.Parent.Map.Drops.Remove(drop);
-
+                    this.Parent.Map.Drops.Remove(drop);                
                     using (Packet oPacket = drop.GetShowGainPacket())
                     {
                         drop.Picker.Client.Send(oPacket);
-                    }
+                    }                      
                 }
                 catch (InventoryFullException)
                 {
@@ -959,28 +966,31 @@ namespace Destiny.Maple.Characters
         {
             foreach (Item loopItem in this.Items)
             {
-                if (loopItem.IsEquipped)
+                if (!loopItem.IsEquipped) continue;
+
+                switch (mode)
                 {
-                    switch (mode)
-                    {
-                        case EquippedQueryMode.Any:
+                    case EquippedQueryMode.Any:
+                        yield return loopItem;
+
+                        break;
+
+                    case EquippedQueryMode.Normal:
+                        if (loopItem.Slot > -100)
+                        {
                             yield return loopItem;
-                            break;
+                        }
+                        break;
 
-                        case EquippedQueryMode.Normal:
-                            if (loopItem.Slot > -100)
-                            {
-                                yield return loopItem;
-                            }
-                            break;
+                    case EquippedQueryMode.Cash:
+                        if (loopItem.Slot < -100)
+                        {
+                            yield return loopItem;
+                        }
+                        break;
 
-                        case EquippedQueryMode.Cash:
-                            if (loopItem.Slot < -100)
-                            {
-                                yield return loopItem;
-                            }
-                            break;
-                    }
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(mode), mode, null);
                 }
             }
         }

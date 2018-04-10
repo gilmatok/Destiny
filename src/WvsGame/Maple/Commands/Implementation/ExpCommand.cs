@@ -2,13 +2,13 @@
 
 namespace Destiny.Maple.Commands.Implementation
 {
-    public sealed class MesoCommand : Command
+    public sealed class ExpCommand : Command
     {
         public override string Name
         {
             get
             {
-                return "meso";
+                return "exp";
             }
         }
 
@@ -36,8 +36,10 @@ namespace Destiny.Maple.Commands.Implementation
             }
             else
             {
-                Meso.giveMesos(caller, int.Parse(args[0]));
+                Experience.giveExp(caller, int.Parse(args[0]));
             }
         }
+
+
     }
 }

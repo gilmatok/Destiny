@@ -59,7 +59,8 @@ namespace Destiny.IO
                     }
                 }
 
-                Log.Inform("Settings file '{0}' {1}.", name, showRefresh ? "refreshed" : "loaded");
+                Log.SkipLine();
+                Log.Success("Settings file '{0}' {1}.", name, showRefresh ? "refreshed" : "loaded");
 
                 Packet.LogLevel = Settings.GetEnum<LogLevel>("Log/Packets");
                 Log.ShowStackTrace = Settings.GetBool("Log/StackTrace");

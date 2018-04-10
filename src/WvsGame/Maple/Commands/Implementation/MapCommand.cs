@@ -58,7 +58,7 @@ namespace Destiny.Maple.Commands.Implementation
                     {
                         mapName = string.Join(" ", args);
                         CommandMaps val;
-                        Enum.TryParse<CommandMaps>(mapName.ToAlphaNumeric(), true, out val);
+                        Enum.TryParse(mapName.ToAlphaNumeric(), true, out val);
                         if (val > 0)
                             mapID = (int)val;
                     }

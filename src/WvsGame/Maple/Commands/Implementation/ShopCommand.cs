@@ -50,8 +50,6 @@ namespace Destiny.Maple.Commands.Implementation
                 if (shopID == -1)
                 {
                     this.ShowSyntax(caller);
-
-                    return;
                 }
 
                 // TODO: Shop the desired shop.

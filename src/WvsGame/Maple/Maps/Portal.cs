@@ -1,13 +1,12 @@
 ﻿using Destiny.Data;
 using Destiny.Network;
 using Destiny.Maple.Characters;
-using System;
 using Destiny.Maple.Data;
 using Destiny.IO;
 
 namespace Destiny.Maple.Maps
 {
-    public class Portal : MapObject
+    public sealed class Portal : MapObject
     {
         public byte ID { get; private set; }
         public string Label { get; private set; }
@@ -49,7 +48,7 @@ namespace Destiny.Maple.Maps
             this.Script = (string)datum["script"];
         }
 
-        public virtual void Enter(Character character)
+        public void Enter(Character character)
         {
             Log.Warn("'{0}' attempted to enter an unimplemented portal '{1}'.", character.Name, this.Script);
 

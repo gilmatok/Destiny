@@ -84,7 +84,9 @@ namespace Destiny.Maple
         {
             base.InsertItem(index, item);
 
+            Log.SkipLine();
             Log.Success("Registered Channel {0}-{1}.", this.Name, item.ID);
+            Log.SkipLine();
         }
 
         protected override void RemoveItem(int index)
@@ -101,7 +103,9 @@ namespace Destiny.Maple
                 }
             }
 
+            Log.SkipLine();
             Log.Warn("Unregistered Channel {0}-{1}.", this.Name, item.ID);
+            Log.SkipLine();
         }
 
         protected override byte GetKeyForItem(Channel item)

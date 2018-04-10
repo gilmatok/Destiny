@@ -78,8 +78,10 @@ namespace Destiny.Maple.Data
                 CommandFactory.Initialize();
 
                 sw.Stop();
-
+                
+                Log.SkipLine();
                 Log.Success("Maple data loaded in {0}ms.", sw.ElapsedMilliseconds);
+                Log.SkipLine();
 
                 DataProvider.IsInitialized = true;
             }

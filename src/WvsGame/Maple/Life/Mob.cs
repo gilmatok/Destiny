@@ -5,6 +5,7 @@ using Destiny.Maple.Data;
 using Destiny.Maple.Maps;
 using System;
 using System.Collections.Generic;
+using Destiny.IO;
 using Destiny.Threading;
 
 namespace Destiny.Maple.Life
@@ -207,7 +208,21 @@ namespace Destiny.Maple.Life
                 {
                     this.IsProvoked = false;
 
-                    newController.ControlledMobs.Add(this);
+                    try
+                    {
+                        if (!newController.ControlledMobs.Contains(this.ObjectID))
+                        {
+                            newController.ControlledMobs.Add(this);
+                        }
+
+                        Log.Inform("ERROR: failed to add mob: {0}, its already in ControlledMobs!", this.ObjectID);
+                    }
+                    catch (Exception e)
+                    {
+                        Log.Inform("ERROR: failed to add mob to controlled mobs: {0}", e);
+                        throw;
+                    }
+                    
                 }
             }
         }

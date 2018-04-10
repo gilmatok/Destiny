@@ -82,10 +82,10 @@ namespace Destiny.Maple
 
             if (this.Type == AttackType.Range)
             {
-                new Point(iPacket.ReadShort(), iPacket.ReadShort()); // NOTE: Projectile position.
+                var pointRnged = new Point(iPacket.ReadShort(), iPacket.ReadShort());
             }
 
-            new Point(iPacket.ReadShort(), iPacket.ReadShort()); // NOTE: Player position.
+            var pointOther = new Point(iPacket.ReadShort(), iPacket.ReadShort());
         }
     }
 }

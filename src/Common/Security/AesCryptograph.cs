@@ -44,7 +44,7 @@ namespace Destiny.Security
         public AesCryptograph(byte[] iv, short version)
         {
             this.IV = iv;
-            this.CryptedMapleVersion = (short)(((version >> 8) & 0xFF) | ((version << 8) & 0xFF00)); ;
+            this.CryptedMapleVersion = (short)(((version >> 8) & 0xFF) | ((version << 8) & 0xFF00));
 
             this.Aes = new AesManaged()
             {

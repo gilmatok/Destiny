@@ -6,7 +6,6 @@ using Destiny.Maple.Maps;
 using System;
 using System.Collections.Generic;
 using Destiny.IO;
-using Destiny.Data;
 
 namespace Destiny.Maple
 {
@@ -1170,5 +1169,11 @@ namespace Destiny.Maple
 
             return oPacket;
         }
+
+        /*public static Packet GetShowItemGainPacket(bool white, int itemID, int ammount, bool inChat)
+        {
+           return Character.GetShowSidebarInfoPacket(MessageType.DropPickup, white, itemID, ammount, inChat, 0, 0);
+        }*/
+
     }
 }

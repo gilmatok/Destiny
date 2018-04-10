@@ -72,7 +72,7 @@ namespace Destiny.Maple.Life
                 }
                 catch (Exception ex)
                 {
-
+                    //Log.Error("Error in NPC conversation: {0}", ex);
                 }
             }
         }

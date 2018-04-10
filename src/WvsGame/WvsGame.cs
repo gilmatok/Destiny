@@ -108,11 +108,8 @@ namespace Destiny
             if (WvsGame.IsAlive)
             {
                 WvsGame.CenterConnectionDone.Reset();
-
                 new Thread(new ThreadStart(CenterServer.Main)).Start();
-
                 WvsGame.CenterConnectionDone.WaitOne();
-
 #if DEBUG
                 string linkPath = Path.Combine(Application.ExecutablePath, "LaunchClient.lnk");
                 if (File.Exists(linkPath) && WvsGame.WorldID == 0 && WvsGame.ChannelID == 0) //Only for the first WvsGame instance, and only if shortcut exists
@@ -131,9 +128,7 @@ namespace Destiny
             while (WvsGame.IsAlive)
             {
                 WvsGame.AcceptDone.Reset();
-
                 WvsGame.Listener.BeginAcceptSocket(new AsyncCallback(WvsGame.OnAcceptSocket), null);
-
                 WvsGame.AcceptDone.WaitOne();
             }
 
@@ -143,15 +138,14 @@ namespace Destiny
             }
 
             WvsGame.Dispose();
-
+            Log.SkipLine();
             Log.Warn("Server stopped.");
+            Log.SkipLine();
 
             if (WvsGame.AutoRestartTime > 0)
             {
                 Log.Inform("Attempting auto-restart in {0} seconds.", WvsGame.AutoRestartTime);
-
                 Thread.Sleep(WvsGame.AutoRestartTime * 1000);
-
                 goto start;
             }
             else
@@ -178,7 +172,7 @@ namespace Destiny
 
             try
             {
-                new GameClient(WvsGame.Listener.EndAcceptSocket(asyncResult));
+                var gameClient = new GameClient(WvsGame.Listener.EndAcceptSocket(asyncResult));
             }
             catch (ObjectDisposedException) { } // TODO: Figure out why this crashes.
         }
@@ -195,6 +189,7 @@ namespace Destiny
                 WvsGame.Listener.Stop();
             }
 
+            Log.SkipLine();
             Log.Inform("Server disposed from thread {0}.", Thread.CurrentThread.ManagedThreadId);
         }
     }
