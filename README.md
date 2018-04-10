@@ -17,7 +17,7 @@ Destiny is a C# based open-source server emulation software for 2D MMORPG game M
 
 Each server will guide you through the process of configuring it automatically.
 
-**Warning: Two auto-setup options currently dont function well.**
-- The autoregister function will get stuck you on login screen and after reset due to generation of wrong hash will claim wrong       password. Simply generate SHA512 for you pass and throw it manually into DB as password or comment out the password check at all its  at LoginClient.cs.
+**Warning: Two auto-setup options currently dont function as intented.**
+- If login for first time with autoregister function set you will have to login for 2 times consequtively. On the fist time you wont be recognized and thefore on second attemp you will be autoregisterted and loged in.
 
 - The number of channels selected on login server setup is not yet implemented. So even if you select 16 channels there will be only 1
