@@ -915,6 +915,76 @@ namespace Destiny.Maple.Characters
             this.Memos.Send();
         }
 
+        //TODO: hp/mp modification bugs out UI bars, add multiple stats, some kind of message to sideBar/chat
+        public static void giveStat(Character player, StatisticType stat, short quantity)
+        {
+            switch (stat)
+            {
+                case StatisticType.Strength:
+                    player.strength += quantity;
+                    player.Update(StatisticType.Strength);
+                    break;
+
+                case StatisticType.Dexterity:
+                    player.dexterity += quantity;
+                    player.Update(StatisticType.Dexterity);
+                    break;
+
+                case StatisticType.Intelligence:
+                    player.intelligence += quantity;
+                    player.Update(StatisticType.Intelligence);
+                    break;
+
+                case StatisticType.Luck:
+                    player.luck += quantity;
+                    player.Update(StatisticType.Luck);
+                    break;
+
+                case StatisticType.Health:
+                    player.health += quantity;
+                    player.Update(StatisticType.Health);
+                    break;
+
+                case StatisticType.MaxHealth:
+                    player.maxHealth += quantity;
+                    player.Update(StatisticType.MaxHealth);
+                    break;
+
+                case StatisticType.Mana:
+                    player.mana += quantity;
+                    player.Update(StatisticType.Mana);
+                    break;
+
+                case StatisticType.MaxMana:
+                    player.maxMana += quantity;
+                    player.Update(StatisticType.MaxMana);
+                    break;
+
+                case StatisticType.AbilityPoints:
+                    player.abilityPoints += quantity;
+                    player.Update(StatisticType.AbilityPoints);
+                    break;
+
+                case StatisticType.SkillPoints:
+                    player.skillPoints += quantity;
+                    player.Update(StatisticType.SkillPoints);
+                    break;
+
+                case StatisticType.Skin: break;
+                case StatisticType.Face: break;
+                case StatisticType.Hair: break;
+                case StatisticType.Level: break;
+                case StatisticType.Job: break;
+                case StatisticType.Experience: break;
+                case StatisticType.Fame: break;
+                case StatisticType.Mesos: break;
+                case StatisticType.Pet: break;
+                case StatisticType.GachaponExperience: break;
+
+                default: throw new ArgumentOutOfRangeException(nameof(stat), stat, null);
+            }
+        }
+
         public void Update(params StatisticType[] statistics)
         {
             using (Packet oPacket = new Packet(ServerOperationCode.StatChanged))

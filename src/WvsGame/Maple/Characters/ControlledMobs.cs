@@ -19,17 +19,21 @@ namespace Destiny.Maple.Characters
             int objectID = iPacket.ReadInt();
 
             Mob mob;
-
-            try
+            if (objectID > 0)
             {
-                mob = this[objectID];
-            }
-            catch (KeyNotFoundException)
-            {
-                return;
+                try
+                {
+                    mob = this[objectID];
+                }
+                catch (KeyNotFoundException)
+                {
+                    return;
+                }
+
+                mob.Move(iPacket);
             }
 
-            mob.Move(iPacket);
+            //Log.Error("ControlledMobs-Move() objectID < 0!");
         }
 
         protected override void InsertItem(int index, Mob item)

@@ -1,6 +1,8 @@
-﻿using Destiny.Maple.Characters;
+﻿using System;
+using Destiny.Maple.Characters;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using Destiny.IO;
 
 namespace Destiny.Maple.Maps
 {
@@ -43,16 +45,33 @@ namespace Destiny.Maple.Maps
 
         protected override void RemoveItem(int index)
         {
-            T item = base.Items[index];
-
-            item.Map = null;
-
-            if (!(item is Character) && !(item is Portal))
+            if (index >= 0 && index < int.MaxValue)
             {
-                item.ObjectID = -1;
-            }
+                T item = base.Items[index];
+                item.Map = null;
 
-            base.RemoveItem(index);
+                if (!(item is Character) && !(item is Portal))
+                {
+                    item.ObjectID = -1;
+                }
+
+                try
+                {
+                    base.RemoveItem(index);
+                }
+                catch(Exception e)
+                {
+                    Log.SkipLine();
+                    Log.Inform("ERROR: MapleObjects-RemoveItem() failed to remove item! Index: {0} \n Exception occured: {1}", index, e);
+                    Log.SkipLine();
+                }
+            }
+            else
+            {
+                Log.SkipLine();
+                Log.Error("ERROR: MapleObjects-RemoveItem() index out of bounds! Index: {0}", index);
+                Log.SkipLine();
+            }
         }
     }
 }

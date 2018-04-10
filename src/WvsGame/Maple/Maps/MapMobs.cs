@@ -4,6 +4,7 @@ using Destiny.Maple.Data;
 using Destiny.Maple.Life;
 using System;
 using System.Collections.Generic;
+using Destiny.IO;
 using Destiny.Threading;
 
 namespace Destiny.Maple.Maps
@@ -23,10 +24,20 @@ namespace Destiny.Maple.Maps
                     this.Map.Broadcast(oPacket);
                 }
 
-                item.AssignController();
+                try
+                {
+                    item.AssignController();
+                }
+                catch (Exception e)
+                {
+                    Log.SkipLine();
+                    Log.Inform("ERROR: MapMobs-InsertItem() failed to AssignController to mobObject item: {0}! \n Exception occured: {1}", item.ObjectID, e);
+                    Log.SkipLine();
+                }
             }
         }
 
+        //TODO: remake as MobDied(int index, bool isBoss)
         protected override void RemoveItem(int index) // NOTE: Equivalent of mob death.
         {
             Mob item = base.Items[index];
@@ -130,9 +141,22 @@ namespace Destiny.Maple.Maps
 
             if (DataProvider.IsInitialized)
             {
-                item.Controller.ControlledMobs.Remove(item);
+                if (item.Controller.ControlledMobs.Contains(item))
+                {
+                    try
+                    {
+                        item.Controller.ControlledMobs.Remove(item);
+                    }
 
-                using (Packet oPacket = item.GetDestroyPacket())
+                    catch (Exception e)
+                    {
+                        Log.SkipLine();
+                        Log.Inform("ERROR: failed to remove mobObject: {0} from controlledMobs! \n Exception occured: {1}", item.ObjectID, e);
+                        Log.SkipLine();
+                    }
+                }
+
+                using (Packet oPacket = item.GetDestroyPacket((Mob.DeathEffects)item.DeathEffect))
                 {
                     this.Map.Broadcast(oPacket);
                 }
