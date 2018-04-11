@@ -2,6 +2,8 @@
 using Destiny.Maple.Characters;
 using Destiny.Maple.Life;
 using System.Collections.Generic;
+using System;
+using Destiny.IO;
 
 namespace Destiny.Maple.Maps
 {
@@ -40,8 +42,17 @@ namespace Destiny.Maple.Maps
 
             item.Position = this.Map.Portals.Count > 0 ? this.Map.Portals[item.SpawnPoint].Position : new Point(0, 0);
 
-            base.InsertItem(index, item);
-
+            try
+            {
+                base.InsertItem(index, item);
+            }
+            catch (Exception e)
+            {
+                Log.SkipLine();
+                Log.Error("MapCharacters-InsertItem() thrown exception: {0}", e);
+                Log.SkipLine();
+            }
+          
             lock (this.Map.Drops)
             {
                 foreach (Drop drop in this.Map.Drops)

@@ -834,11 +834,11 @@ namespace Destiny.Maple.Characters
 
                     if (drop is Meso)
                     {
-                        long myPlusDropMeso = (long)this.Parent.Meso + (long)((Meso)drop).Amount;
+                        long myPlusDropMesos = (long)this.Parent.Meso + (long)((Meso)drop).Amount;
 
-                        if (myPlusDropMeso > Int32.MaxValue)
+                        if (myPlusDropMesos > Meso.mesoLimit)
                         {
-                            this.Parent.Meso = Int32.MaxValue;
+                            this.Parent.Meso = Meso.mesoLimit;
                         }
                         else
                         {

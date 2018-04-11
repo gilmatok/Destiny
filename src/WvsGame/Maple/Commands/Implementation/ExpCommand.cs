@@ -36,10 +36,18 @@ namespace Destiny.Maple.Commands.Implementation
             }
             else
             {
-                Experience.giveExp(caller, int.Parse(args[0]));
+                if (int.Parse(args[0]) > int.MaxValue || int.Parse(args[0]) < int.MinValue)
+                {
+                    int expGiven = int.MaxValue;
+                    Experience.giveExp(caller, expGiven);
+                }
+                else
+                {
+                    int expGiven = int.Parse(args[0]);
+                    Experience.giveExp(caller, expGiven);
+                }
             }
         }
-
 
     }
 }

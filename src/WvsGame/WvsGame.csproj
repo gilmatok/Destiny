@@ -81,6 +81,7 @@
     <Compile Include="Maple\Commands\Implementation\LevelCommand.cs" />
     <Compile Include="Maple\Commands\Implementation\MapCommand.cs" />
     <Compile Include="Maple\Commands\Implementation\MesoCommand.cs" />
+    <Compile Include="Maple\Commands\Implementation\ModifyStatCommand.cs" />
     <Compile Include="Maple\Commands\Implementation\NoticeCommand.cs" />
     <Compile Include="Maple\Commands\Implementation\OnlineCommand.cs" />
     <Compile Include="Maple\Commands\Implementation\ReleaseCommand.cs" />

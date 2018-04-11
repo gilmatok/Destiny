@@ -1,6 +1,8 @@
-﻿using Destiny.Maple.Characters;
+﻿using System;
+using Destiny.Maple.Characters;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using Destiny.IO;
 
 namespace Destiny.Maple.Maps
 {
@@ -38,21 +40,56 @@ namespace Destiny.Maple.Maps
                 item.ObjectID = this.Map.AssignObjectID();
             }
 
-            base.InsertItem(index, item);
+            try
+            {
+                base.InsertItem(index, item);
+            }
+            catch(Exception e)
+            {
+                Log.SkipLine();
+                Log.Inform("ERROR: MapObjects-InsertItem() failed to insert item! Index: {0} \n Exception occured: {1}", index, e);
+                Log.SkipLine();
+            }
+           
         }
 
-        protected override void RemoveItem(int index)
+        protected override void RemoveItem(int index) 
         {
-            T item = base.Items[index];
-
-            item.Map = null;
-
-            if (!(item is Character) && !(item is Portal))
+            if (index >= 0 && index < int.MaxValue)
             {
-                item.ObjectID = -1;
-            }
+                if (base.Items.Count < index)
+                {
+                    Log.SkipLine();
+                    Log.Inform("ERROR: MapObjects-RemoveItem() failed to remove item! Index: {0} \n Theres less items then index points to: {1}", index, base.Items.Count);
+                    Log.SkipLine();
+                    return;
+                }
 
-            base.RemoveItem(index);
+                T item = base.Items[index];
+                item.Map = null;
+
+                if (!(item is Character) && !(item is Portal))
+                {
+                    item.ObjectID = -1;
+                }
+
+                try
+                {
+                    base.RemoveItem(index);
+                }
+                catch(Exception e)
+                {
+                    Log.SkipLine();
+                    Log.Inform("ERROR: MapObjects-RemoveItem() failed to remove item! Index: {0} \n Exception occured: {1}", index, e);
+                    Log.SkipLine();
+                }
+            }
+            else
+            {
+                Log.SkipLine();
+                Log.Error("ERROR: MapObjects-RemoveItem() index out of bounds! Index: {0}", index);
+                Log.SkipLine();
+            }
         }
     }
 }

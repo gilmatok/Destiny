@@ -13,7 +13,11 @@ namespace Destiny.Maple.Life
     public sealed class Mob : MapObject, IMoveable, ISpawnable, IControllable
     {
         public int MapleID { get; private set; }
-        public Character Controller { get; set; }
+        public Character Controller
+        {
+            get; //TODO: overflows due to unhandled MapObjects errors
+            set;
+        }
         public Dictionary<Character, uint> Attackers { get; private set; }
         public SpawnPoint SpawnPoint { get; private set; }
         public byte Stance { get; set; }
@@ -74,6 +78,7 @@ namespace Destiny.Maple.Life
         }
 
         public int SpawnEffect { get; set; }
+        public int DeathEffect { get; set; }
 
         public Mob CachedReference
         {
@@ -214,13 +219,12 @@ namespace Destiny.Maple.Life
                         {
                             newController.ControlledMobs.Add(this);
                         }
-
-                        Log.Inform("ERROR: failed to add mob: {0}, its already in ControlledMobs!", this.ObjectID);
                     }
                     catch (Exception e)
                     {
-                        Log.Inform("ERROR: failed to add mob to controlled mobs: {0}", e);
-                        throw;
+                        Log.SkipLine();
+                        Log.Inform("ERROR: AssignController() failed to add mobObject: {0} to newController.ControlledMobs! \n Exception occured: {1}", this.ObjectID, e);
+                        Log.SkipLine();
                     }
                     
                 }
@@ -233,9 +237,33 @@ namespace Destiny.Maple.Life
             {
                 if (this.Controller != newController)
                 {
-                    this.Controller.ControlledMobs.Remove(this);
+                    if (this.Controller.ControlledMobs.Contains(this))
+                    {
+                        try
+                        {
+                            this.Controller.ControlledMobs.Remove(this);
+                        }
+                        catch (Exception e)
+                        {
+                            Log.SkipLine();
+                            Log.Inform("ERROR: SwitchController() failed to remove mobObject: {0} from this.Controller.ControlledMobs! \n Exception occured: {1}", this.ObjectID, e);
+                            Log.SkipLine();
+                        }
+                    }
 
-                    newController.ControlledMobs.Add(this);
+                    if (!newController.ControlledMobs.Contains(this))
+                    {
+                        try
+                        {
+                            newController.ControlledMobs.Add(this);
+                        }
+                        catch (Exception e)
+                        {
+                            Log.SkipLine();
+                            Log.Inform("ERROR: SwitchController() failed to add mobObject: {0} to newController.ControlledMobs! \n Exception occured: {1}", this.ObjectID, e);
+                            Log.SkipLine();
+                        }
+                    }
                 }
             }
         }
@@ -468,6 +496,27 @@ namespace Destiny.Maple.Life
             oPacket
                 .WriteBool(false)
                 .WriteInt(this.ObjectID);
+
+            return oPacket;
+        }
+
+        public enum DeathEffects
+        {
+            Dissapear,
+            FadeOut,
+            Special1,
+            Special2,
+            Special3
+        }
+
+        public Packet GetDestroyPacket(DeathEffects deathEffect)
+        {
+            Packet oPacket = new Packet(ServerOperationCode.MobLeaveField);
+
+            oPacket
+                .WriteInt(this.ObjectID)
+                .WriteByte(1)
+                .WriteByte((byte)deathEffect);
 
             return oPacket;
         }

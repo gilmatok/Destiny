@@ -36,7 +36,16 @@ namespace Destiny.Maple.Commands.Implementation
             }
             else
             {
-                Meso.giveMesos(caller, int.Parse(args[0]));
+                if (int.Parse(args[0]) > int.MaxValue || int.Parse(args[0]) < int.MinValue)
+                {
+                    int mesoGiven = int.MaxValue;
+                    Meso.giveMesos(caller, mesoGiven);
+                }
+                else
+                {
+                    int mesoGiven = int.Parse(args[0]);
+                    Meso.giveMesos(caller, mesoGiven);
+                }
             }
         }
     }

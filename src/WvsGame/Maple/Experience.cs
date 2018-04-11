@@ -1,5 +1,4 @@
-﻿using System;
-using Destiny.Maple.Characters;
+﻿using Destiny.Maple.Characters;
 using Destiny.Network;
 
 namespace Destiny.Maple
@@ -14,13 +13,15 @@ namespace Destiny.Maple
             this.Amount = amount;
         }
 
+        public const int GivenExpLimit = int.MaxValue;
+
         public static void giveExp(Character character, int exp)
         {
             long myPlusGivenExp = (long)character.Experience + (long)exp;
 
-            if (myPlusGivenExp > Int32.MaxValue)
+            if (myPlusGivenExp > GivenExpLimit)
             {
-                character.Experience = Int32.MaxValue;
+                character.Experience = GivenExpLimit;
             }
             else
             {
