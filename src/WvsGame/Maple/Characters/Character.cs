@@ -651,9 +651,25 @@ namespace Destiny.Maple.Characters
             {
                 if (value == null)
                 {
-                    if (value.Scripts.ContainsKey(this))
+                    try
                     {
-                        value.Scripts.Remove(this);
+                        if (value.Scripts.ContainsKey(this))
+                        {
+                            value.Scripts.Remove(this);
+                        }
+                    }
+                    catch(ArgumentNullException)
+                    {
+                        Log.SkipLine();
+                        Log.Error("Character-LastNPC thrown null exception!");                     
+                        Log.SkipLine();
+                        throw;
+                    }
+                    catch(Exception e)
+                    {
+                        Log.SkipLine();
+                        Log.Error("Character-LastNPC thrown exception: {0}!", e);
+                        Log.SkipLine();
                     }
                 }
 
@@ -1437,8 +1453,8 @@ namespace Destiny.Maple.Characters
             if (this.Foothold == 0)
             {
                 // NOTE: Player is floating in the air.
-                // GMs might be legitmately in this state due to GM fly.
-                // We shouldn't mess with them because they have the tools toget out of falling off the map anyway.
+                // GMs might be legitimately in this state due to GM fly.
+                // We shouldn't mess with them because they have the tools to get out of falling off the map anyway.
 
                 // TODO: Attempt to find foothold.
                 // If none found, check the player fall counter.
@@ -1516,45 +1532,92 @@ namespace Destiny.Maple.Characters
             if (attack.SkillID > 0)
             {
                 skill = this.Skills[attack.SkillID];
-
                 skill.Cast();
             }
 
             // TODO: Modify packet based on attack type.
-            using (Packet oPacket = new Packet(ServerOperationCode.CloseRangeAttack))
+            switch (type)
             {
-                oPacket
-                    .WriteInt(this.ID)
-                    .WriteByte((byte)((attack.Targets * 0x10) + attack.Hits))
-                    .WriteByte() // NOTE: Unknown.
-                    .WriteByte((byte)(attack.SkillID != 0 ? skill.CurrentLevel : 0)); // NOTE: Skill level.
-
-                if (attack.SkillID != 0)
-                {
-                    oPacket.WriteInt(attack.SkillID);
-                }
-
-                oPacket
-                    .WriteByte() // NOTE: Unknown.
-                    .WriteByte(attack.Display)
-                    .WriteByte(attack.Animation)
-                    .WriteByte(attack.WeaponSpeed)
-                    .WriteByte() // NOTE: Skill mastery.
-                    .WriteInt(); // NOTE: Unknown.
-
-                foreach (var target in attack.Damages)
-                {
-                    oPacket
-                        .WriteInt(target.Key)
-                        .WriteByte(6);
-
-                    foreach (uint hit in target.Value)
+                case AttackType.Melee:
+                    using (Packet oPacket = new Packet(ServerOperationCode.CloseRangeAttack))
                     {
-                        oPacket.WriteUInt(hit);
-                    }
-                }
+                        oPacket
+                            .WriteInt(this.ID)
+                            .WriteByte((byte)((attack.Targets * 0x10) + attack.Hits))
+                            .WriteByte() // NOTE: Unknown.
+                            .WriteByte((byte)(attack.SkillID != 0 ? skill.CurrentLevel : 0)); // NOTE: Skill level.
 
-                this.Map.Broadcast(oPacket, this);
+                        if (attack.SkillID > 0)
+                        {
+                            oPacket.WriteInt(attack.SkillID);
+                        }
+
+                        oPacket
+                            .WriteByte() // NOTE: Unknown. //display? 
+                            .WriteByte(attack.Display)     //direction? 
+                            .WriteByte(attack.Animation)   //stance? 
+                            .WriteByte(attack.WeaponSpeed) //speed 
+                            .WriteByte() // NOTE: Skill mastery.
+                            .WriteInt(); // NOTE: Unknown. 
+
+                        foreach (var target in attack.Damages)
+                        {
+                            oPacket
+                                .WriteInt(target.Key)
+                                .WriteByte(6);
+
+                            foreach (uint hit in target.Value)
+                            {
+                                oPacket.WriteUInt(hit);
+                            }
+                        }
+
+                        this.Map.Broadcast(oPacket, this);
+                    }
+                    break;
+
+                case AttackType.Magic:
+                        using (Packet oPacket = new Packet(ServerOperationCode.MagicAttack))
+                        {
+                            oPacket
+                                .WriteInt(this.ID)
+                                .WriteByte((byte)((attack.Targets * 0x10) + attack.Hits))
+                                .WriteByte() // NOTE: Unknown.
+                                .WriteByte((byte)(attack.SkillID != 0 ? skill.CurrentLevel : 0)); // NOTE: Skill level.
+
+                            if (attack.SkillID > 0)
+                            {
+                                oPacket.WriteInt(attack.SkillID);
+                            }
+
+                            oPacket
+                                .WriteByte() // NOTE: Unknown. //display? 
+                                .WriteByte(attack.Display)     //direction? 
+                                .WriteByte(attack.Animation)   //stance? 
+                                .WriteByte(attack.WeaponSpeed) //speed 
+                                .WriteByte() // NOTE: Skill mastery.
+                                .WriteInt(); // NOTE: Unknown. 
+
+                            foreach (var target in attack.Damages)
+                            {
+                                oPacket
+                                    .WriteInt(target.Key)
+                                    .WriteByte(6);
+
+                                foreach (uint hit in target.Value)
+                                {
+                                    oPacket.WriteUInt(hit);
+                                }
+                            }
+
+                            this.Map.Broadcast(oPacket, this);
+                        }                   
+                    break;
+
+                case AttackType.Range:break;
+                case AttackType.Summon:break;
+
+                default: throw new ArgumentOutOfRangeException(nameof(type), type, null);
             }
 
             foreach (KeyValuePair<int, List<uint>> target in attack.Damages)
@@ -1580,9 +1643,9 @@ namespace Destiny.Maple.Characters
                         mob.Die();
                     }
                 }
-            }
+            }        
         }
-
+        
         private const sbyte BumpDamage = -1;
         private const sbyte MapDamage = -2;
 
@@ -2686,7 +2749,7 @@ namespace Destiny.Maple.Characters
             }
         }
 
-        //TODO: theoreticly this could handle all kinds of messages to player like drops, mesos, guild points etc....
+        //TODO: theoretically this could handle all kinds of messages to player like drops, mesos, guild points etc....
         public static Packet GetShowSidebarInfoPacket(MessageType type, bool white, int itemID, int ammount,
             bool inChat, int partyBonus, int equipBonus)
         {
@@ -2741,7 +2804,7 @@ namespace Destiny.Maple.Characters
 
             else
             {
-                Log.Inform("ERROR: unhandled MessageType: {0} encountered", type);
+                Log.Inform("ERROR: unhanded MessageType: {0} encountered", type);
             }
 
             return oPacket;

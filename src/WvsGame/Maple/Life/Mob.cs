@@ -15,7 +15,7 @@ namespace Destiny.Maple.Life
         public int MapleID { get; private set; }
         public Character Controller
         {
-            get; //TODO: overflows due to unhandled MapObjects errors
+            get; //TODO: overflows due to unhanded MapObjects errors
             set;
         }
         public Dictionary<Character, uint> Attackers { get; private set; }
@@ -223,7 +223,7 @@ namespace Destiny.Maple.Life
                     catch (Exception e)
                     {
                         Log.SkipLine();
-                        Log.Inform("ERROR: AssignController() failed to add mobObject: {0} to newController.ControlledMobs! \n Exception occured: {1}", this.ObjectID, e);
+                        Log.Inform("ERROR: AssignController() failed to add mobObject: {0} to newController.ControlledMobs! \n Exception occurred: {1}", this.ObjectID, e);
                         Log.SkipLine();
                     }
                     
@@ -246,7 +246,7 @@ namespace Destiny.Maple.Life
                         catch (Exception e)
                         {
                             Log.SkipLine();
-                            Log.Inform("ERROR: SwitchController() failed to remove mobObject: {0} from this.Controller.ControlledMobs! \n Exception occured: {1}", this.ObjectID, e);
+                            Log.Inform("ERROR: SwitchController() failed to remove mobObject: {0} from this.Controller.ControlledMobs! \n Exception occurred: {1}", this.ObjectID, e);
                             Log.SkipLine();
                         }
                     }
@@ -260,7 +260,7 @@ namespace Destiny.Maple.Life
                         catch (Exception e)
                         {
                             Log.SkipLine();
-                            Log.Inform("ERROR: SwitchController() failed to add mobObject: {0} to newController.ControlledMobs! \n Exception occured: {1}", this.ObjectID, e);
+                            Log.Inform("ERROR: SwitchController() failed to add mobObject: {0} to newController.ControlledMobs! \n Exception occurred: {1}", this.ObjectID, e);
                             Log.SkipLine();
                         }
                     }
@@ -393,35 +393,51 @@ namespace Destiny.Maple.Life
             }
         }
 
+        public bool IsAlive()
+        {
+            if (this.Health <= 0)
+            {
+                return false;
+            }
+            return true;
+        }
+
+        public void ShowHpTo(Character player)
+        {
+            int hpRemaining = (int)(Math.Max(1, (this.Health * 100) / this.MaxHealth));
+
+            using (Packet oPacket = new Packet(ServerOperationCode.MobHPIndicator))
+            {
+                oPacket
+                    .WriteInt(this.ObjectID)
+                    .WriteByte((byte)(hpRemaining));
+
+                player.Client.Send(oPacket);
+            }
+        }
+
         public bool Damage(Character attacker, uint amount)
         {
             lock (this)
             {
-                uint originalAmount = amount;
-
                 amount = Math.Min(amount, this.Health);
 
+                //does the victim knows its attacker?
                 if (this.Attackers.ContainsKey(attacker))
                 {
+                    //if so then add to his established dmg bill
                     this.Attackers[attacker] += amount;
                 }
                 else
                 {
+                    //if not so then add him as new attacker
                     this.Attackers.Add(attacker, amount);
                 }
+                
+                this.Health -= amount; //decrease health by amount dealt
+                ShowHpTo(attacker); //show monster's remaining hp bar to attacker
 
-                this.Health -= amount;
-
-                using (Packet oPacket = new Packet(ServerOperationCode.MobHPIndicator))
-                {
-                    oPacket
-                        .WriteInt(this.ObjectID)
-                        .WriteByte((byte)((this.Health * 100) / this.MaxHealth));
-
-                    attacker.Client.Send(oPacket);
-                }
-
-                if (this.Health <= 0)
+                if (this.Health <= 0) //???
                 {
                     return true;
                 }
@@ -463,8 +479,8 @@ namespace Destiny.Maple.Life
                 .Skip(6) // NOTE: Unknown.
                 .WriteShort(this.Position.X)
                 .WriteShort(this.Position.Y)
-                .WriteByte((byte)(0x02 | (this.IsFacingLeft ? 0x01 : 0x00)))
-                .WriteShort(this.Foothold)
+                .WriteByte((byte)(0x02 | (this.IsFacingLeft ? 0x01 : 0x00))) // implement: getStance()
+                .WriteShort(this.Foothold) //foothold of origin MapObject.GetStartFH()
                 .WriteShort(this.Foothold);
 
             if (this.SpawnEffect > 0)
@@ -481,8 +497,8 @@ namespace Destiny.Maple.Life
             }
 
             oPacket
-                .WriteByte((byte)(newSpawn ? -2 : -1))
-                .WriteByte()
+                .WriteByte((byte)(newSpawn ? -1 : -2)) //-2 : -1, seems wrong 
+                .WriteByte() //implement getTeam()
                 .WriteByte(byte.MaxValue) // NOTE: Carnival team.
                 .WriteInt(); // NOTE: Unknown.
 

@@ -15,6 +15,11 @@ namespace Destiny.Maple
 
         public const int GivenExpLimit = int.MaxValue;
 
+        public static int GetExpNeededForLevel(int level)
+        {
+            return level > 200 ? 2000000000 : ExperienceTables.CharacterLevel[level];
+        }
+
         public static void giveExp(Character character, int exp)
         {
             long myPlusGivenExp = (long)character.Experience + (long)exp;
