@@ -921,54 +921,173 @@ namespace Destiny.Maple.Characters
             switch (stat)
             {
                 case StatisticType.Strength:
-                    player.strength += quantity;
-                    player.Update(StatisticType.Strength);
-                    break;
+                    int totalStrenght = player.strength + quantity;
+
+                    if (totalStrenght < short.MaxValue)
+                    {
+                        player.strength += quantity;
+                        player.Update(StatisticType.Strength);
+                        break;
+                    }
+
+                    else
+                    {
+                        player.strength = short.MaxValue;
+                        player.Update(StatisticType.Strength);
+                        break;
+                    }
 
                 case StatisticType.Dexterity:
-                    player.dexterity += quantity;
-                    player.Update(StatisticType.Dexterity);
-                    break;
+                    int totalDexterity = player.strength + quantity;
+
+                    if (totalDexterity < short.MaxValue)
+                    {
+                        player.dexterity += quantity;
+                        player.Update(StatisticType.Dexterity);
+                        break;
+                    }
+
+                    else
+                    {
+                        player.dexterity = short.MaxValue;
+                        player.Update(StatisticType.Dexterity);
+                        break;
+                    }
 
                 case StatisticType.Intelligence:
-                    player.intelligence += quantity;
-                    player.Update(StatisticType.Intelligence);
-                    break;
+                    int totalIntelligence = player.intelligence + quantity;
+
+                    if (totalIntelligence < short.MaxValue)
+                    {
+                        player.intelligence += quantity;
+                        player.Update(StatisticType.Intelligence);
+                        break;
+                    }
+
+                    else
+                    {
+                        player.intelligence = short.MaxValue;
+                        player.Update(StatisticType.Intelligence);
+                        break;
+                    }
 
                 case StatisticType.Luck:
-                    player.luck += quantity;
-                    player.Update(StatisticType.Luck);
-                    break;
+                    int totalLuck = player.strength + quantity;
+
+                    if (totalLuck < short.MaxValue)
+                    {
+                        player.luck += quantity;
+                        player.Update(StatisticType.Luck);
+                        break;
+                    }
+
+                    else
+                    {
+                        player.luck = short.MaxValue;
+                        player.Update(StatisticType.Luck);
+                        break;
+                    }
 
                 case StatisticType.Health:
-                    player.health += quantity;
-                    player.Update(StatisticType.Health);
-                    break;
+                    int totalHealth = player.Health + quantity;
+
+                    if (totalHealth < short.MaxValue)
+                    {
+                        player.health += quantity;
+                        player.Update(StatisticType.Health);
+                        break;
+                    }
+
+                    else
+                    {
+                        player.health = short.MaxValue;
+                        player.Update(StatisticType.Health);
+                        break;
+                    }
 
                 case StatisticType.MaxHealth:
-                    player.maxHealth += quantity;
-                    player.Update(StatisticType.MaxHealth);
-                    break;
+                    int totalMaxHealth = player.maxHealth + quantity;
+
+                    if (totalMaxHealth < short.MaxValue)
+                    {
+                        player.maxHealth += quantity;
+                        player.Update(StatisticType.MaxHealth);
+                        break;
+                    }
+
+                    else
+                    {
+                        player.maxHealth = short.MaxValue;
+                        player.Update(StatisticType.MaxHealth);
+                        break;
+                    }
 
                 case StatisticType.Mana:
-                    player.mana += quantity;
-                    player.Update(StatisticType.Mana);
-                    break;
+                    int totalMana = player.mana + quantity;
+
+                    if (totalMana < short.MaxValue)
+                    {
+                        player.mana += quantity;
+                        player.Update(StatisticType.Mana);
+                        break;
+                    }
+
+                    else
+                    {
+                        player.mana = short.MaxValue;
+                        player.Update(StatisticType.Mana);
+                        break;
+                    }
 
                 case StatisticType.MaxMana:
-                    player.maxMana += quantity;
-                    player.Update(StatisticType.MaxMana);
-                    break;
+                    int totalMaxMana = player.maxMana + quantity;
+
+                    if (totalMaxMana < short.MaxValue)
+                    {
+                        player.maxMana += quantity;
+                        player.Update(StatisticType.MaxMana);
+                        break;
+                    }
+
+                    else
+                    {
+                        player.maxMana = short.MaxValue;
+                        player.Update(StatisticType.MaxMana);
+                        break;
+                    }
 
                 case StatisticType.AbilityPoints:
-                    player.abilityPoints += quantity;
-                    player.Update(StatisticType.AbilityPoints);
-                    break;
+                    int totalAbilityPoints = player.abilityPoints + quantity;
+
+                    if (totalAbilityPoints < short.MaxValue)
+                    {
+                        player.abilityPoints += quantity;
+                        player.Update(StatisticType.AbilityPoints);
+                        break;
+                    }
+
+                    else
+                    {
+                        player.abilityPoints = short.MaxValue;
+                        player.Update(StatisticType.AbilityPoints);
+                        break;
+                    }
 
                 case StatisticType.SkillPoints:
-                    player.skillPoints += quantity;
-                    player.Update(StatisticType.SkillPoints);
-                    break;
+                    int totalSkillPoints = player.abilityPoints + quantity;
+
+                    if (totalSkillPoints < short.MaxValue)
+                    {
+                        player.skillPoints += quantity;
+                        player.Update(StatisticType.SkillPoints);
+                        break;
+                    }
+                    else
+                    {
+                        player.skillPoints = short.MaxValue;
+                        player.Update(StatisticType.SkillPoints);
+                        break;
+                    }
 
                 case StatisticType.Skin: break;
                 case StatisticType.Face: break;
@@ -2574,7 +2693,7 @@ namespace Destiny.Maple.Characters
             Packet oPacket = new Packet(ServerOperationCode.Message);
 
             //the mesos work, drops dont idk why
-            /*if (type == MessageType.DropPickup && itemID == 0)
+            if (type == MessageType.DropPickup && itemID == 0)
             {
                 oPacket
                     .WriteByte((byte) type)
@@ -2584,6 +2703,7 @@ namespace Destiny.Maple.Characters
                     .WriteShort(0);
             }
 
+            /*
             else if (type == MessageType.DropPickup && itemID > 0)
             {
                 oPacket
@@ -2593,9 +2713,10 @@ namespace Destiny.Maple.Characters
                     .WriteInt(ammount)
                     .WriteInt(0)
                     .WriteInt(0);
-            }else*/
+            }else
+            */
 
-            if (type == MessageType.IncreaseEXP)
+            else if (type == MessageType.IncreaseEXP)
             {
                 oPacket
                     .WriteByte((byte) type) // NOTE: enum MessageType 

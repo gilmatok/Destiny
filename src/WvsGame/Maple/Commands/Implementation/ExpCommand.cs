@@ -43,7 +43,8 @@ namespace Destiny.Maple.Commands.Implementation
                 }
                 else
                 {
-                    Experience.giveExp(caller, int.Parse(args[0]));
+                    int expGiven = int.Parse(args[0]);
+                    Experience.giveExp(caller, expGiven);
                 }
             }
         }

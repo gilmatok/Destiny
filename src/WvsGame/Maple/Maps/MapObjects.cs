@@ -40,13 +40,31 @@ namespace Destiny.Maple.Maps
                 item.ObjectID = this.Map.AssignObjectID();
             }
 
-            base.InsertItem(index, item);
+            try
+            {
+                base.InsertItem(index, item);
+            }
+            catch(Exception e)
+            {
+                Log.SkipLine();
+                Log.Inform("ERROR: MapObjects-InsertItem() failed to insert item! Index: {0} \n Exception occured: {1}", index, e);
+                Log.SkipLine();
+            }
+           
         }
 
-        protected override void RemoveItem(int index)
+        protected override void RemoveItem(int index) 
         {
             if (index >= 0 && index < int.MaxValue)
             {
+                if (base.Items.Count < index)
+                {
+                    Log.SkipLine();
+                    Log.Inform("ERROR: MapObjects-RemoveItem() failed to remove item! Index: {0} \n Theres less items then index points to: {1}", index, base.Items.Count);
+                    Log.SkipLine();
+                    return;
+                }
+
                 T item = base.Items[index];
                 item.Map = null;
 
@@ -62,14 +80,14 @@ namespace Destiny.Maple.Maps
                 catch(Exception e)
                 {
                     Log.SkipLine();
-                    Log.Inform("ERROR: MapleObjects-RemoveItem() failed to remove item! Index: {0} \n Exception occured: {1}", index, e);
+                    Log.Inform("ERROR: MapObjects-RemoveItem() failed to remove item! Index: {0} \n Exception occured: {1}", index, e);
                     Log.SkipLine();
                 }
             }
             else
             {
                 Log.SkipLine();
-                Log.Error("ERROR: MapleObjects-RemoveItem() index out of bounds! Index: {0}", index);
+                Log.Error("ERROR: MapObjects-RemoveItem() index out of bounds! Index: {0}", index);
                 Log.SkipLine();
             }
         }

@@ -14,27 +14,22 @@ namespace Destiny.Maple
             this.Amount = amount;
         }
 
-        public static void giveMesos(Character character, int mesos)
-        {
-            long myPlusGivenMeso = (long)character.Meso + (long)mesos;
+        public const int mesoLimit = int.MaxValue;
 
-            if (myPlusGivenMeso > int.MaxValue)
+        public static void giveMesos(Character character, int mesosGiven)
+        {
+            long myPlusGiven = (long)character.Meso + (long)mesosGiven;  
+
+            if (myPlusGiven > mesoLimit)
             {
-                character.Meso = int.MaxValue;
+                character.Meso = mesoLimit;
             }
             else
             {
-                character.Meso += mesos;
-
-                Packet oPacket = new Packet(ServerOperationCode.Message);
-                oPacket
-                    .WriteByte((byte)MessageType.DropPickup)
-                    .WriteBool(true)
-                    .WriteByte() // NOTE: Unknown.
-                    .WriteInt(mesos)
-                    .WriteShort();
-                character.Client.Send(oPacket);
-            }
+                character.Meso += mesosGiven;
+                Packet showMesosGain = GetShowMesoGainPacket(true, mesosGiven, false);
+                character.Client.Send(showMesosGain);
+            }                   
         }
 
         public override Packet GetShowGainPacket()
@@ -51,10 +46,10 @@ namespace Destiny.Maple
             return oPacket;
         }
 
-        /*public static Packet GetShowMesoGainPacket(bool white, int ammount, bool inChat)
+        public static Packet GetShowMesoGainPacket(bool white, int ammount, bool inChat)
         {
             return Character.GetShowSidebarInfoPacket(MessageType.DropPickup, white, 0, ammount, inChat, 0, 0);
-        }*/
+        }
 
     }
 }

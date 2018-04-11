@@ -317,6 +317,17 @@ namespace Destiny.IO
 
         public int ReadInt()
         {
+            var count = this.Reader.BaseStream.Length / sizeof(int);
+
+            /*for (var i = 0; i < count; i++)
+            {
+                int v = this.Reader.ReadInt32();
+            }*/
+
+#if DEBUG
+            Log.Inform("ByteBuffer-ReadInt() count of int sized lenghts in reader stream: {0}", count);
+#endif
+
             int result = this.Reader.ReadInt32();
             this.Position += sizeof(int);
             return result;

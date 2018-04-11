@@ -13,7 +13,11 @@ namespace Destiny.Maple.Life
     public sealed class Mob : MapObject, IMoveable, ISpawnable, IControllable
     {
         public int MapleID { get; private set; }
-        public Character Controller { get; set; }
+        public Character Controller
+        {
+            get; //TODO: overflows due to unhandled MapObjects errors
+            set;
+        }
         public Dictionary<Character, uint> Attackers { get; private set; }
         public SpawnPoint SpawnPoint { get; private set; }
         public byte Stance { get; set; }
