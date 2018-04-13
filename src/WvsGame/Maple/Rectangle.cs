@@ -10,5 +10,12 @@
             this.LT = lt;
             this.RB = rb;
         }
+
+        /*public override Rectangle(
+            int x,
+            int y,
+            int width,
+            int height
+        )*/
     }
 }

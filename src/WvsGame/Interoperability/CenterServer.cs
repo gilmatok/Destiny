@@ -125,7 +125,7 @@ namespace Destiny.Interoperability
                         WvsGame.PartyQuestExperienceRate = inPacket.ReadInt();
                         WvsGame.MesoRate = inPacket.ReadInt();
                         WvsGame.DropRate = inPacket.ReadInt();
-                        Log.Inform("Rates: {0}x / {1}x / {2}x / {3}x / {4}x.",
+                        Log.Inform("Rates: \n ExpRate: {0}x / \n QuestExpRate: {1}x / \n PartyQuestExpRate: {2}x / \n MesoRate: {3}x / \n DropRate: {4}x.",
                             WvsGame.ExperienceRate,
                             WvsGame.QuestExperienceRate,
                             WvsGame.PartyQuestExperienceRate,

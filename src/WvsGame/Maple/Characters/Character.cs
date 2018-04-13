@@ -954,7 +954,7 @@ namespace Destiny.Maple.Characters
                     }
 
                 case StatisticType.Dexterity:
-                    int totalDexterity = player.strength + quantity;
+                    int totalDexterity = player.dexterity + quantity;
 
                     if (totalDexterity < short.MaxValue)
                     {
@@ -988,7 +988,7 @@ namespace Destiny.Maple.Characters
                     }
 
                 case StatisticType.Luck:
-                    int totalLuck = player.strength + quantity;
+                    int totalLuck = player.luck + quantity;
 
                     if (totalLuck < short.MaxValue)
                     {
@@ -1535,7 +1535,7 @@ namespace Destiny.Maple.Characters
                 skill.Cast();
             }
 
-            // TODO: Modify packet based on attack type.
+            // TODO: further adjustments
             switch (type)
             {
                 case AttackType.Melee:
@@ -1553,12 +1553,12 @@ namespace Destiny.Maple.Characters
                         }
 
                         oPacket
-                            .WriteByte() // NOTE: Unknown. //display? 
-                            .WriteByte(attack.Display)     //direction? 
-                            .WriteByte(attack.Animation)   //stance? 
-                            .WriteByte(attack.WeaponSpeed) //speed 
-                            .WriteByte() // NOTE: Skill mastery.
-                            .WriteInt(); // NOTE: Unknown. 
+                            .WriteByte(attack.Display) // NOTE: display? 
+                            .WriteByte() // NOTE: direction? 
+                            .WriteByte(attack.Animation) // NOTE: stance? 
+                            .WriteByte(attack.WeaponSpeed) // NOTE: speed 
+                            .WriteByte() // NOTE: skill mastery?
+                            .WriteInt(); // NOTE: projectile? 
 
                         foreach (var target in attack.Damages)
                         {
@@ -1591,14 +1591,14 @@ namespace Destiny.Maple.Characters
                             }
 
                             oPacket
-                                .WriteByte() // NOTE: Unknown. //display? 
-                                .WriteByte(attack.Display)     //direction? 
-                                .WriteByte(attack.Animation)   //stance? 
-                                .WriteByte(attack.WeaponSpeed) //speed 
+                                .WriteByte(attack.Display) // NOTE: display? 
+                                .WriteByte() // NOTE: direction? 
+                                .WriteByte(attack.Animation)  // NOTE: stance? 
+                                .WriteByte(attack.WeaponSpeed) // NOTE: speed 
                                 .WriteByte() // NOTE: Skill mastery.
-                                .WriteInt(); // NOTE: Unknown. 
+                                .WriteInt(); // NOTE: projectile?  
 
-                            foreach (var target in attack.Damages)
+                        foreach (var target in attack.Damages)
                             {
                                 oPacket
                                     .WriteInt(target.Key)
@@ -1614,7 +1614,44 @@ namespace Destiny.Maple.Characters
                         }                   
                     break;
 
-                case AttackType.Range:break;
+                case AttackType.Range:
+                    using (Packet oPacket = new Packet(ServerOperationCode.RangedAttack))
+                    {
+                        oPacket
+                            .WriteInt(this.ID)
+                            .WriteByte((byte)((attack.Targets * 0x10) + attack.Hits))
+                            .WriteByte() // NOTE: Unknown.
+                            .WriteByte((byte)(attack.SkillID != 0 ? skill.CurrentLevel : 0)); // NOTE: Skill level.
+
+                        if (attack.SkillID > 0)
+                        {
+                            oPacket.WriteInt(attack.SkillID);
+                        }
+
+                        oPacket
+                            .WriteByte(attack.Display) // NOTE: display? 
+                            .WriteByte() // NOTE: direction? 
+                            .WriteByte(attack.Animation)  // NOTE: stance? 
+                            .WriteByte(attack.WeaponSpeed) // NOTE: speed 
+                            .WriteByte() // NOTE: Skill mastery.
+                            .WriteInt(); // NOTE: projectile?  
+
+                        foreach (var target in attack.Damages)
+                        {
+                            oPacket
+                                .WriteInt(target.Key)
+                                .WriteByte(6);
+
+                            foreach (uint hit in target.Value)
+                            {
+                                oPacket.WriteUInt(hit);
+                            }
+                        }
+
+                        this.Map.Broadcast(oPacket, this);
+                    }
+                    break;
+
                 case AttackType.Summon:break;
 
                 default: throw new ArgumentOutOfRangeException(nameof(type), type, null);
@@ -1959,7 +1996,7 @@ namespace Destiny.Maple.Characters
         {
             iPacket.ReadInt(); // NOTE: Ticks.
             iPacket.ReadInt(); // NOTE: Unknown.
-            short healthAmount = iPacket.ReadShort(); // TODO: Validate
+            short healthAmount = iPacket.ReadShort(); // TODO: Validate 
             short manaAmount = iPacket.ReadShort(); // TODO: Validate
 
             if (healthAmount != 0)
@@ -2139,7 +2176,7 @@ namespace Destiny.Maple.Characters
                     break;
             }
 
-            // NOTE: This is here for convinience. If you accidently use another text window (like party) and not the main text window,
+            // NOTE: This is here for convenience. If you accidentally use another text window (like party) and not the main text window,
             // your commands won't be shown but instead executed from there as well.
             if (text.StartsWith(Application.CommandIndiciator.ToString()))
             {

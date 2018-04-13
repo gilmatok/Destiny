@@ -13,11 +13,7 @@ namespace Destiny.Maple.Life
     public sealed class Mob : MapObject, IMoveable, ISpawnable, IControllable
     {
         public int MapleID { get; private set; }
-        public Character Controller
-        {
-            get; //TODO: overflows due to unhanded MapObjects errors
-            set;
-        }
+        public Character Controller { get; set; }
         public Dictionary<Character, uint> Attackers { get; private set; }
         public SpawnPoint SpawnPoint { get; private set; }
         public byte Stance { get; set; }
@@ -237,31 +233,34 @@ namespace Destiny.Maple.Life
             {
                 if (this.Controller != newController)
                 {
-                    if (this.Controller.ControlledMobs.Contains(this))
+                    if (this != null)
                     {
-                        try
+                        if (this.Controller.ControlledMobs.Contains(this))
                         {
-                            this.Controller.ControlledMobs.Remove(this);
+                            try
+                            {
+                                this.Controller.ControlledMobs.Remove(this);
+                            }
+                            catch (Exception e)
+                            {
+                                Log.SkipLine();
+                                Log.Inform("ERROR: SwitchController() failed to remove mobObject: {0} from this.Controller.ControlledMobs! \n Exception occurred: {1}", this.ObjectID, e);
+                                Log.SkipLine();
+                            }
                         }
-                        catch (Exception e)
-                        {
-                            Log.SkipLine();
-                            Log.Inform("ERROR: SwitchController() failed to remove mobObject: {0} from this.Controller.ControlledMobs! \n Exception occurred: {1}", this.ObjectID, e);
-                            Log.SkipLine();
-                        }
-                    }
 
-                    if (!newController.ControlledMobs.Contains(this))
-                    {
-                        try
+                        if (!newController.ControlledMobs.Contains(this))
                         {
-                            newController.ControlledMobs.Add(this);
-                        }
-                        catch (Exception e)
-                        {
-                            Log.SkipLine();
-                            Log.Inform("ERROR: SwitchController() failed to add mobObject: {0} to newController.ControlledMobs! \n Exception occurred: {1}", this.ObjectID, e);
-                            Log.SkipLine();
+                            try
+                            {
+                                newController.ControlledMobs.Add(this);
+                            }
+                            catch (Exception e)
+                            {
+                                Log.SkipLine();
+                                Log.Inform("ERROR: SwitchController() failed to add mobObject: {0} to newController.ControlledMobs! \n Exception occurred: {1}", this.ObjectID, e);
+                                Log.SkipLine();
+                            }
                         }
                     }
                 }
@@ -307,8 +306,8 @@ namespace Destiny.Maple.Life
             {
                 oPacket
                     .WriteInt(this.ObjectID)
-                    .WriteShort(moveAction)
-                    .WriteBool(cheatResult)
+                    .WriteShort(moveAction) //moveActionID
+                    .WriteBool(cheatResult) //UseSkills??
                     .WriteShort((short)this.Mana)
                     .WriteByte(skillID)
                     .WriteByte(skillLevel);
@@ -321,7 +320,7 @@ namespace Destiny.Maple.Life
                 oPacket
                     .WriteInt(this.ObjectID)
                     .WriteBool(false)
-                    .WriteBool(cheatResult)
+                    .WriteBool(cheatResult) //UseSkills??
                     .WriteByte(centerSplit)
                     .WriteInt(illegalVelocity)
                     .WriteBytes(movements.ToByteArray());
@@ -366,6 +365,44 @@ namespace Destiny.Maple.Life
                 this.Buffs.Remove(buff);
             }, skill.Duration * 1000);
         }
+
+        public void Buff(MobStatus buff, short value, Skill skill)
+        {
+            using (Packet oPacket = new Packet(ServerOperationCode.MobStatSet))
+            {
+                oPacket
+                    .WriteInt(this.ObjectID)
+                    .WriteLong()
+                    .WriteInt()
+                    .WriteInt((int)buff)
+                    .WriteShort(value)
+                    .WriteShort((short)skill.MapleID)
+                    .WriteShort(skill.CurrentLevel)
+                    .WriteShort(-1)
+                    .WriteShort(0) // Delay
+                    .WriteInt();
+
+                this.Map.Broadcast(oPacket);
+            }
+
+            Delay.Execute(() =>
+                {
+                    using (Packet Packet = new Packet(ServerOperationCode.MobStatReset))
+                    {
+                        Packet
+                            .WriteInt(this.ObjectID)
+                            .WriteLong()
+                            .WriteInt()
+                            .WriteInt((int)buff)
+                            .WriteInt();
+
+                        this.Map.Broadcast(Packet);
+                    }
+
+                    this.Buffs.Remove(buff);
+                }, skill.BuffTime * 1000);
+        }
+
 
         public void Heal(uint hp, int range)
         {
@@ -498,7 +535,7 @@ namespace Destiny.Maple.Life
 
             oPacket
                 .WriteByte((byte)(newSpawn ? -1 : -2)) //-2 : -1, seems wrong 
-                .WriteByte() //implement getTeam()
+                .WriteByte() //??
                 .WriteByte(byte.MaxValue) // NOTE: Carnival team.
                 .WriteInt(); // NOTE: Unknown.
 

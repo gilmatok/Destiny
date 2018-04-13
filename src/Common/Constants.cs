@@ -1066,32 +1066,36 @@ namespace Destiny
 
         public enum FirePoisonWizard : int
         {
+            MpEater = 2100000,          
             Meditation = 2101001,
-            MpEater = 2100000,
-            PoisonBreath = 2101005,
-            Slow = 2101003
+            Teleportation = 2101002,
+            Slow = 2101003,
+            FireArrow = 2101004,
+            PoisonBreath = 2101005
         }
 
         public enum FirePoisonMage : int
         {
-            ElementAmplification = 2110001,
-            ElementComposition = 2111006,
             PartialResistance = 2110000,
+            ElementAmplification = 2110001,
+            Explosion = 2110002,
             PoisonMist = 2111003,
             Seal = 2111004,
-            SpellBooster = 2111005
+            SpellBooster = 2111005,
+            ElementComposition = 2111006,
         }
 
         public enum FirePoisonArchMage : int
         {
-            BigBang = 2121001,
-            Elquines = 2121005,
-            FireDemon = 2121003,
-            HerosWill = 2121008,
-            Infinity = 2121004,
-            ManaReflection = 2121002,
             MapleWarrior = 2121000,
-            Paralyze = 2121006
+            BigBang = 2121001,
+            ManaReflection = 2121002,
+            FireDemon = 2121003,
+            Infinity = 2121004,
+            Elquines = 2121005,
+            Paralyze = 2121006,
+            MeteorShower= 2121007,
+            HerosWill = 2121008
         }
 
         public enum IceLightningWizard : int

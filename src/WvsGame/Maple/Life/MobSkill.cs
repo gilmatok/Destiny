@@ -105,7 +105,7 @@ namespace Destiny.Maple.Life
                     break;
 
                 case MobSkillName.Curse:
-                    // TODO: Curse.
+                    disease = CharacterDisease.Curse;
                     break;
 
                 case MobSkillName.Poison:
@@ -128,7 +128,7 @@ namespace Destiny.Maple.Life
                     // TODO: Send to town.
                     break;
 
-                case MobSkillName.PoisonMist:
+                case MobSkillName.PoisonMist:                  
                     // TODO: Spawn poison mist.
                     break;
 

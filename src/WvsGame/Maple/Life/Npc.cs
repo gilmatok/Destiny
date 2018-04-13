@@ -85,6 +85,7 @@ namespace Destiny.Maple.Life
             }
 
             NpcMessageType lastMessageType = (NpcMessageType)iPacket.ReadByte();
+
             byte action = iPacket.ReadByte();
 
             // TODO: Validate last message type.

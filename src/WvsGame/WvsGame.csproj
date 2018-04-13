@@ -88,6 +88,7 @@
     <Compile Include="Maple\Commands\Implementation\SayCommand.cs" />
     <Compile Include="Maple\Commands\Implementation\SearchCommand.cs" />
     <Compile Include="Maple\Commands\Implementation\ShopCommand.cs" />
+    <Compile Include="Maple\Commands\Implementation\LearnSkillCommand.cs" />
     <Compile Include="Maple\Commands\Implementation\SpawnCommand.cs" />
     <Compile Include="Maple\Commands\Implementation\TestCommand.cs" />
     <Compile Include="Maple\Commands\Implementation\TickerCommand.cs" />
@@ -112,6 +113,7 @@
     <Compile Include="Maple\Item.cs" />
     <Compile Include="Maple\Life\LifeObject.cs" />
     <Compile Include="Maple\Life\Loot.cs" />
+    <Compile Include="Maple\Life\Mist.cs" />
     <Compile Include="Maple\Life\Mob.cs" />
     <Compile Include="Maple\Life\MobSkill.cs" />
     <Compile Include="Maple\Life\MobSkills.cs" />
@@ -129,6 +131,7 @@
     <Compile Include="Maple\Maps\MapMobs.cs" />
     <Compile Include="Maple\Maps\MapNpcs.cs" />
     <Compile Include="Maple\Maps\MapObject.cs" />
+    <Compile Include="Maple\Maps\MapObjectMist.cs" />
     <Compile Include="Maple\Maps\MapObjects.cs" />
     <Compile Include="Maple\Maps\MapPlayerShops.cs" />
     <Compile Include="Maple\Maps\MapPortals.cs" />

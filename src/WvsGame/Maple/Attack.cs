@@ -20,7 +20,7 @@ namespace Destiny.Maple
         public uint TotalDamage { get; private set; }
         public Dictionary<int, List<uint>> Damages { get; private set; }
 
-        public Attack(Packet iPacket, AttackType type)
+        public Attack(Packet iPacket, AttackType type) //TODO: recheck this seems wrong
         {
             this.Type = type;
             this.Portals = iPacket.ReadByte();

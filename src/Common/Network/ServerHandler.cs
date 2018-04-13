@@ -115,7 +115,9 @@ namespace Destiny.Network
                                 }
                                 else
                                 {
+                                    Log.SkipLine();
                                     Log.Hex("Received unknown (0x{0:X2}) packet: ", inPacket.Array, inPacket.OperationCode);
+                                    Log.SkipLine();
                                 }
 
                                 this.Dispatch(inPacket);
@@ -126,6 +128,7 @@ namespace Destiny.Network
                     }
                     catch (Exception e)
                     {
+                        Log.SkipLine();
                         Log.Error("Uncatched fatal error on {0}: ", e, this.Title.ToLower());
                         this.Stop();
                     }
