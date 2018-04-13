@@ -180,7 +180,7 @@ namespace Destiny.Maple.Characters
                     mask |= (long)CharacterConstants.SecondaryBuffStat.ShadowPartner;
                 }
 
-                if (this.Contains((int)CharacterConstants.SkillNames.Hunter.SoulArrow) || this.Contains((int)CharacterConstants.SkillNames.Crossbowman.SoulArrow))
+                if (this.Contains((int)CharacterConstants.SkillNames.Hunter.SoulArrowBow) || this.Contains((int)CharacterConstants.SkillNames.Crossbowman.SoulArrowCrossbow))
                 {
                     mask |= (long)CharacterConstants.SecondaryBuffStat.SoulArrow;
                 }
