@@ -5,6 +5,7 @@ using System.Collections;
 using Destiny.Data;
 using Destiny.Network;
 using System.Linq;
+using Destiny.Constants;
 using Destiny.Maple.Data;
 using Destiny.Maple.Life;
 using Destiny.IO;
@@ -461,8 +462,8 @@ namespace Destiny.Maple.Characters
 
                 case 5050000: // NOTE: AP Reset.
                     {
-                        StatisticType statDestination = (StatisticType)iPacket.ReadInt();
-                        StatisticType statSource = (StatisticType)iPacket.ReadInt();
+                        CharacterConstants.StatisticType statDestination = (CharacterConstants.StatisticType)iPacket.ReadInt();
+                        CharacterConstants.StatisticType statSource = (CharacterConstants.StatisticType)iPacket.ReadInt();
 
                         this.Parent.AddAbility(statDestination, 1, true);
                         this.Parent.AddAbility(statSource, -1, true);

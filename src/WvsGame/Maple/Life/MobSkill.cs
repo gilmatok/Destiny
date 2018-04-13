@@ -3,6 +3,7 @@ using Destiny.Network;
 using Destiny.Maple.Characters;
 using System;
 using System.Collections.Generic;
+using Destiny.Constants;
 
 namespace Destiny.Maple.Life
 {
@@ -53,7 +54,7 @@ namespace Destiny.Maple.Life
         public void Cast(Mob caster)
         {
             MobStatus status = MobStatus.None;
-            CharacterDisease disease = CharacterDisease.None;
+            CharacterConstants.CharacterDisease disease = CharacterConstants.CharacterDisease.None;
             bool heal = false;
             //bool banish = false;
             bool dispel = false;
@@ -89,31 +90,31 @@ namespace Destiny.Maple.Life
                     break;
 
                 case MobSkillName.Seal:
-                    disease = CharacterDisease.Sealed;
+                    disease = CharacterConstants.CharacterDisease.Sealed;
                     break;
 
                 case MobSkillName.Darkness:
-                    disease = CharacterDisease.Darkness;
+                    disease = CharacterConstants.CharacterDisease.Darkness;
                     break;
 
                 case MobSkillName.Weakness:
-                    disease = CharacterDisease.Weaken;
+                    disease = CharacterConstants.CharacterDisease.Weaken;
                     break;
 
                 case MobSkillName.Stun:
-                    disease = CharacterDisease.Stun;
+                    disease = CharacterConstants.CharacterDisease.Stun;
                     break;
 
                 case MobSkillName.Curse:
-                    disease = CharacterDisease.Curse;
+                    disease = CharacterConstants.CharacterDisease.Curse;
                     break;
 
                 case MobSkillName.Poison:
-                    disease = CharacterDisease.Poison;
+                    disease = CharacterConstants.CharacterDisease.Poison;
                     break;
 
                 case MobSkillName.Slow:
-                    disease = CharacterDisease.Slow;
+                    disease = CharacterConstants.CharacterDisease.Slow;
                     break;
 
                 case MobSkillName.Dispel:
@@ -121,7 +122,7 @@ namespace Destiny.Maple.Life
                     break;
 
                 case MobSkillName.Seduce:
-                    disease = CharacterDisease.Seduce;
+                    disease = CharacterConstants.CharacterDisease.Seduce;
                     break;
 
                 case MobSkillName.SendToTown:
@@ -133,7 +134,7 @@ namespace Destiny.Maple.Life
                     break;
 
                 case MobSkillName.Confuse:
-                    disease = CharacterDisease.Confuse;
+                    disease = CharacterConstants.CharacterDisease.Confuse;
                     break;
 
                 case MobSkillName.Zombify:
@@ -202,7 +203,7 @@ namespace Destiny.Maple.Life
                 }
                 */
 
-                if (disease != CharacterDisease.None)
+                if (disease != CharacterConstants.CharacterDisease.None)
                 {
                     using (Packet oPacket = new Packet(ServerOperationCode.TemporaryStatSet))
                     {

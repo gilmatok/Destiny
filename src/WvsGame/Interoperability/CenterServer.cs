@@ -9,6 +9,7 @@ using Destiny.Security;
 using System;
 using System.Linq;
 using System.Net;
+using Destiny.Constants;
 
 namespace Destiny.Interoperability
 {
@@ -125,7 +126,7 @@ namespace Destiny.Interoperability
                         WvsGame.PartyQuestExperienceRate = inPacket.ReadInt();
                         WvsGame.MesoRate = inPacket.ReadInt();
                         WvsGame.DropRate = inPacket.ReadInt();
-                        Log.Inform("Rates: \n ExpRate: {0}x / \n QuestExpRate: {1}x / \n PartyQuestExpRate: {2}x / \n MesoRate: {3}x / \n DropRate: {4}x.",
+                        Log.Inform("Rates: \n ExpRate: {0}x \n QuestExpRate: {1}x \n PartyQuestExpRate: {2}x \n MesoRate: {3}x \n DropRate: {4}x",
                             WvsGame.ExperienceRate,
                             WvsGame.QuestExperienceRate,
                             WvsGame.PartyQuestExperienceRate,
@@ -200,7 +201,7 @@ namespace Destiny.Interoperability
         {
             int accountID = inPacket.ReadInt();
             string name = inPacket.ReadString();
-            JobType jobType = (JobType)inPacket.ReadInt();
+            CharacterConstants.JobType jobType = (CharacterConstants.JobType)inPacket.ReadInt();
             int face = inPacket.ReadInt();
             int hair = inPacket.ReadInt();
             int hairColor = inPacket.ReadInt();
@@ -209,7 +210,7 @@ namespace Destiny.Interoperability
             int bottomID = inPacket.ReadInt();
             int shoesID = inPacket.ReadInt();
             int weaponID = inPacket.ReadInt();
-            Gender gender = (Gender)inPacket.ReadByte();
+            CharacterConstants.Gender gender = (CharacterConstants.Gender)inPacket.ReadByte();
 
             bool error = false;
 
@@ -220,7 +221,7 @@ namespace Destiny.Interoperability
                 error = true;
             }
 
-            if (gender == Gender.Male)
+            if (gender == CharacterConstants.Gender.Male)
             {
                 if (!DataProvider.CreationData.MaleSkins.Any(x => x.Item1 == jobType && x.Item2 == skin)
                     || !DataProvider.CreationData.MaleFaces.Any(x => x.Item1 == jobType && x.Item2 == face)
@@ -234,7 +235,7 @@ namespace Destiny.Interoperability
                     error = true;
                 }
             }
-            else if (gender == Gender.Female)
+            else if (gender == CharacterConstants.Gender.Female)
             {
                 if (!DataProvider.CreationData.FemaleSkins.Any(x => x.Item1 == jobType && x.Item2 == skin)
                     || !DataProvider.CreationData.FemaleFaces.Any(x => x.Item1 == jobType && x.Item2 == face)
@@ -263,7 +264,7 @@ namespace Destiny.Interoperability
             character.Face = face;
             character.Hair = hair + hairColor;
             character.Level = 1;
-            character.Job = jobType == JobType.Cygnus ? Job.Noblesse : jobType == JobType.Explorer ? Job.Beginner : Job.Legend;
+            character.Job = jobType == CharacterConstants.JobType.Cygnus ? CharacterConstants.Job.Noblesse : jobType == CharacterConstants.JobType.Explorer ? CharacterConstants.Job.Beginner : CharacterConstants.Job.Legend;
             character.Strength = 12;
             character.Dexterity = 5;
             character.Intelligence = 4;
@@ -276,7 +277,7 @@ namespace Destiny.Interoperability
             character.SkillPoints = 0;
             character.Experience = 0;
             character.Fame = 0;
-            character.Map = DataProvider.Maps[jobType == JobType.Cygnus ? 130030000 : jobType == JobType.Explorer ? 10000 : 914000000];
+            character.Map = DataProvider.Maps[jobType == CharacterConstants.JobType.Cygnus ? 130030000 : jobType == CharacterConstants.JobType.Explorer ? 10000 : 914000000];
             character.SpawnPoint = 0;
             character.Meso = 0;
 
@@ -284,7 +285,7 @@ namespace Destiny.Interoperability
             character.Items.Add(new Item(bottomID, equipped: true));
             character.Items.Add(new Item(shoesID, equipped: true));
             character.Items.Add(new Item(weaponID, equipped: true));
-            character.Items.Add(new Item(jobType == JobType.Cygnus ? 4161047 : jobType == JobType.Explorer ? 4161001 : 4161048), forceGetSlot: true);
+            character.Items.Add(new Item(jobType == CharacterConstants.JobType.Cygnus ? 4161047 : jobType == CharacterConstants.JobType.Explorer ? 4161001 : 4161048), forceGetSlot: true);
 
             character.Keymap.Add(new Shortcut(KeymapKey.One, KeymapAction.AllChat));
             character.Keymap.Add(new Shortcut(KeymapKey.Two, KeymapAction.PartyChat));

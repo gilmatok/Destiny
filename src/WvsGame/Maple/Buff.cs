@@ -4,6 +4,7 @@ using Destiny.Maple.Characters;
 using Destiny.Maple.Data;
 using System;
 using System.Collections.Generic;
+using Destiny.Constants;
 using Destiny.Threading;
 
 namespace Destiny.Maple
@@ -15,8 +16,8 @@ namespace Destiny.Maple
         public int MapleID { get; set; }
         public byte SkillLevel { get; set; }
         public byte Type { get; set; }
-        public Dictionary<PrimaryBuffStat, short> PrimaryStatups { get; set; }
-        public Dictionary<SecondaryBuffStat, short> SecondaryStatups { get; set; }
+        public Dictionary<CharacterConstants.PrimaryBuffStat, short> PrimaryStatups { get; set; }
+        public Dictionary<CharacterConstants.SecondaryBuffStat, short> SecondaryStatups { get; set; }
         public DateTime End { get; set; }
         public int Value { get; set; }
 
@@ -34,7 +35,7 @@ namespace Destiny.Maple
             {
                 long mask = 0;
 
-                foreach (KeyValuePair<PrimaryBuffStat, short> primaryStatup in this.PrimaryStatups)
+                foreach (KeyValuePair<CharacterConstants.PrimaryBuffStat, short> primaryStatup in this.PrimaryStatups)
                 {
                     mask |= (long)primaryStatup.Key;
                 }
@@ -49,7 +50,7 @@ namespace Destiny.Maple
             {
                 long mask = 0;
 
-                foreach (KeyValuePair<SecondaryBuffStat, short> secondaryStatus in this.SecondaryStatups)
+                foreach (KeyValuePair<CharacterConstants.SecondaryBuffStat, short> secondaryStatus in this.SecondaryStatups)
                 {
                     mask |= (long)secondaryStatus.Key;
                 }
@@ -66,8 +67,8 @@ namespace Destiny.Maple
             this.Type = 1;
             this.Value = value;
             this.End = DateTime.Now.AddSeconds(skill.BuffTime);
-            this.PrimaryStatups = new Dictionary<PrimaryBuffStat, short>();
-            this.SecondaryStatups = new Dictionary<SecondaryBuffStat, short>();
+            this.PrimaryStatups = new Dictionary<CharacterConstants.PrimaryBuffStat, short>();
+            this.SecondaryStatups = new Dictionary<CharacterConstants.SecondaryBuffStat, short>();
 
             this.CalculateStatups(skill);
 
@@ -88,8 +89,8 @@ namespace Destiny.Maple
             this.Type = (byte)datum["Type"];
             this.Value = (int)datum["Value"];
             this.End = (DateTime)datum["End"];
-            this.PrimaryStatups = new Dictionary<PrimaryBuffStat, short>();
-            this.SecondaryStatups = new Dictionary<SecondaryBuffStat, short>();
+            this.PrimaryStatups = new Dictionary<CharacterConstants.PrimaryBuffStat, short>();
+            this.SecondaryStatups = new Dictionary<CharacterConstants.SecondaryBuffStat, short>();
 
             if (this.Type == 1)
             {
@@ -131,7 +132,7 @@ namespace Destiny.Maple
                                 .WriteLong(this.PrimaryBuffMask)
                                 .WriteLong(this.SecondaryBuffMask);
 
-                            foreach (KeyValuePair<PrimaryBuffStat, short> primaryStatup in this.PrimaryStatups)
+                            foreach (KeyValuePair<CharacterConstants.PrimaryBuffStat, short> primaryStatup in this.PrimaryStatups)
                             {
                                 oPacket
                                     .WriteShort(primaryStatup.Value)
@@ -139,7 +140,7 @@ namespace Destiny.Maple
                                     .WriteInt((int)(this.End - DateTime.Now).TotalMilliseconds);
                             }
 
-                            foreach (KeyValuePair<SecondaryBuffStat, short> secondaryStatup in this.SecondaryStatups)
+                            foreach (KeyValuePair<CharacterConstants.SecondaryBuffStat, short> secondaryStatup in this.SecondaryStatups)
                             {
                                 oPacket
                                     .WriteShort(secondaryStatup.Value)
@@ -163,12 +164,12 @@ namespace Destiny.Maple
                                 .WriteLong(this.PrimaryBuffMask)
                                 .WriteLong(this.SecondaryBuffMask);
 
-                            foreach (KeyValuePair<PrimaryBuffStat, short> primaryStatup in this.PrimaryStatups)
+                            foreach (KeyValuePair<CharacterConstants.PrimaryBuffStat, short> primaryStatup in this.PrimaryStatups)
                             {
                                 oPacket.WriteShort(primaryStatup.Value);
                             }
 
-                            foreach (KeyValuePair<SecondaryBuffStat, short> secondaryStatup in this.SecondaryStatups)
+                            foreach (KeyValuePair<CharacterConstants.SecondaryBuffStat, short> secondaryStatup in this.SecondaryStatups)
                             {
                                 oPacket.WriteShort(secondaryStatup.Value);
                             }
@@ -211,62 +212,62 @@ namespace Destiny.Maple
         {
             if (skill.WeaponAttack > 0)
             {
-                this.SecondaryStatups.Add(SecondaryBuffStat.WeaponAttack, skill.WeaponAttack);
+                this.SecondaryStatups.Add(CharacterConstants.SecondaryBuffStat.WeaponAttack, skill.WeaponAttack);
             }
 
             if (skill.WeaponDefense > 0)
             {
-                this.SecondaryStatups.Add(SecondaryBuffStat.WeaponDefense, skill.WeaponDefense);
+                this.SecondaryStatups.Add(CharacterConstants.SecondaryBuffStat.WeaponDefense, skill.WeaponDefense);
             }
 
             if (skill.MagicAttack > 0)
             {
-                this.SecondaryStatups.Add(SecondaryBuffStat.MagicAttack, skill.MagicAttack);
+                this.SecondaryStatups.Add(CharacterConstants.SecondaryBuffStat.MagicAttack, skill.MagicAttack);
             }
 
             if (skill.MagicDefense > 0)
             {
-                this.SecondaryStatups.Add(SecondaryBuffStat.MagicDefense, skill.MagicDefense);
+                this.SecondaryStatups.Add(CharacterConstants.SecondaryBuffStat.MagicDefense, skill.MagicDefense);
             }
 
             if (skill.Accuracy > 0)
             {
-                this.SecondaryStatups.Add(SecondaryBuffStat.Accuracy, skill.Accuracy);
+                this.SecondaryStatups.Add(CharacterConstants.SecondaryBuffStat.Accuracy, skill.Accuracy);
             }
 
             if (skill.Avoidability > 0)
             {
-                this.SecondaryStatups.Add(SecondaryBuffStat.Avoid, skill.Avoidability);
+                this.SecondaryStatups.Add(CharacterConstants.SecondaryBuffStat.Avoid, skill.Avoidability);
             }
 
             if (skill.Speed > 0)
             {
-                this.SecondaryStatups.Add(SecondaryBuffStat.Speed, skill.Speed);
+                this.SecondaryStatups.Add(CharacterConstants.SecondaryBuffStat.Speed, skill.Speed);
             }
 
             if (skill.Jump > 0)
             {
-                this.SecondaryStatups.Add(SecondaryBuffStat.Jump, skill.Jump);
+                this.SecondaryStatups.Add(CharacterConstants.SecondaryBuffStat.Jump, skill.Jump);
             }
 
             if (skill.Morph > 0)
             {
-                this.SecondaryStatups.Add(SecondaryBuffStat.Morph, (short)(skill.Morph + 100 * (int)this.Character.Gender));
+                this.SecondaryStatups.Add(CharacterConstants.SecondaryBuffStat.Morph, (short)(skill.Morph + 100 * (int)this.Character.Gender));
             }
 
             switch (this.MapleID)
             {
-                case (int)SkillNames.SuperGM.HyperBody:
-                    this.SecondaryStatups.Add(SecondaryBuffStat.HyperBodyHP, skill.ParameterA);
-                    this.SecondaryStatups.Add(SecondaryBuffStat.HyperBodyMP, skill.ParameterB);
+                case (int)CharacterConstants.SkillNames.SuperGM.HyperBody:
+                    this.SecondaryStatups.Add(CharacterConstants.SecondaryBuffStat.HyperBodyHP, skill.ParameterA);
+                    this.SecondaryStatups.Add(CharacterConstants.SecondaryBuffStat.HyperBodyMP, skill.ParameterB);
                     break;
 
-                case (int)SkillNames.SuperGM.HolySymbol:
-                    this.SecondaryStatups.Add(SecondaryBuffStat.HolySymbol, skill.ParameterA);
+                case (int)CharacterConstants.SkillNames.SuperGM.HolySymbol:
+                    this.SecondaryStatups.Add(CharacterConstants.SecondaryBuffStat.HolySymbol, skill.ParameterA);
                     break;
 
-                case (int)SkillNames.SuperGM.Hide:
-                    this.SecondaryStatups.Add(SecondaryBuffStat.DarkSight, skill.ParameterA);
+                case (int)CharacterConstants.SkillNames.SuperGM.Hide:
+                    this.SecondaryStatups.Add(CharacterConstants.SecondaryBuffStat.DarkSight, skill.ParameterA);
                     break;
             }
         }

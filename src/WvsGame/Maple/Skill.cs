@@ -4,6 +4,7 @@ using Destiny.Maple.Characters;
 using Destiny.Maple.Data;
 using System;
 using System.Linq;
+using Destiny.Constants;
 using Destiny.IO;
 using Destiny.Maple.Life;
 using Destiny.Threading;
@@ -383,7 +384,7 @@ namespace Destiny.Maple
                 this.CooldownEnd = DateTime.Now.AddSeconds(this.Cooldown);
             }
 
-            if (this.MapleID == (int)SkillNames.FirePoisonMage.PoisonMist)
+            if (this.MapleID == (int)CharacterConstants.SkillNames.FirePoisonMage.PoisonMist)
             {
                 Point mistMaxLT = new Point(-200, -150);
                 Point mistMaxRB = new Point(200, 150);
@@ -395,7 +396,7 @@ namespace Destiny.Maple
                 //get damage ticks of poisoned mobs within bounds
             }
 
-            if (this.MapleID == (int) SkillNames.FirePoisonWizard.PoisonBreath)
+            if (this.MapleID == (int) CharacterConstants.SkillNames.FirePoisonWizard.PoisonBreath)
             {
                 Mob victim = this.Character.ControlledMobs.FirstOrDefault();
                 if (victim != null)

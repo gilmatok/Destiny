@@ -1,6 +1,7 @@
 ﻿using Destiny.Maple;
 using Destiny.Maple.Characters;
 using System.Net.Sockets;
+using Destiny.Constants;
 
 namespace Destiny.Network
 {
@@ -93,15 +94,15 @@ namespace Destiny.Network
                     break;
 
                 case ClientOperationCode.CloseRangeAttack:
-                    this.Character.Attack(iPacket, AttackType.Melee);
+                    this.Character.Attack(iPacket, CharacterConstants.AttackType.Melee);
                     break;
 
                 case ClientOperationCode.RangedAttack:
-                    this.Character.Attack(iPacket, AttackType.Range);
+                    this.Character.Attack(iPacket, CharacterConstants.AttackType.Range);
                     break;
 
                 case ClientOperationCode.MagicAttack:
-                    this.Character.Attack(iPacket, AttackType.Magic);
+                    this.Character.Attack(iPacket, CharacterConstants.AttackType.Magic);
                     break;
 
                 case ClientOperationCode.TakeDamage:

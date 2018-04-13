@@ -1,14 +1,14 @@
-﻿using Destiny.Maple.Characters;
+﻿using Destiny.Constants;
+using Destiny.Maple.Characters;
 using Destiny.Maple.Maps;
 using Destiny.Network;
 
 namespace Destiny.Maple.Life
 {
-    public sealed class Mist : MapObject
+    public sealed class Mist : MapObject, ISpawnable
     {
         private Rectangle mistPosition { get; set; }
         public Character mistOwner { get; set; }
-        public UserEffect mistEffect { get; set; }
         public Skill mistSkill { get; set; }
 
         public enum MistType : int
@@ -28,10 +28,10 @@ namespace Destiny.Maple.Life
         {
             switch (this.mistSkill.MapleID)
             {
-                case (int) SkillNames.FirePoisonMage.PoisonMist:
+                case (int) CharacterConstants.SkillNames.FirePoisonMage.PoisonMist:
                     return MistType.playerPoisonMist;
 
-                case (int) SkillNames.Shadower.Smokescreen:
+                case (int) CharacterConstants.SkillNames.Shadower.Smokescreen:
                     return MistType.playerSmokescreen;
             }
 
@@ -67,18 +67,13 @@ namespace Destiny.Maple.Life
 
         public Packet GetCreatePacket()
         {
-            return this.GetInternalPacket();
+            return this.GetSpawnPacket();
         }
 
-        //public Packet GetSpawnPacket()
-        //{
-            //return this.GetInternalPacket(false, false);
-        //}
-
-        //public Packet GetControlRequestPacket()
-        //{
-            //return this.GetInternalPacket(true, false);
-        //}
+        public Packet GetSpawnPacket()
+        {
+            return this.GetInternalPacket();
+        }
 
         private Packet GetInternalPacket()
         {
@@ -99,12 +94,6 @@ namespace Destiny.Maple.Life
                     
             return oPacket;
         }
-
-        //public Packet GetControlCancelPacket()
-        //{
-           // Packet oPacket = new Packet(ServerOperationCode.MobChangeController);
-            //return oPacket;
-        //}
 
         public Packet GetDestroyPacket()
         {
