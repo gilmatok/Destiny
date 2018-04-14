@@ -1,4 +1,6 @@
-﻿using Destiny.Data;
+﻿using System;
+using Destiny.Data;
+using Destiny.IO;
 
 namespace Destiny.Maple.Life
 {
@@ -16,7 +18,16 @@ namespace Destiny.Maple.Life
         {
             if (this.IsMob)
             {
-                this.Map.Mobs.Add(new Mob(this));
+                try
+                {
+                    this.Map.Mobs.Add(new Mob(this));
+                }
+                catch (Exception e)
+                {
+                    Log.SkipLine();
+                    Log.Inform("SpawnPoint-Spawn() exception occurred: {0}", e);
+                    Log.SkipLine();
+                }
             }
             else
             {

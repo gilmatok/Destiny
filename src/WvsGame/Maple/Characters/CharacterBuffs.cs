@@ -4,6 +4,7 @@ using Destiny.Network;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Destiny.Constants;
 
 namespace Destiny.Maple.Characters
 {
@@ -163,25 +164,25 @@ namespace Destiny.Maple.Characters
                 long mask = 0;
                 int value = 0;
 
-                if (this.Contains((int)SkillNames.Rogue.DarkSight))
+                if (this.Contains((int)CharacterConstants.SkillNames.Rogue.DarkSight))
                 {
-                    mask |= (long)SecondaryBuffStat.DarkSight;
+                    mask |= (long)CharacterConstants.SecondaryBuffStat.DarkSight;
                 }
 
-                if (this.Contains((int)SkillNames.Crusader.ComboAttack))
+                if (this.Contains((int)CharacterConstants.SkillNames.Crusader.ComboAttack))
                 {
-                    mask |= (long)SecondaryBuffStat.Combo;
-                    value = this[(int)SkillNames.Crusader.ComboAttack].Value;
+                    mask |= (long)CharacterConstants.SecondaryBuffStat.Combo;
+                    value = this[(int)CharacterConstants.SkillNames.Crusader.ComboAttack].Value;
                 }
 
-                if (this.Contains((int)SkillNames.Hermit.ShadowPartner))
+                if (this.Contains((int)CharacterConstants.SkillNames.Hermit.ShadowPartner))
                 {
-                    mask |= (long)SecondaryBuffStat.ShadowPartner;
+                    mask |= (long)CharacterConstants.SecondaryBuffStat.ShadowPartner;
                 }
 
-                if (this.Contains((int)SkillNames.Hunter.SoulArrow) || this.Contains((int)SkillNames.Crossbowman.SoulArrow))
+                if (this.Contains((int)CharacterConstants.SkillNames.Hunter.SoulArrowBow) || this.Contains((int)CharacterConstants.SkillNames.Crossbowman.SoulArrowCrossbow))
                 {
-                    mask |= (long)SecondaryBuffStat.SoulArrow;
+                    mask |= (long)CharacterConstants.SecondaryBuffStat.SoulArrow;
                 }
 
                 oPacket.WriteInt((int)((mask >> 32) & 0xFFFFFFFFL));

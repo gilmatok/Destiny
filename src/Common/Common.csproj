@@ -52,6 +52,7 @@
     <Compile Include="Application.cs" />
     <Compile Include="Collections\PendingKeyedQueue.cs" />
     <Compile Include="Constants.cs" />
+    <Compile Include="Constants\CharacterConstants.cs" />
     <Compile Include="Data\Database.cs" />
     <Compile Include="Data\Datum.cs" />
     <Compile Include="Data\Meta.cs" />

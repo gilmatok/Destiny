@@ -31,7 +31,7 @@ namespace Destiny.Maple.Maps
                 catch (Exception e)
                 {
                     Log.SkipLine();
-                    Log.Inform("ERROR: MapMobs-InsertItem() failed to AssignController to mobObject item: {0}! \n Exception occured: {1}", item.ObjectID, e);
+                    Log.Inform("ERROR: MapMobs-InsertItem() failed to AssignController to mobObject item: {0}! \n Exception occurred: {1}", item.ObjectID, e);
                     Log.SkipLine();
                 }
             }
@@ -151,7 +151,7 @@ namespace Destiny.Maple.Maps
                     catch (Exception e)
                     {
                         Log.SkipLine();
-                        Log.Inform("ERROR: failed to remove mobObject: {0} from controlledMobs! \n Exception occured: {1}", item.ObjectID, e);
+                        Log.Inform("ERROR: failed to remove mobObject: {0} from controlledMobs! \n Exception occurred: {1}", item.ObjectID, e);
                         Log.SkipLine();
                     }
                 }

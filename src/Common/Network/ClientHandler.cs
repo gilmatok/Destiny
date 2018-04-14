@@ -156,6 +156,7 @@ namespace Destiny.Network
                 }
                 catch (Exception e)
                 {
+                    Log.SkipLine();
                     Log.Error("Uncatched fatal error on {0}: ", e, this.Title.ToLower(), Thread.CurrentThread.ManagedThreadId);
                     this.Stop();
                 }

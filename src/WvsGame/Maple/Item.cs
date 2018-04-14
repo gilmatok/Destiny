@@ -5,6 +5,7 @@ using Destiny.Maple.Data;
 using Destiny.Maple.Maps;
 using System;
 using System.Collections.Generic;
+using Destiny.Constants;
 using Destiny.IO;
 
 namespace Destiny.Maple
@@ -66,7 +67,7 @@ namespace Destiny.Maple
         public short RequiredIntelligence { get; private set; }
         public short RequiredLuck { get; private set; }
         public short RequiredFame { get; private set; }
-        public Job RequiredJob { get; private set; }
+        public CharacterConstants.Job RequiredJob { get; private set; }
 
         // Consume data properties are prefixed with 'C'.
         public int CItemId { get; private set; }

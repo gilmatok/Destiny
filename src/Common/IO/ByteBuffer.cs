@@ -325,7 +325,7 @@ namespace Destiny.IO
             }*/
 
 #if DEBUG
-            Log.Inform("ByteBuffer-ReadInt() count of int sized lenghts in reader stream: {0}", count);
+            Log.Inform("ByteBuffer-ReadInt() count of int sized lengths in reader stream: {0}", count);
 #endif
 
             int result = this.Reader.ReadInt32();

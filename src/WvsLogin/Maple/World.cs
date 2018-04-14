@@ -85,7 +85,7 @@ namespace Destiny.Maple
             base.InsertItem(index, item);
 
             Log.SkipLine();
-            Log.Success("Registered Channel {0}-{1}.", this.Name, item.ID);
+            Log.Success("Registered Channel ({0}-{1}).", this.Name, item.ID + 1);
             Log.SkipLine();
         }
 

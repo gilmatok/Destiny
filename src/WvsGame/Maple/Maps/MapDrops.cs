@@ -1,4 +1,6 @@
-﻿using Destiny.Maple.Characters;
+﻿using System;
+using Destiny.IO;
+using Destiny.Maple.Characters;
 using Destiny.Network;
 using Destiny.Threading;
 
@@ -53,7 +55,20 @@ namespace Destiny.Maple.Maps
                 this.Map.Broadcast(oPacket);
             }
 
-            base.RemoveItem(index);
+            if (base.Items.Count > index)
+            {
+                try
+                {
+                    base.RemoveItem(index);
+                }
+                catch (Exception e)
+                {
+                    Log.SkipLine();
+                    Log.Inform("MapDrops-RemoveItem: exception occurred: {0}", e);
+                    Log.SkipLine();
+                }
+            }
+
         }
     }
 }

@@ -3,6 +3,7 @@ using Destiny.Data;
 using Destiny.Maple.Data;
 using System;
 using System.Collections.Generic;
+using Destiny.Constants;
 using Destiny.Maple.Life;
 using Destiny.IO;
 
@@ -274,7 +275,7 @@ namespace Destiny.Maple.Characters
 
             // TODO: Meso gain packet in chat.
 
-            foreach (KeyValuePair<Skill, Job> skill in quest.PostSkillRewards)
+            foreach (KeyValuePair<Skill, CharacterConstants.Job> skill in quest.PostSkillRewards)
             {
                 if (this.Parent.Job == skill.Value)
                 {
@@ -326,7 +327,7 @@ namespace Destiny.Maple.Characters
                     using (Packet oPacket = new Packet(ServerOperationCode.Effect))
                     {
                         oPacket
-                            .WriteByte((byte)UserEffect.Quest)
+                            .WriteByte((byte)CharacterConstants.UserEffect.Quest)
                             .WriteByte(1)
                             .WriteInt(item.Key)
                             .WriteInt(item.Value);
@@ -342,8 +343,8 @@ namespace Destiny.Maple.Characters
 
             this.Completed.Add(quest.MapleID, DateTime.UtcNow);
 
-            this.Parent.ShowLocalUserEffect(UserEffect.QuestComplete);
-            this.Parent.ShowRemoteUserEffect(UserEffect.QuestComplete, true);
+            this.Parent.ShowLocalUserEffect(CharacterConstants.UserEffect.QuestComplete);
+            this.Parent.ShowRemoteUserEffect(CharacterConstants.UserEffect.QuestComplete, true);
         }
 
         public void Forfeit(ushort questID)

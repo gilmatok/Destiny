@@ -1,11 +1,12 @@
 ﻿using Destiny.Network;
 using System.Collections.Generic;
+using Destiny.Constants;
 
 namespace Destiny.Maple
 {
     public sealed class Attack
     {
-        public AttackType Type { get; private set; }
+        public CharacterConstants.AttackType Type { get; private set; }
         public byte Portals { get; private set; }
         public int Targets { get; private set; }
         public int Hits { get; private set; }
@@ -20,7 +21,7 @@ namespace Destiny.Maple
         public uint TotalDamage { get; private set; }
         public Dictionary<int, List<uint>> Damages { get; private set; }
 
-        public Attack(Packet iPacket, AttackType type)
+        public Attack(Packet iPacket, CharacterConstants.AttackType type) //TODO: recheck this seems wrong
         {
             this.Type = type;
             this.Portals = iPacket.ReadByte();
@@ -43,7 +44,7 @@ namespace Destiny.Maple
             this.WeaponSpeed = iPacket.ReadByte();
             this.Ticks = iPacket.ReadInt();
 
-            if (this.Type == AttackType.Range)
+            if (this.Type == CharacterConstants.AttackType.Range)
             {
                 short starSlot = iPacket.ReadShort();
                 short cashStarSlot = iPacket.ReadShort();
@@ -74,13 +75,13 @@ namespace Destiny.Maple
                     this.TotalDamage += damage;
                 }
 
-                if (this.Type != AttackType.Summon)
+                if (this.Type != CharacterConstants.AttackType.Summon)
                 {
                     iPacket.ReadInt(); // NOTE: Unknown, probably CRC.
                 }
             }
 
-            if (this.Type == AttackType.Range)
+            if (this.Type == CharacterConstants.AttackType.Range)
             {
                 var pointRnged = new Point(iPacket.ReadShort(), iPacket.ReadShort());
             }
