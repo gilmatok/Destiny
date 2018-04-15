@@ -468,6 +468,7 @@ namespace Destiny.Maple.Characters
                         this.Level++;
                     }
                 }
+
                 else
                 {
                     if (experience >= CharacterConstants.ExperienceTables.CharacterLevel[this.Level])
@@ -846,195 +847,6 @@ namespace Destiny.Maple.Characters
             this.Keymap.Send();
 
             this.Memos.Send();
-        }
-
-        //TODO: hp/mp modification bugs out UI bars, add multiple stats, some kind of message to sideBar/chat
-        public static void giveStat(Character player, CharacterConstants.StatisticType stat, short quantity)
-        {
-            switch (stat)
-            {
-                case CharacterConstants.StatisticType.Strength:
-                    int totalStrenght = player.strength + quantity;
-
-                    if (totalStrenght < short.MaxValue)
-                    {
-                        player.strength += quantity;
-                        player.Update(CharacterConstants.StatisticType.Strength);
-                        break;
-                    }
-
-                    else
-                    {
-                        player.strength = short.MaxValue;
-                        player.Update(CharacterConstants.StatisticType.Strength);
-                        break;
-                    }
-
-                case CharacterConstants.StatisticType.Dexterity:
-                    int totalDexterity = player.dexterity + quantity;
-
-                    if (totalDexterity < short.MaxValue)
-                    {
-                        player.dexterity += quantity;
-                        player.Update(CharacterConstants.StatisticType.Dexterity);
-                        break;
-                    }
-
-                    else
-                    {
-                        player.dexterity = short.MaxValue;
-                        player.Update(CharacterConstants.StatisticType.Dexterity);
-                        break;
-                    }
-
-                case CharacterConstants.StatisticType.Intelligence:
-                    int totalIntelligence = player.intelligence + quantity;
-
-                    if (totalIntelligence < short.MaxValue)
-                    {
-                        player.intelligence += quantity;
-                        player.Update(CharacterConstants.StatisticType.Intelligence);
-                        break;
-                    }
-
-                    else
-                    {
-                        player.intelligence = short.MaxValue;
-                        player.Update(CharacterConstants.StatisticType.Intelligence);
-                        break;
-                    }
-
-                case CharacterConstants.StatisticType.Luck:
-                    int totalLuck = player.luck + quantity;
-
-                    if (totalLuck < short.MaxValue)
-                    {
-                        player.luck += quantity;
-                        player.Update(CharacterConstants.StatisticType.Luck);
-                        break;
-                    }
-
-                    else
-                    {
-                        player.luck = short.MaxValue;
-                        player.Update(CharacterConstants.StatisticType.Luck);
-                        break;
-                    }
-
-                case CharacterConstants.StatisticType.Health:
-                    int totalHealth = player.Health + quantity;
-
-                    if (totalHealth < short.MaxValue)
-                    {
-                        player.health += quantity;
-                        player.Update(CharacterConstants.StatisticType.Health);
-                        break;
-                    }
-
-                    else
-                    {
-                        player.health = short.MaxValue;
-                        player.Update(CharacterConstants.StatisticType.Health);
-                        break;
-                    }
-
-                case CharacterConstants.StatisticType.MaxHealth:
-                    int totalMaxHealth = player.maxHealth + quantity;
-
-                    if (totalMaxHealth < short.MaxValue)
-                    {
-                        player.maxHealth += quantity;
-                        player.Update(CharacterConstants.StatisticType.MaxHealth);
-                        break;
-                    }
-
-                    else
-                    {
-                        player.maxHealth = short.MaxValue;
-                        player.Update(CharacterConstants.StatisticType.MaxHealth);
-                        break;
-                    }
-
-                case CharacterConstants.StatisticType.Mana:
-                    int totalMana = player.mana + quantity;
-
-                    if (totalMana < short.MaxValue)
-                    {
-                        player.mana += quantity;
-                        player.Update(CharacterConstants.StatisticType.Mana);
-                        break;
-                    }
-
-                    else
-                    {
-                        player.mana = short.MaxValue;
-                        player.Update(CharacterConstants.StatisticType.Mana);
-                        break;
-                    }
-
-                case CharacterConstants.StatisticType.MaxMana:
-                    int totalMaxMana = player.maxMana + quantity;
-
-                    if (totalMaxMana < short.MaxValue)
-                    {
-                        player.maxMana += quantity;
-                        player.Update(CharacterConstants.StatisticType.MaxMana);
-                        break;
-                    }
-
-                    else
-                    {
-                        player.maxMana = short.MaxValue;
-                        player.Update(CharacterConstants.StatisticType.MaxMana);
-                        break;
-                    }
-
-                case CharacterConstants.StatisticType.AbilityPoints:
-                    int totalAbilityPoints = player.abilityPoints + quantity;
-
-                    if (totalAbilityPoints < short.MaxValue)
-                    {
-                        player.abilityPoints += quantity;
-                        player.Update(CharacterConstants.StatisticType.AbilityPoints);
-                        break;
-                    }
-
-                    else
-                    {
-                        player.abilityPoints = short.MaxValue;
-                        player.Update(CharacterConstants.StatisticType.AbilityPoints);
-                        break;
-                    }
-
-                case CharacterConstants.StatisticType.SkillPoints:
-                    int totalSkillPoints = player.abilityPoints + quantity;
-
-                    if (totalSkillPoints < short.MaxValue)
-                    {
-                        player.skillPoints += quantity;
-                        player.Update(CharacterConstants.StatisticType.SkillPoints);
-                        break;
-                    }
-                    else
-                    {
-                        player.skillPoints = short.MaxValue;
-                        player.Update(CharacterConstants.StatisticType.SkillPoints);
-                        break;
-                    }
-
-                case CharacterConstants.StatisticType.Skin: break;
-                case CharacterConstants.StatisticType.Face: break;
-                case CharacterConstants.StatisticType.Hair: break;
-                case CharacterConstants.StatisticType.Level: break;
-                case CharacterConstants.StatisticType.Job: break;
-                case CharacterConstants.StatisticType.Experience: break;
-                case CharacterConstants.StatisticType.Fame: break;
-                case CharacterConstants.StatisticType.Mesos: break;
-                case CharacterConstants.StatisticType.Pet: break;
-                case CharacterConstants.StatisticType.GachaponExperience: break;
-
-                default: throw new ArgumentOutOfRangeException(nameof(stat), stat, null);
-            }
         }
 
         public void Update(params CharacterConstants.StatisticType[] statistics)
@@ -1572,15 +1384,13 @@ namespace Destiny.Maple.Characters
             int disease = 0;
             byte level = 0;
             short mpBurn = 0;
-            int mobObjectID = 0;
             int mobID = 0;
             int noDamageSkillID = 0;
 
             if (type != MapDamage)
             {
                 mobID = iPacket.ReadInt();
-                mobObjectID = iPacket.ReadInt();
-
+                int mobObjectID = iPacket.ReadInt();
                 Mob mob;
 
                 try
@@ -1796,36 +1606,6 @@ namespace Destiny.Maple.Characters
             this.LastNpc.Converse(this);
         }
 
-        public void DistributeAP(CharacterConstants.StatisticType type, short amount = 1)
-        {
-            switch (type)
-            {
-                case CharacterConstants.StatisticType.Strength:
-                    this.Strength += amount;
-                    break;
-
-                case CharacterConstants.StatisticType.Dexterity:
-                    this.Dexterity += amount;
-                    break;
-
-                case CharacterConstants.StatisticType.Intelligence:
-                    this.Intelligence += amount;
-                    break;
-
-                case CharacterConstants.StatisticType.Luck:
-                    this.Luck += amount;
-                    break;
-
-                case CharacterConstants.StatisticType.MaxHealth:
-                    // TODO: Get addition based on other factors.
-                    break;
-
-                case CharacterConstants.StatisticType.MaxMana:
-                    // TODO: Get addition based on other factors.
-                    break;
-            }
-        }
-
         public void DistributeAP(Packet iPacket)
         {
             if (this.AbilityPoints == 0)
@@ -1836,7 +1616,7 @@ namespace Destiny.Maple.Characters
             iPacket.ReadInt(); // NOTE: Ticks.
             CharacterConstants.StatisticType type = (CharacterConstants.StatisticType)iPacket.ReadInt();
 
-            this.DistributeAP(type);
+            CharacterStats.DistributeAP(this,type);
             this.AbilityPoints--;
         }
 
@@ -1857,7 +1637,7 @@ namespace Destiny.Maple.Characters
                     return;
                 }
 
-                this.DistributeAP(type, (short)amount);
+                CharacterStats.DistributeAP(this, type, (short)amount);
 
                 total += amount;
             }

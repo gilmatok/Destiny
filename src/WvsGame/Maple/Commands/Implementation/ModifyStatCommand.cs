@@ -86,7 +86,7 @@ namespace Destiny.Maple.Commands.Implementation
                         break;
                 }
 
-                Character.giveStat(caller, type, quantity);
+                CharacterStats.giveStat(caller, type, quantity);
             }
         }
 

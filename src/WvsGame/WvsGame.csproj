@@ -123,6 +123,7 @@
     <Compile Include="Maple\Life\Reactor.cs" />
     <Compile Include="Maple\Life\ReactorState.cs" />
     <Compile Include="Maple\Life\SpawnPoint.cs" />
+    <Compile Include="Maple\Life\Summon.cs" />
     <Compile Include="Maple\Line.cs" />
     <Compile Include="Maple\Maps\Drop.cs" />
     <Compile Include="Maple\Maps\Foothold.cs" />
@@ -135,6 +136,7 @@
     <Compile Include="Maple\Maps\MapObject.cs" />
     <Compile Include="Maple\Maps\MapObjectMist.cs" />
     <Compile Include="Maple\Maps\MapObjects.cs" />
+    <Compile Include="Maple\Maps\MapObjectSummon.cs" />
     <Compile Include="Maple\Maps\MapPlayerShops.cs" />
     <Compile Include="Maple\Maps\MapPortals.cs" />
     <Compile Include="Maple\Maps\MapReactors.cs" />
