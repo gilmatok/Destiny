@@ -15,7 +15,7 @@ namespace Destiny.Maple.Characters
     public sealed class CharacterItems : IEnumerable<Item>
     {
         public Character Parent { get; private set; }
-        public Dictionary<ItemType, byte> MaxSlots { get; private set; }
+        public Dictionary<ItemConstants.ItemType, byte> MaxSlots { get; private set; }
         private List<Item> Items { get; set; }
 
         public CharacterItems(Character parent, byte equipmentSlots, byte usableSlots, byte setupSlots, byte etceteraSlots, byte cashSlots)
@@ -23,13 +23,13 @@ namespace Destiny.Maple.Characters
         {
             this.Parent = parent;
 
-            this.MaxSlots = new Dictionary<ItemType, byte>(Enum.GetValues(typeof(ItemType)).Length);
+            this.MaxSlots = new Dictionary<ItemConstants.ItemType, byte>(Enum.GetValues(typeof(ItemConstants.ItemType)).Length);
 
-            this.MaxSlots.Add(ItemType.Equipment, equipmentSlots);
-            this.MaxSlots.Add(ItemType.Usable, usableSlots);
-            this.MaxSlots.Add(ItemType.Setup, setupSlots);
-            this.MaxSlots.Add(ItemType.Etcetera, etceteraSlots);
-            this.MaxSlots.Add(ItemType.Cash, cashSlots);
+            this.MaxSlots.Add(ItemConstants.ItemType.Equipment, equipmentSlots);
+            this.MaxSlots.Add(ItemConstants.ItemType.Usable, usableSlots);
+            this.MaxSlots.Add(ItemConstants.ItemType.Setup, setupSlots);
+            this.MaxSlots.Add(ItemConstants.ItemType.Etcetera, etceteraSlots);
+            this.MaxSlots.Add(ItemConstants.ItemType.Cash, cashSlots);
 
             this.Items = new List<Item>();
         }
@@ -108,7 +108,7 @@ namespace Destiny.Maple.Characters
                         oPacket
                             .WriteBool(fromDrop)
                             .WriteByte(1)
-                            .WriteByte((byte)InventoryOperationType.AddItem)
+                            .WriteByte((byte)ItemConstants.InventoryOperationType.AddItem)
                             .WriteByte((byte)item.Type)
                             .WriteShort(item.Slot)
                             .WriteBytes(item.ToByteArray(true));
@@ -172,7 +172,7 @@ namespace Destiny.Maple.Characters
                     oPacket
                         .WriteBool(fromDrop)
                         .WriteByte(1)
-                        .WriteByte((byte)InventoryOperationType.RemoveItem)
+                        .WriteByte((byte)ItemConstants.InventoryOperationType.RemoveItem)
                         .WriteByte((byte)item.Type)
                         .WriteShort(item.Slot);
 
@@ -258,7 +258,7 @@ namespace Destiny.Maple.Characters
             return count;
         }
 
-        public sbyte GetNextFreeSlot(ItemType type)
+        public sbyte GetNextFreeSlot(ItemConstants.ItemType type)
         {
             for (sbyte i = 1; i <= this.MaxSlots[type]; i++)
             {
@@ -276,7 +276,7 @@ namespace Destiny.Maple.Characters
 
         }
 
-        public bool IsFull(ItemType type)
+        public bool IsFull(ItemConstants.ItemType type)
         {
             short count = 0;
 
@@ -291,7 +291,7 @@ namespace Destiny.Maple.Characters
             return (count == this.MaxSlots[type]);
         }
 
-        public int RemainingSlots(ItemType type)
+        public int RemainingSlots(ItemConstants.ItemType type)
         {
             short remaining = this.MaxSlots[type];
 
@@ -309,20 +309,20 @@ namespace Destiny.Maple.Characters
         public void Sort(Packet iPacket)
         {
             iPacket.ReadInt(); // NOTE: Ticks.
-            ItemType type = (ItemType)iPacket.ReadByte();
+            ItemConstants.ItemType type = (ItemConstants.ItemType)iPacket.ReadByte();
         }
 
         public void Gather(Packet iPacket)
         {
             iPacket.ReadInt(); // NOTE: Ticks.
-            ItemType type = (ItemType)iPacket.ReadByte();
+            ItemConstants.ItemType type = (ItemConstants.ItemType)iPacket.ReadByte();
         }
 
         public void Handle(Packet iPacket)
         {
             iPacket.ReadInt();
 
-            ItemType type = (ItemType)iPacket.ReadByte();
+            ItemConstants.ItemType type = (ItemConstants.ItemType)iPacket.ReadByte();
             short source = iPacket.ReadShort();
             short destination = iPacket.ReadShort();
             short quantity = iPacket.ReadShort();
@@ -360,7 +360,7 @@ namespace Destiny.Maple.Characters
             short slot = iPacket.ReadShort();
             int itemID = iPacket.ReadInt();
 
-            Item item = this[ItemType.Usable, slot];
+            Item item = this[ItemConstants.ItemType.Usable, slot];
 
             if (item == null || itemID != item.MapleID)
             {
@@ -406,7 +406,7 @@ namespace Destiny.Maple.Characters
             short slot = iPacket.ReadShort();
             int itemID = iPacket.ReadInt();
 
-            Item item = this[ItemType.Usable, slot];
+            Item item = this[ItemConstants.ItemType.Usable, slot];
 
             if (item == null || itemID != item.MapleID)
             {
@@ -431,58 +431,116 @@ namespace Destiny.Maple.Characters
         {
             short slot = iPacket.ReadShort();
             int itemID = iPacket.ReadInt();
+            bool itemUsed = false;
 
-            Item item = this[ItemType.Cash, slot];
+            Item item = this[ItemConstants.ItemType.Cash, slot];
+            if (item == null || itemID != item.MapleID) return;
 
-            if (item == null || itemID != item.MapleID)
+            switch (item.MapleID)
             {
-                return;
-            }
-
-            bool used = false;
-
-            switch (item.MapleID) // TODO: Enum for these.
-            {
-                case 5040000: // NOTE: Teleport Rock.
-                case 5040001: // NOTE: Coke Teleport Rock.
-                case 5041000: // NOTE: VIP Teleport Rock.
-                    {
-                        used = this.Parent.Trocks.Use(itemID, iPacket);
-                    }
+                #region TeleportRocks
+                case (int) ItemConstants.UsableCashItems.TeleportRock:
+                {
+                }
                     break;
 
-                case 5050001: // NOTE: 1st Job SP Reset.
-                case 5050002: // NOTE: 2nd Job SP Reset.
-                case 5050003: // NOTE: 3rd Job SP Reset.
-                case 5050004: // NOTE: 4th Job SP Reset.
-                    {
-
-                    }
+                case (int) ItemConstants.UsableCashItems.CokeTeleportRock:
+                {
+                }
                     break;
 
-                case 5050000: // NOTE: AP Reset.
-                    {
-                        CharacterConstants.StatisticType statDestination = (CharacterConstants.StatisticType)iPacket.ReadInt();
-                        CharacterConstants.StatisticType statSource = (CharacterConstants.StatisticType)iPacket.ReadInt();
+                case (int) ItemConstants.UsableCashItems.VIPTeleportRock:
+                {
+                    itemUsed = this.Parent.Trocks.Use(itemID, iPacket);
+                }
+                    break;
+                #endregion
 
-                        this.Parent.AddAbility(statDestination, 1, true);
-                        this.Parent.AddAbility(statSource, -1, true);
+                #region AP/SP Reset
+                case (int) ItemConstants.UsableCashItems.APReset:
+                {
+                    CharacterConstants.StatisticType statDestination = (CharacterConstants.StatisticType) iPacket.ReadInt();
+                    CharacterConstants.StatisticType statSource = (CharacterConstants.StatisticType) iPacket.ReadInt();
 
-                        used = true;
-                    }
+                    this.Parent.AddAbility(statDestination, 1, true);
+                    this.Parent.AddAbility(statSource, -1, true);
+
+                    itemUsed = true;
+                }
                     break;
 
-                case 5071000: // NOTE: Megaphone.
-                    {
-                        if (this.Parent.Level <= 10)
-                        {
-                            // NOTE: You can't use a megaphone unless you're over level 10.
+                case (int) ItemConstants.UsableCashItems.SPReset1stJob:
+                {
+                    if (!Character.IsFirstJob(this.Parent)) return;
+                    //TODO: skill change
+                    itemUsed = true;
+                }
+                    break;
 
-                            return;
-                        }
+                case (int) ItemConstants.UsableCashItems.SPReset2stJob:
+                {
+                }
+                    break;
+
+                case (int) ItemConstants.UsableCashItems.SPReset3stJob:
+                {
+                }
+                    break;
+
+                case (int) ItemConstants.UsableCashItems.SPReset4stJob:
+                {
+                }
+                    break;
+                #endregion
+
+                #region ItemTags/ItemGuards
+                case (int)ItemConstants.UsableCashItems.ItemTag:
+                {
+                    short targetSlot = iPacket.ReadShort();
+                    if (targetSlot == 0) return;
+
+                    Item targetItem = this[ItemConstants.ItemType.Equipment, targetSlot];
+                    if (targetItem == null) return;
+
+                    targetItem.Creator = this.Parent.Name;
+                    targetItem.Update(); // TODO: This does not seem to update the item's creator.
+
+                    itemUsed = true;
+                }
+                    break;
+
+                case (int)ItemConstants.UsableCashItems.ItemGuard:
+                {
+                }
+                    break;
+
+                case (int)ItemConstants.UsableCashItems.Incubator: //doest belong here by name only by ordering of usableCashItemsID
+                {
+                }
+                    break;
+
+                case (int)ItemConstants.UsableCashItems.ItemGuard7Days:
+                {
+                }
+                    break;
+
+                case (int)ItemConstants.UsableCashItems.ItemGuard30Days:
+                {
+                }
+                    break;
+                case (int)ItemConstants.UsableCashItems.ItemGuard90Days:
+                {
+                }
+                    break;
+                #endregion
+
+                #region Megaphones/Messengers                   
+                case (int)ItemConstants.UsableCashItems.CheapMegaphone:
+                    {
+                        // NOTE: You can't use a megaphone unless you're over level 10.
+                        if (this.Parent.Level < 11) return;
 
                         string text = iPacket.ReadString();
-
                         string message = string.Format($"{this.Parent.Name} : {text}"); // TODO: Include medal name.
 
                         // NOTE: In GMS, this sends to everyone on the current channel, not the map (despite the item's description).
@@ -495,18 +553,34 @@ namespace Destiny.Maple.Characters
                             //this.Parent.Client.Channel.Broadcast(oPacket);
                         }
 
-                        used = true;
+                        itemUsed = true;
                     }
                     break;
 
-                case 5072000: // NOTE: Super Megaphone.
+                case (int)ItemConstants.UsableCashItems.Megaphone:
                     {
-                        if (this.Parent.Level <= 10)
-                        {
-                            // NOTE: You can't use a megaphone unless you're over level 10.
+                        if (this.Parent.Level < 11) return;
 
-                            return;
+                        string text = iPacket.ReadString();
+                        string message = string.Format($"{this.Parent.Name} : {text}"); // TODO: Include medal name.
+
+                        // NOTE: In GMS, this sends to everyone on the current channel, not the map (despite the item's description).
+                        using (Packet oPacket = new Packet(ServerOperationCode.BroadcastMsg))
+                        {
+                            oPacket
+                                .WriteByte((byte) NoticeType.Megaphone)
+                                .WriteString(message);
+
+                            //this.Parent.Client.Channel.Broadcast(oPacket);
                         }
+
+                        itemUsed = true;
+                    }
+                    break;
+
+                case (int)ItemConstants.UsableCashItems.SuperMegaphone:
+                    {
+                        if (this.Parent.Level < 11) return;
 
                         string text = iPacket.ReadString();
                         bool whisper = iPacket.ReadBool();
@@ -516,7 +590,7 @@ namespace Destiny.Maple.Characters
                         using (Packet oPacket = new Packet(ServerOperationCode.BroadcastMsg))
                         {
                             oPacket
-                                .WriteByte((byte)NoticeType.SuperMegaphone)
+                                .WriteByte((byte) NoticeType.SuperMegaphone)
                                 .WriteString(message)
                                 .WriteByte(WvsGame.ChannelID)
                                 .WriteBool(whisper);
@@ -524,49 +598,62 @@ namespace Destiny.Maple.Characters
                             //this.Parent.Client.World.Broadcast(oPacket);
                         }
 
-                        used = true;
+                        itemUsed = true;
                     }
                     break;
 
-                case 5390000: // NOTE: Diablo Messenger.
-                case 5390001: // NOTE: Cloud 9 Messenger.
-                case 5390002: // NOTE: Loveholic Messenger.
+                case (int)ItemConstants.UsableCashItems.HeartMegaphone:
                     {
-                        if (this.Parent.Level <= 10)
-                        {
-                            // NOTE: You can't use a megaphone unless you're over level 10.
-
-                            return;
-                        }
-
-                        string text1 = iPacket.ReadString();
-                        string text2 = iPacket.ReadString();
-                        string text3 = iPacket.ReadString();
-                        string text4 = iPacket.ReadString();
-                        bool whisper = iPacket.ReadBool();
-
-                        using (Packet oPacket = new Packet(ServerOperationCode.SetAvatarMegaphone))
-                        {
-                            oPacket
-                                .WriteInt(itemID)
-                                .WriteString(this.Parent.Name)
-                                .WriteString(text1)
-                                .WriteString(text2)
-                                .WriteString(text3)
-                                .WriteString(text4)
-                                .WriteInt(WvsGame.ChannelID)
-                                .WriteBool(whisper)
-                                .WriteBytes(this.Parent.AppearanceToByteArray());
-
-                            //this.Parent.Client.World.Broadcast(oPacket);
-                        }
-
-                        used = true;
+                        if (this.Parent.Level < 11) return;
                     }
                     break;
 
-                case 5076000: // NOTE: Item Megaphone.
+                case (int)ItemConstants.UsableCashItems.SkullMegaphone:
                     {
+                        if (this.Parent.Level < 11) return;
+                    }
+                    break;
+
+                case (int)ItemConstants.UsableCashItems.MapleTVMessenger:
+                    {
+                        if (this.Parent.Level < 11) return;
+                    }
+                    break;
+
+                case (int)ItemConstants.UsableCashItems.MapleTVStarMessenger:
+                    {
+                        if (this.Parent.Level < 11) return;
+                    }
+                    break;
+
+                case (int)ItemConstants.UsableCashItems.MapleTVHeartMessenger:
+                    {
+                        if (this.Parent.Level < 11) return;
+                    }
+                    break;
+
+                case (int)ItemConstants.UsableCashItems.Megassenger:
+                    {
+                        if (this.Parent.Level < 11) return;
+                    }
+                    break;
+
+                case (int)ItemConstants.UsableCashItems.StarMegassenger:
+                    {
+                        if (this.Parent.Level < 11) return;
+                    }
+                    break;
+
+                case (int)ItemConstants.UsableCashItems.HeartMegassenger:
+                    {
+                        if (this.Parent.Level < 11) return;
+                    }
+                    break;
+
+                case (int)ItemConstants.UsableCashItems.ItemMegaphone: // NOTE: Item Megaphone.
+                    {
+                        if (this.Parent.Level < 11) return;
+
                         string text = iPacket.ReadString();
                         bool whisper = iPacket.ReadBool();
                         bool includeItem = iPacket.ReadBool();
@@ -575,7 +662,7 @@ namespace Destiny.Maple.Characters
 
                         if (includeItem)
                         {
-                            ItemType type = (ItemType)iPacket.ReadInt();
+                            ItemConstants.ItemType type = (ItemConstants.ItemType) iPacket.ReadInt();
                             short targetSlot = iPacket.ReadShort();
 
                             targetItem = this[type, targetSlot];
@@ -591,11 +678,11 @@ namespace Destiny.Maple.Characters
                         using (Packet oPacket = new Packet(ServerOperationCode.BroadcastMsg))
                         {
                             oPacket
-                                .WriteByte((byte)NoticeType.ItemMegaphone)
+                                .WriteByte((byte) NoticeType.ItemMegaphone)
                                 .WriteString(message)
                                 .WriteByte(WvsGame.ChannelID)
                                 .WriteBool(whisper)
-                                .WriteByte((byte)(targetItem != null ? targetItem.Slot : 0));
+                                .WriteByte((byte) (targetItem != null ? targetItem.Slot : 0));
 
                             if (targetItem != null)
                             {
@@ -605,131 +692,35 @@ namespace Destiny.Maple.Characters
                             //this.Parent.Client.World.Broadcast(oPacket);
                         }
 
-                        used = true;
+                        itemUsed = true;
                     }
                     break;
+                #endregion
 
-                case 5077000: // NOTE: Art Megaphone.
+                #region FloatingMessage
+                case (int)ItemConstants.UsableCashItems.KoreanKite:
                     {
-
                     }
                     break;
 
-                case 5170000: // NOTE: Pet Name Tag.
+                case (int)ItemConstants.UsableCashItems.HeartBalloon:
                     {
-                        //// TODO: Get the summoned pet.
-
-                        //string name = iPacket.ReadString();
-
-                        //using (Packet oPacket = new Packet(ServerOperationCode.PetNameChanged))
-                        //{
-                        //    oPacket
-                        //        .WriteInt(this.Parent.ID)
-                        //        .WriteByte() // NOTE: Index.
-                        //        .WriteString(name)
-                        //        .WriteByte();
-
-                        //    this.Parent.Map.Broadcast(oPacket);
-                        //}
                     }
                     break;
 
-                case 5060000: // NOTE: Item Name Tag.
+                case (int)ItemConstants.UsableCashItems.GraduationBanner:
                     {
-                        short targetSlot = iPacket.ReadShort();
-
-                        if (targetSlot == 0)
-                        {
-                            return;
-                        }
-
-                        Item targetItem = this[ItemType.Equipment, targetSlot];
-
-                        if (targetItem == null)
-                        {
-                            return;
-                        }
-
-                        targetItem.Creator = this.Parent.Name;
-                        targetItem.Update(); // TODO: This does not seem to update the item's creator.
-
-                        used = true;
                     }
                     break;
 
-                case 5520000: // NOTE: Scissors of Karma.
-                case 5060001: // NOTE: Item Lock. 
+                case (int)ItemConstants.UsableCashItems.AdmissionBanner:
                     {
-
                     }
                     break;
+                #endregion
 
-                case 5075000: // NOTE: Maple TV Messenger.
-                case 5075003: // NOTE: Megassenger.
-                    {
-
-                    }
-                    break;
-
-                case 5075001: // NOTE: Maple TV Star Messenger.
-                case 5075004: // NOTE: Star Megassenger.
-                    {
-
-                    }
-                    break;
-
-                case 5075002: // NOTE: Maple TV Heart Messenger.
-                case 5075005: // NOTE: Heart Megassenger.
-                    {
-
-                    }
-                    break;
-
-                case 5200000: // NOTE: Bronze Sack of Meso.
-                case 5200001: // NOTE: Silver Sack of Meso.
-                case 5200002: // NOTE: Gold Sack of Meso.
-                    {
-                        this.Parent.Meso += item.Meso;
-
-                        // TODO: We definitely need a GainMeso method with inChat parameter.
-                        using (Packet oPacket = new Packet(ServerOperationCode.Message))
-                        {
-                            oPacket
-                                .WriteByte((byte)MessageType.IncreaseMeso)
-                                .WriteInt(item.Meso)
-                                .WriteShort();
-
-                            this.Parent.Client.Send(oPacket);
-                        }
-
-                        used = true;
-                    }
-                    break;
-
-                case 5370000: // NOTE: Chalkboard.
-                case 5370001: // NOTE: Chalkboard 2.
-                    {
-                        string text = iPacket.ReadString();
-
-                        this.Parent.Chalkboard = text;
-                    }
-                    break;
-
-                case 5300000: // NOTE: Fungus Scrol.
-                case 5300001: // NOTE: Oinker Delight.
-                case 5300002: // NOTE: Zeta Nightmare.
-                    {
-
-                    }
-                    break;
-
-                case 5570000: // NOTE: Vicious Hammer.
-                    {
-
-                    }
-                    break;
-
-                case 5090000: // NOTE: Note (Memo).
+                #region otherStuff
+                case (int)ItemConstants.UsableCashItems.Note: // NOTE: Memo.
                     {
                         //string targetName = iPacket.ReadString();
                         //string message = iPacket.ReadString();
@@ -790,21 +781,100 @@ namespace Destiny.Maple.Characters
                     }
                     break;
 
-                case 5100000: // NOTE: Congratulatory Song.
+                case (int)ItemConstants.UsableCashItems.CongratulatorySong:
                     {
-
                     }
                     break;
+
+                case (int)ItemConstants.UsableCashItems.PetNameTag:
+                        {
+                            //// TODO: Get the summoned pet.
+
+                            //string name = iPacket.ReadString();
+
+                            //using (Packet oPacket = new Packet(ServerOperationCode.PetNameChanged))
+                            //{
+                            //    oPacket
+                            //        .WriteInt(this.Parent.ID)
+                            //        .WriteByte() // NOTE: Index.
+                            //        .WriteString(name)
+                            //        .WriteByte();
+
+                            //    this.Parent.Map.Broadcast(oPacket);
+                            //}
+                        }
+                    break;
+
+                case (int) ItemConstants.UsableCashItems.BronzeSackofMesos:
+                    {
+                    }
+                    break;
+
+                case (int)ItemConstants.UsableCashItems.SilverSackofMesos:
+                    {
+                    }
+                    break;
+
+                case (int)ItemConstants.UsableCashItems.GoldSackofMesos:
+                    {
+                        this.Parent.Meso += item.Meso;
+
+                        // TODO: We definitely need a GainMeso method with inChat parameter.
+                        using (Packet oPacket = new Packet(ServerOperationCode.Message))
+                        {
+                            oPacket
+                                .WriteByte((byte)MessageType.IncreaseMeso)
+                                .WriteInt(item.Meso)
+                                .WriteShort();
+
+                            this.Parent.Client.Send(oPacket);
+                        }
+
+                        itemUsed = true;
+                    }
+                    break;
+
+                case (int)ItemConstants.UsableCashItems.FungusScroll:
+                    {
+                    }
+                    break;
+
+                case (int)ItemConstants.UsableCashItems.OinkerDelight:
+                    {
+                    }
+                    break;
+
+                case (int)ItemConstants.UsableCashItems.ZetaNightmare:
+                    {
+                    }
+                    break;
+
+                case (int)ItemConstants.UsableCashItems.ChalkBoard:
+                    {
+                    }
+                    break;
+
+                case (int)ItemConstants.UsableCashItems.ChalkBoard2:
+                    {
+                        string text = iPacket.ReadString();
+                        this.Parent.Chalkboard = text;
+                    }
+                    break;
+
+                case (int)ItemConstants.UsableCashItems.ScissorsofKarma:
+                    {
+                    }
+                    break;
+
+                case (int)ItemConstants.UsableCashItems.ViciousHammer:
+                    {
+                    }
+                    break;
+                #endregion
             }
 
-            if (used)
-            {
-                this.Remove(itemID, 1);
-            }
-            else
-            {
-                this.Parent.Release(); // TODO: Blank inventory update.
-            }
+            if (itemUsed) this.Remove(itemID, 1);
+            else this.Parent.Release(); // TODO: Blank inventory update.
         }
 
         public void UseReturnScroll(Packet iPacket)
@@ -814,11 +884,7 @@ namespace Destiny.Maple.Characters
             int itemID = iPacket.ReadInt();
 
             Item item = this[itemID, slot];
-
-            if (item == null)
-            {
-                return;
-            }
+            if (item == null) return;
 
             this.Remove(itemID, 1);
 
@@ -890,7 +956,7 @@ namespace Destiny.Maple.Characters
             }
         }
 
-        public Item this[ItemType type, short slot]
+        public Item this[ItemConstants.ItemType type, short slot]
         {
             get
             {
@@ -938,7 +1004,7 @@ namespace Destiny.Maple.Characters
             }
         }
 
-        public IEnumerable<Item> this[ItemType type]
+        public IEnumerable<Item> this[ItemConstants.ItemType type]
         {
             get
             {
@@ -1025,13 +1091,13 @@ namespace Destiny.Maple.Characters
 
         public bool CouldReceive(IEnumerable<Item> items, bool autoMerge = true)
         {
-            Dictionary<ItemType, int> spaceCount = new Dictionary<ItemType, int>(5);
+            Dictionary<ItemConstants.ItemType, int> spaceCount = new Dictionary<ItemConstants.ItemType, int>(5);
             {
-                spaceCount.Add(ItemType.Equipment, 0);
-                spaceCount.Add(ItemType.Usable, 0);
-                spaceCount.Add(ItemType.Setup, 0);
-                spaceCount.Add(ItemType.Etcetera, 0);
-                spaceCount.Add(ItemType.Cash, 0);
+                spaceCount.Add(ItemConstants.ItemType.Equipment, 0);
+                spaceCount.Add(ItemConstants.ItemType.Usable, 0);
+                spaceCount.Add(ItemConstants.ItemType.Setup, 0);
+                spaceCount.Add(ItemConstants.ItemType.Etcetera, 0);
+                spaceCount.Add(ItemConstants.ItemType.Cash, 0);
             }
 
             foreach (Item loopItem in items)
@@ -1039,7 +1105,7 @@ namespace Destiny.Maple.Characters
                 spaceCount[loopItem.Type] += this.SpaceTakenBy(loopItem, autoMerge);
             }
 
-            foreach (KeyValuePair<ItemType, int> loopSpaceCount in spaceCount)
+            foreach (KeyValuePair<ItemConstants.ItemType, int> loopSpaceCount in spaceCount)
             {
                 if (this.RemainingSlots(loopSpaceCount.Key) < loopSpaceCount.Value)
                 {
@@ -1055,11 +1121,11 @@ namespace Destiny.Maple.Characters
             using (ByteBuffer oPacket = new ByteBuffer())
             {
                 oPacket
-                    .WriteByte(this.MaxSlots[ItemType.Equipment])
-                    .WriteByte(this.MaxSlots[ItemType.Usable])
-                    .WriteByte(this.MaxSlots[ItemType.Setup])
-                    .WriteByte(this.MaxSlots[ItemType.Etcetera])
-                    .WriteByte(this.MaxSlots[ItemType.Cash])
+                    .WriteByte(this.MaxSlots[ItemConstants.ItemType.Equipment])
+                    .WriteByte(this.MaxSlots[ItemConstants.ItemType.Usable])
+                    .WriteByte(this.MaxSlots[ItemConstants.ItemType.Setup])
+                    .WriteByte(this.MaxSlots[ItemConstants.ItemType.Etcetera])
+                    .WriteByte(this.MaxSlots[ItemConstants.ItemType.Cash])
                     .WriteLong(); // NOTE: Unknown.
 
                 foreach (Item item in this.GetEquipped(EquippedQueryMode.Normal))
@@ -1076,7 +1142,7 @@ namespace Destiny.Maple.Characters
 
                 oPacket.WriteShort();
 
-                foreach (Item item in this[ItemType.Equipment])
+                foreach (Item item in this[ItemConstants.ItemType.Equipment])
                 {
                     oPacket.WriteBytes(item.ToByteArray());
                 }
@@ -1084,28 +1150,28 @@ namespace Destiny.Maple.Characters
                 oPacket.WriteShort();
                 oPacket.WriteShort(); // TODO: Evan inventory.
 
-                foreach (Item item in this[ItemType.Usable])
+                foreach (Item item in this[ItemConstants.ItemType.Usable])
                 {
                     oPacket.WriteBytes(item.ToByteArray());
                 }
 
                 oPacket.WriteByte();
 
-                foreach (Item item in this[ItemType.Setup])
+                foreach (Item item in this[ItemConstants.ItemType.Setup])
                 {
                     oPacket.WriteBytes(item.ToByteArray());
                 }
 
                 oPacket.WriteByte();
 
-                foreach (Item item in this[ItemType.Etcetera])
+                foreach (Item item in this[ItemConstants.ItemType.Etcetera])
                 {
                     oPacket.WriteBytes(item.ToByteArray());
                 }
 
                 oPacket.WriteByte();
 
-                foreach (Item item in this[ItemType.Cash])
+                foreach (Item item in this[ItemConstants.ItemType.Cash])
                 {
                     oPacket.WriteBytes(item.ToByteArray());
                 }

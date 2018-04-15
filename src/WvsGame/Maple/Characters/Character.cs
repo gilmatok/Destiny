@@ -205,7 +205,7 @@ namespace Destiny.Maple.Characters
 
             // generate randomized HP && MP bonus
             Random r = new Random();
-            if (this.Job == CharacterConstants.Job.Beginner || this.Job == CharacterConstants.Job.Noblesse || this.Job == CharacterConstants.Job.Legend)
+            if (this.Job == CharacterConstants.Job.Beginner || this.Job == CharacterConstants.Job.Noblesse || this.Job == CharacterConstants.Job.Aran)
             {
             short rndHPbonus = Convert.ToInt16(r.Next(10, 16));
             short rndMPbonus = Convert.ToInt16(r.Next(10, 12));
@@ -223,7 +223,7 @@ namespace Destiny.Maple.Characters
 
             //TODO: edge cases when overlevling job adv
             // give AP
-            if (this.IsCygnus && this.Level < 70)
+            if (IsCygnus(this) && this.Level < 70)
             {
                 this.AbilityPoints += 6;
             }
@@ -253,7 +253,7 @@ namespace Destiny.Maple.Characters
             }
 
             // give SP
-            if (this.Job == CharacterConstants.Job.Beginner || this.Job == CharacterConstants.Job.Noblesse || this.Job == CharacterConstants.Job.Legend)
+            if (this.Job == CharacterConstants.Job.Beginner || this.Job == CharacterConstants.Job.Noblesse || this.Job == CharacterConstants.Job.Aran)
             {
                 this.SkillPoints += 1;
             }
@@ -325,7 +325,6 @@ namespace Destiny.Maple.Characters
                 if (this.IsInitialized)
                 {
                     this.Update(CharacterConstants.StatisticType.Job);
-
                     this.ShowRemoteUserEffect(CharacterConstants.UserEffect.JobChanged);
                 }
             }
@@ -617,13 +616,208 @@ namespace Destiny.Maple.Characters
             }
         }
 
-        // TODO: Improve this check.
-        public bool IsCygnus
+        public static bool IsAdventurerFirstJob(Character player)
         {
-            get
+            CharacterConstants.Job currentJob = player.job;
+
+            switch (currentJob)
             {
-                return (short)this.Job >= 1000 && (short)this.Job <= 2000;
+                case CharacterConstants.Job.Warrior:
+                    return true;
+                case CharacterConstants.Job.Magician:
+                    return true;
+                case CharacterConstants.Job.Bowman:
+                    return true;
+                case CharacterConstants.Job.Thief:
+                    return true;
+                case CharacterConstants.Job.Pirate:
+                    return true;
+
+                default: return false;
             }
+        }
+
+        public static bool IsAdventurerSecondJob(Character player)
+        {
+            CharacterConstants.Job currentJob = player.job;
+
+            switch (currentJob)
+            {
+                // warriors
+                case CharacterConstants.Job.Page:
+                    return true;
+                case CharacterConstants.Job.Fighter:
+                    return true;
+                case CharacterConstants.Job.Spearman:
+                    return true;
+                // mages
+                case CharacterConstants.Job.Cleric:
+                    return true;
+                case CharacterConstants.Job.IceLightningWizard:
+                    return true;
+                case CharacterConstants.Job.FirePoisonWizard:
+                    return true;
+                // thiefs
+                case CharacterConstants.Job.Assassin:
+                    return true;
+                case CharacterConstants.Job.Bandit:
+                    return true;
+                // archers
+                case CharacterConstants.Job.Hunter:
+                    return true;
+                case CharacterConstants.Job.CrossbowMan:
+                    return true;
+                // pirates
+                case CharacterConstants.Job.Gunslinger:
+                    return true;
+                case CharacterConstants.Job.Brawler:
+                    return true;
+
+                default: return false;
+            }
+        }
+
+        public static bool IsAdventurerThirdJob(Character player)
+        {
+            CharacterConstants.Job currentJob = player.job;
+
+            switch (currentJob)
+            {
+                case CharacterConstants.Job.Warrior:
+                    return true;
+                case CharacterConstants.Job.Magician:
+                    return true;
+                case CharacterConstants.Job.Bowman:
+                    return true;
+                case CharacterConstants.Job.Thief:
+                    return true;
+                case CharacterConstants.Job.Pirate:
+                    return true;
+
+                default: return false;
+            }
+        }
+
+        public static bool IsAdventurerFourthJob(Character player)
+        {
+            CharacterConstants.Job currentJob = player.job;
+
+            switch (currentJob)
+            {
+                case CharacterConstants.Job.Warrior:
+                    return true;
+                case CharacterConstants.Job.Magician:
+                    return true;
+                case CharacterConstants.Job.Bowman:
+                    return true;
+                case CharacterConstants.Job.Thief:
+                    return true;
+                case CharacterConstants.Job.Pirate:
+                    return true;
+
+                default: return false;
+            }
+        }
+
+        public static bool IsCygnusFirstJob(Character player)
+        {
+            CharacterConstants.Job currentJob = player.job;
+
+            switch (currentJob)
+            {
+                case CharacterConstants.Job.DawnWarrior1:
+                    return true;
+                case CharacterConstants.Job.BlazeWizard1:
+                    return true;
+                case CharacterConstants.Job.WindArcher1:
+                    return true;
+                case CharacterConstants.Job.NightWalker1:
+                    return true;
+                case CharacterConstants.Job.ThunderBreaker1:
+                    return true;
+
+                default: return false;
+            }
+        }
+
+        public static bool IsCygnusSecondJob(Character player)
+        {
+            CharacterConstants.Job currentJob = player.job;
+
+            switch (currentJob)
+            {
+                case CharacterConstants.Job.DawnWarrior2:
+                    return true;
+                case CharacterConstants.Job.BlazeWizard2:
+                    return true;
+                case CharacterConstants.Job.WindArcher2:
+                    return true;
+                case CharacterConstants.Job.NightWalker2:
+                    return true;
+                case CharacterConstants.Job.ThunderBreaker2:
+                    return true;
+
+                default: return false;
+            }
+        }
+
+        public static bool IsCygnusThirdJob(Character player)
+        {
+            CharacterConstants.Job currentJob = player.job;
+
+            switch (currentJob)
+            {
+                case CharacterConstants.Job.DawnWarrior3:
+                    return true;
+                case CharacterConstants.Job.BlazeWizard3:
+                    return true;
+                case CharacterConstants.Job.WindArcher3:
+                    return true;
+                case CharacterConstants.Job.NightWalker3:
+                    return true;
+                case CharacterConstants.Job.ThunderBreaker3:
+                    return true;
+
+                default: return false;
+            }
+        }
+
+        public static bool IsCygnusFourthJob(Character player)
+        {
+            CharacterConstants.Job currentJob = player.job;
+
+            switch (currentJob)
+            {
+                case CharacterConstants.Job.DawnWarrior4:
+                    return true;
+                case CharacterConstants.Job.BlazeWizard4:
+                    return true;
+                case CharacterConstants.Job.WindArcher4:
+                    return true;
+                case CharacterConstants.Job.NightWalker4:
+                    return true;
+                case CharacterConstants.Job.ThunderBreaker4:
+                    return true;
+
+                default: return false;
+            }
+        }
+
+        public static bool IsCygnus(Character player)
+        {
+            return IsCygnusFirstJob(player) || IsCygnusSecondJob(player) || IsCygnusThirdJob(player) || IsCygnusFourthJob(player);
+        }
+
+        public static bool IsAranFirstJob(Character player)
+        {
+            CharacterConstants.Job currentJob = player.job;
+
+            return currentJob == CharacterConstants.Job.Aran1;
+        }
+
+        public static bool IsFirstJob(Character player)
+        {
+            return IsAdventurerFirstJob(player) || IsCygnusFirstJob(player) || IsAranFirstJob(player);
         }
 
         public bool FacesLeft
@@ -817,11 +1011,11 @@ namespace Destiny.Maple.Characters
             this.SpawnPoint = (byte)datum["SpawnPoint"];
             this.Meso = (int)datum["Meso"];
 
-            this.Items.MaxSlots[ItemType.Equipment] = (byte)datum["EquipmentSlots"];
-            this.Items.MaxSlots[ItemType.Usable] = (byte)datum["UsableSlots"];
-            this.Items.MaxSlots[ItemType.Setup] = (byte)datum["SetupSlots"];
-            this.Items.MaxSlots[ItemType.Etcetera] = (byte)datum["EtceteraSlots"];
-            this.Items.MaxSlots[ItemType.Cash] = (byte)datum["CashSlots"];
+            this.Items.MaxSlots[ItemConstants.ItemType.Equipment] = (byte)datum["EquipmentSlots"];
+            this.Items.MaxSlots[ItemConstants.ItemType.Usable] = (byte)datum["UsableSlots"];
+            this.Items.MaxSlots[ItemConstants.ItemType.Setup] = (byte)datum["SetupSlots"];
+            this.Items.MaxSlots[ItemConstants.ItemType.Etcetera] = (byte)datum["EtceteraSlots"];
+            this.Items.MaxSlots[ItemConstants.ItemType.Cash] = (byte)datum["CashSlots"];
 
             this.Items.Load();
             this.Skills.Load();
@@ -867,11 +1061,11 @@ namespace Destiny.Maple.Characters
             datum["SpawnPoint"] = this.SpawnPoint;
             datum["Meso"] = this.Meso;
 
-            datum["EquipmentSlots"] = this.Items.MaxSlots[ItemType.Equipment];
-            datum["UsableSlots"] = this.Items.MaxSlots[ItemType.Usable];
-            datum["SetupSlots"] = this.Items.MaxSlots[ItemType.Setup];
-            datum["EtceteraSlots"] = this.Items.MaxSlots[ItemType.Etcetera];
-            datum["CashSlots"] = this.Items.MaxSlots[ItemType.Cash];
+            datum["EquipmentSlots"] = this.Items.MaxSlots[ItemConstants.ItemType.Equipment];
+            datum["UsableSlots"] = this.Items.MaxSlots[ItemConstants.ItemType.Usable];
+            datum["SetupSlots"] = this.Items.MaxSlots[ItemConstants.ItemType.Setup];
+            datum["EtceteraSlots"] = this.Items.MaxSlots[ItemConstants.ItemType.Etcetera];
+            datum["CashSlots"] = this.Items.MaxSlots[ItemConstants.ItemType.Cash];
 
             if (this.Assigned)
             {
@@ -1240,13 +1434,13 @@ namespace Destiny.Maple.Characters
             this.Update();
         }
 
-        public void Notify(string message, NoticeType type = NoticeType.Pink)
+        public void Notify(string message, NoticeType type = NoticeType.PinkText)
         {
             using (Packet oPacket = new Packet(ServerOperationCode.BroadcastMsg))
             {
                 oPacket.WriteByte((byte)type);
 
-                if (type == NoticeType.Ticker)
+                if (type == NoticeType.ScrollingText)
                 {
                     oPacket.WriteBool(!string.IsNullOrEmpty(message));
                 }
@@ -1653,7 +1847,25 @@ namespace Destiny.Maple.Characters
                     }
                     break;
 
-                case CharacterConstants.AttackType.Summon:break;
+                case CharacterConstants.AttackType.Summon:
+                    /*using (Packet oPacket = new Packet(ServerOperationCode.RangedAttack))
+                    {
+                        oPacket
+                            .WriteInt(this.ID)
+                            .WriteInt(summonID)
+                            .WriteByte(0) //??
+                            .Write(damageDirection)
+                            .Write(allDamage)
+
+                            foreach (var attackEntry in attack.Damages)
+                            {
+                                oPacket
+                                    .WriteInt(attackEntry.getMonsterOid())
+                                    .WriteByte(6)
+                                    .WriteInt(attackEntry.getDamage());
+                            }
+                    }*/
+                    break;
 
                 default: throw new ArgumentOutOfRangeException(nameof(type), type, null);
             }
@@ -2794,57 +3006,76 @@ namespace Destiny.Maple.Characters
             Packet oPacket = new Packet(ServerOperationCode.Message);
 
             //the mesos work, drops dont idk why
-            if (type == MessageType.DropPickup && itemID == 0)
+            switch (type)
             {
-                oPacket
-                    .WriteByte((byte) type)
-                    .WriteBool(white)
-                    .WriteByte(0) // NOTE: Unknown.
-                    .WriteInt(ammount)
-                    .WriteShort(0);
+                case MessageType.DropPickup: //when itemID == 0:
+                    oPacket
+                        .WriteByte((byte) type)
+                        .WriteBool(white)
+                        .WriteByte(0) // NOTE: Unknown.
+                        .WriteInt(ammount)
+                        .WriteShort(0);
+                    break;
+
+               /* case (MessageType.DropPickup when itemID > 0):
+                    oPacket
+                        .WriteByte((byte) type) 
+                        .WriteBool(false)
+                        .WriteInt(itemID)
+                        .WriteInt(ammount)
+                        .WriteInt(0)
+                        .WriteInt(0);
+                    break; */
+
+                case MessageType.IncreaseEXP:
+                    oPacket
+                        .WriteByte((byte) type) // NOTE: enum MessageType 
+                        .WriteBool(white) // NOTE: white is default as 1, 0 = yellow
+                        .WriteInt(ammount)
+                        .WriteBool(inChat) // NOTE: display message in chat box
+                        .WriteInt(0) // NOTE: monster book bonus (Bonus Event Exp)
+                        .WriteShort(0) // NOTE: unknown
+                        .WriteInt(0) // NOTE: wedding bonus
+                        .WriteByte(0) // NOTE: 0 = party bonus, 1 = Bonus Event party Exp () x0
+                        .WriteInt(partyBonus)
+                        .WriteInt(equipBonus)
+                        .WriteInt(0) // NOTE: Internet Cafe Bonus
+                        .WriteInt(0); // NOTE: Rainbow Week Bonus          
+
+                    if (inChat) //is this necessary?
+                    {
+                        oPacket
+                            .WriteByte(0);
+                    }
+                    break;
+
+                case MessageType.QuestRecord:
+                    break;
+                case MessageType.CashItemExpire:
+                    break;
+                case MessageType.IncreaseFame:
+                    break;
+                case MessageType.IncreaseMeso:
+                    break;
+                case MessageType.IncreaseGP:
+                    break;
+                case MessageType.GiveBuff:
+                    break;
+                case MessageType.GeneralItemExpire:
+                    break;
+                case MessageType.System:
+                    break;
+                case MessageType.QuestRecordEx:
+                    break;
+                case MessageType.ItemProtectExpire:
+                    break;
+                case MessageType.ItemExpireReplace:
+                    break;
+                case MessageType.SkillExpire:
+                    break;
+                case MessageType.TutorialMessage:
+                    break;
             }
-
-            /*
-            else if (type == MessageType.DropPickup && itemID > 0)
-            {
-                oPacket
-                    .WriteByte((byte) type) 
-                    .WriteBool(false)
-                    .WriteInt(itemID)
-                    .WriteInt(ammount)
-                    .WriteInt(0)
-                    .WriteInt(0);
-            }else
-            */
-
-            else if (type == MessageType.IncreaseEXP)
-            {
-                oPacket
-                    .WriteByte((byte) type) // NOTE: enum MessageType 
-                    .WriteBool(white) // NOTE: white is default as 1, 0 = yellow
-                    .WriteInt(ammount)
-                    .WriteBool(inChat) // NOTE: display message in chat box
-                    .WriteInt(0) // NOTE: monster book bonus (Bonus Event Exp)
-                    .WriteShort(0) // NOTE: unknown
-                    .WriteInt(0) // NOTE: wedding bonus
-                    .WriteByte(0) // NOTE: 0 = party bonus, 1 = Bonus Event party Exp () x0
-                    .WriteInt(partyBonus)
-                    .WriteInt(equipBonus)
-                    .WriteInt(0) // NOTE: Internet Cafe Bonus
-                    .WriteInt(0); // NOTE: Rainbow Week Bonus          
-
-                if (inChat) //is this necessary?
-                {
-                oPacket
-                    .WriteByte(0);
-                }
-            }
-
-            else
-            {
-                Log.Inform("ERROR: unhanded MessageType: {0} encountered", type);
-            }
-
             return oPacket;
         }
            
@@ -2882,7 +3113,7 @@ namespace Destiny.Maple.Characters
                 .WriteBytes(this.AppearanceToByteArray())
                 .WriteInt(this.Items.Available(5110000))
                 .WriteInt() // NOTE: Item effect.
-                .WriteInt((int)(Item.GetType(this.Chair) == ItemType.Setup ? this.Chair : 0))
+                .WriteInt((int)(Item.GetType(this.Chair) == ItemConstants.ItemType.Setup ? this.Chair : 0))
                 .WriteShort(this.Position.X)
                 .WriteShort(this.Position.Y)
                 .WriteByte(this.Stance)

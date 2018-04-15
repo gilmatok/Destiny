@@ -264,7 +264,7 @@ namespace Destiny.Interoperability
             character.Face = face;
             character.Hair = hair + hairColor;
             character.Level = 1;
-            character.Job = jobType == CharacterConstants.JobType.Cygnus ? CharacterConstants.Job.Noblesse : jobType == CharacterConstants.JobType.Explorer ? CharacterConstants.Job.Beginner : CharacterConstants.Job.Legend;
+            character.Job = jobType == CharacterConstants.JobType.Cygnus ? CharacterConstants.Job.Noblesse : jobType == CharacterConstants.JobType.Explorer ? CharacterConstants.Job.Beginner : CharacterConstants.Job.Aran;
             character.Strength = 12;
             character.Dexterity = 5;
             character.Intelligence = 4;

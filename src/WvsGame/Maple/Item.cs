@@ -12,9 +12,9 @@ namespace Destiny.Maple
 {
     public class Item : Drop
     {
-        public static ItemType GetType(int mapleID)
+        public static ItemConstants.ItemType GetType(int mapleID)
         {
-            return (ItemType)(mapleID / 1000000);
+            return (ItemConstants.ItemType)(mapleID / 1000000);
         }
 
         public CharacterItems Parent { get; set; }
@@ -94,7 +94,7 @@ namespace Destiny.Maple
         public List<Tuple<int, short>> Summons { get; private set; }
 
 
-        public ItemType Type
+        public ItemConstants.ItemType Type
         {
             get
             {
@@ -230,11 +230,11 @@ namespace Destiny.Maple
             {
                 byte flags = 0;
 
-                if (this.IsSealed) flags |= (byte)ItemFlags.Sealed;
-                if (this.PreventsSlipping) flags |= (byte)ItemFlags.AddPreventSlipping;
-                if (this.PreventsColdness) flags |= (byte)ItemFlags.AddPreventColdness;
-                if (this.IsScissored) flags |= (byte)ItemFlags.Scissored;
-                if (this.IsTradeBlocked) flags |= (byte)ItemFlags.Untradeable;
+                if (this.IsSealed) flags |= (byte)ItemConstants.ItemFlags.Sealed;
+                if (this.PreventsSlipping) flags |= (byte)ItemConstants.ItemFlags.AddPreventSlipping;
+                if (this.PreventsColdness) flags |= (byte)ItemConstants.ItemFlags.AddPreventColdness;
+                if (this.IsScissored) flags |= (byte)ItemConstants.ItemFlags.Scissored;
+                if (this.IsTradeBlocked) flags |= (byte)ItemConstants.ItemFlags.Untradeable;
 
                 return flags;
             }
@@ -424,7 +424,7 @@ namespace Destiny.Maple
         {
             this.MapleID = mapleID;
             this.MaxPerStack = this.CachedReference.MaxPerStack;
-            this.Quantity = (this.Type == ItemType.Equipment) ? (short)1 : quantity;
+            this.Quantity = (this.Type == ItemConstants.ItemType.Equipment) ? (short)1 : quantity;
             if (equipped) this.Slot = (short)this.GetEquippedSlot();
 
             if (!expiration.HasValue)
@@ -442,7 +442,7 @@ namespace Destiny.Maple
             this.RequiredLevel = this.CachedReference.RequiredLevel;
             this.Meso = this.CachedReference.Meso;
 
-            if (this.Type == ItemType.Equipment)
+            if (this.Type == ItemConstants.ItemType.Equipment)
             {
                 this.PreventsSlipping = this.CachedReference.PreventsSlipping;
                 this.PreventsColdness = this.CachedReference.PreventsColdness;
@@ -528,7 +528,7 @@ namespace Destiny.Maple
                 this.RequiredLevel = this.CachedReference.RequiredLevel;
                 this.Meso = this.CachedReference.Meso;
 
-                if (this.Type == ItemType.Equipment)
+                if (this.Type == ItemConstants.ItemType.Equipment)
                 {
                     this.AttackSpeed = this.CachedReference.AttackSpeed;
                     this.RecoveryRate = this.CachedReference.RecoveryRate;
@@ -709,7 +709,7 @@ namespace Destiny.Maple
                 oPacket
                     .WriteBool(true)
                     .WriteByte(1)
-                    .WriteByte((byte)InventoryOperationType.ModifyQuantity)
+                    .WriteByte((byte)ItemConstants.InventoryOperationType.ModifyQuantity)
                     .WriteByte((byte)this.Type)
                     .WriteShort(this.Slot)
                     .WriteShort(this.Quantity);
@@ -720,7 +720,7 @@ namespace Destiny.Maple
 
         public void Equip()
         {
-            if (this.Type != ItemType.Equipment)
+            if (this.Type != ItemConstants.ItemType.Equipment)
             {
                 throw new InvalidOperationException("Can only equip equipment items.");
             }
@@ -756,7 +756,7 @@ namespace Destiny.Maple
                 oPacket
                     .WriteBool(true)
                     .WriteByte(1)
-                    .WriteByte((byte)InventoryOperationType.ModifySlot)
+                    .WriteByte((byte)ItemConstants.InventoryOperationType.ModifySlot)
                     .WriteByte((byte)this.Type)
                     .WriteShort(sourceSlot)
                     .WriteShort((short)destinationSlot)
@@ -809,7 +809,7 @@ namespace Destiny.Maple
 
         public void Unequip(short destinationSlot = 0)
         {
-            if (this.Type != ItemType.Equipment)
+            if (this.Type != ItemConstants.ItemType.Equipment)
             {
                 throw new InvalidOperationException("Cna only unequip equipment items.");
             }
@@ -818,7 +818,7 @@ namespace Destiny.Maple
 
             if (destinationSlot == 0)
             {
-                destinationSlot = this.Parent.GetNextFreeSlot(ItemType.Equipment);
+                destinationSlot = this.Parent.GetNextFreeSlot(ItemConstants.ItemType.Equipment);
             }
 
             this.Slot = destinationSlot;
@@ -828,7 +828,7 @@ namespace Destiny.Maple
                 oPacket
                     .WriteBool(true)
                     .WriteByte(1)
-                    .WriteByte((byte)InventoryOperationType.ModifySlot)
+                    .WriteByte((byte)ItemConstants.InventoryOperationType.ModifySlot)
                     .WriteByte((byte)this.Type)
                     .WriteShort(sourceSlot)
                     .WriteShort(destinationSlot)
@@ -864,7 +864,7 @@ namespace Destiny.Maple
                     oPacket
                         .WriteBool(true)
                         .WriteByte(1)
-                        .WriteByte((byte)InventoryOperationType.RemoveItem)
+                        .WriteByte((byte)ItemConstants.InventoryOperationType.RemoveItem)
                         .WriteByte((byte)this.Type)
                         .WriteShort(this.Slot);
 
@@ -892,7 +892,7 @@ namespace Destiny.Maple
                     oPacket
                         .WriteBool(true)
                         .WriteByte(1)
-                        .WriteByte((byte)InventoryOperationType.ModifyQuantity)
+                        .WriteByte((byte)ItemConstants.InventoryOperationType.ModifyQuantity)
                         .WriteByte((byte)this.Type)
                         .WriteShort(this.Slot)
                         .WriteShort(this.Quantity);
@@ -917,7 +917,7 @@ namespace Destiny.Maple
             Item destination = this.Parent[this.Type, destinationSlot];
 
             if (destination != null &&
-                this.Type != ItemType.Equipment &&
+                this.Type != ItemConstants.ItemType.Equipment &&
                 this.MapleID == destination.MapleID &&
                 !this.IsRechargeable &&
                 destination.Quantity < destination.MaxPerStack)
@@ -931,11 +931,11 @@ namespace Destiny.Maple
                         oPacket
                             .WriteBool(true)
                             .WriteByte(2)
-                            .WriteByte((byte)InventoryOperationType.ModifyQuantity)
+                            .WriteByte((byte)ItemConstants.InventoryOperationType.ModifyQuantity)
                             .WriteByte((byte)this.Type)
                             .WriteShort(sourceSlot)
                             .WriteShort(this.Quantity)
-                            .WriteByte((byte)InventoryOperationType.ModifyQuantity)
+                            .WriteByte((byte)ItemConstants.InventoryOperationType.ModifyQuantity)
                             .WriteByte((byte)destination.Type)
                             .WriteShort(destinationSlot)
                             .WriteShort(destination.Quantity);
@@ -952,10 +952,10 @@ namespace Destiny.Maple
                         oPacket
                             .WriteBool(true)
                             .WriteByte(2)
-                            .WriteByte((byte)InventoryOperationType.RemoveItem)
+                            .WriteByte((byte)ItemConstants.InventoryOperationType.RemoveItem)
                             .WriteByte((byte)this.Type)
                             .WriteShort(sourceSlot)
-                            .WriteByte((byte)InventoryOperationType.ModifyQuantity)
+                            .WriteByte((byte)ItemConstants.InventoryOperationType.ModifyQuantity)
                             .WriteByte((byte)destination.Type)
                             .WriteShort(destinationSlot)
                             .WriteShort(destination.Quantity);
@@ -978,7 +978,7 @@ namespace Destiny.Maple
                     oPacket
                         .WriteBool(true)
                         .WriteByte(1)
-                        .WriteByte((byte)InventoryOperationType.ModifySlot)
+                        .WriteByte((byte)ItemConstants.InventoryOperationType.ModifySlot)
                         .WriteByte((byte)this.Type)
                         .WriteShort(sourceSlot)
                         .WriteShort(destinationSlot);
@@ -1005,7 +1005,7 @@ namespace Destiny.Maple
                         slot -= 100;
                     }
 
-                    if (this.Type == ItemType.Equipment)
+                    if (this.Type == ItemConstants.ItemType.Equipment)
                     {
                         oPacket.WriteShort(slot);
                     }
@@ -1016,7 +1016,7 @@ namespace Destiny.Maple
                 }
 
                 oPacket
-                    .WriteByte((byte)(this.PetID != null ? 3 : this.Type == ItemType.Equipment ? 1 : 2))
+                    .WriteByte((byte)(this.PetID != null ? 3 : this.Type == ItemConstants.ItemType.Equipment ? 1 : 2))
                     .WriteInt(this.MapleID)
                     .WriteBool(this.IsCash);
 
@@ -1031,7 +1031,7 @@ namespace Destiny.Maple
                 {
 
                 }
-                else if (this.Type == ItemType.Equipment)
+                else if (this.Type == ItemConstants.ItemType.Equipment)
                 {
                     oPacket
                         .WriteByte(this.UpgradesAvailable)

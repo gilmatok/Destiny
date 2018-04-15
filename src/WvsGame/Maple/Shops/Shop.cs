@@ -3,6 +3,7 @@ using Destiny.Data;
 using Destiny.Maple.Characters;
 using Destiny.Maple.Life;
 using System.Collections.Generic;
+using Destiny.Constants;
 
 namespace Destiny.Maple.Shops
 {
@@ -185,7 +186,7 @@ namespace Destiny.Maple.Shops
                     {
                         short slot = iPacket.ReadShort();
 
-                        Item item = customer.Items[ItemType.Usable, slot];
+                        Item item = customer.Items[ItemConstants.ItemType.Usable, slot];
 
                         int price = (int)(this.UnitPrices[item.MapleID] * (item.MaxPerStack - item.Quantity));
 

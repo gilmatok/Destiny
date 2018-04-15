@@ -100,82 +100,6 @@ namespace Destiny
     }
     #endregion
 
-    #region Items
-    [Flags]
-    public enum ItemFlags : short
-    {
-        Sealed = 0x01,
-        AddPreventSlipping = 0x02,
-        AddPreventColdness = 0x04,
-        Untradeable = 0x08,
-        Scissored = 0x10
-    }
-
-    public enum ItemType : byte
-    {
-        Equipment = 1,
-        Usable = 2,
-        Setup = 3,
-        Etcetera = 4,
-        Cash = 5,
-        Count = 6
-    }
-
-    public enum InventoryOperationType : byte
-    {
-        AddItem,
-        ModifyQuantity,
-        ModifySlot,
-        RemoveItem
-    }
-
-    public enum MemoAction : byte
-    {
-        Send = 0,
-        Delete = 1
-    }
-
-    public enum MemoResult : byte
-    {
-        Send = 3,
-        Sent = 4,
-        Error = 5
-    }
-
-    public enum MemoError : byte
-    {
-        ReceiverOnline,
-        ReceiverInvalidName,
-        ReceiverInboxFull
-    }
-
-    public enum TrockAction : byte
-    {
-        Remove = 0,
-        Add = 1
-    }
-
-    public enum TrockType : byte
-    {
-        Regular = 0,
-        VIP = 1
-    }
-
-    public enum TrockResult : byte
-    {
-        Success,
-        Unknown = 2,
-        Unknown2 = 3,
-        CannotGo2 = 5,
-        DifficultToLocate = 6,
-        DifficultToLocate2 = 7,
-        CannotGo = 8,
-        AlreadyThere = 9,
-        CannotSaveMap = 10,
-        NoobsCannotLeaveMapleIsland = 11
-    }
-    #endregion
-
     #region Interaction
     public enum InteractionCode : byte
     {
@@ -676,10 +600,13 @@ namespace Destiny
         Popup,
         Megaphone,
         SuperMegaphone,
-        Ticker,
-        Pink,
-        Blue,
-        ItemMegaphone = 8
+        ScrollingText,
+        PinkText,
+        LightBlueText,
+        // 7
+        ItemMegaphone = 8,
+        // 9
+        // 10
     }
     #endregion
 

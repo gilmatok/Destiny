@@ -110,8 +110,7 @@ namespace Destiny.Constants
             ThunderBreaker3,
             ThunderBreaker4,
 
-            Legend = 2000, //evan unimplemented?
-
+            Aran  = 2000, // aran begginer
             Aran1 = 2100,
             Aran2 = 2110,
             Aran3,
@@ -771,8 +770,8 @@ namespace Destiny.Constants
 
             public enum MapleLeafBrigadier : int
             {
-                //?????? = 8001000,
-                //  ???? = 8001001
+                //?????? = 8001000, //lie detector
+                //  ???? = 8001001  //teleport?
             }
 
             public enum GM : int
@@ -780,13 +779,14 @@ namespace Destiny.Constants
                 Haste = 9001000, //official name is Haste(Normal)
                 SuperDragonRoar = 9001001,
                 Teleport = 9001002,
-                Bless = 9001003,
-                Hide = 9001004,
-                Resurrection = 9001005,
-                SuperDragonRoar2 = 9001006, //??
-                Teleport2 = 9001007, //??
-                HyperBody = 9001008,
-                ADMIN_ANTIMACRO = 9001009 //??
+
+               // Bless = 9001003,
+               // Hide = 9001004,
+               // Resurrection = 9001005,
+               // SuperDragonRoar2 = 9001006, //??
+               // Teleport2 = 9001007, //??
+               // HyperBody = 9001008,
+               // ADMIN_ANTIMACRO = 9001009 //??
             }
 
             public enum SuperGM : int
@@ -814,9 +814,8 @@ namespace Destiny.Constants
                 LegendarySpirit = 10001003,
                 MonsterRider = 10001004,
                 EchoOfHero = 10001005,
-                JumpDown = 10001006, //hidden?
+                JumpDown = 10001006,
                 Maker = 10001007,
-
                 //dojoo temporary skills
                 BambooThrust = 10001009,
                 InvincibleBarrier = 10001010,
@@ -1003,7 +1002,7 @@ namespace Destiny.Constants
                 //uninplemented 
             }
 
-            public enum Aran : int //begginer aran
+            public enum Aran : int //beginner aran
             {
                 BlessingoftheFairy = 20000012,
                 FollowtheLead = 20000024,
@@ -1122,7 +1121,7 @@ namespace Destiny.Constants
             PickPocket = 0x800000000000000L,
             Puppet = 0x800000000000000L,
             MesoGuard = 0x1000000000000000L,
-            Weaken = 0x4000000000000000L,
+            Weaken = 0x4000000000000000L
         }
 
         public enum PrimaryBuffStat : long
