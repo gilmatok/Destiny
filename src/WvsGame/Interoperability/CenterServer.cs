@@ -196,7 +196,22 @@ namespace Destiny.Interoperability
             }
         }
 
-        // TODO: Name & items validation.
+        public bool ValidCharacterName(string charName)
+        {
+            // exception charName too short!
+            if(charName.Length < 4) return true;
+            // exception charName too long!
+            if (charName.Length > 12) return true;
+            // exception charName already in use!
+            if (Database.Exists("characters", "Name = {0}", charName)) return true;
+            // exception charName is in ForbiddenNames!
+            if (DataProvider.CreationData.ForbiddenNames.Any(forbiddenWord =>
+                charName.ToLowerInvariant().Contains(forbiddenWord))) return false;
+
+            return true;
+        }
+
+        // TODO: Items validation.
         private void CreateCharacter(Packet inPacket)
         {
             int accountID = inPacket.ReadInt();
@@ -214,44 +229,49 @@ namespace Destiny.Interoperability
 
             bool error = false;
 
-            if (name.Length < 4 || name.Length > 12
-                || Database.Exists("characters", "Name = {0}", name)
-                || DataProvider.CreationData.ForbiddenNames.Any(forbiddenWord => name.ToLowerInvariant().Contains(forbiddenWord)))
-            {
-                error = true;
+            if (ValidCharacterName(name))
+            {   
+                switch (gender) // TODO: these need error catching with item info.
+                {
+                    case CharacterConstants.Gender.Male:
+                        if (!DataProvider.CreationData.MaleSkins.Any(x => x.Item1 == jobType && x.Item2 == skin)
+                            || !DataProvider.CreationData.MaleFaces.Any(x => x.Item1 == jobType && x.Item2 == face)
+                            || !DataProvider.CreationData.MaleHairs.Any(x => x.Item1 == jobType && x.Item2 == hair)
+                            || !DataProvider.CreationData.MaleHairColors.Any(x => x.Item1 == jobType && x.Item2 == hairColor)
+                            || !DataProvider.CreationData.MaleTops.Any(x => x.Item1 == jobType && x.Item2 == topID)
+                            || !DataProvider.CreationData.MaleBottoms.Any(x => x.Item1 == jobType && x.Item2 == bottomID)
+                            || !DataProvider.CreationData.MaleShoes.Any(x => x.Item1 == jobType && x.Item2 == shoesID)
+                            || !DataProvider.CreationData.MaleWeapons.Any(x => x.Item1 == jobType && x.Item2 == weaponID))
+
+                            error = true;
+                        break;
+
+                    case CharacterConstants.Gender.Female:
+                        if (!DataProvider.CreationData.FemaleSkins.Any(x => x.Item1 == jobType && x.Item2 == skin)
+                            || !DataProvider.CreationData.FemaleFaces.Any(x => x.Item1 == jobType && x.Item2 == face)
+                            || !DataProvider.CreationData.FemaleHairs.Any(x => x.Item1 == jobType && x.Item2 == hair)
+                            || !DataProvider.CreationData.FemaleHairColors.Any(x => x.Item1 == jobType && x.Item2 == hairColor)
+                            || !DataProvider.CreationData.FemaleTops.Any(x => x.Item1 == jobType && x.Item2 == topID)
+                            || !DataProvider.CreationData.FemaleBottoms.Any(x => x.Item1 == jobType && x.Item2 == bottomID)
+                            || !DataProvider.CreationData.FemaleShoes.Any(x => x.Item1 == jobType && x.Item2 == shoesID)
+                            || !DataProvider.CreationData.FemaleWeapons.Any(x => x.Item1 == jobType && x.Item2 == weaponID))
+
+                            error = true;
+                        break;
+
+                    default:
+                        error = false;
+                        break;
+                }
             }
 
-            if (gender == CharacterConstants.Gender.Male)
+            if (error)
             {
-                if (!DataProvider.CreationData.MaleSkins.Any(x => x.Item1 == jobType && x.Item2 == skin)
-                    || !DataProvider.CreationData.MaleFaces.Any(x => x.Item1 == jobType && x.Item2 == face)
-                    || !DataProvider.CreationData.MaleHairs.Any(x => x.Item1 == jobType && x.Item2 == hair)
-                    || !DataProvider.CreationData.MaleHairColors.Any(x => x.Item1 == jobType && x.Item2 == hairColor)
-                    || !DataProvider.CreationData.MaleTops.Any(x => x.Item1 == jobType && x.Item2 == topID)
-                    || !DataProvider.CreationData.MaleBottoms.Any(x => x.Item1 == jobType && x.Item2 == bottomID)
-                    || !DataProvider.CreationData.MaleShoes.Any(x => x.Item1 == jobType && x.Item2 == shoesID)
-                    || !DataProvider.CreationData.MaleWeapons.Any(x => x.Item1 == jobType && x.Item2 == weaponID))
-                {
-                    error = true;
-                }
-            }
-            else if (gender == CharacterConstants.Gender.Female)
-            {
-                if (!DataProvider.CreationData.FemaleSkins.Any(x => x.Item1 == jobType && x.Item2 == skin)
-                    || !DataProvider.CreationData.FemaleFaces.Any(x => x.Item1 == jobType && x.Item2 == face)
-                    || !DataProvider.CreationData.FemaleHairs.Any(x => x.Item1 == jobType && x.Item2 == hair)
-                    || !DataProvider.CreationData.FemaleHairColors.Any(x => x.Item1 == jobType && x.Item2 == hairColor)
-                    || !DataProvider.CreationData.FemaleTops.Any(x => x.Item1 == jobType && x.Item2 == topID)
-                    || !DataProvider.CreationData.FemaleBottoms.Any(x => x.Item1 == jobType && x.Item2 == bottomID)
-                    || !DataProvider.CreationData.FemaleShoes.Any(x => x.Item1 == jobType && x.Item2 == shoesID)
-                    || !DataProvider.CreationData.FemaleWeapons.Any(x => x.Item1 == jobType && x.Item2 == weaponID))
-                {
-                    error = true;
-                }
-            }
-            else // NOTE: Not allowed to choose "both" genders at character creation.
-            {
-                error = true;
+                Log.SkipLine();
+                Log.Error("Failed to load character items on character creation!");
+                Log.SkipLine();
+
+                WvsGame.Stop();
             }
 
             Character character = new Character();

@@ -32,7 +32,6 @@ namespace Destiny.Maple
 
             if (this.SkillID > 0)
             {
-
             }
 
             iPacket.Skip(4); // NOTE: Unknown, probably CRC.
@@ -83,10 +82,10 @@ namespace Destiny.Maple
 
             if (this.Type == CharacterConstants.AttackType.Range)
             {
-                var pointRnged = new Point(iPacket.ReadShort(), iPacket.ReadShort());
+                var rangedAttackPoint = new Point(iPacket.ReadShort(), iPacket.ReadShort());
             }
 
-            var pointOther = new Point(iPacket.ReadShort(), iPacket.ReadShort());
+            var meleeAttackPoint = new Point(iPacket.ReadShort(), iPacket.ReadShort());
         }
     }
 }

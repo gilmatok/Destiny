@@ -49,8 +49,7 @@ namespace Destiny.Maple.Maps
                 Log.SkipLine();
                 Log.Inform("ERROR: MapObjects-InsertItem() failed to insert item! Index: {0} \n Exception occurred: {1}", index, e);
                 Log.SkipLine();
-            }
-           
+            }     
         }
 
         protected override void RemoveItem(int index) 
@@ -81,7 +80,7 @@ namespace Destiny.Maple.Maps
                     catch (Exception e)
                     {
                         Log.SkipLine();
-                        Log.Inform("ERROR: MapObjects-RemoveItem() failed to remove item! Index: {0} \n Exception occurred: {1}", index, e);
+                        Log.Inform("ERROR: MapObjects-RemoveItem() failed to remove item! ItemIndex: {0} \n Exception occurred: {1}", index, e);
                         Log.SkipLine();
                     }
                 }
@@ -95,7 +94,7 @@ namespace Destiny.Maple.Maps
             else
             {
                 Log.SkipLine();
-                Log.Error("ERROR: MapObjects-RemoveItem() index out of bounds! Index: {0}", index);
+                Log.Error("ERROR: MapObjects-RemoveItem() index out of bounds! ItemIndex: {0}", index);
                 Log.SkipLine();
             }
         }

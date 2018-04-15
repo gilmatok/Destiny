@@ -1,10 +1,10 @@
 ﻿using Destiny.Data;
 using Destiny.Maple;
 using Destiny.Security;
+using Destiny.Constants;
 using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
-using Destiny.Constants;
 
 namespace Destiny.Network
 {
@@ -449,71 +449,70 @@ namespace Destiny.Network
 
         private void ViewAllChar(Packet iPacket)
         {
-            //if (this.IsInViewAllChar)
-            //{
-            //    using (Packet oPacket = new Packet(ServerOperationCode.ViewAllCharResult))
-            //    {
-            //        oPacket
-            //            .WriteByte((byte)VACResult.UnknownError)
-            //            .WriteByte();
+            /*List<byte[]> characters = WvsLogin.CenterConnection.GetCharacters(this.World, this.Account.ID);
 
-            //        this.Send(oPacket);
-            //    }
+            if (this.IsInViewAllChar)
+            {
+                using (Packet oPacket = new Packet(ServerOperationCode.ViewAllCharResult))
+                {
+                    oPacket
+                        .WriteByte((byte) VACResult.UnknownError)
+                        .WriteByte();
 
-            //    return;
-            //}
+                    this.Send(oPacket);
+                }
 
-            //this.IsInViewAllChar = true;
+                this.IsInViewAllChar = true;
+                List<Character> characters = new List<Character>();
 
-            //List<Character> characters = new List<Character>();
+                foreach (Datum datum in new Datums("characters").PopulateWith("ID", "AccountID = {0}", this.Account.ID))
+                {
+                    Character character = new Character((int) datum["ID"], this);
 
-            //foreach (Datum datum in new Datums("characters").PopulateWith("ID", "AccountID = {0}", this.Account.ID))
-            //{
-            //    Character character = new Character((int)datum["ID"], this);
+                    character.Load();
+                    characters.Add(character);
+                }
 
-            //    character.Load();
+                using (Packet oPacket = new Packet(ServerOperationCode.ViewAllCharResult))
+                {
+                    if (characters.Count == 0)
+                    {
+                        oPacket
+                            .WriteByte((byte) VACResult.NoCharacters);
+                    }
 
-            //    characters.Add(character);
-            //}
+                    else
+                    {
+                        oPacket
+                            .WriteByte((byte) VACResult.SendCount)
+                            .WriteInt(characters.Count)
+                            .WriteInt(); //unknown
 
-            //using (Packet oPacket = new Packet(ServerOperationCode.ViewAllCharResult))
-            //{
-            //    if (characters.Count == 0)
-            //    {
-            //        oPacket
-            //            .WriteByte((byte)VACResult.NoCharacters);
-            //    }
-            //    else
-            //    {
-            //        oPacket
-            //            .WriteByte((byte)VACResult.SendCount)
-            //            .WriteInt(MasterServer.Worlds.Length)
-            //            .WriteInt(characters.Count);
-            //    }
-
-            //    this.Send(oPacket);
-            //}
-
-            //foreach (WorldServer world in MasterServer.Worlds)
-            //{
-            //    using (Packet oPacket = new Packet(ServerOperationCode.ViewAllCharResult))
-            //    {
-            //        IEnumerable<Character> worldChars = characters.Where(x => x.WorldID == world.ID);
-
-            //        oPacket
-            //            .WriteByte((byte)VACResult.CharInfo)
-            //            .WriteByte(world.ID)
-            //            .WriteByte((byte)worldChars.Count());
-
-            //        foreach (Character character in worldChars)
-            //        {
-            //            oPacket.WriteBytes(character.ToByteArray());
-            //        }
-
-            //        this.Send(oPacket);
-            //    }
-            //}
+                        this.Send(oPacket);
+                    }
+                }
+            }
         }
+
+        foreach (WorldServer world in MasterServer.Worlds)
+           {
+                using (Packet oPacket = new Packet(ServerOperationCode.ViewAllCharResult))
+                {
+                    IEnumerable<Character> worldChars = characters.Where(x => x.WorldID == world.ID);
+
+                    oPacket
+                     .WriteByte((byte)VACResult.CharInfo)
+                        .WriteByte(world.ID)
+                        .WriteByte((byte)worldChars.Count());
+
+                    foreach (Character character in worldChars)
+                    {
+                        oPacket.WriteBytes(character.ToByteArray());
+                    }
+
+                    this.Send(oPacket);
+                }*/
+            }      
 
         private void SetViewAllChar(Packet iPacket)
         {

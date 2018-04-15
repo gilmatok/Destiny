@@ -1087,7 +1087,7 @@ namespace Destiny.Maple
             }
         }
 
-        private EquipmentSlot GetEquippedSlot()
+        private EquipmentSlot GetEquippedSlot() // TODO: Fugly heuristics, remake into better method
         {
             short slot = 0;
 

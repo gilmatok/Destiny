@@ -462,34 +462,43 @@ namespace Destiny.Maple.Characters
                     CharacterConstants.StatisticType statDestination = (CharacterConstants.StatisticType) iPacket.ReadInt();
                     CharacterConstants.StatisticType statSource = (CharacterConstants.StatisticType) iPacket.ReadInt();
 
-                    this.Parent.AddAbility(statDestination, 1, true);
-                    this.Parent.AddAbility(statSource, -1, true);
+                    CharacterStats.AddAbility(this.Parent, statDestination, 1, true);
+                    CharacterStats.AddAbility(this.Parent, statSource, -1, true);
 
                     itemUsed = true;
                 }
                     break;
 
                 case (int) ItemConstants.UsableCashItems.SPReset1stJob:
-                {
-                    if (!Character.IsFirstJob(this.Parent)) return;
-                    //TODO: skill change
-                    itemUsed = true;
-                }
+                     {
+                        if (!CharacterJobs.IsFirstJob(this.Parent)) return;
+                        //TODO: skill change
+                        itemUsed = true;
+                     }
                     break;
 
                 case (int) ItemConstants.UsableCashItems.SPReset2stJob:
-                {
-                }
+                    {
+                        if (!CharacterJobs.IsSecondJob(this.Parent)) return;
+                        //TODO: skill change
+                        itemUsed = true;
+                    }
                     break;
 
                 case (int) ItemConstants.UsableCashItems.SPReset3stJob:
-                {
-                }
+                    {
+                        if (!CharacterJobs.IsThirdJob(this.Parent)) return;
+                        //TODO: skill change
+                        itemUsed = true;
+                    }
                     break;
 
                 case (int) ItemConstants.UsableCashItems.SPReset4stJob:
-                {
-                }
+                    {
+                        if (!CharacterJobs.IsFourthJob(this.Parent)) return;
+                        //TODO: skill change
+                        itemUsed = true;
+                    }
                     break;
                 #endregion
 

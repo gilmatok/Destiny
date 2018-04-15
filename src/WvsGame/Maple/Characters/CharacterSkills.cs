@@ -133,4 +133,3 @@ namespace Destiny.Maple.Characters
         }
     }
 }
-

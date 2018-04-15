@@ -195,79 +195,6 @@ namespace Destiny.Maple.Characters
             }
         }
 
-        public void LevelUP(bool PlayEffect)
-        {
-            // increase level
-            level++;
-
-            // update stats
-            this.Update(CharacterConstants.StatisticType.Level);
-
-            // generate randomized HP && MP bonus
-            Random r = new Random();
-            if (this.Job == CharacterConstants.Job.Beginner || this.Job == CharacterConstants.Job.Noblesse || this.Job == CharacterConstants.Job.Aran)
-            {
-            short rndHPbonus = Convert.ToInt16(r.Next(10, 16));
-            short rndMPbonus = Convert.ToInt16(r.Next(10, 12));
-            this.MaxHealth += rndHPbonus;
-            this.MaxMana += rndMPbonus;
-            }
-            // TODO: Health/Mana improvement.  
-            // warrior && dawnwarrior case
-            // magician && blazewizard case
-            // bowman && theif case
-            // pirate && thunderbreaker case
-            // aran case
-            // gm && supergm case
-            // skills, improved MP && HP case
-
-            //TODO: edge cases when overlevling job adv
-            // give AP
-            if (IsCygnus(this) && this.Level < 70)
-            {
-                this.AbilityPoints += 6;
-            }
-            else if (this.Job == CharacterConstants.Job.Beginner && this.Level < 8)
-            {
-                this.AbilityPoints += 0;
-
-                if (this.Level < 6)
-                {
-                    this.Strength += 5;
-                }
-                else if (this.Level >= 6 && this.Level < 8)
-                {
-                    this.Strength += 4;
-                    this.Dexterity += 1;
-                }
-            }
-            else if (this.Job == CharacterConstants.Job.Beginner && this.Level == 8)
-            {
-                this.Strength = 4;
-                this.Dexterity = 4;
-                this.AbilityPoints += 35;    
-            }
-            else
-            {
-                this.AbilityPoints += 5; 
-            }
-
-            // give SP
-            if (this.Job == CharacterConstants.Job.Beginner || this.Job == CharacterConstants.Job.Noblesse || this.Job == CharacterConstants.Job.Aran)
-            {
-                this.SkillPoints += 1;
-            }
-            else
-            {
-                this.SkillPoints += 3;
-            }
-
-            if (PlayEffect)
-            {
-                this.ShowRemoteUserEffect(CharacterConstants.UserEffect.LevelUp);
-            }
-         }
-
         // TODO: Update party's properties.
         public byte Level
         {
@@ -300,12 +227,11 @@ namespace Destiny.Maple.Characters
                     {
                         for (int i = 0; i < delta; i++)
                         {
-                            LevelUP(true);
+                            CharacterStats.LevelUP(this, true);
                         }
 
-                        //heal up
-                        this.Health = this.MaxHealth;
-                        this.Mana = this.MaxMana;
+                        CharacterStats.FillToFull(this, CharacterConstants.StatisticType.Health);
+                        CharacterStats.FillToFull(this, CharacterConstants.StatisticType.Mana);
                     }
                 }
             }
@@ -614,210 +540,6 @@ namespace Destiny.Maple.Characters
                 //TODO: Check for data in login DB
                 return true;
             }
-        }
-
-        public static bool IsAdventurerFirstJob(Character player)
-        {
-            CharacterConstants.Job currentJob = player.job;
-
-            switch (currentJob)
-            {
-                case CharacterConstants.Job.Warrior:
-                    return true;
-                case CharacterConstants.Job.Magician:
-                    return true;
-                case CharacterConstants.Job.Bowman:
-                    return true;
-                case CharacterConstants.Job.Thief:
-                    return true;
-                case CharacterConstants.Job.Pirate:
-                    return true;
-
-                default: return false;
-            }
-        }
-
-        public static bool IsAdventurerSecondJob(Character player)
-        {
-            CharacterConstants.Job currentJob = player.job;
-
-            switch (currentJob)
-            {
-                // warriors
-                case CharacterConstants.Job.Page:
-                    return true;
-                case CharacterConstants.Job.Fighter:
-                    return true;
-                case CharacterConstants.Job.Spearman:
-                    return true;
-                // mages
-                case CharacterConstants.Job.Cleric:
-                    return true;
-                case CharacterConstants.Job.IceLightningWizard:
-                    return true;
-                case CharacterConstants.Job.FirePoisonWizard:
-                    return true;
-                // thiefs
-                case CharacterConstants.Job.Assassin:
-                    return true;
-                case CharacterConstants.Job.Bandit:
-                    return true;
-                // archers
-                case CharacterConstants.Job.Hunter:
-                    return true;
-                case CharacterConstants.Job.CrossbowMan:
-                    return true;
-                // pirates
-                case CharacterConstants.Job.Gunslinger:
-                    return true;
-                case CharacterConstants.Job.Brawler:
-                    return true;
-
-                default: return false;
-            }
-        }
-
-        public static bool IsAdventurerThirdJob(Character player)
-        {
-            CharacterConstants.Job currentJob = player.job;
-
-            switch (currentJob)
-            {
-                case CharacterConstants.Job.Warrior:
-                    return true;
-                case CharacterConstants.Job.Magician:
-                    return true;
-                case CharacterConstants.Job.Bowman:
-                    return true;
-                case CharacterConstants.Job.Thief:
-                    return true;
-                case CharacterConstants.Job.Pirate:
-                    return true;
-
-                default: return false;
-            }
-        }
-
-        public static bool IsAdventurerFourthJob(Character player)
-        {
-            CharacterConstants.Job currentJob = player.job;
-
-            switch (currentJob)
-            {
-                case CharacterConstants.Job.Warrior:
-                    return true;
-                case CharacterConstants.Job.Magician:
-                    return true;
-                case CharacterConstants.Job.Bowman:
-                    return true;
-                case CharacterConstants.Job.Thief:
-                    return true;
-                case CharacterConstants.Job.Pirate:
-                    return true;
-
-                default: return false;
-            }
-        }
-
-        public static bool IsCygnusFirstJob(Character player)
-        {
-            CharacterConstants.Job currentJob = player.job;
-
-            switch (currentJob)
-            {
-                case CharacterConstants.Job.DawnWarrior1:
-                    return true;
-                case CharacterConstants.Job.BlazeWizard1:
-                    return true;
-                case CharacterConstants.Job.WindArcher1:
-                    return true;
-                case CharacterConstants.Job.NightWalker1:
-                    return true;
-                case CharacterConstants.Job.ThunderBreaker1:
-                    return true;
-
-                default: return false;
-            }
-        }
-
-        public static bool IsCygnusSecondJob(Character player)
-        {
-            CharacterConstants.Job currentJob = player.job;
-
-            switch (currentJob)
-            {
-                case CharacterConstants.Job.DawnWarrior2:
-                    return true;
-                case CharacterConstants.Job.BlazeWizard2:
-                    return true;
-                case CharacterConstants.Job.WindArcher2:
-                    return true;
-                case CharacterConstants.Job.NightWalker2:
-                    return true;
-                case CharacterConstants.Job.ThunderBreaker2:
-                    return true;
-
-                default: return false;
-            }
-        }
-
-        public static bool IsCygnusThirdJob(Character player)
-        {
-            CharacterConstants.Job currentJob = player.job;
-
-            switch (currentJob)
-            {
-                case CharacterConstants.Job.DawnWarrior3:
-                    return true;
-                case CharacterConstants.Job.BlazeWizard3:
-                    return true;
-                case CharacterConstants.Job.WindArcher3:
-                    return true;
-                case CharacterConstants.Job.NightWalker3:
-                    return true;
-                case CharacterConstants.Job.ThunderBreaker3:
-                    return true;
-
-                default: return false;
-            }
-        }
-
-        public static bool IsCygnusFourthJob(Character player)
-        {
-            CharacterConstants.Job currentJob = player.job;
-
-            switch (currentJob)
-            {
-                case CharacterConstants.Job.DawnWarrior4:
-                    return true;
-                case CharacterConstants.Job.BlazeWizard4:
-                    return true;
-                case CharacterConstants.Job.WindArcher4:
-                    return true;
-                case CharacterConstants.Job.NightWalker4:
-                    return true;
-                case CharacterConstants.Job.ThunderBreaker4:
-                    return true;
-
-                default: return false;
-            }
-        }
-
-        public static bool IsCygnus(Character player)
-        {
-            return IsCygnusFirstJob(player) || IsCygnusSecondJob(player) || IsCygnusThirdJob(player) || IsCygnusFourthJob(player);
-        }
-
-        public static bool IsAranFirstJob(Character player)
-        {
-            CharacterConstants.Job currentJob = player.job;
-
-            return currentJob == CharacterConstants.Job.Aran1;
-        }
-
-        public static bool IsFirstJob(Character player)
-        {
-            return IsAdventurerFirstJob(player) || IsCygnusFirstJob(player) || IsAranFirstJob(player);
         }
 
         public bool FacesLeft
@@ -1557,68 +1279,6 @@ namespace Destiny.Maple.Characters
             DataProvider.Maps[mapID].Characters.Add(this);
         }
 
-        public void AddAbility(CharacterConstants.StatisticType statistic, short mod, bool isReset)
-        {
-            short maxStat = short.MaxValue; // TODO: Should this be a setting?
-            bool isSubtract = mod < 0;
-
-            lock (this)
-            {
-                switch (statistic)
-                {
-                    case CharacterConstants.StatisticType.Strength:
-                        if (this.Strength >= maxStat)
-                        {
-                            return;
-                        }
-
-                        this.Strength += mod;
-                        break;
-
-                    case CharacterConstants.StatisticType.Dexterity:
-                        if (this.Dexterity >= maxStat)
-                        {
-                            return;
-                        }
-
-                        this.Dexterity += mod;
-                        break;
-
-                    case CharacterConstants.StatisticType.Intelligence:
-                        if (this.Intelligence >= maxStat)
-                        {
-                            return;
-                        }
-
-                        this.Intelligence += mod;
-                        break;
-
-                    case CharacterConstants.StatisticType.Luck:
-                        if (this.Luck >= maxStat)
-                        {
-                            return;
-                        }
-
-                        this.Luck += mod;
-                        break;
-
-                    case CharacterConstants.StatisticType.MaxHealth:
-                    case CharacterConstants.StatisticType.MaxMana:
-                        {
-                            // TODO: This is way too complicated for now.
-                        }
-                        break;
-                }
-
-                if (!isReset)
-                {
-                    this.AbilityPoints -= mod;
-                }
-
-                // TODO: Update bonuses.
-            }
-        }
-
         public void Move(Packet iPacket)
         {
             byte portals = iPacket.ReadByte();
@@ -2258,14 +1918,14 @@ namespace Destiny.Maple.Characters
 
             // TODO: Check for skill requirements.
 
-            if (skill.IsFromBeginner)
+            if (Skill.IsFromBeginner(skill))
             {
                 // TODO: Handle beginner skills.
             }
 
             if (skill.CurrentLevel + 1 <= skill.MaxLevel)
             {
-                if (!skill.IsFromBeginner)
+                if (!Skill.IsFromBeginner(skill))
                 {
                     this.SkillPoints--;
                 }
