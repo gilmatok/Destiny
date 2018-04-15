@@ -128,11 +128,39 @@ namespace Destiny.Maple
             }
         }
 
-        public bool IsFromBeginner
+        public static bool IsFromBeginner(Skill skill)
         {
-            get
+            switch (skill.MapleID)
             {
-                return this.MapleID % 10000000 > 999 && this.MapleID % 10000000 < 1003;
+                case (int)CharacterConstants.SkillNames.Beginner.NimbleFeet:
+                    return true;
+                case (int)CharacterConstants.SkillNames.Beginner.Recovery:
+                    return true;
+                case (int)CharacterConstants.SkillNames.Beginner.ThreeSnails:
+                    return true;
+
+                default: return false;
+
+                /* case (int)CharacterConstants.SkillNames.Beginner.BambooRain:
+                    return true;
+                case (int)CharacterConstants.SkillNames.Beginner.BlessingOfTheFairy:
+                    return true;
+                case (int)CharacterConstants.SkillNames.Beginner.ChairMaster:
+                    return true;
+                case (int)CharacterConstants.SkillNames.Beginner.EchoOfHero:
+                    return true;
+                case (int)CharacterConstants.SkillNames.Beginner.FollowTheLead:
+                    return true;
+                case (int)CharacterConstants.SkillNames.Beginner.Invincibility:
+                    return true;
+                case (int)CharacterConstants.SkillNames.Beginner.JumpDown:
+                    return true;
+                case (int)CharacterConstants.SkillNames.Beginner.LegendarySpirit:
+                    return true;
+                case (int)CharacterConstants.SkillNames.Beginner.Maker:
+                    return true;
+                case (int)CharacterConstants.SkillNames.Beginner.MonsterRider:
+                    return true; */
             }
         }
 

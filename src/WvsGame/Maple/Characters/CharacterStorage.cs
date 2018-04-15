@@ -2,6 +2,7 @@
 using Destiny.Data;
 using Destiny.Maple.Life;
 using System.Collections.Generic;
+using Destiny.Constants;
 
 namespace Destiny.Maple.Characters
 {
@@ -111,7 +112,7 @@ namespace Destiny.Maple.Characters
             {
                 case StorageAction.Withdraw:
                     {
-                        ItemType type = (ItemType)iPacket.ReadByte();
+                        ItemConstants.ItemType type = (ItemConstants.ItemType)iPacket.ReadByte();
                         byte slot = iPacket.ReadByte();
 
                         Item item = this.Items[slot];

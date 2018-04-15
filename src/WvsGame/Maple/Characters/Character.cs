@@ -195,79 +195,6 @@ namespace Destiny.Maple.Characters
             }
         }
 
-        public void LevelUP(bool PlayEffect)
-        {
-            // increase level
-            level++;
-
-            // update stats
-            this.Update(CharacterConstants.StatisticType.Level);
-
-            // generate randomized HP && MP bonus
-            Random r = new Random();
-            if (this.Job == CharacterConstants.Job.Beginner || this.Job == CharacterConstants.Job.Noblesse || this.Job == CharacterConstants.Job.Legend)
-            {
-            short rndHPbonus = Convert.ToInt16(r.Next(10, 16));
-            short rndMPbonus = Convert.ToInt16(r.Next(10, 12));
-            this.MaxHealth += rndHPbonus;
-            this.MaxMana += rndMPbonus;
-            }
-            // TODO: Health/Mana improvement.  
-            // warrior && dawnwarrior case
-            // magician && blazewizard case
-            // bowman && theif case
-            // pirate && thunderbreaker case
-            // aran case
-            // gm && supergm case
-            // skills, improved MP && HP case
-
-            //TODO: edge cases when overlevling job adv
-            // give AP
-            if (this.IsCygnus && this.Level < 70)
-            {
-                this.AbilityPoints += 6;
-            }
-            else if (this.Job == CharacterConstants.Job.Beginner && this.Level < 8)
-            {
-                this.AbilityPoints += 0;
-
-                if (this.Level < 6)
-                {
-                    this.Strength += 5;
-                }
-                else if (this.Level >= 6 && this.Level < 8)
-                {
-                    this.Strength += 4;
-                    this.Dexterity += 1;
-                }
-            }
-            else if (this.Job == CharacterConstants.Job.Beginner && this.Level == 8)
-            {
-                this.Strength = 4;
-                this.Dexterity = 4;
-                this.AbilityPoints += 35;    
-            }
-            else
-            {
-                this.AbilityPoints += 5; 
-            }
-
-            // give SP
-            if (this.Job == CharacterConstants.Job.Beginner || this.Job == CharacterConstants.Job.Noblesse || this.Job == CharacterConstants.Job.Legend)
-            {
-                this.SkillPoints += 1;
-            }
-            else
-            {
-                this.SkillPoints += 3;
-            }
-
-            if (PlayEffect)
-            {
-                this.ShowRemoteUserEffect(CharacterConstants.UserEffect.LevelUp);
-            }
-         }
-
         // TODO: Update party's properties.
         public byte Level
         {
@@ -300,12 +227,11 @@ namespace Destiny.Maple.Characters
                     {
                         for (int i = 0; i < delta; i++)
                         {
-                            LevelUP(true);
+                            CharacterStats.LevelUP(this, true);
                         }
 
-                        //heal up
-                        this.Health = this.MaxHealth;
-                        this.Mana = this.MaxMana;
+                        CharacterStats.FillToFull(this, CharacterConstants.StatisticType.Health);
+                        CharacterStats.FillToFull(this, CharacterConstants.StatisticType.Mana);
                     }
                 }
             }
@@ -325,7 +251,6 @@ namespace Destiny.Maple.Characters
                 if (this.IsInitialized)
                 {
                     this.Update(CharacterConstants.StatisticType.Job);
-
                     this.ShowRemoteUserEffect(CharacterConstants.UserEffect.JobChanged);
                 }
             }
@@ -617,15 +542,6 @@ namespace Destiny.Maple.Characters
             }
         }
 
-        // TODO: Improve this check.
-        public bool IsCygnus
-        {
-            get
-            {
-                return (short)this.Job >= 1000 && (short)this.Job <= 2000;
-            }
-        }
-
         public bool FacesLeft
         {
             get
@@ -817,11 +733,11 @@ namespace Destiny.Maple.Characters
             this.SpawnPoint = (byte)datum["SpawnPoint"];
             this.Meso = (int)datum["Meso"];
 
-            this.Items.MaxSlots[ItemType.Equipment] = (byte)datum["EquipmentSlots"];
-            this.Items.MaxSlots[ItemType.Usable] = (byte)datum["UsableSlots"];
-            this.Items.MaxSlots[ItemType.Setup] = (byte)datum["SetupSlots"];
-            this.Items.MaxSlots[ItemType.Etcetera] = (byte)datum["EtceteraSlots"];
-            this.Items.MaxSlots[ItemType.Cash] = (byte)datum["CashSlots"];
+            this.Items.MaxSlots[ItemConstants.ItemType.Equipment] = (byte)datum["EquipmentSlots"];
+            this.Items.MaxSlots[ItemConstants.ItemType.Usable] = (byte)datum["UsableSlots"];
+            this.Items.MaxSlots[ItemConstants.ItemType.Setup] = (byte)datum["SetupSlots"];
+            this.Items.MaxSlots[ItemConstants.ItemType.Etcetera] = (byte)datum["EtceteraSlots"];
+            this.Items.MaxSlots[ItemConstants.ItemType.Cash] = (byte)datum["CashSlots"];
 
             this.Items.Load();
             this.Skills.Load();
@@ -867,11 +783,11 @@ namespace Destiny.Maple.Characters
             datum["SpawnPoint"] = this.SpawnPoint;
             datum["Meso"] = this.Meso;
 
-            datum["EquipmentSlots"] = this.Items.MaxSlots[ItemType.Equipment];
-            datum["UsableSlots"] = this.Items.MaxSlots[ItemType.Usable];
-            datum["SetupSlots"] = this.Items.MaxSlots[ItemType.Setup];
-            datum["EtceteraSlots"] = this.Items.MaxSlots[ItemType.Etcetera];
-            datum["CashSlots"] = this.Items.MaxSlots[ItemType.Cash];
+            datum["EquipmentSlots"] = this.Items.MaxSlots[ItemConstants.ItemType.Equipment];
+            datum["UsableSlots"] = this.Items.MaxSlots[ItemConstants.ItemType.Usable];
+            datum["SetupSlots"] = this.Items.MaxSlots[ItemConstants.ItemType.Setup];
+            datum["EtceteraSlots"] = this.Items.MaxSlots[ItemConstants.ItemType.Etcetera];
+            datum["CashSlots"] = this.Items.MaxSlots[ItemConstants.ItemType.Cash];
 
             if (this.Assigned)
             {
@@ -1240,13 +1156,13 @@ namespace Destiny.Maple.Characters
             this.Update();
         }
 
-        public void Notify(string message, NoticeType type = NoticeType.Pink)
+        public void Notify(string message, NoticeType type = NoticeType.PinkText)
         {
             using (Packet oPacket = new Packet(ServerOperationCode.BroadcastMsg))
             {
                 oPacket.WriteByte((byte)type);
 
-                if (type == NoticeType.Ticker)
+                if (type == NoticeType.ScrollingText)
                 {
                     oPacket.WriteBool(!string.IsNullOrEmpty(message));
                 }
@@ -1361,68 +1277,6 @@ namespace Destiny.Maple.Characters
             }
 
             DataProvider.Maps[mapID].Characters.Add(this);
-        }
-
-        public void AddAbility(CharacterConstants.StatisticType statistic, short mod, bool isReset)
-        {
-            short maxStat = short.MaxValue; // TODO: Should this be a setting?
-            bool isSubtract = mod < 0;
-
-            lock (this)
-            {
-                switch (statistic)
-                {
-                    case CharacterConstants.StatisticType.Strength:
-                        if (this.Strength >= maxStat)
-                        {
-                            return;
-                        }
-
-                        this.Strength += mod;
-                        break;
-
-                    case CharacterConstants.StatisticType.Dexterity:
-                        if (this.Dexterity >= maxStat)
-                        {
-                            return;
-                        }
-
-                        this.Dexterity += mod;
-                        break;
-
-                    case CharacterConstants.StatisticType.Intelligence:
-                        if (this.Intelligence >= maxStat)
-                        {
-                            return;
-                        }
-
-                        this.Intelligence += mod;
-                        break;
-
-                    case CharacterConstants.StatisticType.Luck:
-                        if (this.Luck >= maxStat)
-                        {
-                            return;
-                        }
-
-                        this.Luck += mod;
-                        break;
-
-                    case CharacterConstants.StatisticType.MaxHealth:
-                    case CharacterConstants.StatisticType.MaxMana:
-                        {
-                            // TODO: This is way too complicated for now.
-                        }
-                        break;
-                }
-
-                if (!isReset)
-                {
-                    this.AbilityPoints -= mod;
-                }
-
-                // TODO: Update bonuses.
-            }
         }
 
         public void Move(Packet iPacket)
@@ -1653,7 +1507,25 @@ namespace Destiny.Maple.Characters
                     }
                     break;
 
-                case CharacterConstants.AttackType.Summon:break;
+                case CharacterConstants.AttackType.Summon:
+                    /*using (Packet oPacket = new Packet(ServerOperationCode.RangedAttack))
+                    {
+                        oPacket
+                            .WriteInt(this.ID)
+                            .WriteInt(summonID)
+                            .WriteByte(0) //??
+                            .Write(damageDirection)
+                            .Write(allDamage)
+
+                            foreach (var attackEntry in attack.Damages)
+                            {
+                                oPacket
+                                    .WriteInt(attackEntry.getMonsterOid())
+                                    .WriteByte(6)
+                                    .WriteInt(attackEntry.getDamage());
+                            }
+                    }*/
+                    break;
 
                 default: throw new ArgumentOutOfRangeException(nameof(type), type, null);
             }
@@ -2046,14 +1918,14 @@ namespace Destiny.Maple.Characters
 
             // TODO: Check for skill requirements.
 
-            if (skill.IsFromBeginner)
+            if (Skill.IsFromBeginner(skill))
             {
                 // TODO: Handle beginner skills.
             }
 
             if (skill.CurrentLevel + 1 <= skill.MaxLevel)
             {
-                if (!skill.IsFromBeginner)
+                if (!Skill.IsFromBeginner(skill))
                 {
                     this.SkillPoints--;
                 }
@@ -2794,57 +2666,76 @@ namespace Destiny.Maple.Characters
             Packet oPacket = new Packet(ServerOperationCode.Message);
 
             //the mesos work, drops dont idk why
-            if (type == MessageType.DropPickup && itemID == 0)
+            switch (type)
             {
-                oPacket
-                    .WriteByte((byte) type)
-                    .WriteBool(white)
-                    .WriteByte(0) // NOTE: Unknown.
-                    .WriteInt(ammount)
-                    .WriteShort(0);
+                case MessageType.DropPickup: //when itemID == 0:
+                    oPacket
+                        .WriteByte((byte) type)
+                        .WriteBool(white)
+                        .WriteByte(0) // NOTE: Unknown.
+                        .WriteInt(ammount)
+                        .WriteShort(0);
+                    break;
+
+               /* case (MessageType.DropPickup when itemID > 0):
+                    oPacket
+                        .WriteByte((byte) type) 
+                        .WriteBool(false)
+                        .WriteInt(itemID)
+                        .WriteInt(ammount)
+                        .WriteInt(0)
+                        .WriteInt(0);
+                    break; */
+
+                case MessageType.IncreaseEXP:
+                    oPacket
+                        .WriteByte((byte) type) // NOTE: enum MessageType 
+                        .WriteBool(white) // NOTE: white is default as 1, 0 = yellow
+                        .WriteInt(ammount)
+                        .WriteBool(inChat) // NOTE: display message in chat box
+                        .WriteInt(0) // NOTE: monster book bonus (Bonus Event Exp)
+                        .WriteShort(0) // NOTE: unknown
+                        .WriteInt(0) // NOTE: wedding bonus
+                        .WriteByte(0) // NOTE: 0 = party bonus, 1 = Bonus Event party Exp () x0
+                        .WriteInt(partyBonus)
+                        .WriteInt(equipBonus)
+                        .WriteInt(0) // NOTE: Internet Cafe Bonus
+                        .WriteInt(0); // NOTE: Rainbow Week Bonus          
+
+                    if (inChat) //is this necessary?
+                    {
+                        oPacket
+                            .WriteByte(0);
+                    }
+                    break;
+
+                case MessageType.QuestRecord:
+                    break;
+                case MessageType.CashItemExpire:
+                    break;
+                case MessageType.IncreaseFame:
+                    break;
+                case MessageType.IncreaseMeso:
+                    break;
+                case MessageType.IncreaseGP:
+                    break;
+                case MessageType.GiveBuff:
+                    break;
+                case MessageType.GeneralItemExpire:
+                    break;
+                case MessageType.System:
+                    break;
+                case MessageType.QuestRecordEx:
+                    break;
+                case MessageType.ItemProtectExpire:
+                    break;
+                case MessageType.ItemExpireReplace:
+                    break;
+                case MessageType.SkillExpire:
+                    break;
+                case MessageType.TutorialMessage:
+                    break;
             }
-
-            /*
-            else if (type == MessageType.DropPickup && itemID > 0)
-            {
-                oPacket
-                    .WriteByte((byte) type) 
-                    .WriteBool(false)
-                    .WriteInt(itemID)
-                    .WriteInt(ammount)
-                    .WriteInt(0)
-                    .WriteInt(0);
-            }else
-            */
-
-            else if (type == MessageType.IncreaseEXP)
-            {
-                oPacket
-                    .WriteByte((byte) type) // NOTE: enum MessageType 
-                    .WriteBool(white) // NOTE: white is default as 1, 0 = yellow
-                    .WriteInt(ammount)
-                    .WriteBool(inChat) // NOTE: display message in chat box
-                    .WriteInt(0) // NOTE: monster book bonus (Bonus Event Exp)
-                    .WriteShort(0) // NOTE: unknown
-                    .WriteInt(0) // NOTE: wedding bonus
-                    .WriteByte(0) // NOTE: 0 = party bonus, 1 = Bonus Event party Exp () x0
-                    .WriteInt(partyBonus)
-                    .WriteInt(equipBonus)
-                    .WriteInt(0) // NOTE: Internet Cafe Bonus
-                    .WriteInt(0); // NOTE: Rainbow Week Bonus          
-
-                if (inChat) //is this necessary?
-                {
-                oPacket
-                    .WriteByte(0);
-                }
-            }
-
-            else
-            {
-                Log.Inform("ERROR: unhanded MessageType: {0} encountered", type);
-            }
-
             return oPacket;
         }
            
@@ -2882,7 +2773,7 @@ namespace Destiny.Maple.Characters
                 .WriteBytes(this.AppearanceToByteArray())
                 .WriteInt(this.Items.Available(5110000))
                 .WriteInt() // NOTE: Item effect.
-                .WriteInt((int)(Item.GetType(this.Chair) == ItemType.Setup ? this.Chair : 0))
+                .WriteInt((int)(Item.GetType(this.Chair) == ItemConstants.ItemType.Setup ? this.Chair : 0))
                 .WriteShort(this.Position.X)
                 .WriteShort(this.Position.Y)
                 .WriteByte(this.Stance)

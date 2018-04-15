@@ -1,6 +1,7 @@
 ﻿using Destiny.Network;
 using Destiny.Data;
 using System.Collections.ObjectModel;
+using Destiny.Constants;
 
 namespace Destiny.Maple.Characters
 {
@@ -26,18 +27,18 @@ namespace Destiny.Maple.Characters
 
         public void Handle(Packet iPacket)
         {
-            MemoAction action = (MemoAction)iPacket.ReadByte();
+            ItemConstants.MemoAction action = (ItemConstants.MemoAction)iPacket.ReadByte();
 
             switch (action)
             {
-                case MemoAction.Send:
+                case ItemConstants.MemoAction.Send:
                     {
                         // TODO: This is occured when you send a note from the Cash Shop.
                         // As we don't have Cash Shop implemented yet, this remains unhandled.
                     }
                     break;
 
-                case MemoAction.Delete:
+                case ItemConstants.MemoAction.Delete:
                     {
                         byte count = iPacket.ReadByte();
                         byte a = iPacket.ReadByte();
@@ -65,7 +66,7 @@ namespace Destiny.Maple.Characters
             using (Packet oPacket = new Packet(ServerOperationCode.MemoResult))
             {
                 oPacket
-                    .WriteByte((byte)MemoResult.Send)
+                    .WriteByte((byte)ItemConstants.MemoResult.Send)
                     .WriteByte((byte)this.Count);
 
                 foreach (Memo memo in this)

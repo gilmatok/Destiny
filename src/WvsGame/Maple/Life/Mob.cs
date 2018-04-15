@@ -569,7 +569,7 @@ namespace Destiny.Maple.Life
             oPacket
                 .WriteInt(this.ObjectID)
                 .WriteByte(1)
-                .WriteByte((byte)deathEffect);
+                .WriteByte((byte)this.DeathEffect);
 
             return oPacket;
         }

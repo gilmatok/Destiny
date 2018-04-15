@@ -1,7 +1,5 @@
-﻿using System;
-using Destiny.Maple.Characters;
+﻿using Destiny.Maple.Characters;
 using Destiny.Maple.Data;
-using System.Linq;
 
 namespace Destiny.Maple.Commands.Implementation
 {
@@ -51,12 +49,15 @@ namespace Destiny.Maple.Commands.Implementation
                         skillToModify.CurrentLevel = (byte)skillLVL;
                         skillToModify.Update();
                     }
+                    // TODO: needs proper treatment
                     else if(!caller.Skills.Contains(skillID))
                     {
-                        Skill skillToAdd = new Skill(skillID);
+                        Skill skillToAdd = new Skill(skillID)
+                        {
+                            CurrentLevel = (byte) skillLVL,
+                            MapleID = skillID
+                        };
 
-                        skillToAdd.CurrentLevel = (byte) skillLVL;
-                        skillToAdd.MapleID = skillID;
                         skillToAdd.Update();
                     }
                 }
