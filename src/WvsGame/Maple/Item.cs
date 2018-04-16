@@ -102,62 +102,62 @@ namespace Destiny.Maple
             }
         }
 
-        public WeaponType WeaponType
+        public ItemConstants.WeaponType WeaponType
         {
             get
             {
                 switch (this.MapleID / 10000 % 100)
                 {
                     case 30:
-                        return WeaponType.Sword1H;
+                        return ItemConstants.WeaponType.Sword1H;
 
                     case 31:
-                        return WeaponType.Axe1H;
+                        return ItemConstants.WeaponType.Axe1H;
 
                     case 32:
-                        return WeaponType.Blunt1H;
+                        return ItemConstants.WeaponType.Blunt1H;
 
                     case 33:
-                        return WeaponType.Dagger;
+                        return ItemConstants.WeaponType.Dagger;
 
                     case 37:
-                        return WeaponType.Wand;
+                        return ItemConstants.WeaponType.Wand;
 
                     case 38:
-                        return WeaponType.Staff;
+                        return ItemConstants.WeaponType.Staff;
 
                     case 40:
-                        return WeaponType.Sword2H;
+                        return ItemConstants.WeaponType.Sword2H;
 
                     case 41:
-                        return WeaponType.Axe2H;
+                        return ItemConstants.WeaponType.Axe2H;
 
                     case 42:
-                        return WeaponType.Blunt2H;
+                        return ItemConstants.WeaponType.Blunt2H;
 
                     case 43:
-                        return WeaponType.Spear;
+                        return ItemConstants.WeaponType.Spear;
 
                     case 44:
-                        return WeaponType.PoleArm;
+                        return ItemConstants.WeaponType.PoleArm;
 
                     case 45:
-                        return WeaponType.Bow;
+                        return ItemConstants.WeaponType.Bow;
 
                     case 46:
-                        return WeaponType.Crossbow;
+                        return ItemConstants.WeaponType.Crossbow;
 
                     case 47:
-                        return WeaponType.Claw;
+                        return ItemConstants.WeaponType.Claw;
 
                     case 48:
-                        return WeaponType.Knuckle;
+                        return ItemConstants.WeaponType.Knuckle;
 
                     case 49:
-                        return WeaponType.Gun;
+                        return ItemConstants.WeaponType.Gun;
 
                     default:
-                        return WeaponType.NotAWeapon;
+                        return ItemConstants.WeaponType.NotAWeapon;
                 }
             }
         }
@@ -324,7 +324,7 @@ namespace Destiny.Maple
         {
             get
             {
-                return this.WeaponType != WeaponType.NotAWeapon;
+                return this.WeaponType != ItemConstants.WeaponType.NotAWeapon;
             }
         }
 
@@ -358,16 +358,16 @@ namespace Destiny.Maple
             {
                 switch (this.WeaponType)
                 {
-                    case WeaponType.Sword2H:
-                    case WeaponType.Axe2H:
-                    case WeaponType.Blunt2H:
-                    case WeaponType.Spear:
-                    case WeaponType.PoleArm:
-                    case WeaponType.Bow:
-                    case WeaponType.Crossbow:
-                    case WeaponType.Claw:
-                    case WeaponType.Knuckle:
-                    case WeaponType.Gun:
+                    case ItemConstants.WeaponType.Sword2H:
+                    case ItemConstants.WeaponType.Axe2H:
+                    case ItemConstants.WeaponType.Blunt2H:
+                    case ItemConstants.WeaponType.Spear:
+                    case ItemConstants.WeaponType.PoleArm:
+                    case ItemConstants.WeaponType.Bow:
+                    case ItemConstants.WeaponType.Crossbow:
+                    case ItemConstants.WeaponType.Claw:
+                    case ItemConstants.WeaponType.Knuckle:
+                    case ItemConstants.WeaponType.Gun:
                         return true;
 
                     default:
@@ -735,12 +735,12 @@ namespace Destiny.Maple
             }
 
             short sourceSlot = this.Slot;
-            EquipmentSlot destinationSlot = this.GetEquippedSlot();
+            ItemConstants.EquipmentSlot destinationSlot = this.GetEquippedSlot();
 
-            Item top = this.Parent[EquipmentSlot.Top];
-            Item bottom = this.Parent[EquipmentSlot.Bottom];
-            Item weapon = this.Parent[EquipmentSlot.Weapon];
-            Item shield = this.Parent[EquipmentSlot.Shield];
+            Item top = this.Parent[ItemConstants.EquipmentSlot.Top];
+            Item bottom = this.Parent[ItemConstants.EquipmentSlot.Bottom];
+            Item weapon = this.Parent[ItemConstants.EquipmentSlot.Weapon];
+            Item shield = this.Parent[ItemConstants.EquipmentSlot.Shield];
 
             Item destination = this.Parent[destinationSlot];
 
@@ -767,7 +767,7 @@ namespace Destiny.Maple
 
             switch (destinationSlot)
             {
-                case EquipmentSlot.Bottom:
+                case ItemConstants.EquipmentSlot.Bottom:
                     {
                         if (top != null && top.IsOverall)
                         {
@@ -776,7 +776,7 @@ namespace Destiny.Maple
                     }
                     break;
 
-                case EquipmentSlot.Top:
+                case ItemConstants.EquipmentSlot.Top:
                     {
                         if (this.IsOverall && bottom != null)
                         {
@@ -785,7 +785,7 @@ namespace Destiny.Maple
                     }
                     break;
 
-                case EquipmentSlot.Shield:
+                case ItemConstants.EquipmentSlot.Shield:
                     {
                         if (weapon != null && weapon.IsTwoHanded)
                         {
@@ -794,7 +794,7 @@ namespace Destiny.Maple
                     }
                     break;
 
-                case EquipmentSlot.Weapon:
+                case ItemConstants.EquipmentSlot.Weapon:
                     {
                         if (this.IsTwoHanded && shield != null)
                         {
@@ -1087,7 +1087,7 @@ namespace Destiny.Maple
             }
         }
 
-        private EquipmentSlot GetEquippedSlot() // TODO: Fugly heuristics, remake into better method
+        private ItemConstants.EquipmentSlot GetEquippedSlot() // TODO: Fugly heuristics, remake into better method
         {
             short slot = 0;
 
@@ -1153,7 +1153,7 @@ namespace Destiny.Maple
                 slot -= 100;
             }
 
-            return (EquipmentSlot)slot;
+            return (ItemConstants.EquipmentSlot)slot;
         }
 
         public override Packet GetShowGainPacket()
