@@ -981,7 +981,7 @@ namespace Destiny.Maple.Characters
             }
         }
 
-        public Item this[EquipmentSlot slot]
+        public Item this[ItemConstants.EquipmentSlot slot]
         {
             get
             {
@@ -1038,7 +1038,7 @@ namespace Destiny.Maple.Characters
             }
         }
 
-        public IEnumerable<Item> GetEquipped(EquippedQueryMode mode = EquippedQueryMode.Any)
+        public IEnumerable<Item> GetEquipped(ItemConstants.EquippedQueryMode mode = ItemConstants.EquippedQueryMode.Any)
         {
             foreach (Item loopItem in this.Items)
             {
@@ -1046,19 +1046,19 @@ namespace Destiny.Maple.Characters
 
                 switch (mode)
                 {
-                    case EquippedQueryMode.Any:
+                    case ItemConstants.EquippedQueryMode.Any:
                         yield return loopItem;
 
                         break;
 
-                    case EquippedQueryMode.Normal:
+                    case ItemConstants.EquippedQueryMode.Normal:
                         if (loopItem.Slot > -100)
                         {
                             yield return loopItem;
                         }
                         break;
 
-                    case EquippedQueryMode.Cash:
+                    case ItemConstants.EquippedQueryMode.Cash:
                         if (loopItem.Slot < -100)
                         {
                             yield return loopItem;
@@ -1137,14 +1137,14 @@ namespace Destiny.Maple.Characters
                     .WriteByte(this.MaxSlots[ItemConstants.ItemType.Cash])
                     .WriteLong(); // NOTE: Unknown.
 
-                foreach (Item item in this.GetEquipped(EquippedQueryMode.Normal))
+                foreach (Item item in this.GetEquipped(ItemConstants.EquippedQueryMode.Normal))
                 {
                     oPacket.WriteBytes(item.ToByteArray());
                 }
 
                 oPacket.WriteShort();
 
-                foreach (Item item in this.GetEquipped(EquippedQueryMode.Cash))
+                foreach (Item item in this.GetEquipped(ItemConstants.EquippedQueryMode.Cash))
                 {
                     oPacket.WriteBytes(item.ToByteArray());
                 }

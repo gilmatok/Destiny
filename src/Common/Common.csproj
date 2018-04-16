@@ -62,6 +62,7 @@
     <Compile Include="Constants.cs" />
     <Compile Include="Constants\CharacterConstants.cs" />
     <Compile Include="Constants\ItemConstants.cs" />
+    <Compile Include="Constants\SummonConstants.cs" />
     <Compile Include="Data\Database.cs" />
     <Compile Include="Data\Datum.cs" />
     <Compile Include="Data\Meta.cs" />

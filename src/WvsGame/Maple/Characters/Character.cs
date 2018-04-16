@@ -2393,7 +2393,7 @@ namespace Destiny.Maple.Characters
 
                 oPacket.WriteByte(byte.MaxValue);
 
-                Item cashWeapon = this.Items[EquipmentSlot.CashWeapon];
+                Item cashWeapon = this.Items[ItemConstants.EquipmentSlot.CashWeapon];
 
                 oPacket.WriteInt(cashWeapon != null ? cashWeapon.MapleID : 0);
 

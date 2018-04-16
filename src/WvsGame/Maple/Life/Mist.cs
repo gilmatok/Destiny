@@ -11,6 +11,11 @@ namespace Destiny.Maple.Life
         public Character mistOwner { get; set; }
         public Skill mistSkill { get; set; }
 
+        public MapleMapObjectType getType()
+        {
+            return MapleMapObjectType.Mist;
+        }
+
         public enum MistType : int
         {
             mobMist = 0,
