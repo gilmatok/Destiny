@@ -67,8 +67,8 @@ namespace Destiny.Maple.Commands.Implementation
                     {
                         if (true) // TODO: Check if map exists.
                             caller.ChangeMap(mapID, portalID);
-                        else
-                            caller.Notify(string.Format("[Command] Invalid map ID {0}.", mapID));
+                        //else
+                            //caller.Notify(string.Format("[Command] Invalid map ID {0}.", mapID));
                     }
                     else
                     {

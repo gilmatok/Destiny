@@ -41,7 +41,12 @@ namespace Destiny.Maple.Characters
             }
         }
 
-        public void Cast(Packet iPacket)
+        public static Skill GetNewSkillFromInt(int skillMapleID)
+        {
+            return new Skill(skillMapleID);
+        }
+
+    public void Cast(Packet iPacket)
         {
             iPacket.ReadInt(); // NOTE: Ticks.
             int mapleID = iPacket.ReadInt();

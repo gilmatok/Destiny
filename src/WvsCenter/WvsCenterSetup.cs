@@ -144,7 +144,7 @@ namespace Destiny
             }
 
             Log.SkipLine();
-            Log.Success("Configuration is done! Center server set up for use sucessfully.");
+            Log.Success("Configuration is done! Center server set up for use successfully.");
         }
 
         private static void PopulateCenterDatabase()

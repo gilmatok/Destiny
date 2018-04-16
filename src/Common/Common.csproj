@@ -72,6 +72,7 @@
     <Compile Include="IO\LogLevel.cs" />
     <Compile Include="IO\SettingReadException.cs" />
     <Compile Include="IO\Settings.cs" />
+    <Compile Include="IO\Tracer.cs" />
     <Compile Include="Network\ClientHandler.cs" />
     <Compile Include="Network\ClientOperationCode.cs" />
     <Compile Include="Network\InteroperabilityOperationCode.cs" />

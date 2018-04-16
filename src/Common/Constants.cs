@@ -22,7 +22,6 @@ namespace Destiny
             }
         }
     }
-
     public enum ServerRegsitrationResponse : byte
     {
         Valid,
@@ -31,6 +30,7 @@ namespace Destiny
         Full
     }
 
+    // TODO: refactor into separate files under constants folder
     #region Interaction
     public enum InteractionCode : byte
     {
