@@ -31,6 +31,8 @@ namespace Destiny.Maple.Maps
         public MapDrops Drops { get; private set; }
         public MapMobs Mobs { get; private set; }
         public MapNpcs Npcs { get; private set; }
+        public MapObjectMist Mists { get; private set; }
+        public MapObjectSummon Summons { get; private set; }
         public MapReactors Reactors { get; private set; }
         public MapFootholds Footholds { get; private set; }
         public MapSeats Seats { get; private set; }
@@ -67,6 +69,8 @@ namespace Destiny.Maple.Maps
             this.Drops = new MapDrops(this);
             this.Mobs = new MapMobs(this);
             this.Npcs = new MapNpcs(this);
+            this.Mists = new MapObjectMist(this);
+            this.Summons = new MapObjectSummon(this);
             this.Footholds = new MapFootholds(this);
             this.Seats = new MapSeats(this);
             this.Reactors = new MapReactors(this);

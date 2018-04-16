@@ -221,7 +221,7 @@ namespace Destiny
             }
 
             Log.SkipLine();
-            Log.Success("Configuration is done! Game server set up for use succesfully.");
+            Log.Success("Configuration is done! Game server set up for use successfully.");
         }
 
 

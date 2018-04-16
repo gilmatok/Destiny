@@ -378,7 +378,7 @@
         ChangeParamResult = 323,
         QuestCashResult = 324,
         CashShopOperation = 325,
-        // 326
+        //326
         //327
         //328
         //329

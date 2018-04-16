@@ -10,7 +10,7 @@ using Destiny.IO;
 
 namespace Destiny.Maple
 {
-    public class Item : Drop
+    public class Item : Drop // TODO: too big and fugly; redo
     {
         public static ItemConstants.ItemType GetType(int mapleID)
         {
@@ -92,7 +92,6 @@ namespace Destiny.Maple
         public short CMorph { get; private set; }
 
         public List<Tuple<int, short>> Summons { get; private set; }
-
 
         public ItemConstants.ItemType Type
         {

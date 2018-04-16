@@ -92,6 +92,7 @@
     <Compile Include="Maple\Commands\Implementation\ShopCommand.cs" />
     <Compile Include="Maple\Commands\Implementation\LearnSkillCommand.cs" />
     <Compile Include="Maple\Commands\Implementation\SpawnCommand.cs" />
+    <Compile Include="Maple\Commands\Implementation\SummonCommand.cs" />
     <Compile Include="Maple\Commands\Implementation\TestCommand.cs" />
     <Compile Include="Maple\Commands\Implementation\TickerCommand.cs" />
     <Compile Include="Maple\Commands\Implementation\ZakumCommand.cs" />

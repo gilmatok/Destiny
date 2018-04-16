@@ -26,7 +26,7 @@ namespace Destiny.Shell
 
                 if (System.Windows.Application.Current == null)
                 {
-                    new System.Windows.Application();
+                    var newApplication = new System.Windows.Application();
                 }
 
                 JumpList.SetJumpList(System.Windows.Application.Current, jumpList);

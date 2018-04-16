@@ -469,6 +469,7 @@ namespace Destiny.Maple.Characters
                     }
                 }
 
+                /*
                 else
                 {
                     if (experience >= CharacterConstants.ExperienceTables.CharacterLevel[this.Level])
@@ -483,6 +484,7 @@ namespace Destiny.Maple.Characters
                         experience = CharacterConstants.ExperienceTables.CharacterLevel[this.Level] - 1;
                     }
                 }
+                */
 
                 if (this.IsInitialized && delta != 0)
                 {
@@ -2195,7 +2197,6 @@ namespace Destiny.Maple.Characters
             if (false) // TODO: Check if portal is onlyOnce and player already used it.
             {
                 // TODO: Send a "closed for now" portal message.
-
                 return;
             }
 

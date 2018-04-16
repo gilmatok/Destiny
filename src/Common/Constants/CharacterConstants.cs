@@ -967,7 +967,7 @@ namespace Destiny.Constants
                 Straight = 15001001,
                 SomersaultKick = 15001002,
                 Dash = 15001003,
-                Lightning = 15001004
+                LightningSprite = 15001004
             }
 
             public enum ThunderBreaker2 : int

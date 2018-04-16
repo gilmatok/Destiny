@@ -142,6 +142,7 @@ namespace Destiny.Maple.Characters
                                 this.VIP.Add(mapID);
                             }
                         }
+
                         else
                         {
                             return;
