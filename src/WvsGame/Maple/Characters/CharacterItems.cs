@@ -193,7 +193,7 @@ namespace Destiny.Maple.Characters
 
             if (wasEquipped)
             {
-                this.Parent.UpdateApperance();
+                Character.UpdateApperance(this.Parent);
             }
         }
 
@@ -883,7 +883,7 @@ namespace Destiny.Maple.Characters
             }
 
             if (itemUsed) this.Remove(itemID, 1);
-            else this.Parent.Release(); // TODO: Blank inventory update.
+            else Character.Release(this.Parent); // TODO: Blank inventory update.
         }
 
         public void UseReturnScroll(Packet iPacket)

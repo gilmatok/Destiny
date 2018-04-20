@@ -1,19 +1,17 @@
 ﻿using Destiny.Data;
 using Destiny.IO;
 using Destiny.Network;
+using Destiny.Constants;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Destiny.Constants;
 
 namespace Destiny.Maple.Characters
 {
     public sealed class CharacterBuffs : IEnumerable<Buff>
     {
         public Character Parent { get; private set; }
-
         private List<Buff> Buffs { get; set; }
-
         public Buff this[int mapleId]
         {
             get
@@ -146,6 +144,60 @@ namespace Destiny.Maple.Characters
         IEnumerator IEnumerable.GetEnumerator()
         {
             return ((IEnumerable)this.Buffs).GetEnumerator();
+        }
+
+        public static void showOwnBuffEffect(Character character, Skill skill)
+        {
+            using (Packet oPacket = new Packet(ServerOperationCode.Effect))
+            {
+                oPacket
+                    .WriteInt(character.ID)
+                    .WriteInt(skill.MapleID)
+                    .WriteByte(0xA9) //??
+                    .WriteByte(1); //??
+
+                character.Client.Send(oPacket);
+            }
+        }
+
+        public void ShowBuffEffect(Character character, CharacterConstants.UserEffect effect, Skill skill, byte direction)
+        {
+            direction = 3;
+
+            using (Packet oPacket = new Packet(ServerOperationCode.ShowRemoteEffect))
+            {
+                oPacket
+                    .WriteInt(character.ID)
+                    .WriteByte((byte)effect) //buff level??
+                    .WriteInt(skill.MapleID)
+                    .WriteByte(direction)
+                    .WriteByte((byte)effect)
+                    .WriteByte(1); //??
+
+                character.Map.Broadcast(oPacket, null);
+            }
+        }
+
+        public static void ShowLocalUserEffect(Character character, CharacterConstants.UserEffect effect)
+        {
+            using (Packet oPacket = new Packet(ServerOperationCode.Effect))
+            {
+                oPacket.WriteByte((byte)effect);
+
+                character.Client.Send(oPacket);
+            }
+        }
+
+        public static void ShowRemoteEffect(Character character, CharacterConstants.UserEffect effect, bool skipSelf = false)
+        {
+            using (Packet oPacket = new Packet(ServerOperationCode.ShowRemoteEffect))
+            {
+                oPacket
+                    .WriteInt(character.ID)
+                    .WriteByte((byte)effect);
+
+                character.Map.Broadcast(oPacket, skipSelf ? character : null);
+            }
         }
 
         // TODO: Refactor this to use actual TwoStateTemporaryStat and not some random values.

@@ -163,6 +163,8 @@
     <Compile Include="Maple\Variable.cs" />
     <Compile Include="Network\GameClient.cs" />
     <Compile Include="Network\GameClients.cs" />
+    <Compile Include="Network\PacketFactory\MaplePacketFactory\MapleCharacterPackets.cs" />
+    <Compile Include="Network\PacketFactory\PacketFactoryManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WvsGame.cs" />
     <Compile Include="WvsGameSetup.cs" />

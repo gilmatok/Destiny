@@ -4,7 +4,12 @@ namespace Destiny.Maple.Characters
 {
     public sealed class CharacterJobs
     {
-        public Character Player { get; private set; }
+        public Character Parent { get; private set; }  
+        public CharacterJobs(Character parent)
+            : base()
+        {
+            this.Parent = parent;
+        }
         public CharacterConstants.Job Job;
 
         #region AdventurerJobs

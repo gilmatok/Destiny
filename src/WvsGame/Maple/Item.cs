@@ -803,7 +803,7 @@ namespace Destiny.Maple
                     break;
             }
 
-            this.Character.UpdateApperance();
+            Character.UpdateApperance(this.Character);
         }
 
         public void Unequip(short destinationSlot = 0)
@@ -836,7 +836,7 @@ namespace Destiny.Maple
                 this.Character.Client.Send(oPacket);
             }
 
-            this.Character.UpdateApperance();
+            Character.UpdateApperance(this.Character);
         }
 
         public void Drop(short quantity)

@@ -36,7 +36,7 @@ namespace Destiny.Maple.Commands.Implementation
             }
             else
             {
-                caller.Release();
+                Character.Release(caller);
             }
         }
     }

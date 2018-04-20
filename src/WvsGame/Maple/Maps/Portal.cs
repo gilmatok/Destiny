@@ -63,7 +63,7 @@ namespace Destiny.Maple.Maps
 
         public void PlaySoundEffect(Character character)
         {
-            character.ShowLocalUserEffect(CharacterConstants.UserEffect.PlayPortalSE);
+            CharacterBuffs.ShowLocalUserEffect(character, CharacterConstants.UserEffect.PlayPortalSE);
         }
 
         public void ShowBalloonMessage(Character character, string text, short width, short height)
