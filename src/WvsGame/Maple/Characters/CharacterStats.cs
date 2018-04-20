@@ -1,11 +1,21 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using Destiny.Constants;
+using Destiny.Network.PacketFactory.MaplePacketFactory;
 
 namespace Destiny.Maple.Characters
 {
     public sealed class CharacterStats : KeyedCollection<int, CharacterStats>
     {
+        public Character Parent { get; private set; }
+
+        public CharacterStats(Character parent)
+            : base()
+        {
+            this.Parent = parent;
+        }
+        public CharacterConstants.StatisticType Statistic;
+
         public static bool IsAtMaxHP(Character character)
         {
             short currentHealth = character.Health;
@@ -29,7 +39,7 @@ namespace Destiny.Maple.Characters
             if (character.MaxHealth == short.MaxValue) return;
 
             character.MaxHealth += (short) quantity;
-            character.Update(CharacterConstants.StatisticType.MaxHealth);
+            Update(character, CharacterConstants.StatisticType.MaxHealth);
         }
 
         public static void AddMP(Character character, int quantity)
@@ -38,7 +48,7 @@ namespace Destiny.Maple.Characters
             if (character.MaxMana == short.MaxValue) return;
 
             character.MaxMana += (short) quantity;
-            character.Update(CharacterConstants.StatisticType.MaxMana);
+            Update(character, CharacterConstants.StatisticType.MaxMana);
         }
 
         public static void FillToFull(Character character, CharacterConstants.StatisticType typeToFill)
@@ -50,12 +60,12 @@ namespace Destiny.Maple.Characters
             {
                 case CharacterConstants.StatisticType.Mana:
                     character.Health = character.MaxHealth;
-                    character.Update(CharacterConstants.StatisticType.Health);
+                    Update(character, CharacterConstants.StatisticType.Health);
                     break;
 
                 case CharacterConstants.StatisticType.Health:
                     character.Mana = character.MaxMana;
-                    character.Update(CharacterConstants.StatisticType.Mana);
+                    Update(character, CharacterConstants.StatisticType.Mana);
                     break;
             }
         }
@@ -530,7 +540,7 @@ namespace Destiny.Maple.Characters
         {
             // increase level & update stats
             character.Level++;
-            character.Update(CharacterConstants.StatisticType.Level);
+            Update(character, CharacterConstants.StatisticType.Level);
             // generate randomized HP && MP bonus
             AdjustHPOnLevelUP(character);
             AdjustMPOnLevelUP(character);
@@ -539,7 +549,7 @@ namespace Destiny.Maple.Characters
             GainAPOnLeveLUP(character);
             GainSPOnLeveLUP(character);
             // play effect if needed
-            if (PlayEffect) character.ShowRemoteUserEffect(CharacterConstants.UserEffect.LevelUp);
+            if (PlayEffect) CharacterBuffs.ShowRemoteEffect(character, CharacterConstants.UserEffect.LevelUp);
         }
 
         public static void DistributeAP(Character character, CharacterConstants.StatisticType type, short amount = 1)
@@ -635,6 +645,11 @@ namespace Destiny.Maple.Characters
         }
 
 
+        public static void Update(Character character, params CharacterConstants.StatisticType[] charStats)
+        {
+            character.Client.Send(MapleCharacterPackets.UpdateStatsPacket(character, charStats));  
+        }
+
         //TODO: hp/mp modification bugs out UI bars, add multiple stats, some kind of message to sideBar/chat
         public static void giveStat(Character player, CharacterConstants.StatisticType stat, short quantity)
         {
@@ -646,14 +661,14 @@ namespace Destiny.Maple.Characters
                     if (totalStrenght < Int16.MaxValue)
                     {
                         player.Strength += quantity;
-                        player.Update(CharacterConstants.StatisticType.Strength);
+                        Update(player, CharacterConstants.StatisticType.Strength);
                         break;
                     }
 
                     else
                     {
                         player.Strength = Int16.MaxValue;
-                        player.Update(CharacterConstants.StatisticType.Strength);
+                        Update(player, CharacterConstants.StatisticType.Strength);
                         break;
                     }
 
@@ -663,14 +678,14 @@ namespace Destiny.Maple.Characters
                     if (totalDexterity < Int16.MaxValue)
                     {
                         player.Dexterity += quantity;
-                        player.Update(CharacterConstants.StatisticType.Dexterity);
+                        Update(player, CharacterConstants.StatisticType.Dexterity);
                         break;
                     }
 
                     else
                     {
                         player.Dexterity = Int16.MaxValue;
-                        player.Update(CharacterConstants.StatisticType.Dexterity);
+                        Update(player, CharacterConstants.StatisticType.Dexterity);
                         break;
                     }
 
@@ -680,14 +695,14 @@ namespace Destiny.Maple.Characters
                     if (totalIntelligence < Int16.MaxValue)
                     {
                         player.Intelligence += quantity;
-                        player.Update(CharacterConstants.StatisticType.Intelligence);
+                        Update(player, CharacterConstants.StatisticType.Intelligence);
                         break;
                     }
 
                     else
                     {
                         player.Intelligence = Int16.MaxValue;
-                        player.Update(CharacterConstants.StatisticType.Intelligence);
+                        Update(player, CharacterConstants.StatisticType.Intelligence);
                         break;
                     }
 
@@ -698,14 +713,14 @@ namespace Destiny.Maple.Characters
                     if (totalLuck < Int16.MaxValue)
                     {
                         player.Luck += quantity;
-                        player.Update(CharacterConstants.StatisticType.Luck);
+                        Update(player, CharacterConstants.StatisticType.Luck);
                         break;
                     }
 
                     else
                     {
                         player.Luck = Int16.MaxValue;
-                        player.Update(CharacterConstants.StatisticType.Luck);
+                        Update(player, CharacterConstants.StatisticType.Luck);
                         break;
                     }
 
@@ -715,14 +730,14 @@ namespace Destiny.Maple.Characters
                     if (totalHealth < Int16.MaxValue)
                     {
                         player.Health += quantity;
-                        player.Update(CharacterConstants.StatisticType.Health);
+                        Update(player, CharacterConstants.StatisticType.Health);
                         break;
                     }
 
                     else
                     {
                         player.Health = Int16.MaxValue;
-                        player.Update(CharacterConstants.StatisticType.Health);
+                        Update(player, CharacterConstants.StatisticType.Health);
                         break;
                     }
 
@@ -732,14 +747,14 @@ namespace Destiny.Maple.Characters
                     if (totalMaxHealth < Int16.MaxValue)
                     {
                         player.MaxHealth += quantity;
-                        player.Update(CharacterConstants.StatisticType.MaxHealth);
+                        Update(player, CharacterConstants.StatisticType.MaxHealth);
                         break;
                     }
 
                     else
                     {
                         player.MaxHealth = Int16.MaxValue;
-                        player.Update(CharacterConstants.StatisticType.MaxHealth);
+                        Update(player, CharacterConstants.StatisticType.MaxHealth);
                         break;
                     }
 
@@ -749,14 +764,14 @@ namespace Destiny.Maple.Characters
                     if (totalMana < Int16.MaxValue)
                     {
                         player.Mana += quantity;
-                        player.Update(CharacterConstants.StatisticType.Mana);
+                        Update(player, CharacterConstants.StatisticType.Mana);
                         break;
                     }
 
                     else
                     {
                         player.Mana = Int16.MaxValue;
-                        player.Update(CharacterConstants.StatisticType.Mana);
+                        Update(player, CharacterConstants.StatisticType.Mana);
                         break;
                     }
 
@@ -766,14 +781,14 @@ namespace Destiny.Maple.Characters
                     if (totalMaxMana < Int16.MaxValue)
                     {
                         player.MaxMana += quantity;
-                        player.Update(CharacterConstants.StatisticType.MaxMana);
+                        Update(player, CharacterConstants.StatisticType.MaxMana);
                         break;
                     }
 
                     else
                     {
                         player.MaxMana = Int16.MaxValue;
-                        player.Update(CharacterConstants.StatisticType.MaxMana);
+                        Update(player, CharacterConstants.StatisticType.MaxMana);
                         break;
                     }
 
@@ -783,14 +798,14 @@ namespace Destiny.Maple.Characters
                     if (totalAbilityPoints < Int16.MaxValue)
                     {
                         player.AbilityPoints += quantity;
-                        player.Update(CharacterConstants.StatisticType.AbilityPoints);
+                        Update(player, CharacterConstants.StatisticType.AbilityPoints);
                         break;
                     }
 
                     else
                     {
                         player.AbilityPoints = Int16.MaxValue;
-                        player.Update(CharacterConstants.StatisticType.AbilityPoints);
+                        Update(player, CharacterConstants.StatisticType.AbilityPoints);
                         break;
                     }
 
@@ -800,13 +815,13 @@ namespace Destiny.Maple.Characters
                     if (totalSkillPoints < Int16.MaxValue)
                     {
                         player.SkillPoints += quantity;
-                        player.Update(CharacterConstants.StatisticType.SkillPoints);
+                        Update(player, CharacterConstants.StatisticType.SkillPoints);
                         break;
                     }
                     else
                     {
                         player.SkillPoints = Int16.MaxValue;
-                        player.Update(CharacterConstants.StatisticType.SkillPoints);
+                        Update(player, CharacterConstants.StatisticType.SkillPoints);
                         break;
                     }
 

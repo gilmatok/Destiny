@@ -19,7 +19,7 @@ namespace Destiny.Maple.Scripting
 
         private void PlayPortalSoundEffect()
         {
-            mCharacter.ShowLocalUserEffect(CharacterConstants.UserEffect.PlayPortalSE);
+            CharacterBuffs.ShowLocalUserEffect(mCharacter, CharacterConstants.UserEffect.PlayPortalSE);
         }
     }
 }

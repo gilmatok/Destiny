@@ -218,7 +218,7 @@
         ShowUpgradeTombEffect = 195,
         SetActiveRemoteChair = 196,
         AvatarModified = 197,
-        RemoteEffect = 198,
+        ShowRemoteEffect = 198,
         SetTemporaryStat = 199,
         ResetTemporaryStat = 200,
         RecieveHP = 201,

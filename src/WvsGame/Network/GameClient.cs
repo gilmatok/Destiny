@@ -40,7 +40,7 @@ namespace Destiny.Network
 
             this.Character = new Character(characterID, this);
             this.Character.Load();
-            this.Character.Initialize();
+            Character.InitializeCharacter(this.Character);
 
             this.Title = this.Character.Name;
         }

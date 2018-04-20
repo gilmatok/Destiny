@@ -73,15 +73,16 @@
     <Compile Include="IO\SettingReadException.cs" />
     <Compile Include="IO\Settings.cs" />
     <Compile Include="IO\Tracer.cs" />
-    <Compile Include="Network\ClientHandler.cs" />
-    <Compile Include="Network\ClientOperationCode.cs" />
-    <Compile Include="Network\InteroperabilityOperationCode.cs" />
-    <Compile Include="Network\MapleClientHandler.cs" />
-    <Compile Include="Network\NetworkConnector.cs" />
-    <Compile Include="Network\NetworkException.cs" />
-    <Compile Include="Network\ServerHandler.cs" />
-    <Compile Include="Network\ServerOperationCode.cs" />
-    <Compile Include="Network\Packet.cs" />
+    <Compile Include="Network\ClientHandler\ClientHandler.cs" />
+    <Compile Include="Network\ClientHandler\ClientOperationCode.cs" />
+    <Compile Include="Network\Common\InteroperabilityOperationCode.cs" />
+    <Compile Include="Network\MapleClientHandler\MapleClientHandler.cs" />
+    <Compile Include="Network\Common\NetworkConnector.cs" />
+    <Compile Include="Network\Common\NetworkException.cs" />
+    <Compile Include="Network\PacketFactory\PacketFactoryManager.cs" />
+    <Compile Include="Network\ServerHandler\ServerHandler.cs" />
+    <Compile Include="Network\ServerHandler\ServerOperationCode.cs" />
+    <Compile Include="Network\Common\Packet.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Scripting\LuaScriptable.cs" />
     <Compile Include="Security\AesCryptograph.cs" />
@@ -104,5 +105,6 @@
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
