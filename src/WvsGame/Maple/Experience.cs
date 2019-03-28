@@ -1,6 +1,6 @@
 ﻿using Destiny.Maple.Characters;
 using Destiny.Network;
-using Destiny.Constants;
+using static Destiny.Constants.CharacterConstants;
 
 namespace Destiny.Maple
 {
@@ -18,7 +18,7 @@ namespace Destiny.Maple
 
         public static int GetExpNeededForLevel(int level)
         {
-            return level > 200 ? 2000000000 : CharacterConstants.ExperienceTables.CharacterLevel[level];
+            return level > 200 ? 2000000000 : ExperienceTables.CharacterLevelExp[level];
         }
 
         public static void giveExp(Character character, int exp)

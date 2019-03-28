@@ -1,7 +1,7 @@
 ﻿using Destiny.Data;
 using Destiny.IO;
 using System.Collections.ObjectModel;
-using Destiny.Constants;
+using static Destiny.Constants.CharacterConstants;
 
 namespace Destiny.Maple.Data
 {
@@ -114,11 +114,11 @@ namespace Destiny.Maple.Data
                             {
                                 if (state == 0)
                                 {
-                                    this[(ushort)(int)datum["questid"]].PreSkillRewards.Add(new Skill((int)datum["rewardid"], (byte)(short)datum["quantity"], (byte)(short)datum["master_level"]), (CharacterConstants.Job)datum["job"]);
+                                    this[(ushort)(int)datum["questid"]].PreSkillRewards.Add(new Skill((int)datum["rewardid"], (byte)(short)datum["quantity"], (byte)(short)datum["master_level"]), (Job)datum["job"]);
                                 }
                                 else
                                 {
-                                    this[(ushort)(int)datum["questid"]].PostSkillRewards.Add(new Skill((int)datum["rewardid"], (byte)(short)datum["quantity"], (byte)(short)datum["master_level"]), (CharacterConstants.Job)datum["job"]);
+                                    this[(ushort)(int)datum["questid"]].PostSkillRewards.Add(new Skill((int)datum["rewardid"], (byte)(short)datum["quantity"], (byte)(short)datum["master_level"]), (Job)datum["job"]);
                                 }
                             }
                             break;
@@ -139,7 +139,7 @@ namespace Destiny.Maple.Data
 
                 foreach (Datum datum in new Datums("quest_required_jobs").Populate())
                 {
-                    this[(ushort)datum["questid"]].ValidJobs.Add((CharacterConstants.Job)datum["valid_jobid"]);
+                    this[(ushort)datum["questid"]].ValidJobs.Add((Job)datum["valid_jobid"]);
                 }
             }
         }

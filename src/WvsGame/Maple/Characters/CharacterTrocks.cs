@@ -1,10 +1,10 @@
-﻿using Destiny.Network;
-using Destiny.Data;
-using Destiny.Maple.Maps;
-using System.Collections.Generic;
-using Destiny.Constants;
+﻿using Destiny.Data;
 using Destiny.IO;
 using Destiny.Maple.Data;
+using Destiny.Maple.Maps;
+using Destiny.Network;
+using System.Collections.Generic;
+using static Destiny.Constants.ItemConstants;
 
 namespace Destiny.Maple.Characters
 {
@@ -95,16 +95,16 @@ namespace Destiny.Maple.Characters
 
         public void Update(Packet iPacket)
         {
-            ItemConstants.TrockAction action = (ItemConstants.TrockAction)iPacket.ReadByte();
-            ItemConstants.TrockType type = (ItemConstants.TrockType)iPacket.ReadByte();
+            TrockAction action = (TrockAction)iPacket.ReadByte();
+            TrockType type = (TrockType)iPacket.ReadByte();
 
             switch (action)
             {
-                case ItemConstants.TrockAction.Remove:
+                case TrockAction.Remove:
                     {
                         int mapID = iPacket.ReadInt();
 
-                        if (type == ItemConstants.TrockType.Regular)
+                        if (type == TrockType.Regular)
                         {
                             if (!this.Regular.Contains(mapID))
                             {
@@ -113,7 +113,7 @@ namespace Destiny.Maple.Characters
 
                             this.Regular.Remove(mapID);
                         }
-                        else if (type == ItemConstants.TrockType.VIP)
+                        else if (type == TrockType.VIP)
                         {
                             if (!this.VIP.Contains(mapID))
                             {
@@ -125,7 +125,7 @@ namespace Destiny.Maple.Characters
                     }
                     break;
 
-                case ItemConstants.TrockAction.Add:
+                case TrockAction.Add:
                     {
                         int mapID = this.Parent.Map.MapleID;
 
@@ -133,11 +133,11 @@ namespace Destiny.Maple.Characters
 
                         if (true)
                         {
-                            if (type == ItemConstants.TrockType.Regular)
+                            if (type == TrockType.Regular)
                             {
                                 this.Regular.Add(mapID);
                             }
-                            else if (type == ItemConstants.TrockType.VIP)
+                            else if (type == TrockType.VIP)
                             {
                                 this.VIP.Add(mapID);
                             }
@@ -154,9 +154,9 @@ namespace Destiny.Maple.Characters
             using (Packet oPacket = new Packet(ServerOperationCode.MapTransferResult))
             {
                 oPacket
-                    .WriteByte((byte)(action == ItemConstants.TrockAction.Remove ? 2 : 3))
+                    .WriteByte((byte)(action == TrockAction.Remove ? 2 : 3))
                     .WriteByte((byte)type)
-                    .WriteBytes(type == ItemConstants.TrockType.Regular ? this.RegularToByteArray() : this.VIPToByteArray());
+                    .WriteBytes(type == TrockType.Regular ? this.RegularToByteArray() : this.VIPToByteArray());
 
                 this.Parent.Client.Send(oPacket);
             }
@@ -167,10 +167,10 @@ namespace Destiny.Maple.Characters
             bool used = false;
             byte action = iPacket.ReadByte();
 
-            ItemConstants.TrockType type = itemID == 5040000 ? ItemConstants.TrockType.Regular : ItemConstants.TrockType.VIP;
+            TrockType type = itemID == 5040000 ? TrockType.Regular : TrockType.VIP;
 
             int destinationMapID = -1;
-            ItemConstants.TrockResult result = ItemConstants.TrockResult.Success;
+            TrockResult result = TrockResult.Success;
 
             if (action == 0) // NOTE: Preset map.
             {
@@ -178,7 +178,7 @@ namespace Destiny.Maple.Characters
 
                 if (!this.Parent.Trocks.Contains(mapID))
                 {
-                    result = ItemConstants.TrockResult.CannotGo;
+                    result = TrockResult.CannotGo;
                 }
 
                 destinationMapID = mapID;
@@ -191,7 +191,7 @@ namespace Destiny.Maple.Characters
 
                 if (target == null)
                 {
-                    result = ItemConstants.TrockResult.DifficultToLocate;
+                    result = TrockResult.DifficultToLocate;
                 }
                 else
                 {
@@ -208,23 +208,23 @@ namespace Destiny.Maple.Characters
 
                 if (false) // TODO: Field limit check.
                 {
-                    result = ItemConstants.TrockResult.CannotGo;
+                    result = TrockResult.CannotGo;
                 }
                 else if (false) // TODO: Origin map field limit check.
                 {
-                    result = ItemConstants.TrockResult.CannotGo;
+                    result = TrockResult.CannotGo;
                 }
                 else if (originMap.MapleID == destinationMap.MapleID)
                 {
-                    result = ItemConstants.TrockResult.AlreadyThere;
+                    result = TrockResult.AlreadyThere;
                 }
                 else if (false) // TODO: Continent check.
                 {
-                    result = ItemConstants.TrockResult.CannotGo;
+                    result = TrockResult.CannotGo;
                 }
             }
             
-            if (result == ItemConstants.TrockResult.Success)
+            if (result == TrockResult.Success)
             {
                 this.Parent.ChangeMap(destinationMapID);
 

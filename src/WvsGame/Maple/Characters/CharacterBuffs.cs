@@ -1,10 +1,10 @@
 ﻿using Destiny.Data;
 using Destiny.IO;
 using Destiny.Network;
-using Destiny.Constants;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using static Destiny.Constants.CharacterConstants;
 
 namespace Destiny.Maple.Characters
 {
@@ -160,7 +160,7 @@ namespace Destiny.Maple.Characters
             }
         }
 
-        public void ShowBuffEffect(Character character, CharacterConstants.UserEffect effect, Skill skill, byte direction)
+        public void ShowBuffEffect(Character character, UserEffect effect, Skill skill, byte direction)
         {
             direction = 3;
 
@@ -178,7 +178,7 @@ namespace Destiny.Maple.Characters
             }
         }
 
-        public static void ShowLocalUserEffect(Character character, CharacterConstants.UserEffect effect)
+        public static void ShowLocalUserEffect(Character character, UserEffect effect)
         {
             using (Packet oPacket = new Packet(ServerOperationCode.Effect))
             {
@@ -188,7 +188,7 @@ namespace Destiny.Maple.Characters
             }
         }
 
-        public static void ShowRemoteEffect(Character character, CharacterConstants.UserEffect effect, bool skipSelf = false)
+        public static void ShowRemoteEffect(Character character, UserEffect effect, bool skipSelf = false)
         {
             using (Packet oPacket = new Packet(ServerOperationCode.ShowRemoteEffect))
             {
@@ -216,25 +216,25 @@ namespace Destiny.Maple.Characters
                 long mask = 0;
                 int value = 0;
 
-                if (this.Contains((int)CharacterConstants.SkillNames.Rogue.DarkSight))
+                if (this.Contains((int)SkillNames.Rogue.DarkSight))
                 {
-                    mask |= (long)CharacterConstants.SecondaryBuffStat.DarkSight;
+                    mask |= (long)SecondaryBuffStat.DarkSight;
                 }
 
-                if (this.Contains((int)CharacterConstants.SkillNames.Crusader.ComboAttack))
+                if (this.Contains((int)SkillNames.Crusader.ComboAttack))
                 {
-                    mask |= (long)CharacterConstants.SecondaryBuffStat.Combo;
-                    value = this[(int)CharacterConstants.SkillNames.Crusader.ComboAttack].Value;
+                    mask |= (long)SecondaryBuffStat.Combo;
+                    value = this[(int)SkillNames.Crusader.ComboAttack].Value;
                 }
 
-                if (this.Contains((int)CharacterConstants.SkillNames.Hermit.ShadowPartner))
+                if (this.Contains((int)SkillNames.Hermit.ShadowPartner))
                 {
-                    mask |= (long)CharacterConstants.SecondaryBuffStat.ShadowPartner;
+                    mask |= (long)SecondaryBuffStat.ShadowPartner;
                 }
 
-                if (this.Contains((int)CharacterConstants.SkillNames.Hunter.SoulArrowBow) || this.Contains((int)CharacterConstants.SkillNames.Crossbowman.SoulArrowCrossbow))
+                if (this.Contains((int)SkillNames.Hunter.SoulArrowBow) || this.Contains((int)SkillNames.Crossbowman.SoulArrowCrossbow))
                 {
-                    mask |= (long)CharacterConstants.SecondaryBuffStat.SoulArrow;
+                    mask |= (long)SecondaryBuffStat.SoulArrow;
                 }
 
                 oPacket.WriteInt((int)((mask >> 32) & 0xFFFFFFFFL));

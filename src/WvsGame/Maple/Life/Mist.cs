@@ -1,4 +1,4 @@
-﻿using Destiny.Constants;
+﻿using static Destiny.Constants.CharacterConstants;
 using Destiny.Maple.Characters;
 using Destiny.Maple.Maps;
 using Destiny.Network;
@@ -33,10 +33,10 @@ namespace Destiny.Maple.Life
         {
             switch (this.mistSkill.MapleID)
             {
-                case (int) CharacterConstants.SkillNames.FirePoisonMage.PoisonMist:
+                case (int) SkillNames.FirePoisonMage.PoisonMist:
                     return MistType.playerPoisonMist;
 
-                case (int) CharacterConstants.SkillNames.Shadower.Smokescreen:
+                case (int) SkillNames.Shadower.Smokescreen:
                     return MistType.playerSmokescreen;
             }
 

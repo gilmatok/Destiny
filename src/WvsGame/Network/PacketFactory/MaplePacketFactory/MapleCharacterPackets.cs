@@ -1,5 +1,5 @@
 ﻿using System;
-using Destiny.Constants;
+using static Destiny.Constants.CharacterConstants;
 using Destiny.Maple.Characters;
 
 namespace Destiny.Network.PacketFactory.MaplePacketFactory
@@ -7,7 +7,7 @@ namespace Destiny.Network.PacketFactory.MaplePacketFactory
     public class MapleCharacterPackets : PacketFactoryManager
     {
         #region GenderPackets
-        public static Packet SetGenderPacket(CharacterConstants.Gender gender)
+        public static Packet SetGenderPacket(Gender gender)
         {
             Packet setGenderPacket = new Packet(ServerOperationCode.SetGender);
             setGenderPacket.WriteByte((byte) gender);
@@ -41,7 +41,7 @@ namespace Destiny.Network.PacketFactory.MaplePacketFactory
         #endregion
 
         #region  UpdateStatsPackets
-        public static Packet UpdateStatsPacket(Character character, params CharacterConstants.StatisticType[] charStats)
+        public static Packet UpdateStatsPacket(Character character, params StatisticType[] charStats)
         {
             Packet setStatsPacket = new Packet(ServerOperationCode.StatChanged);
 
@@ -49,7 +49,7 @@ namespace Destiny.Network.PacketFactory.MaplePacketFactory
 
             int flag = 0;
 
-            foreach (CharacterConstants.StatisticType statistic in charStats)
+            foreach (StatisticType statistic in charStats)
             {
                 flag |= (int)statistic;
             }
@@ -58,79 +58,79 @@ namespace Destiny.Network.PacketFactory.MaplePacketFactory
 
             Array.Sort(charStats);
 
-            foreach (CharacterConstants.StatisticType statistic in charStats)
+            foreach (StatisticType statistic in charStats)
             {
                 switch (statistic)
                 {
-                    case CharacterConstants.StatisticType.Skin:
+                    case StatisticType.Skin:
                         setStatsPacket.WriteByte(character.Skin);
                         break;
 
-                    case CharacterConstants.StatisticType.Face:
+                    case StatisticType.Face:
                         setStatsPacket.WriteInt(character.Face);
                         break;
 
-                    case CharacterConstants.StatisticType.Hair:
+                    case StatisticType.Hair:
                         setStatsPacket.WriteInt(character.Hair);
                         break;
 
-                    case CharacterConstants.StatisticType.Level:
+                    case StatisticType.Level:
                         setStatsPacket.WriteByte(character.Level);
                         break;
 
-                    case CharacterConstants.StatisticType.Job:
+                    case StatisticType.Job:
                         setStatsPacket.WriteShort((short) character.Job);
                         break;
 
-                    case CharacterConstants.StatisticType.Strength:
+                    case StatisticType.Strength:
                         setStatsPacket.WriteShort(character.Strength);
                         break;
 
-                    case CharacterConstants.StatisticType.Dexterity:
+                    case StatisticType.Dexterity:
                         setStatsPacket.WriteShort(character.Dexterity);
                         break;
 
-                    case CharacterConstants.StatisticType.Intelligence:
+                    case StatisticType.Intelligence:
                         setStatsPacket.WriteShort(character.Intelligence);
                         break;
 
-                    case CharacterConstants.StatisticType.Luck:
+                    case StatisticType.Luck:
                         setStatsPacket.WriteShort(character.Luck);
                         break;
 
-                    case CharacterConstants.StatisticType.Health:
+                    case StatisticType.Health:
                         setStatsPacket.WriteShort(character.Health);
                         break;
 
-                    case CharacterConstants.StatisticType.MaxHealth:
+                    case StatisticType.MaxHealth:
                         setStatsPacket.WriteShort(character.MaxHealth);
                         break;
 
-                    case CharacterConstants.StatisticType.Mana:
+                    case StatisticType.Mana:
                         setStatsPacket.WriteShort(character.Mana);
                         break;
 
-                    case CharacterConstants.StatisticType.MaxMana:
+                    case StatisticType.MaxMana:
                         setStatsPacket.WriteShort(character.MaxMana);
                         break;
 
-                    case CharacterConstants.StatisticType.AbilityPoints:
+                    case StatisticType.AbilityPoints:
                         setStatsPacket.WriteShort(character.AbilityPoints);
                         break;
 
-                    case CharacterConstants.StatisticType.SkillPoints:
+                    case StatisticType.SkillPoints:
                         setStatsPacket.WriteShort(character.SkillPoints);
                         break;
 
-                    case CharacterConstants.StatisticType.Experience:
+                    case StatisticType.Experience:
                         setStatsPacket.WriteInt(character.Experience);
                         break;
 
-                    case CharacterConstants.StatisticType.Fame:
+                    case StatisticType.Fame:
                         setStatsPacket.WriteShort(character.Fame);
                         break;
 
-                    case CharacterConstants.StatisticType.Mesos:
+                    case StatisticType.Mesos:
                         setStatsPacket.WriteInt(character.Meso);
                         break;
                 }

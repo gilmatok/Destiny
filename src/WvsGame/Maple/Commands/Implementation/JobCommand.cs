@@ -1,6 +1,6 @@
 ﻿using Destiny.Maple.Characters;
 using System;
-using Destiny.Constants;
+using static Destiny.Constants.CharacterConstants;
 
 namespace Destiny.Maple.Commands.Implementation
 {
@@ -42,9 +42,9 @@ namespace Destiny.Maple.Commands.Implementation
                 {
                     short jobID = short.Parse(args[0]);
 
-                    if (Enum.IsDefined(typeof(CharacterConstants.Job), jobID))
+                    if (Enum.IsDefined(typeof(Job), jobID))
                     {
-                        caller.Job = (CharacterConstants.Job)jobID;
+                        caller.Job = (Job)jobID;
                     }
                     else
                     {
@@ -55,7 +55,7 @@ namespace Destiny.Maple.Commands.Implementation
                 {
                     try
                     {
-                        caller.Job = (CharacterConstants.Job)Enum.Parse(typeof(CharacterConstants.Job), args[0], true);
+                        caller.Job = (Job)Enum.Parse(typeof(Job), args[0], true);
                     }
                     catch (ArgumentException)
                     {

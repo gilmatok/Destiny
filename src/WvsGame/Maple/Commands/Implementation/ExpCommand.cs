@@ -1,4 +1,5 @@
 ﻿using Destiny.Maple.Characters;
+using System;
 
 namespace Destiny.Maple.Commands.Implementation
 {
@@ -16,7 +17,7 @@ namespace Destiny.Maple.Commands.Implementation
         {
             get
             {
-                return "amount";
+                return "{ amount }";
             }
         }
 
@@ -36,17 +37,15 @@ namespace Destiny.Maple.Commands.Implementation
             }
             else
             {
-                if (int.Parse(args[0]) > int.MaxValue || int.Parse(args[0]) < int.MinValue)
-                {
-                    int expGiven = int.MaxValue;
-                    Experience.giveExp(caller, expGiven);
-                }
-                else
-                {
-                    int expGiven = int.Parse(args[0]);
-                    Experience.giveExp(caller, expGiven);
-                }
-            }
+				if (int.TryParse(args[0], out int expGiven))
+				{
+					Experience.giveExp(caller, expGiven);
+				}
+				else
+				{
+					caller.Notify("[Command] Invalid amount provided.");
+				}
+			}
         }
 
     }

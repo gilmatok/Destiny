@@ -1,7 +1,7 @@
-﻿using System;
+﻿using Destiny.Network.PacketFactory.MaplePacketFactory;
+using System;
 using System.Collections.ObjectModel;
-using Destiny.Constants;
-using Destiny.Network.PacketFactory.MaplePacketFactory;
+using static Destiny.Constants.CharacterConstants;
 
 namespace Destiny.Maple.Characters
 {
@@ -14,7 +14,7 @@ namespace Destiny.Maple.Characters
         {
             this.Parent = parent;
         }
-        public CharacterConstants.StatisticType Statistic;
+        public StatisticType Statistic;
 
         public static bool IsAtMaxHP(Character character)
         {
@@ -39,7 +39,7 @@ namespace Destiny.Maple.Characters
             if (character.MaxHealth == short.MaxValue) return;
 
             character.MaxHealth += (short) quantity;
-            Update(character, CharacterConstants.StatisticType.MaxHealth);
+            Update(character, StatisticType.MaxHealth);
         }
 
         public static void AddMP(Character character, int quantity)
@@ -48,227 +48,227 @@ namespace Destiny.Maple.Characters
             if (character.MaxMana == short.MaxValue) return;
 
             character.MaxMana += (short) quantity;
-            Update(character, CharacterConstants.StatisticType.MaxMana);
+            Update(character, StatisticType.MaxMana);
         }
 
-        public static void FillToFull(Character character, CharacterConstants.StatisticType typeToFill)
+        public static void FillToFull(Character character, StatisticType typeToFill)
         {
             if (character == null) return;
             if (IsAtMaxHP(character) || IsAtMaxMP(character)) return;
 
             switch (typeToFill)
             {
-                case CharacterConstants.StatisticType.Mana:
+                case StatisticType.Mana:
                     character.Health = character.MaxHealth;
-                    Update(character, CharacterConstants.StatisticType.Health);
+                    Update(character, StatisticType.Health);
                     break;
 
-                case CharacterConstants.StatisticType.Health:
+                case StatisticType.Health:
                     character.Mana = character.MaxMana;
-                    Update(character, CharacterConstants.StatisticType.Mana);
+                    Update(character, StatisticType.Mana);
                     break;
             }
         }
 
         // TODO: finish this, sub-switch depending on skill and another on skill level.
-        public static void AdjustHPOnLevelUP(Character character)
+        public static void AdjustHPOnLevelUp(Character character)
         {
             if (character == null) return;
 
-            CharacterConstants.Job charJob = character.Job;
+            Job charJob = character.Job;
             Random r = new Random();
 
             switch (charJob)
             {
-                case CharacterConstants.Job.Beginner:
+                case Job.Beginner:
                     short HPBonusBeginner = Convert.ToInt16(r.Next(10, 16));
                     AddHP(character, HPBonusBeginner);
                     break;
 
-                case CharacterConstants.Job.Aran:
+                case Job.Aran:
                     short HPBonusAran = Convert.ToInt16(r.Next(10, 16));
                     AddHP(character, HPBonusAran);
                     break;
 
-                case CharacterConstants.Job.Noblesse:
+                case Job.Noblesse:
                     short HPBonusNoblesse = Convert.ToInt16(r.Next(10, 16));
                     AddHP(character, HPBonusNoblesse);
                     break;
 
-                case CharacterConstants.Job.Warrior:
+                case Job.Warrior:
                     short HPBonusWarrior = Convert.ToInt16(r.Next(24, 28));
                     AddHP(character, HPBonusWarrior);
                     break;
 
-                case CharacterConstants.Job.DawnWarrior1:
+                case Job.DawnWarrior1:
                     short HPBonusDawnWarrior1 = Convert.ToInt16(r.Next(24, 28));
                     AddHP(character, HPBonusDawnWarrior1);
                     break;
 
-                case CharacterConstants.Job.Aran1:
+                case Job.Aran1:
                     short HPBonusAran1 = Convert.ToInt16(r.Next(44, 48));
                     AddHP(character, HPBonusAran1);
                     break;
 
-                case CharacterConstants.Job.Magician:
+                case Job.Magician:
                     short HPBonusCrusader = Convert.ToInt16(r.Next(10, 14));
                     AddHP(character, HPBonusCrusader);
                     break;
 
-                case CharacterConstants.Job.BlazeWizard1:
+                case Job.BlazeWizard1:
                     short HPBonusDawnWarrior2 = Convert.ToInt16(r.Next(10, 14));
                     AddHP(character, HPBonusDawnWarrior2);
                     break;
 
-                case CharacterConstants.Job.Bowman:
+                case Job.Archer:
                     short HPBonusBowman = Convert.ToInt16(r.Next(20, 24));
                     AddHP(character, HPBonusBowman);
                     break;
 
-                case CharacterConstants.Job.WindArcher1:
+                case Job.WindArcher1:
                     short HPBonusWindArcher1 = Convert.ToInt16(r.Next(20, 24));
                     AddHP(character, HPBonusWindArcher1);
                     break;
 
-                case CharacterConstants.Job.Thief:
+                case Job.Thief:
                     short HPBonusThief = Convert.ToInt16(r.Next(20, 24));
                     AddHP(character, HPBonusThief);
                     break;
 
-                case CharacterConstants.Job.NightWalker1:
+                case Job.NightWalker1:
                     short HPBonusNightWalker1 = Convert.ToInt16(r.Next(20, 24));
                     AddHP(character, HPBonusNightWalker1);
                     break;
 
-                case CharacterConstants.Job.Pirate:
+                case Job.Pirate:
                     short HPBonusPirate = Convert.ToInt16(r.Next(22, 28));
                     AddHP(character, HPBonusPirate);
                     break;
 
-                case CharacterConstants.Job.ThunderBreaker1:
+                case Job.ThunderBreaker1:
                     short HPBonusThunderBreaker1 = Convert.ToInt16(r.Next(22, 28));
                     AddHP(character, HPBonusThunderBreaker1);
                     break;
 
-                case CharacterConstants.Job.GM:
+                case Job.GM:
                     short HPBonusGM = 30000;
                     AddHP(character, HPBonusGM);
                     break;
 
-                case CharacterConstants.Job.SuperGM:
+                case Job.SuperGM:
                     short HPBonusSuperGM = 30000;
                     AddHP(character, HPBonusSuperGM);
                     break;
 
-                case CharacterConstants.Job.Fighter:
+                case Job.Fighter:
                     break;
-                case CharacterConstants.Job.Crusader:
+                case Job.Crusader:
                     break;
-                case CharacterConstants.Job.Hero:
+                case Job.Hero:
                     break;
-                case CharacterConstants.Job.Page:
+                case Job.Page:
                     break;
-                case CharacterConstants.Job.WhiteKnight:
+                case Job.WhiteKnight:
                     break;
-                case CharacterConstants.Job.Paladin:
+                case Job.Paladin:
                     break;
-                case CharacterConstants.Job.Spearman:
+                case Job.Spearman:
                     break;
-                case CharacterConstants.Job.DragonKnight:
+                case Job.DragonKnight:
                     break;
-                case CharacterConstants.Job.DarkKnight:
+                case Job.DarkKnight:
                     break;
-                case CharacterConstants.Job.FirePoisonWizard:
+                case Job.FirePoisonWizard:
                     break;
-                case CharacterConstants.Job.FirePoisonMage:
+                case Job.FirePoisonMage:
                     break;
-                case CharacterConstants.Job.FirePoisonArchMage:
+                case Job.FirePoisonArchMage:
                     break;
-                case CharacterConstants.Job.IceLightningWizard:
+                case Job.IceLightningWizard:
                     break;
-                case CharacterConstants.Job.IceLightningMage:
+                case Job.IceLightningMage:
                     break;
-                case CharacterConstants.Job.IceLightningArchMage:
+                case Job.IceLightningArchMage:
                     break;
-                case CharacterConstants.Job.Cleric:
+                case Job.Cleric:
                     break;
-                case CharacterConstants.Job.Priest:
+                case Job.Priest:
                     break;
-                case CharacterConstants.Job.Bishop:
+                case Job.Bishop:
                     break;
-                case CharacterConstants.Job.Hunter:
+                case Job.Hunter:
                     break;
-                case CharacterConstants.Job.Ranger:
+                case Job.Ranger:
                     break;
-                case CharacterConstants.Job.BowMaster:
+                case Job.BowMaster:
                     break;
-                case CharacterConstants.Job.CrossbowMan:
+                case Job.CrossbowMan:
                     break;
-                case CharacterConstants.Job.Sniper:
+                case Job.Sniper:
                     break;
-                case CharacterConstants.Job.CrossbowMaster:
+                case Job.CrossbowMaster:
                     break;
-                case CharacterConstants.Job.Assassin:
+                case Job.Assassin:
                     break;
-                case CharacterConstants.Job.Hermit:
+                case Job.Hermit:
                     break;
-                case CharacterConstants.Job.NightLord:
+                case Job.NightLord:
                     break;
-                case CharacterConstants.Job.Bandit:
+                case Job.Bandit:
                     break;
-                case CharacterConstants.Job.ChiefBandit:
+                case Job.ChiefBandit:
                     break;
-                case CharacterConstants.Job.Shadower:
+                case Job.Shadower:
                     break;
-                case CharacterConstants.Job.Brawler:
+                case Job.Brawler:
                     break;
-                case CharacterConstants.Job.Marauder:
+                case Job.Marauder:
                     break;
-                case CharacterConstants.Job.Buccaneer:
+                case Job.Buccaneer:
                     break;
-                case CharacterConstants.Job.Gunslinger:
+                case Job.Gunslinger:
                     break;
-                case CharacterConstants.Job.Outlaw:
+                case Job.Outlaw:
                     break;
-                case CharacterConstants.Job.Corsair:
+                case Job.Corsair:
                     break;
-                case CharacterConstants.Job.MapleleafBrigadier:
+                case Job.MapleleafBrigadier:
                     break;
-                case CharacterConstants.Job.DawnWarrior2:
+                case Job.DawnWarrior2:
                     break;
-                case CharacterConstants.Job.DawnWarrior3:
+                case Job.DawnWarrior3:
                     break;
-                case CharacterConstants.Job.DawnWarrior4:
+                case Job.DawnWarrior4:
                     break;
-                case CharacterConstants.Job.BlazeWizard2:
+                case Job.BlazeWizard2:
                     break;
-                case CharacterConstants.Job.BlazeWizard3:
+                case Job.BlazeWizard3:
                     break;
-                case CharacterConstants.Job.BlazeWizard4:
+                case Job.BlazeWizard4:
                     break;
-                case CharacterConstants.Job.WindArcher2:
+                case Job.WindArcher2:
                     break;
-                case CharacterConstants.Job.WindArcher3:
+                case Job.WindArcher3:
                     break;
-                case CharacterConstants.Job.WindArcher4:
+                case Job.WindArcher4:
                     break;
-                case CharacterConstants.Job.NightWalker2:
+                case Job.NightWalker2:
                     break;
-                case CharacterConstants.Job.NightWalker3:
+                case Job.NightWalker3:
                     break;
-                case CharacterConstants.Job.NightWalker4:
+                case Job.NightWalker4:
                     break;
-                case CharacterConstants.Job.ThunderBreaker2:
+                case Job.ThunderBreaker2:
                     break;
-                case CharacterConstants.Job.ThunderBreaker3:
+                case Job.ThunderBreaker3:
                     break;
-                case CharacterConstants.Job.ThunderBreaker4:
+                case Job.ThunderBreaker4:
                     break;
-                case CharacterConstants.Job.Aran2:
+                case Job.Aran2:
                     break;
-                case CharacterConstants.Job.Aran3:
+                case Job.Aran3:
                     break;
-                case CharacterConstants.Job.Aran4:
+                case Job.Aran4:
                     break;
 
                 default:
@@ -277,204 +277,204 @@ namespace Destiny.Maple.Characters
             }
         }  
 
-        public static void AdjustMPOnLevelUP(Character character)
+        public static void AdjustMPOnLevelUp(Character character)
         {
             if (character == null) return;
 
-            CharacterConstants.Job charJob = character.Job;
+            Job charJob = character.Job;
             Random r = new Random();
 
             switch (charJob)
             {
-                case CharacterConstants.Job.Beginner:
+                case Job.Beginner:
                     short MPBonusBeginner = Convert.ToInt16(r.Next(10, 12));
                     AddMP(character, MPBonusBeginner);
                     break;
 
-                case CharacterConstants.Job.Aran:
+                case Job.Aran:
                     short MPBonusAran = Convert.ToInt16(r.Next(10, 12));
                     AddMP(character, MPBonusAran);
                     break;
 
-                case CharacterConstants.Job.Noblesse:
+                case Job.Noblesse:
                     short MPBonusNoblesse = Convert.ToInt16(r.Next(10, 12));
                     AddMP(character, MPBonusNoblesse);
                     break;
 
-                case CharacterConstants.Job.Warrior:
+                case Job.Warrior:
                     short MPBonusWarrior = Convert.ToInt16(r.Next(4, 6));
                     AddMP(character, MPBonusWarrior);
                     break;
 
-                case CharacterConstants.Job.DawnWarrior1:
+                case Job.DawnWarrior1:
                     short MPBonusDawnWarrior1 = Convert.ToInt16(r.Next(4, 6));
                     AddMP(character, MPBonusDawnWarrior1);
                     break;
 
-                case CharacterConstants.Job.Aran1:
+                case Job.Aran1:
                     short MPBonusAran1 = Convert.ToInt16(r.Next(4, 8));
                     AddMP(character, MPBonusAran1);
                     break;
 
-                case CharacterConstants.Job.Magician:
+                case Job.Magician:
                     short MPBonusCrusader = Convert.ToInt16(r.Next(22, 24));
                     AddMP(character, MPBonusCrusader);
                     break;
 
-                case CharacterConstants.Job.BlazeWizard1:
+                case Job.BlazeWizard1:
                     short MPBonusDawnWarrior2 = Convert.ToInt16(r.Next(22, 24));
                     AddMP(character, MPBonusDawnWarrior2);
                     break;
 
-                case CharacterConstants.Job.Bowman:
+                case Job.Archer:
                     short MPBonusBowman = Convert.ToInt16(r.Next(14, 16));
                     AddMP(character, MPBonusBowman);
                     break;
 
-                case CharacterConstants.Job.WindArcher1:
+                case Job.WindArcher1:
                     short MPBonusWindArcher1 = Convert.ToInt16(r.Next(14, 16));
                     AddMP(character, MPBonusWindArcher1);
                     break;
 
-                case CharacterConstants.Job.Thief:
+                case Job.Thief:
                     short MPBonusThief = Convert.ToInt16(r.Next(14, 16));
                     AddMP(character, MPBonusThief);
                     break;
 
-                case CharacterConstants.Job.NightWalker1:
+                case Job.NightWalker1:
                     short MPBonusNightWalker1 = Convert.ToInt16(r.Next(14, 16));
                     AddMP(character, MPBonusNightWalker1);
                     break;
 
-                case CharacterConstants.Job.Pirate:
+                case Job.Pirate:
                     short MPBonusPirate = Convert.ToInt16(r.Next(14, 16));
                     AddMP(character, MPBonusPirate);
                     break;
 
-                case CharacterConstants.Job.ThunderBreaker1:
+                case Job.ThunderBreaker1:
                     short MPBonusThunderBreaker1 = Convert.ToInt16(r.Next(14, 16));
                     AddMP(character, MPBonusThunderBreaker1);
                     break;
 
-                case CharacterConstants.Job.GM:
+                case Job.GM:
                     short MPBonusGM = 30000;
                     AddMP(character, MPBonusGM);
                     break;
 
-                case CharacterConstants.Job.SuperGM:
+                case Job.SuperGM:
                     short MPBonusSuperGM = 30000;
                     AddMP(character, MPBonusSuperGM);
                     break;
 
-                case CharacterConstants.Job.Fighter:
+                case Job.Fighter:
                     break;
-                case CharacterConstants.Job.Crusader:
+                case Job.Crusader:
                     break;
-                case CharacterConstants.Job.Hero:
+                case Job.Hero:
                     break;
-                case CharacterConstants.Job.Page:
+                case Job.Page:
                     break;
-                case CharacterConstants.Job.WhiteKnight:
+                case Job.WhiteKnight:
                     break;
-                case CharacterConstants.Job.Paladin:
+                case Job.Paladin:
                     break;
-                case CharacterConstants.Job.Spearman:
+                case Job.Spearman:
                     break;
-                case CharacterConstants.Job.DragonKnight:
+                case Job.DragonKnight:
                     break;
-                case CharacterConstants.Job.DarkKnight:
+                case Job.DarkKnight:
                     break;
-                case CharacterConstants.Job.FirePoisonWizard:
+                case Job.FirePoisonWizard:
                     break;
-                case CharacterConstants.Job.FirePoisonMage:
+                case Job.FirePoisonMage:
                     break;
-                case CharacterConstants.Job.FirePoisonArchMage:
+                case Job.FirePoisonArchMage:
                     break;
-                case CharacterConstants.Job.IceLightningWizard:
+                case Job.IceLightningWizard:
                     break;
-                case CharacterConstants.Job.IceLightningMage:
+                case Job.IceLightningMage:
                     break;
-                case CharacterConstants.Job.IceLightningArchMage:
+                case Job.IceLightningArchMage:
                     break;
-                case CharacterConstants.Job.Cleric:
+                case Job.Cleric:
                     break;
-                case CharacterConstants.Job.Priest:
+                case Job.Priest:
                     break;
-                case CharacterConstants.Job.Bishop:
+                case Job.Bishop:
                     break;
-                case CharacterConstants.Job.Hunter:
+                case Job.Hunter:
                     break;
-                case CharacterConstants.Job.Ranger:
+                case Job.Ranger:
                     break;
-                case CharacterConstants.Job.BowMaster:
+                case Job.BowMaster:
                     break;
-                case CharacterConstants.Job.CrossbowMan:
+                case Job.CrossbowMan:
                     break;
-                case CharacterConstants.Job.Sniper:
+                case Job.Sniper:
                     break;
-                case CharacterConstants.Job.CrossbowMaster:
+                case Job.CrossbowMaster:
                     break;
-                case CharacterConstants.Job.Assassin:
+                case Job.Assassin:
                     break;
-                case CharacterConstants.Job.Hermit:
+                case Job.Hermit:
                     break;
-                case CharacterConstants.Job.NightLord:
+                case Job.NightLord:
                     break;
-                case CharacterConstants.Job.Bandit:
+                case Job.Bandit:
                     break;
-                case CharacterConstants.Job.ChiefBandit:
+                case Job.ChiefBandit:
                     break;
-                case CharacterConstants.Job.Shadower:
+                case Job.Shadower:
                     break;
-                case CharacterConstants.Job.Brawler:
+                case Job.Brawler:
                     break;
-                case CharacterConstants.Job.Marauder:
+                case Job.Marauder:
                     break;
-                case CharacterConstants.Job.Buccaneer:
+                case Job.Buccaneer:
                     break;
-                case CharacterConstants.Job.Gunslinger:
+                case Job.Gunslinger:
                     break;
-                case CharacterConstants.Job.Outlaw:
+                case Job.Outlaw:
                     break;
-                case CharacterConstants.Job.Corsair:
+                case Job.Corsair:
                     break;
-                case CharacterConstants.Job.MapleleafBrigadier:
+                case Job.MapleleafBrigadier:
                     break;
-                case CharacterConstants.Job.DawnWarrior2:
+                case Job.DawnWarrior2:
                     break;
-                case CharacterConstants.Job.DawnWarrior3:
+                case Job.DawnWarrior3:
                     break;
-                case CharacterConstants.Job.DawnWarrior4:
+                case Job.DawnWarrior4:
                     break;
-                case CharacterConstants.Job.BlazeWizard2:
+                case Job.BlazeWizard2:
                     break;
-                case CharacterConstants.Job.BlazeWizard3:
+                case Job.BlazeWizard3:
                     break;
-                case CharacterConstants.Job.BlazeWizard4:
+                case Job.BlazeWizard4:
                     break;
-                case CharacterConstants.Job.WindArcher2:
+                case Job.WindArcher2:
                     break;
-                case CharacterConstants.Job.WindArcher3:
+                case Job.WindArcher3:
                     break;
-                case CharacterConstants.Job.WindArcher4:
+                case Job.WindArcher4:
                     break;
-                case CharacterConstants.Job.NightWalker2:
+                case Job.NightWalker2:
                     break;
-                case CharacterConstants.Job.NightWalker3:
+                case Job.NightWalker3:
                     break;
-                case CharacterConstants.Job.NightWalker4:
+                case Job.NightWalker4:
                     break;
-                case CharacterConstants.Job.ThunderBreaker2:
+                case Job.ThunderBreaker2:
                     break;
-                case CharacterConstants.Job.ThunderBreaker3:
+                case Job.ThunderBreaker3:
                     break;
-                case CharacterConstants.Job.ThunderBreaker4:
+                case Job.ThunderBreaker4:
                     break;       
-                case CharacterConstants.Job.Aran2:
+                case Job.Aran2:
                     break;
-                case CharacterConstants.Job.Aran3:
+                case Job.Aran3:
                     break;
-                case CharacterConstants.Job.Aran4:
+                case Job.Aran4:
                     break;
 
                 default:
@@ -483,53 +483,24 @@ namespace Destiny.Maple.Characters
             }
         }
 
-        public static void GainAPOnLeveLUP(Character character)
+        public static void GainAPOnLevelUp(Character character)
         {
-            if (CharacterJobs.IsCygnus(character) && character.Level < 70)
+            if (IsCygnus(character.Job) && character.Level <= 70)
             {
-                character.AbilityPoints += 6;
+				character.AbilityPoints += 6;
             }
-
-            else if (CharacterJobs.IsCygnus(character) && character.Level > 70)
-            {
-                character.AbilityPoints += 5;
-            }
-
-            else if (CharacterJobs.IsBeginner(character) && character.Level < 8)
-            {
-                character.AbilityPoints += 0;
-
-                if (character.Level < 6)
-                {
-                    character.Strength += 5;
-                }
-                else if (character.Level >= 6 && character.Level < 8)
-                {
-                    character.Strength += 4;
-                    character.Dexterity += 1;
-                }
-            }
-
-            else if (CharacterJobs.IsBeginner(character) && character.Level == 8)
-            {
-                character.Strength = 4;
-                character.Dexterity = 4;
-                character.AbilityPoints += 35;
-            }
-
             else
             {
                 character.AbilityPoints += 5;
             }
         }
 
-        public static void GainSPOnLeveLUP(Character character)
+        public static void GainSPOnLevelUp(Character character)
         {
-            if (CharacterJobs.IsBeginner(character))
+            if (IsBeginner(character.Job))
             {
                 character.SkillPoints += 1;
             }
-
             else
             {
                 character.SkillPoints += 3;
@@ -540,49 +511,49 @@ namespace Destiny.Maple.Characters
         {
             // increase level & update stats
             character.Level++;
-            Update(character, CharacterConstants.StatisticType.Level);
+            Update(character, StatisticType.Level);
             // generate randomized HP && MP bonus
-            AdjustHPOnLevelUP(character);
-            AdjustMPOnLevelUP(character);
+            AdjustHPOnLevelUp(character);
+            AdjustMPOnLevelUp(character);
             // gain stats
-            // TODO: edge cases when overlevling job adv
-            GainAPOnLeveLUP(character);
-            GainSPOnLeveLUP(character);
+            GainAPOnLevelUp(character);
+            GainSPOnLevelUp(character);
             // play effect if needed
-            if (PlayEffect) CharacterBuffs.ShowRemoteEffect(character, CharacterConstants.UserEffect.LevelUp);
+            if (PlayEffect)
+				CharacterBuffs.ShowRemoteEffect(character, UserEffect.LevelUp);
         }
 
-        public static void DistributeAP(Character character, CharacterConstants.StatisticType type, short amount = 1)
+        public static void DistributeAP(Character character, StatisticType type, short amount = 1)
         {
             switch (type)
             {
-                case CharacterConstants.StatisticType.Strength:
+                case StatisticType.Strength:
                     character.Strength += amount;
                     break;
 
-                case CharacterConstants.StatisticType.Dexterity:
+                case StatisticType.Dexterity:
                     character.Dexterity += amount;
                     break;
 
-                case CharacterConstants.StatisticType.Intelligence:
+                case StatisticType.Intelligence:
                     character.Intelligence += amount;
                     break;
 
-                case CharacterConstants.StatisticType.Luck:
+                case StatisticType.Luck:
                     character.Luck += amount;
                     break;
 
-                case CharacterConstants.StatisticType.MaxHealth:
+                case StatisticType.MaxHealth:
                     // TODO: Get addition based on other factors.
                     break;
 
-                case CharacterConstants.StatisticType.MaxMana:
+                case StatisticType.MaxMana:
                     // TODO: Get addition based on other factors.
                     break;
             }
         }
     
-        public static void AddAbility(Character character, CharacterConstants.StatisticType statistic, short mod, bool isReset)
+        public static void AddAbility(Character character, StatisticType statistic, short mod, bool isReset)
         {
             short maxStat = Int16.MaxValue; // TODO: Should this be a setting?
             bool isSubtract = mod < 0;
@@ -591,7 +562,7 @@ namespace Destiny.Maple.Characters
             {
                 switch (statistic)
                 {
-                    case CharacterConstants.StatisticType.Strength:
+                    case StatisticType.Strength:
                         if (character.Strength >= maxStat)
                         {
                             return;
@@ -600,7 +571,7 @@ namespace Destiny.Maple.Characters
                         character.Strength += mod;
                         break;
 
-                    case CharacterConstants.StatisticType.Dexterity:
+                    case StatisticType.Dexterity:
                         if (character.Dexterity >= maxStat)
                         {
                             return;
@@ -609,7 +580,7 @@ namespace Destiny.Maple.Characters
                         character.Dexterity += mod;
                         break;
 
-                    case CharacterConstants.StatisticType.Intelligence:
+                    case StatisticType.Intelligence:
                         if (character.Intelligence >= maxStat)
                         {
                             return;
@@ -618,7 +589,7 @@ namespace Destiny.Maple.Characters
                         character.Intelligence += mod;
                         break;
 
-                    case CharacterConstants.StatisticType.Luck:
+                    case StatisticType.Luck:
                         if (character.Luck >= maxStat)
                         {
                             return;
@@ -627,8 +598,8 @@ namespace Destiny.Maple.Characters
                         character.Luck += mod;
                         break;
 
-                    case CharacterConstants.StatisticType.MaxHealth:
-                    case CharacterConstants.StatisticType.MaxMana:
+                    case StatisticType.MaxHealth:
+                    case StatisticType.MaxMana:
                         {
                             // TODO: character is way too complicated for now.
                         }
@@ -645,196 +616,196 @@ namespace Destiny.Maple.Characters
         }
 
 
-        public static void Update(Character character, params CharacterConstants.StatisticType[] charStats)
+        public static void Update(Character character, params StatisticType[] charStats)
         {
             character.Client.Send(MapleCharacterPackets.UpdateStatsPacket(character, charStats));  
         }
 
         //TODO: hp/mp modification bugs out UI bars, add multiple stats, some kind of message to sideBar/chat
-        public static void giveStat(Character player, CharacterConstants.StatisticType stat, short quantity)
+        public static void giveStat(Character player, StatisticType stat, short quantity)
         {
             switch (stat)
             {
-                case CharacterConstants.StatisticType.Strength:
+                case StatisticType.Strength:
                     int totalStrenght = player.Strength + quantity;
 
                     if (totalStrenght < Int16.MaxValue)
                     {
                         player.Strength += quantity;
-                        Update(player, CharacterConstants.StatisticType.Strength);
+                        Update(player, StatisticType.Strength);
                         break;
                     }
 
                     else
                     {
                         player.Strength = Int16.MaxValue;
-                        Update(player, CharacterConstants.StatisticType.Strength);
+                        Update(player, StatisticType.Strength);
                         break;
                     }
 
-                case CharacterConstants.StatisticType.Dexterity:
+                case StatisticType.Dexterity:
                     int totalDexterity = player.Dexterity + quantity;
 
                     if (totalDexterity < Int16.MaxValue)
                     {
                         player.Dexterity += quantity;
-                        Update(player, CharacterConstants.StatisticType.Dexterity);
+                        Update(player, StatisticType.Dexterity);
                         break;
                     }
 
                     else
                     {
                         player.Dexterity = Int16.MaxValue;
-                        Update(player, CharacterConstants.StatisticType.Dexterity);
+                        Update(player, StatisticType.Dexterity);
                         break;
                     }
 
-                case CharacterConstants.StatisticType.Intelligence:
+                case StatisticType.Intelligence:
                     int totalIntelligence = player.Intelligence + quantity;
 
                     if (totalIntelligence < Int16.MaxValue)
                     {
                         player.Intelligence += quantity;
-                        Update(player, CharacterConstants.StatisticType.Intelligence);
+                        Update(player, StatisticType.Intelligence);
                         break;
                     }
 
                     else
                     {
                         player.Intelligence = Int16.MaxValue;
-                        Update(player, CharacterConstants.StatisticType.Intelligence);
+                        Update(player, StatisticType.Intelligence);
                         break;
                     }
 
-                case CharacterConstants.StatisticType.Luck:
+                case StatisticType.Luck:
                     int totalLuck = player.Luck + quantity;
                     
 
                     if (totalLuck < Int16.MaxValue)
                     {
                         player.Luck += quantity;
-                        Update(player, CharacterConstants.StatisticType.Luck);
+                        Update(player, StatisticType.Luck);
                         break;
                     }
 
                     else
                     {
                         player.Luck = Int16.MaxValue;
-                        Update(player, CharacterConstants.StatisticType.Luck);
+                        Update(player, StatisticType.Luck);
                         break;
                     }
 
-                case CharacterConstants.StatisticType.Health:
+                case StatisticType.Health:
                     int totalHealth = player.Health + quantity;
 
                     if (totalHealth < Int16.MaxValue)
                     {
                         player.Health += quantity;
-                        Update(player, CharacterConstants.StatisticType.Health);
+                        Update(player, StatisticType.Health);
                         break;
                     }
 
                     else
                     {
                         player.Health = Int16.MaxValue;
-                        Update(player, CharacterConstants.StatisticType.Health);
+                        Update(player, StatisticType.Health);
                         break;
                     }
 
-                case CharacterConstants.StatisticType.MaxHealth:
+                case StatisticType.MaxHealth:
                     int totalMaxHealth = player.MaxHealth + quantity;
 
                     if (totalMaxHealth < Int16.MaxValue)
                     {
                         player.MaxHealth += quantity;
-                        Update(player, CharacterConstants.StatisticType.MaxHealth);
+                        Update(player, StatisticType.MaxHealth);
                         break;
                     }
 
                     else
                     {
                         player.MaxHealth = Int16.MaxValue;
-                        Update(player, CharacterConstants.StatisticType.MaxHealth);
+                        Update(player, StatisticType.MaxHealth);
                         break;
                     }
 
-                case CharacterConstants.StatisticType.Mana:
+                case StatisticType.Mana:
                     int totalMana = player.Mana + quantity;
 
                     if (totalMana < Int16.MaxValue)
                     {
                         player.Mana += quantity;
-                        Update(player, CharacterConstants.StatisticType.Mana);
+                        Update(player, StatisticType.Mana);
                         break;
                     }
 
                     else
                     {
                         player.Mana = Int16.MaxValue;
-                        Update(player, CharacterConstants.StatisticType.Mana);
+                        Update(player, StatisticType.Mana);
                         break;
                     }
 
-                case CharacterConstants.StatisticType.MaxMana:
+                case StatisticType.MaxMana:
                     int totalMaxMana = player.MaxMana + quantity;
 
                     if (totalMaxMana < Int16.MaxValue)
                     {
                         player.MaxMana += quantity;
-                        Update(player, CharacterConstants.StatisticType.MaxMana);
+                        Update(player, StatisticType.MaxMana);
                         break;
                     }
 
                     else
                     {
                         player.MaxMana = Int16.MaxValue;
-                        Update(player, CharacterConstants.StatisticType.MaxMana);
+                        Update(player, StatisticType.MaxMana);
                         break;
                     }
 
-                case CharacterConstants.StatisticType.AbilityPoints:
+                case StatisticType.AbilityPoints:
                     int totalAbilityPoints = player.AbilityPoints + quantity;
 
                     if (totalAbilityPoints < Int16.MaxValue)
                     {
                         player.AbilityPoints += quantity;
-                        Update(player, CharacterConstants.StatisticType.AbilityPoints);
+                        Update(player, StatisticType.AbilityPoints);
                         break;
                     }
 
                     else
                     {
                         player.AbilityPoints = Int16.MaxValue;
-                        Update(player, CharacterConstants.StatisticType.AbilityPoints);
+                        Update(player, StatisticType.AbilityPoints);
                         break;
                     }
 
-                case CharacterConstants.StatisticType.SkillPoints:
+                case StatisticType.SkillPoints:
                     int totalSkillPoints = player.SkillPoints + quantity;
 
                     if (totalSkillPoints < Int16.MaxValue)
                     {
                         player.SkillPoints += quantity;
-                        Update(player, CharacterConstants.StatisticType.SkillPoints);
+                        Update(player, StatisticType.SkillPoints);
                         break;
                     }
                     else
                     {
                         player.SkillPoints = Int16.MaxValue;
-                        Update(player, CharacterConstants.StatisticType.SkillPoints);
+                        Update(player, StatisticType.SkillPoints);
                         break;
                     }
 
-                case CharacterConstants.StatisticType.Skin: break;
-                case CharacterConstants.StatisticType.Face: break;
-                case CharacterConstants.StatisticType.Hair: break;
-                case CharacterConstants.StatisticType.Level: break;
-                case CharacterConstants.StatisticType.Job: break;
-                case CharacterConstants.StatisticType.Experience: break;
-                case CharacterConstants.StatisticType.Fame: break;
-                case CharacterConstants.StatisticType.Mesos: break;
-                case CharacterConstants.StatisticType.Pet: break;
-                case CharacterConstants.StatisticType.GachaponExperience: break;
+                case StatisticType.Skin: break;
+                case StatisticType.Face: break;
+                case StatisticType.Hair: break;
+                case StatisticType.Level: break;
+                case StatisticType.Job: break;
+                case StatisticType.Experience: break;
+                case StatisticType.Fame: break;
+                case StatisticType.Mesos: break;
+                case StatisticType.Pet: break;
+                case StatisticType.GachaponExperience: break;
 
                 default: throw new ArgumentOutOfRangeException(nameof(stat), stat, null);
             }

@@ -1,9 +1,9 @@
 ﻿using Destiny.Data;
+using Destiny.IO;
+using Destiny.Network;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using Destiny.Constants;
-using Destiny.Network;
-using Destiny.IO;
+using static Destiny.Constants.CharacterConstants;
 
 namespace Destiny.Maple.Characters
 {
@@ -64,7 +64,7 @@ namespace Destiny.Maple.Characters
 
             switch (skill.MapleID)
             {
-                case (int)CharacterConstants.SkillNames.SuperGM.Resurrection:
+                case (int)SkillNames.SuperGM.Resurrection:
                     {
                         byte targets = iPacket.ReadByte();
 

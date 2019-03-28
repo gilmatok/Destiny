@@ -2,7 +2,7 @@
 using Destiny.Network;
 using Destiny.Maple.Characters;
 using System.Collections.Generic;
-using Destiny.Constants;
+using static Destiny.Constants.ItemConstants;
 
 namespace Destiny.Maple.Interaction
 {
@@ -71,7 +71,7 @@ namespace Destiny.Maple.Interaction
 
                 case InteractionCode.AddItem:
                     {
-                        ItemConstants.ItemType type = (ItemConstants.ItemType)iPacket.ReadByte();
+                        ItemType type = (ItemType)iPacket.ReadByte();
                         short slot = iPacket.ReadShort();
                         short bundles = iPacket.ReadShort();
                         short perBundle = iPacket.ReadShort();

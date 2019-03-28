@@ -1,13 +1,13 @@
-﻿using Destiny.Network;
-using Destiny.Data;
+﻿using Destiny.Data;
+using Destiny.IO;
 using Destiny.Maple.Characters;
 using Destiny.Maple.Data;
+using Destiny.Maple.Life;
+using Destiny.Network;
+using Destiny.Threading;
 using System;
 using System.Linq;
-using Destiny.Constants;
-using Destiny.IO;
-using Destiny.Maple.Life;
-using Destiny.Threading;
+using static Destiny.Constants.CharacterConstants;
 
 namespace Destiny.Maple
 {
@@ -132,34 +132,34 @@ namespace Destiny.Maple
         {
             switch (skill.MapleID)
             {
-                case (int)CharacterConstants.SkillNames.Beginner.NimbleFeet:
+                case (int)SkillNames.Beginner.NimbleFeet:
                     return true;
-                case (int)CharacterConstants.SkillNames.Beginner.Recovery:
+                case (int)SkillNames.Beginner.Recovery:
                     return true;
-                case (int)CharacterConstants.SkillNames.Beginner.ThreeSnails:
+                case (int)SkillNames.Beginner.ThreeSnails:
                     return true;
 
                 default: return false;
 
-                /* case (int)CharacterConstants.SkillNames.Beginner.BambooRain:
+                /* case (int)SkillNames.Beginner.BambooRain:
                     return true;
-                case (int)CharacterConstants.SkillNames.Beginner.BlessingOfTheFairy:
+                case (int)SkillNames.Beginner.BlessingOfTheFairy:
                     return true;
-                case (int)CharacterConstants.SkillNames.Beginner.ChairMaster:
+                case (int)SkillNames.Beginner.ChairMaster:
                     return true;
-                case (int)CharacterConstants.SkillNames.Beginner.EchoOfHero:
+                case (int)SkillNames.Beginner.EchoOfHero:
                     return true;
-                case (int)CharacterConstants.SkillNames.Beginner.FollowTheLead:
+                case (int)SkillNames.Beginner.FollowTheLead:
                     return true;
-                case (int)CharacterConstants.SkillNames.Beginner.Invincibility:
+                case (int)SkillNames.Beginner.Invincibility:
                     return true;
-                case (int)CharacterConstants.SkillNames.Beginner.JumpDown:
+                case (int)SkillNames.Beginner.JumpDown:
                     return true;
-                case (int)CharacterConstants.SkillNames.Beginner.LegendarySpirit:
+                case (int)SkillNames.Beginner.LegendarySpirit:
                     return true;
-                case (int)CharacterConstants.SkillNames.Beginner.Maker:
+                case (int)SkillNames.Beginner.Maker:
                     return true;
-                case (int)CharacterConstants.SkillNames.Beginner.MonsterRider:
+                case (int)SkillNames.Beginner.MonsterRider:
                     return true; */
             }
         }
@@ -412,7 +412,7 @@ namespace Destiny.Maple
                 this.CooldownEnd = DateTime.Now.AddSeconds(this.Cooldown);
             }
 
-            if (this.MapleID == (int)CharacterConstants.SkillNames.FirePoisonMage.PoisonMist)
+            if (this.MapleID == (int)SkillNames.FirePoisonMage.PoisonMist)
             {
                 Point mistMaxLT = new Point(-200, -150);
                 Point mistMaxRB = new Point(200, 150);
@@ -424,7 +424,7 @@ namespace Destiny.Maple
                 //get damage ticks of poisoned mobs within bounds
             }
 
-            if (this.MapleID == (int) CharacterConstants.SkillNames.FirePoisonWizard.PoisonBreath)
+            if (this.MapleID == (int) SkillNames.FirePoisonWizard.PoisonBreath)
             {
                 Mob victim = this.Character.ControlledMobs.FirstOrDefault();
                 if (victim != null)

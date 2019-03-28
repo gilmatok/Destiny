@@ -9,7 +9,7 @@ using Destiny.Security;
 using System;
 using System.Linq;
 using System.Net;
-using Destiny.Constants;
+using static Destiny.Constants.CharacterConstants;
 
 namespace Destiny.Interoperability
 {
@@ -199,11 +199,11 @@ namespace Destiny.Interoperability
         public bool ValidCharacterName(string charName)
         {
             // exception charName too short!
-            if(charName.Length < 4) return true;
+            if(charName.Length < 4) return false;
             // exception charName too long!
-            if (charName.Length > 12) return true;
+            if (charName.Length > 12) return false;
             // exception charName already in use!
-            if (Database.Exists("characters", "Name = {0}", charName)) return true;
+            if (Database.Exists("characters", "Name = {0}", charName)) return false;
             // exception charName is in ForbiddenNames!
             if (DataProvider.CreationData.ForbiddenNames.Any(forbiddenWord =>
                 charName.ToLowerInvariant().Contains(forbiddenWord))) return false;
@@ -216,7 +216,7 @@ namespace Destiny.Interoperability
         {
             int accountID = inPacket.ReadInt();
             string name = inPacket.ReadString();
-            CharacterConstants.JobType jobType = (CharacterConstants.JobType)inPacket.ReadInt();
+            JobType jobType = (JobType)inPacket.ReadInt();
             int face = inPacket.ReadInt();
             int hair = inPacket.ReadInt();
             int hairColor = inPacket.ReadInt();
@@ -225,7 +225,7 @@ namespace Destiny.Interoperability
             int bottomID = inPacket.ReadInt();
             int shoesID = inPacket.ReadInt();
             int weaponID = inPacket.ReadInt();
-            CharacterConstants.Gender gender = (CharacterConstants.Gender)inPacket.ReadByte();
+            Gender gender = (Gender)inPacket.ReadByte();
 
             bool error = false;
 
@@ -233,7 +233,7 @@ namespace Destiny.Interoperability
             {   
                 switch (gender) // TODO: these need error catching with item info.
                 {
-                    case CharacterConstants.Gender.Male:
+                    case Gender.Male:
                         if (!DataProvider.CreationData.MaleSkins.Any(x => x.Item1 == jobType && x.Item2 == skin)
                             || !DataProvider.CreationData.MaleFaces.Any(x => x.Item1 == jobType && x.Item2 == face)
                             || !DataProvider.CreationData.MaleHairs.Any(x => x.Item1 == jobType && x.Item2 == hair)
@@ -246,7 +246,7 @@ namespace Destiny.Interoperability
                             error = true;
                         break;
 
-                    case CharacterConstants.Gender.Female:
+                    case Gender.Female:
                         if (!DataProvider.CreationData.FemaleSkins.Any(x => x.Item1 == jobType && x.Item2 == skin)
                             || !DataProvider.CreationData.FemaleFaces.Any(x => x.Item1 == jobType && x.Item2 == face)
                             || !DataProvider.CreationData.FemaleHairs.Any(x => x.Item1 == jobType && x.Item2 == hair)
@@ -274,38 +274,39 @@ namespace Destiny.Interoperability
                 WvsGame.Stop();
             }
 
-            Character character = new Character();
+			Character character = new Character
+			{
+				AccountID = accountID,
+				WorldID = WvsGame.WorldID,
+				Name = name,
+				Gender = gender,
+				Skin = skin,
+				Face = face,
+				Hair = hair + hairColor,
+				Level = 1,
+				Job = jobType == JobType.Cygnus ? Job.Noblesse : jobType == JobType.Explorer ? Job.Beginner : Job.Aran,
+				Strength = 12,
+				Dexterity = 5,
+				Intelligence = 4,
+				Luck = 4,
+				MaxHealth = 50,
+				MaxMana = 5,
+				Health = 50,
+				Mana = 5,
+				AbilityPoints = 0,
+				SkillPoints = 0,
+				Experience = 0,
+				Fame = 0,
+				Map = DataProvider.Maps[jobType == JobType.Cygnus ? 130030000 : jobType == JobType.Explorer ? 10000 : 914000000],
+				SpawnPoint = 0,
+				Meso = 0
+			};
 
-            character.AccountID = accountID;
-            character.WorldID = WvsGame.WorldID;
-            character.Name = name;
-            character.Gender = gender;
-            character.Skin = skin;
-            character.Face = face;
-            character.Hair = hair + hairColor;
-            character.Level = 1;
-            character.Job = jobType == CharacterConstants.JobType.Cygnus ? CharacterConstants.Job.Noblesse : jobType == CharacterConstants.JobType.Explorer ? CharacterConstants.Job.Beginner : CharacterConstants.Job.Aran;
-            character.Strength = 12;
-            character.Dexterity = 5;
-            character.Intelligence = 4;
-            character.Luck = 4;
-            character.MaxHealth = 50;
-            character.MaxMana = 5;
-            character.Health = 50;
-            character.Mana = 5;
-            character.AbilityPoints = 0;
-            character.SkillPoints = 0;
-            character.Experience = 0;
-            character.Fame = 0;
-            character.Map = DataProvider.Maps[jobType == CharacterConstants.JobType.Cygnus ? 130030000 : jobType == CharacterConstants.JobType.Explorer ? 10000 : 914000000];
-            character.SpawnPoint = 0;
-            character.Meso = 0;
-
-            character.Items.Add(new Item(topID, equipped: true));
+			character.Items.Add(new Item(topID, equipped: true));
             character.Items.Add(new Item(bottomID, equipped: true));
             character.Items.Add(new Item(shoesID, equipped: true));
             character.Items.Add(new Item(weaponID, equipped: true));
-            character.Items.Add(new Item(jobType == CharacterConstants.JobType.Cygnus ? 4161047 : jobType == CharacterConstants.JobType.Explorer ? 4161001 : 4161048), forceGetSlot: true);
+            character.Items.Add(new Item(jobType == JobType.Cygnus ? 4161047 : jobType == JobType.Explorer ? 4161001 : 4161048), forceGetSlot: true);
 
             character.Keymap.Add(new Shortcut(KeymapKey.One, KeymapAction.AllChat));
             character.Keymap.Add(new Shortcut(KeymapKey.Two, KeymapAction.PartyChat));

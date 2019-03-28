@@ -16,7 +16,7 @@ namespace Destiny.Maple.Commands.Implementation
         {
             get
             {
-                return "amount";
+                return "{ amount }";
             }
         }
 
@@ -36,16 +36,14 @@ namespace Destiny.Maple.Commands.Implementation
             }
             else
             {
-                if (int.Parse(args[0]) > int.MaxValue || int.Parse(args[0]) < int.MinValue)
-                {
-                    int mesoGiven = int.MaxValue;
-                    Meso.giveMesos(caller, mesoGiven);
-                }
-                else
-                {
-                    int mesoGiven = int.Parse(args[0]);
-                    Meso.giveMesos(caller, mesoGiven);
-                }
+				if (int.TryParse(args[0], out int mesoGiven))
+				{
+					Meso.giveMesos(caller, mesoGiven);
+				}
+				else
+				{
+					caller.Notify("[Command] Invalid amount provided.");
+				}
             }
         }
     }

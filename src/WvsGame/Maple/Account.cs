@@ -2,7 +2,7 @@
 using Destiny.Network;
 using System;
 using System.Data;
-using Destiny.Constants;
+using static Destiny.Constants.CharacterConstants;
 
 namespace Destiny.Maple
 {
@@ -12,7 +12,7 @@ namespace Destiny.Maple
 
         public int ID { get; private set; }
         public string Username { get; set; }
-        public CharacterConstants.Gender Gender { get; set; }
+        public Gender Gender { get; set; }
         public bool IsMaster { get; set; }
         public DateTime Birthday { get; set; }
         public DateTime Creation { get; set; }
@@ -41,7 +41,7 @@ namespace Destiny.Maple
             this.Assigned = true;
 
             this.Username = (string)datum["Username"];
-            this.Gender = (CharacterConstants.Gender)datum["Gender"];
+            this.Gender = (Gender)datum["Gender"];
             this.IsMaster = (bool)datum["IsMaster"];
             this.Birthday = (DateTime)datum["Birthday"];
             this.Creation = (DateTime)datum["Creation"];

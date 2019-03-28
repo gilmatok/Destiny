@@ -1,268 +1,470 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Destiny.Constants
 {
-    public class CharacterConstants
-    {
-        public static class ExperienceTables
-        {
-            public static readonly int[] BegginerLevels = { 1, 15, 34, 57, 92, 135, 372, 560, 840, 1242, 1144 };
-            public static readonly int[] FirstJobLevels = { 1573, 2144, 2800, 3640, 4700, 5893, 7360, 9144, 11120, 13477, 16268, 19320, 22880, 27008, 31477, 36600, 42444, 48720, 55813, 63800 };
-            public static readonly int[] SecondJobLevels = { 86784, 98208, 110932, 124432, 139372, 155865, 173280, 192400, 213345, 235372, 259392, 285532, 312928, 342624, 374760, 408336, 445544, 483532, 524160, 567772, 598886, 631704, 666321, 702836, 741351, 781976, 824828, 870028, 917625, 967995, 1021041, 1076994, 1136013, 1198266, 1263930, 1333194, 1406252, 1483314, 1564600, 1650340 };
-            public static readonly int[] ThirdJobLevels = { 1740778, 1836173, 1936794, 2042930, 2154882, 2272970, 2397528, 2528912, 2667496, 2813674, 2967863, 3130502, 3302053, 3483005, 3673873, 3875201, 4087562, 4311559, 4547832, 4797053, 5059931, 5337215, 5629694, 5938202, 6263614, 6606860, 6968915, 7350811, 7753635, 8178534, 8626718, 9099462, 9598112, 10124088, 10678888, 11264090, 11881362, 12532461, 13219239, 13943653, 14707765, 15513750, 16363902, 17260644, 18206527, 19204245, 20256637, 21366700, 22537594, 23772654 };
-            public static readonly int[] FourthJobLevels = { 25075395, 26449526, 27898960, 29427822, 31040466, 32741483, 34535716, 36428273, 38424542, 40530206, 42751262, 45094030, 47565183, 50171755, 52921167, 55821246, 58880250, 62106888, 65510344, 69100311, 72887008, 76881216, 81094306, 85594273, 90225770, 95170142, 100385466, 105886589, 111689174, 117809740, 124265714, 131075474, 138258410, 145834970, 153826726, 162256430, 171148082, 180526997, 190419876, 200854885, 211861732, 223471711, 223471711, 248635353, 262260570, 276632449, 291791906, 307782102, 324648562, 342439302, 361204976, 380999008, 401877754, 423900654, 447130410, 471633156, 497478653, 524740482, 553496261, 583827855, 615821622, 649568646, 685165008, 722712050, 762316670, 804091623, 848155844, 894634784, 943660770, 995373379, 1049919840, 1107455447, 1168144006, 1232158297, 1299680571, 1370903066, 1446028554, 1525246918, 1608855764, 1697021059 };
+	public class CharacterConstants
+	{
+		public static class ExperienceTables
+		{
+			public static readonly int[] BeginnerLevelExp = { 0, 15, 34, 57, 92, 135, 372, 560, 840, 1242, 1144 };
+			public static readonly int[] FirstJobLevelExp = { 1573, 2144, 2800, 3640, 4700, 5893, 7360, 9144, 11120, 13477, 16268, 19320, 22880, 27008, 31477, 36600, 42444, 48720, 55813, 63800 };
+			public static readonly int[] SecondJobLevelExp = { 86784, 98208, 110932, 124432, 139372, 155865, 173280, 192400, 213345, 235372, 259392, 285532, 312928, 342624, 374760, 408336, 445544, 483532, 524160, 567772, 598886, 631704, 666321, 702836, 741351, 781976, 824828, 870028, 917625, 967995, 1021041, 1076994, 1136013, 1198266, 1263930, 1333194, 1406252, 1483314, 1564600, 1650340 };
+			public static readonly int[] ThirdJobLevelExp = { 1740778, 1836173, 1936794, 2042930, 2154882, 2272970, 2397528, 2528912, 2667496, 2813674, 2967863, 3130502, 3302053, 3483005, 3673873, 3875201, 4087562, 4311559, 4547832, 4797053, 5059931, 5337215, 5629694, 5938202, 6263614, 6606860, 6968915, 7350811, 7753635, 8178534, 8626718, 9099462, 9598112, 10124088, 10678888, 11264090, 11881362, 12532461, 13219239, 13943653, 14707765, 15513750, 16363902, 17260644, 18206527, 19204245, 20256637, 21366700, 22537594, 23772654 };
+			public static readonly int[] FourthJobLevelExp = { 25075395, 26449526, 27898960, 29427822, 31040466, 32741483, 34535716, 36428273, 38424542, 40530206, 42751262, 45094030, 47565183, 50171755, 52921167, 55821246, 58880250, 62106888, 65510344, 69100311, 72887008, 76881216, 81094306, 85594273, 90225770, 95170142, 100385466, 105886589, 111689174, 117809740, 124265714, 131075474, 138258410, 145834970, 153826726, 162256430, 171148082, 180526997, 190419876, 200854885, 211861732, 223471711, 223471711, 248635353, 262260570, 276632449, 291791906, 307782102, 324648562, 342439302, 361204976, 380999008, 401877754, 423900654, 447130410, 471633156, 497478653, 524740482, 553496261, 583827855, 615821622, 649568646, 685165008, 722712050, 762316670, 804091623, 848155844, 894634784, 943660770, 995373379, 1049919840, 1107455447, 1168144006, 1232158297, 1299680571, 1370903066, 1446028554, 1525246918, 1608855764, 1697021059, int.MaxValue };
 
-            public static readonly int[] PetLevels = { 1, 1, 3, 6, 14, 31, 60, 108, 181, 287, 434, 632, 891, 1224, 1642, 2161, 2793, 3557, 4467, 5542, 6801, 8263, 9950, 11882, 14084, 16578, 19391, 22547, 26074, 30000, int.MaxValue };
-            public static readonly int[] PetCloseness = { 0, 1, 3, 6, 14, 31, 60, 108, 181, 287, 434, 632, 891, 1224, 1642, 2161, 2793, 3557, 4467, 5542, 9000 };
-            public static readonly int[] MountLevels = { 1, 24, 50, 105, 134, 196, 254, 263, 315, 367, 430, 543, 587, 679, 725, 897, 1146, 1394, 1701, 2247, 2543, 2898, 3156, 3313, 3584, 3923, 4150, 4305, 4550 };
+			public static readonly int[] PetLevelExp = { 1, 1, 3, 6, 14, 31, 60, 108, 181, 287, 434, 632, 891, 1224, 1642, 2161, 2793, 3557, 4467, 5542, 6801, 8263, 9950, 11882, 14084, 16578, 19391, 22547, 26074, 30000, int.MaxValue };
+			public static readonly int[] PetCloseness = { 0, 1, 3, 6, 14, 31, 60, 108, 181, 287, 434, 632, 891, 1224, 1642, 2161, 2793, 3557, 4467, 5542, 9000 };
+			public static readonly int[] MountLevels = { 1, 24, 50, 105, 134, 196, 254, 263, 315, 367, 430, 543, 587, 679, 725, 897, 1146, 1394, 1701, 2247, 2543, 2898, 3156, 3313, 3584, 3923, 4150, 4305, 4550 };
 
-            //TODO: these data seem slightly wrong?
-            public static readonly int[] CharacterLevel = { 1, 15, 34, 57, 92, 135, 372, 560, 840, 1242, 1242, 1242, 1242, 1242, 1242, 1490, 1788, 2146, 2575, 3090, 3708, 4450, 5340, 6408, 7690, 9228, 11074, 13289, 15947, 19136, 19136, 19136, 19136, 19136, 19136, 22963, 27556, 33067, 39681, 47616, 51425, 55539, 59582, 64781, 69963, 75560, 81605, 88133, 95184, 102799, 111023, 119905, 129497, 139857, 151046, 163129, 176180, 190274, 205496, 221936, 239691, 258866, 279575, 301941, 326097, 352184, 380359, 410788, 443651, 479143, 479143, 479143, 479143, 479143, 479143, 512683, 548571, 586971, 628059, 672024, 719065, 769400, 823258, 880886, 942548, 1008526, 1079123, 1154662, 1235488, 1321972, 1414511, 1513526, 1619473, 1732836, 1854135, 1983924, 2122799, 2271395, 2430393, 2600520, 2782557, 2977336, 3185749, 3408752, 3647365, 3902680, 4175868, 4468179, 4780951, 5115618, 5473711, 5856871, 6266852, 6705531, 7176919, 7677163, 8214565, 8789584, 9404855, 10063195, 10063195, 10063195, 10063195, 10063195, 10063195, 10767619, 11521352, 12327847, 13190796, 14114152, 15102142, 16159292, 17290443, 18500774, 19795828, 21181536, 22664244, 24250741, 25948292, 27764673, 29708200, 31787774, 34012918, 36393823, 38941390, 41667310, 44584022, 47704904, 51044247, 54617344, 58440558, 62531397, 66908595, 71592197, 76603651, 81965907, 87703520, 93842766, 100411760, 107440583, 113887018, 120720239, 127963453, 135641260, 143779736, 152406520, 161550911, 171243966, 181518604, 192409720, 203954303, 216191561, 229163055, 242912838, 257487608, 272936864, 289313076, 306671861, 325072173, 344576503, 365251093, 387166159, 410396129, 435019897, 461121091, 488788356, 518115657, 549202596, 582154752, 617084037, 654109079, 693355624, 734956961, 779054379, 825797642, 875345501, 927866231, 983538205, 1042550497, 1105103527, int.MaxValue }; //NOTE: Last value is needed or else level 200 characters will throw an IndexOutOfRange exception
-        }
+			public static readonly int[] CharacterLevelExp = BeginnerLevelExp.Concat(FirstJobLevelExp)
+				.Concat(SecondJobLevelExp)
+				.Concat(ThirdJobLevelExp)
+				.Concat(FourthJobLevelExp).ToArray();
+		}
 
-        #region Character
-        public enum Gender : byte
-        {
-            Male,
-            Female,
-            Both,
-            Unset = 10
-        }
+		#region Character
+		public enum Gender : byte
+		{
+			Male,
+			Female,
+			Both,
+			Unset = 10
+		}
 
-        public enum Job : short
-        {
-            Beginner,
+		public enum Job : short
+		{
+			Beginner,
 
-            Warrior = 100,
-            Fighter = 110,
-            Crusader,
-            Hero,
-            Page = 120,
-            WhiteKnight,
-            Paladin,
-            Spearman = 130,
-            DragonKnight,
-            DarkKnight,
+			Warrior = 100,
+			Fighter = 110,
+			Crusader,
+			Hero,
+			Page = 120,
+			WhiteKnight,
+			Paladin,
+			Spearman = 130,
+			DragonKnight,
+			DarkKnight,
 
-            Magician = 200,
-            FirePoisonWizard = 210,
-            FirePoisonMage,
-            FirePoisonArchMage,
-            IceLightningWizard = 220,
-            IceLightningMage,
-            IceLightningArchMage,
-            Cleric = 230,
-            Priest,
-            Bishop,
+			Magician = 200,
+			FirePoisonWizard = 210,
+			FirePoisonMage,
+			FirePoisonArchMage,
+			IceLightningWizard = 220,
+			IceLightningMage,
+			IceLightningArchMage,
+			Cleric = 230,
+			Priest,
+			Bishop,
 
-            Bowman = 300,
-            Hunter = 310,
-            Ranger,
-            BowMaster,
-            CrossbowMan = 320,
-            Sniper,
-            CrossbowMaster,
+			Archer = 300,
+			Hunter = 310,
+			Ranger,
+			BowMaster,
+			CrossbowMan = 320,
+			Sniper,
+			CrossbowMaster,
 
-            Thief = 400,
-            Assassin = 410,
-            Hermit,
-            NightLord,
-            Bandit = 420,
-            ChiefBandit,
-            Shadower,
+			Thief = 400,
+			Assassin = 410,
+			Hermit,
+			NightLord,
+			Bandit = 420,
+			ChiefBandit,
+			Shadower,
 
-            Pirate = 500,
-            Brawler = 510,
-            Marauder,
-            Buccaneer,
-            Gunslinger = 520,
-            Outlaw,
-            Corsair,
+			Pirate = 500,
+			Brawler = 510,
+			Marauder,
+			Buccaneer,
+			Gunslinger = 520,
+			Outlaw,
+			Corsair,
 
-            MapleleafBrigadier = 800,
-            GM = 900,
-            SuperGM = 910,
+			MapleleafBrigadier = 800,
+			GM = 900,
+			SuperGM = 910,
 
-            Noblesse = 1000,
+			Noblesse = 1000,
 
-            DawnWarrior1 = 1100,
-            DawnWarrior2 = 1110,
-            DawnWarrior3,
-            DawnWarrior4,
+			DawnWarrior1 = 1100,
+			DawnWarrior2 = 1110,
+			DawnWarrior3,
+			DawnWarrior4,
 
-            BlazeWizard1 = 1200,
-            BlazeWizard2 = 1210,
-            BlazeWizard3,
-            BlazeWizard4,
+			BlazeWizard1 = 1200,
+			BlazeWizard2 = 1210,
+			BlazeWizard3,
+			BlazeWizard4,
 
-            WindArcher1 = 1300,
-            WindArcher2 = 1310,
-            WindArcher3,
-            WindArcher4,
+			WindArcher1 = 1300,
+			WindArcher2 = 1310,
+			WindArcher3,
+			WindArcher4,
 
-            NightWalker1 = 1400,
-            NightWalker2 = 1410,
-            NightWalker3,
-            NightWalker4,
+			NightWalker1 = 1400,
+			NightWalker2 = 1410,
+			NightWalker3,
+			NightWalker4,
 
-            ThunderBreaker1 = 1500,
-            ThunderBreaker2 = 1510,
-            ThunderBreaker3,
-            ThunderBreaker4,
+			ThunderBreaker1 = 1500,
+			ThunderBreaker2 = 1510,
+			ThunderBreaker3,
+			ThunderBreaker4,
 
-            Aran  = 2000, // aran begginer
-            Aran1 = 2100,
-            Aran2 = 2110,
-            Aran3,
-            Aran4
-        }
+			Aran = 2000, // aran beginner
+			Aran1 = 2100,
+			Aran2 = 2110,
+			Aran3,
+			Aran4
+		}
 
-        public enum JobType
-        {
-            Cygnus = 0,
-            Explorer = 1,
-            Aran = 2
-        }
+		public enum JobType
+		{
+			Cygnus = 0,
+			Explorer = 1,
+			Aran = 2
+		}
 
-        public enum UserEffect : byte
-        {
-            LevelUp = 0,
-            SkillUse = 1,
-            SkillAffected = 2,
-            Quest = 3,
-            Pet = 4,
-            SkillSpecial = 5,
-            ProtectOnDieItemUse = 6,
-            PlayPortalSE = 7,
-            JobChanged = 8,
-            QuestComplete = 9,
-            IncDecHPEffect = 10,
-            BuffItemEffect = 11,
-            SquibEffect = 12,
-            MonsterBookCardGet = 13,
-            LotteryUse = 14,
-            ItemLevelUp = 15,
-            ItemMaker = 16,
-            ExpItemConsumed = 17,
-            ReservedEffect = 18,
-            Buff = 19,
-            ConsumeEffect = 20,
-            UpgradeTombItemUse = 21,
-            BattlefieldItemUse = 22,
-            AvatarOriented = 23,
-            IncubatorUse = 24,
-            PlaySoundWithMuteBGM = 25,
-            SoulStoneUse = 26,
-            IncDecHPEffect_EX = 27,
-            DeliveryQuestItemUse = 28, // NOTE: Post big bang update.
-            RepeatEffectRemove = 29, // NOTE: Post big bang update.
-            EvolRing = 30 // NOTE: Post big bang update.
-        }
+		public enum UserEffect : byte
+		{
+			LevelUp = 0,
+			SkillUse = 1,
+			SkillAffected = 2,
+			Quest = 3,
+			Pet = 4,
+			SkillSpecial = 5,
+			ProtectOnDieItemUse = 6,
+			PlayPortalSE = 7,
+			JobChanged = 8,
+			QuestComplete = 9,
+			IncDecHPEffect = 10,
+			BuffItemEffect = 11,
+			SquibEffect = 12,
+			MonsterBookCardGet = 13,
+			LotteryUse = 14,
+			ItemLevelUp = 15,
+			ItemMaker = 16,
+			ExpItemConsumed = 17,
+			ReservedEffect = 18,
+			Buff = 19,
+			ConsumeEffect = 20,
+			UpgradeTombItemUse = 21,
+			BattlefieldItemUse = 22,
+			AvatarOriented = 23,
+			IncubatorUse = 24,
+			PlaySoundWithMuteBGM = 25,
+			SoulStoneUse = 26,
+			IncDecHPEffect_EX = 27,
+			DeliveryQuestItemUse = 28, // NOTE: Post big bang update.
+			RepeatEffectRemove = 29, // NOTE: Post big bang update.
+			EvolRing = 30 // NOTE: Post big bang update.
+		}
 
-        [Flags]
-        public enum StatisticType : int
-        {
-            None = 0x0,
+		[Flags]
+		public enum StatisticType : int
+		{
+			None = 0x0,
 
-            Skin = 0x1,
-            Face = 0x2,
-            Hair = 0x4,
-            Level = 0x10,
-            Job = 0x20,
-            Strength = 0x40,
-            Dexterity = 0x80,
-            Intelligence = 0x100,
-            Luck = 0x200,
-            Health = 0x400,
-            MaxHealth = 0x800,
-            Mana = 0x1000,
-            MaxMana = 0x2000,
-            AbilityPoints = 0x4000,
-            SkillPoints = 0x8000,
-            Experience = 0x10000,
-            Fame = 0x20000,
-            Mesos = 0x40000,
-            Pet = 0x180000,
-            GachaponExperience = 0x200000
-        }
+			Skin = 0x1,
+			Face = 0x2,
+			Hair = 0x4,
+			Level = 0x10,
+			Job = 0x20,
+			Strength = 0x40,
+			Dexterity = 0x80,
+			Intelligence = 0x100,
+			Luck = 0x200,
+			Health = 0x400,
+			MaxHealth = 0x800,
+			Mana = 0x1000,
+			MaxMana = 0x2000,
+			AbilityPoints = 0x4000,
+			SkillPoints = 0x8000,
+			Experience = 0x10000,
+			Fame = 0x20000,
+			Mesos = 0x40000,
+			Pet = 0x180000,
+			GachaponExperience = 0x200000
+		}
 
-        public enum AttackType
-        {
-            Melee,
-            Range,
-            Magic,
-            Summon
-        }
+		public enum AttackType
+		{
+			Melee,
+			Range,
+			Magic,
+			Summon
+		}
 
-        public enum AttackElementType
-        {
-            Neutral,
-            Fire,
-            Poison,
-            Ice,
-            Lighting,
-            Holy,
-        }
+		public enum AttackElementType
+		{
+			Neutral,
+			Fire,
+			Poison,
+			Ice,
+			Lighting,
+			Holy,
+		}
 
-        public enum CommandType : byte
-        {
-            Find = 5,
-            Whisper = 6
-        }
+		public enum CommandType : byte
+		{
+			Find = 5,
+			Whisper = 6
+		}
 
-        public enum AdminCommandType : byte
-        {
-            CreateItem = 0,
-            DestroyFirstITem = 1,
-            GiveExperience = 2,
-            Ban = 3,
-            Block = 4,
-            VarSetGet = 9,
-            Hide = 16,
-            ShowMessageMap = 17,
-            Send = 18,
-            Summon = 23,
-            Snow = 28,
-            Warn = 29,
-            Log = 30,
-            SetObjectState = 34
-        }
+		public enum AdminCommandType : byte
+		{
+			CreateItem = 0,
+			DestroyFirstITem = 1,
+			GiveExperience = 2,
+			Ban = 3,
+			Block = 4,
+			VarSetGet = 9,
+			Hide = 16,
+			ShowMessageMap = 17,
+			Send = 18,
+			Summon = 23,
+			Snow = 28,
+			Warn = 29,
+			Log = 30,
+			SetObjectState = 34
+		}
 
-        public enum CharacterDisease : ulong
-        {
-            None = 0x0L,
+		public enum CharacterDisease : ulong
+		{
+			None = 0x0L,
 
-            Slow = 0x1L,
-            Seduce = 0x80L,
-            Fishable = 0x100L,
-            Confuse = 0x80000L,
-            Stun = 0x2000000000000L,
-            Poison = 0x4000000000000L,
-            Sealed = 0x8000000000000L,
-            Darkness = 0x10000000000000L,
-            Weaken = 0x4000000000000000L,
-            Curse = 0x8000000000000000L
-        }
+			Slow = 0x1L,
+			Seduce = 0x80L,
+			Fishable = 0x100L,
+			Confuse = 0x80000L,
+			Stun = 0x2000000000000L,
+			Poison = 0x4000000000000L,
+			Sealed = 0x8000000000000L,
+			Darkness = 0x10000000000000L,
+			Weaken = 0x4000000000000000L,
+			Curse = 0x8000000000000000L
+		}
 
-        public enum ReportType : byte
-        {
-            IllegalProgramUsage = 0,
-            ConversationClaim = 1
-        }
+		public enum ReportType : byte
+		{
+			IllegalProgramUsage = 0,
+			ConversationClaim = 1
+		}
 
-        public enum ReportResult : byte
-        {
-            Success,
-            UnableToLocate,
-            Max10TimesADay,
-            YouAreReportedByUser,
-            UnknownError
-        }
-        #endregion
+		public enum ReportResult : byte
+		{
+			Success,
+			UnableToLocate,
+			Max10TimesADay,
+			YouAreReportedByUser,
+			UnknownError
+		}
 
-        #region Skills and Buffs
+		#region Job Helpers
+		public enum JobClass
+		{
+			None,
+			Magician,
+			Thief,
+			Warrior,
+			Bowman,
+			Pirate,
+			Special
+		}
 
-        public static class SkillNames
+		public enum JobRace
+		{
+			Explorer,
+			Cygnus,
+			Hero, // Aran is the only "Hero" in v83
+			Unique
+		}
+		
+		public struct JobDetail
+		{
+			public JobClass Class { get; set; }
+			public JobRace Race { get; set; }
+			public int Tier { get; set; }
+
+			public JobDetail(JobClass jobClass, JobRace race, int tier)
+			{
+				Class = jobClass;
+				Race = race;
+				Tier = tier;
+			}
+		}
+
+		public static IDictionary<Job, JobDetail> JobDetails = new Dictionary<Job, JobDetail>()
+		{
+			[Job.Beginner] = new JobDetail(JobClass.None, JobRace.Explorer, 0),
+			[Job.Warrior] = new JobDetail(JobClass.Warrior, JobRace.Explorer, 1),
+			[Job.Fighter] = new JobDetail(JobClass.Warrior, JobRace.Explorer, 2),
+			[Job.Crusader] = new JobDetail(JobClass.Warrior, JobRace.Explorer, 3),
+			[Job.Hero] = new JobDetail(JobClass.Warrior, JobRace.Explorer, 4),
+			[Job.Page] = new JobDetail(JobClass.Warrior, JobRace.Explorer, 2),
+			[Job.WhiteKnight] = new JobDetail(JobClass.Warrior, JobRace.Explorer, 3),
+			[Job.Paladin] = new JobDetail(JobClass.Warrior, JobRace.Explorer, 4),
+			[Job.Spearman] = new JobDetail(JobClass.Warrior, JobRace.Explorer, 2),
+			[Job.DragonKnight] = new JobDetail(JobClass.Warrior, JobRace.Explorer, 3),
+			[Job.DarkKnight] = new JobDetail(JobClass.Warrior, JobRace.Explorer, 4),
+			[Job.Magician] = new JobDetail(JobClass.Magician, JobRace.Explorer, 1),
+			[Job.FirePoisonWizard] = new JobDetail(JobClass.Magician, JobRace.Explorer, 2),
+			[Job.FirePoisonMage] = new JobDetail(JobClass.Magician, JobRace.Explorer, 3),
+			[Job.FirePoisonArchMage] = new JobDetail(JobClass.Magician, JobRace.Explorer, 4),
+			[Job.IceLightningWizard] = new JobDetail(JobClass.Magician, JobRace.Explorer, 2),
+			[Job.IceLightningMage] = new JobDetail(JobClass.Magician, JobRace.Explorer, 3),
+			[Job.IceLightningArchMage] = new JobDetail(JobClass.Magician, JobRace.Explorer, 4),
+			[Job.Cleric] = new JobDetail(JobClass.Magician, JobRace.Explorer, 2),
+			[Job.Priest] = new JobDetail(JobClass.Magician, JobRace.Explorer, 3),
+			[Job.Bishop] = new JobDetail(JobClass.Magician, JobRace.Explorer, 4),
+			[Job.Archer] = new JobDetail(JobClass.Bowman, JobRace.Explorer, 1),
+			[Job.Hunter] = new JobDetail(JobClass.Bowman, JobRace.Explorer, 2),
+			[Job.Ranger] = new JobDetail(JobClass.Bowman, JobRace.Explorer, 3),
+			[Job.BowMaster] = new JobDetail(JobClass.Bowman, JobRace.Explorer, 4),
+			[Job.CrossbowMan] = new JobDetail(JobClass.Bowman, JobRace.Explorer, 2),
+			[Job.Sniper] = new JobDetail(JobClass.Bowman, JobRace.Explorer, 3),
+			[Job.CrossbowMaster] = new JobDetail(JobClass.Bowman, JobRace.Explorer, 4),
+			[Job.Thief] = new JobDetail(JobClass.Thief, JobRace.Explorer, 1),
+			[Job.Assassin] = new JobDetail(JobClass.Thief, JobRace.Explorer, 2),
+			[Job.Hermit] = new JobDetail(JobClass.Thief, JobRace.Explorer, 3),
+			[Job.NightLord] = new JobDetail(JobClass.Thief, JobRace.Explorer, 4),
+			[Job.Bandit] = new JobDetail(JobClass.Thief, JobRace.Explorer, 2),
+			[Job.ChiefBandit] = new JobDetail(JobClass.Thief, JobRace.Explorer, 3),
+			[Job.Shadower] = new JobDetail(JobClass.Thief, JobRace.Explorer, 4),
+			[Job.Pirate] = new JobDetail(JobClass.Pirate, JobRace.Explorer, 1),
+			[Job.Brawler] = new JobDetail(JobClass.Pirate, JobRace.Explorer, 2),
+			[Job.Marauder] = new JobDetail(JobClass.Pirate, JobRace.Explorer, 3),
+			[Job.Buccaneer] = new JobDetail(JobClass.Pirate, JobRace.Explorer, 4),
+			[Job.Gunslinger] = new JobDetail(JobClass.Pirate, JobRace.Explorer, 2),
+			[Job.Outlaw] = new JobDetail(JobClass.Pirate, JobRace.Explorer, 3),
+			[Job.Corsair] = new JobDetail(JobClass.Pirate, JobRace.Explorer, 4),
+			[Job.MapleleafBrigadier] = new JobDetail(JobClass.None, JobRace.Unique, 0),
+			[Job.GM] = new JobDetail(JobClass.Special, JobRace.Unique, 4),
+			[Job.SuperGM] = new JobDetail(JobClass.Special, JobRace.Unique, 4),
+			[Job.Noblesse] = new JobDetail(JobClass.None, JobRace.Cygnus, 0),
+			[Job.DawnWarrior1] = new JobDetail(JobClass.Warrior, JobRace.Cygnus, 1),
+			[Job.DawnWarrior2] = new JobDetail(JobClass.Warrior, JobRace.Cygnus, 2),
+			[Job.DawnWarrior3] = new JobDetail(JobClass.Warrior, JobRace.Cygnus, 3),
+			[Job.DawnWarrior4] = new JobDetail(JobClass.Warrior, JobRace.Cygnus, 4),
+			[Job.BlazeWizard1] = new JobDetail(JobClass.Magician, JobRace.Cygnus, 1),
+			[Job.BlazeWizard2] = new JobDetail(JobClass.Magician, JobRace.Cygnus, 2),
+			[Job.BlazeWizard3] = new JobDetail(JobClass.Magician, JobRace.Cygnus, 3),
+			[Job.BlazeWizard4] = new JobDetail(JobClass.Magician, JobRace.Cygnus, 4),
+			[Job.WindArcher1] = new JobDetail(JobClass.Bowman, JobRace.Cygnus, 1),
+			[Job.WindArcher2] = new JobDetail(JobClass.Bowman, JobRace.Cygnus, 2),
+			[Job.WindArcher3] = new JobDetail(JobClass.Bowman, JobRace.Cygnus, 3),
+			[Job.WindArcher4] = new JobDetail(JobClass.Bowman, JobRace.Cygnus, 4),
+			[Job.NightWalker1] = new JobDetail(JobClass.Thief, JobRace.Cygnus, 1),
+			[Job.NightWalker2] = new JobDetail(JobClass.Thief, JobRace.Cygnus, 2),
+			[Job.NightWalker3] = new JobDetail(JobClass.Thief, JobRace.Cygnus, 3),
+			[Job.NightWalker4] = new JobDetail(JobClass.Thief, JobRace.Cygnus, 4),
+			[Job.ThunderBreaker1] = new JobDetail(JobClass.Pirate, JobRace.Cygnus, 1),
+			[Job.ThunderBreaker2] = new JobDetail(JobClass.Pirate, JobRace.Cygnus, 2),
+			[Job.ThunderBreaker3] = new JobDetail(JobClass.Pirate, JobRace.Cygnus, 3),
+			[Job.ThunderBreaker4] = new JobDetail(JobClass.Pirate, JobRace.Cygnus, 4),
+			[Job.Aran] = new JobDetail(JobClass.None, JobRace.Hero, 0),
+			[Job.Aran1] = new JobDetail(JobClass.Warrior, JobRace.Hero, 1),
+			[Job.Aran2] = new JobDetail(JobClass.Warrior, JobRace.Hero, 2),
+			[Job.Aran3] = new JobDetail(JobClass.Warrior, JobRace.Hero, 3),
+			[Job.Aran4] = new JobDetail(JobClass.Warrior, JobRace.Hero, 4),
+		};
+
+		public static bool IsGMJob(Job job)
+		{
+			return job == Job.GM || job == Job.SuperGM;
+		}
+		
+		#region Job Classes
+		public static bool IsWarrior(Job job)
+		{
+			return JobDetails[job].Class == JobClass.Warrior;
+		}
+
+		public static bool IsMagician(Job job)
+		{
+			return JobDetails[job].Class == JobClass.Magician;
+		}
+
+		public static bool IsBowman(Job job)
+		{
+			return JobDetails[job].Class == JobClass.Bowman;
+		}
+
+		public static bool IsThief(Job job)
+		{
+			return JobDetails[job].Class == JobClass.Thief;
+		}
+
+		public static bool IsPirate(Job job)
+		{
+			return JobDetails[job].Class == JobClass.Pirate;
+		}
+
+		public static bool IsNoClass(Job job)
+		{
+			return JobDetails[job].Class == JobClass.None;
+		}
+		#endregion
+
+		#region Job Races
+		public static bool IsExplorer(Job job)
+		{
+			return JobDetails[job].Race == JobRace.Explorer;
+		}
+
+		public static bool IsCygnus(Job job)
+		{
+			return JobDetails[job].Race == JobRace.Cygnus;
+		}
+
+		public static bool IsHero(Job job)
+		{
+			return JobDetails[job].Race == JobRace.Hero;
+		}
+
+		public static bool IsUniqueJob(Job job)
+		{
+			return JobDetails[job].Race == JobRace.Unique;
+		}
+		#endregion
+
+		#region Job Tiers
+		public static bool IsBeginner(Job job)
+		{
+			return JobDetails[job].Tier == 0;
+		}
+
+		public static bool IsFirstJob(Job job)
+		{
+			return JobDetails[job].Tier == 1;
+		}
+
+		public static bool IsSecondJob(Job job)
+		{
+			return JobDetails[job].Tier == 2;
+		}
+
+		public static bool IsThirdJob(Job job)
+		{
+			return JobDetails[job].Tier == 3;
+		}
+
+		public static bool IsFourthJob(Job job)
+		{
+			return JobDetails[job].Tier == 4;
+		}
+		#endregion
+
+		#endregion Job Helpers
+
+		#endregion Character
+
+		#region Skills and Buffs
+
+		public static class SkillNames
         {
             public enum All : int
             {
@@ -282,7 +484,7 @@ namespace Destiny.Constants
                 EchoOfHero = 1005,
                 JumpDown = 1006, 
                 Maker = 1007,
-                //dojoo temporary skills
+                //dojo temporary skills
                 BambooRain = 1009,
                 Invincibility = 1010,
                 PowerExplosion = 1011
@@ -816,7 +1018,7 @@ namespace Destiny.Constants
                 EchoOfHero = 10001005,
                 JumpDown = 10001006,
                 Maker = 10001007,
-                //dojoo temporary skills
+                //dojo temporary skills
                 BambooThrust = 10001009,
                 InvincibleBarrier = 10001010,
                 MeteoShower = 10001011,
@@ -1015,7 +1217,7 @@ namespace Destiny.Constants
                 EchoofHero = 20001005,
                 JumpDown = 20001006,
                 Maker = 20001007,
-                //dojoo/pyramid skills
+                //dojo/pyramid skills
                 BambooThrust = 20001009,
                 InvincibleBarrier = 20001010,
                 MeteoShower = 20001011,

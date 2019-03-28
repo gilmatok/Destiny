@@ -1,7 +1,7 @@
 ﻿using Destiny.Data;
 using Destiny.Maple.Data;
 using System.Collections.Generic;
-using Destiny.Constants;
+using static Destiny.Constants.CharacterConstants;
 
 namespace Destiny.Maple
 {
@@ -25,7 +25,7 @@ namespace Destiny.Maple
         public Dictionary<int, short> PreRequiredItems { get; private set; }
         public Dictionary<int, short> PostRequiredItems { get; private set; }
         public Dictionary<int, short> PostRequiredKills { get; private set; }
-        public List<CharacterConstants.Job> ValidJobs { get; private set; }
+        public List<Job> ValidJobs { get; private set; }
 
         // Rewards (Start, End)
         public int[] ExperienceReward { get; set; }
@@ -36,8 +36,8 @@ namespace Destiny.Maple
         public int[] PetSkillReward { get; set; }
         public Dictionary<int, short> PreItemRewards { get; private set; }
         public Dictionary<int, short> PostItemRewards { get; private set; }
-        public Dictionary<Skill, CharacterConstants.Job> PreSkillRewards { get; set; }
-        public Dictionary<Skill, CharacterConstants.Job> PostSkillRewards { get; set; }
+        public Dictionary<Skill, Job> PreSkillRewards { get; set; }
+        public Dictionary<Skill, Job> PostSkillRewards { get; set; }
 
         public Quest NextQuest
         {
@@ -90,10 +90,10 @@ namespace Destiny.Maple
 
             this.PreItemRewards = new Dictionary<int, short>();
             this.PostItemRewards = new Dictionary<int, short>();
-            this.PreSkillRewards = new Dictionary<Skill, CharacterConstants.Job>();
-            this.PostSkillRewards = new Dictionary<Skill, CharacterConstants.Job>();
+            this.PreSkillRewards = new Dictionary<Skill, Job>();
+            this.PostSkillRewards = new Dictionary<Skill, Job>();
 
-            this.ValidJobs = new List<CharacterConstants.Job>();
+            this.ValidJobs = new List<Job>();
         }
     }
 }

@@ -56,7 +56,6 @@
     <Compile Include="Maple\Characters\Character.cs" />
     <Compile Include="Maple\Characters\CharacterBuffs.cs" />
     <Compile Include="Maple\Characters\CharacterItems.cs" />
-    <Compile Include="Maple\Characters\CharacterJobs.cs" />
     <Compile Include="Maple\Characters\CharacterKeymap.cs" />
     <Compile Include="Maple\Characters\CharacterMemos.cs" />
     <Compile Include="Maple\Characters\CharacterQuests.cs" />
@@ -176,10 +175,6 @@
     <ProjectReference Include="..\Common\Common.csproj">
       <Project>{aa849096-96f3-47fe-92c2-c79fdf0ad5ad}</Project>
       <Name>Common</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\WvsLogin\WvsLogin.csproj">
-      <Project>{A3E538AC-1C5C-462A-8FF2-56016EC83ECE}</Project>
-      <Name>WvsLogin</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -1,7 +1,6 @@
 ﻿using Destiny.Maple.Maps;
 using System;
 using System.Collections.Generic;
-using Destiny.Constants;
 using Destiny.Maple.Commands;
 using Destiny.Maple.Life;
 using Destiny.Data;
@@ -11,6 +10,8 @@ using Destiny.Network;
 using Destiny.IO;
 using Destiny.Maple.Scripting;
 using Destiny.Network.PacketFactory.MaplePacketFactory;
+using static Destiny.Constants.CharacterConstants;
+using static Destiny.Constants.ItemConstants;
 
 namespace Destiny.Maple.Characters
 {
@@ -32,7 +33,6 @@ namespace Destiny.Maple.Characters
         public int? GuildRank { get; set; }
 
         public CharacterItems Items { get; private set; }
-        public CharacterJobs Jobs { get; private set; }
         public CharacterStats Stats { get; private set; }
         public CharacterSkills Skills { get; private set; }
         public CharacterQuests Quests { get; private set; }
@@ -50,12 +50,12 @@ namespace Destiny.Maple.Characters
         private DateTime LastHealthHealOverTime = new DateTime();
         private DateTime LastManaHealOverTime = new DateTime();
 
-        private CharacterConstants.Gender gender;
+        private Gender gender;
         private byte skin;
         private int face;
         private int hair;
         private byte level;
-        private CharacterConstants.Job job;
+        private Job job;
         private short strength;
         private short dexterity;
         private short intelligence;
@@ -73,7 +73,7 @@ namespace Destiny.Maple.Characters
         private Quest lastQuest;
         private string chalkboard;
 
-        public CharacterConstants.Gender Gender
+        public Gender Gender
         {
             get { return gender; }
             set
@@ -102,7 +102,7 @@ namespace Destiny.Maple.Characters
 
                 if (this.IsInitialized)
                 {
-                    CharacterStats.Update(this,CharacterConstants.StatisticType.Skin);
+                    CharacterStats.Update(this,StatisticType.Skin);
                     this.Map.Broadcast(MapleCharacterPackets.UpdateApperancePacket(this));
                 }
             }
@@ -113,8 +113,8 @@ namespace Destiny.Maple.Characters
             get { return face; }
             set
             {
-                if (this.Gender == CharacterConstants.Gender.Male
-                    && !DataProvider.Styles.MaleFaces.Contains(value) || this.Gender == CharacterConstants.Gender.Female && !DataProvider.Styles.FemaleFaces.Contains(value))
+                if (this.Gender == Gender.Male
+                    && !DataProvider.Styles.MaleFaces.Contains(value) || this.Gender == Gender.Female && !DataProvider.Styles.FemaleFaces.Contains(value))
                 {
                     throw new StyleUnavailableException();
                 }
@@ -123,7 +123,7 @@ namespace Destiny.Maple.Characters
 
                 if (this.IsInitialized)
                 {
-                    CharacterStats.Update(this, CharacterConstants.StatisticType.Face);
+                    CharacterStats.Update(this, StatisticType.Face);
                     this.Map.Broadcast(MapleCharacterPackets.UpdateApperancePacket(this));
                 }
             }
@@ -134,8 +134,8 @@ namespace Destiny.Maple.Characters
             get { return hair; }
             set
             {
-                if (this.Gender == CharacterConstants.Gender.Male 
-                    && !DataProvider.Styles.MaleHairs.Contains(value) || this.Gender == CharacterConstants.Gender.Female && !DataProvider.Styles.FemaleHairs.Contains(value))
+                if (this.Gender == Gender.Male 
+                    && !DataProvider.Styles.MaleHairs.Contains(value) || this.Gender == Gender.Female && !DataProvider.Styles.FemaleHairs.Contains(value))
                 {
                     throw new StyleUnavailableException();
                 }
@@ -144,7 +144,7 @@ namespace Destiny.Maple.Characters
 
                 if (this.IsInitialized)
                 {
-                    CharacterStats.Update(this, CharacterConstants.StatisticType.Hair);
+                    CharacterStats.Update(this, StatisticType.Hair);
                     this.Map.Broadcast(MapleCharacterPackets.UpdateApperancePacket(this));
                 }
             }
@@ -160,7 +160,7 @@ namespace Destiny.Maple.Characters
             get
             {
                 return (this.Face - (10 * (this.Face / 10))) +
-                       (this.Gender == CharacterConstants.Gender.Male ? 20000 : 21000);
+                       (this.Gender == Gender.Male ? 20000 : 21000);
             }
         }
 
@@ -197,7 +197,7 @@ namespace Destiny.Maple.Characters
                     {
                         level = value;
 
-                        CharacterStats.Update(this,CharacterConstants.StatisticType.Level);
+                        CharacterStats.Update(this,StatisticType.Level);
                     }
                     else
                     {
@@ -206,15 +206,15 @@ namespace Destiny.Maple.Characters
                             CharacterStats.LevelUP(this, true);
                         }
 
-                        CharacterStats.FillToFull(this, CharacterConstants.StatisticType.Health);
-                        CharacterStats.FillToFull(this, CharacterConstants.StatisticType.Mana);
+                        CharacterStats.FillToFull(this, StatisticType.Health);
+                        CharacterStats.FillToFull(this, StatisticType.Mana);
                     }
                 }
             }
         }
 
         // TODO: Update party's properties.
-        public CharacterConstants.Job Job
+        public Job Job
         {
             get { return job; }
             set
@@ -223,8 +223,8 @@ namespace Destiny.Maple.Characters
 
                 if (this.IsInitialized)
                 {
-                    CharacterStats.Update(this, CharacterConstants.StatisticType.Job);
-                    CharacterBuffs.ShowRemoteEffect(this, CharacterConstants.UserEffect.JobChanged);
+                    CharacterStats.Update(this, StatisticType.Job);
+                    CharacterBuffs.ShowRemoteEffect(this, UserEffect.JobChanged);
                 }
             }
         }
@@ -238,7 +238,7 @@ namespace Destiny.Maple.Characters
 
                 if (this.IsInitialized)
                 {
-                    CharacterStats.Update(this, CharacterConstants.StatisticType.Strength);
+                    CharacterStats.Update(this, StatisticType.Strength);
                 }
             }
         }
@@ -252,7 +252,7 @@ namespace Destiny.Maple.Characters
 
                 if (this.IsInitialized)
                 {
-                    CharacterStats.Update(this, CharacterConstants.StatisticType.Dexterity);
+                    CharacterStats.Update(this, StatisticType.Dexterity);
                 }
             }
         }
@@ -266,7 +266,7 @@ namespace Destiny.Maple.Characters
 
                 if (this.IsInitialized)
                 {
-                    CharacterStats.Update(this, CharacterConstants.StatisticType.Intelligence);
+                    CharacterStats.Update(this, StatisticType.Intelligence);
                 }
             }
         }
@@ -280,7 +280,7 @@ namespace Destiny.Maple.Characters
 
                 if (this.IsInitialized)
                 {
-                    CharacterStats.Update(this, CharacterConstants.StatisticType.Luck);
+                    CharacterStats.Update(this, StatisticType.Luck);
                 }
             }
         }
@@ -305,7 +305,7 @@ namespace Destiny.Maple.Characters
 
                 if (this.IsInitialized)
                 {
-                    CharacterStats.Update(this, CharacterConstants.StatisticType.Health);
+                    CharacterStats.Update(this, StatisticType.Health);
                 }
             }
         }
@@ -319,7 +319,7 @@ namespace Destiny.Maple.Characters
 
                 if (this.IsInitialized)
                 {
-                    CharacterStats.Update(this, CharacterConstants.StatisticType.MaxHealth);
+                    CharacterStats.Update(this, StatisticType.MaxHealth);
                 }
             }
         }
@@ -344,7 +344,7 @@ namespace Destiny.Maple.Characters
 
                 if (this.IsInitialized)
                 {
-                    CharacterStats.Update(this, CharacterConstants.StatisticType.Mana);
+                    CharacterStats.Update(this, StatisticType.Mana);
                 }
             }
         }
@@ -358,7 +358,7 @@ namespace Destiny.Maple.Characters
 
                 if (this.IsInitialized)
                 {
-                    CharacterStats.Update(this, CharacterConstants.StatisticType.MaxMana);
+                    CharacterStats.Update(this, StatisticType.MaxMana);
                 }
             }
         }
@@ -372,7 +372,7 @@ namespace Destiny.Maple.Characters
 
                 if (this.IsInitialized)
                 {
-                    CharacterStats.Update(this, CharacterConstants.StatisticType.AbilityPoints);
+                    CharacterStats.Update(this, StatisticType.AbilityPoints);
                 }
             }
         }
@@ -386,7 +386,7 @@ namespace Destiny.Maple.Characters
 
                 if (this.IsInitialized)
                 {
-                    CharacterStats.Update(this, CharacterConstants.StatisticType.SkillPoints);
+                    CharacterStats.Update(this, StatisticType.SkillPoints);
                 }
             }
         }
@@ -401,9 +401,9 @@ namespace Destiny.Maple.Characters
 
                 if (true) // NOTE: A server setting for multi-leveling.
                 {
-                    while (experience >= CharacterConstants.ExperienceTables.CharacterLevel[this.Level])
+                    while (experience >= ExperienceTables.CharacterLevelExp[this.Level])
                     {
-                        experience -= CharacterConstants.ExperienceTables.CharacterLevel[this.Level];
+                        experience -= ExperienceTables.CharacterLevelExp[this.Level];
 
                         this.Level++;
                     }
@@ -412,23 +412,23 @@ namespace Destiny.Maple.Characters
                 /*
                 else
                 {
-                    if (experience >= CharacterConstants.ExperienceTables.CharacterLevel[this.Level])
+                    if (experience >= ExperienceTables.CharacterLevel[this.Level])
                     {
-                        experience -= CharacterConstants.ExperienceTables.CharacterLevel[this.Level];
+                        experience -= ExperienceTables.CharacterLevel[this.Level];
 
                         this.Level++;
                     }
 
-                    if (experience >= CharacterConstants.ExperienceTables.CharacterLevel[this.Level])
+                    if (experience >= ExperienceTables.CharacterLevel[this.Level])
                     {
-                        experience = CharacterConstants.ExperienceTables.CharacterLevel[this.Level] - 1;
+                        experience = ExperienceTables.CharacterLevel[this.Level] - 1;
                     }
                 }
                 */
 
                 if (this.IsInitialized && delta != 0)
                 {
-                    CharacterStats.Update(this, CharacterConstants.StatisticType.Experience);
+                    CharacterStats.Update(this, StatisticType.Experience);
                 }
             }
         }
@@ -442,7 +442,7 @@ namespace Destiny.Maple.Characters
 
                 if (this.IsInitialized)
                 {
-                    CharacterStats.Update(this, CharacterConstants.StatisticType.Fame);
+                    CharacterStats.Update(this, StatisticType.Fame);
                 }
             }
         }
@@ -456,7 +456,7 @@ namespace Destiny.Maple.Characters
 
                 if (this.IsInitialized)
                 {
-                    CharacterStats.Update(this, CharacterConstants.StatisticType.Mesos);
+                    CharacterStats.Update(this, StatisticType.Mesos);
                 }
             }
         }
@@ -604,7 +604,6 @@ namespace Destiny.Maple.Characters
             this.Client = client;
 
             this.Items = new CharacterItems(this, 24, 24, 24, 24, 48);
-            this.Jobs = new CharacterJobs(this);
             this.Stats = new CharacterStats(this);
             this.Skills = new CharacterSkills(this);
             this.Quests = new CharacterQuests(this);
@@ -632,12 +631,12 @@ namespace Destiny.Maple.Characters
             this.AccountID = (int) datum["AccountID"];
             this.WorldID = (byte) datum["WorldID"];
             this.Name = (string) datum["Name"];
-            this.Gender = (CharacterConstants.Gender) datum["Gender"];
+            this.Gender = (Gender) datum["Gender"];
             this.Skin = (byte) datum["Skin"];
             this.Face = (int) datum["Face"];
             this.Hair = (int) datum["Hair"];
             this.Level = (byte) datum["Level"];
-            this.Job = (CharacterConstants.Job) datum["Job"];
+            this.Job = (Job) datum["Job"];
             this.Strength = (short) datum["Strength"];
             this.Dexterity = (short) datum["Dexterity"];
             this.Intelligence = (short) datum["Intelligence"];
@@ -654,11 +653,11 @@ namespace Destiny.Maple.Characters
             this.SpawnPoint = (byte) datum["SpawnPoint"];
             this.Meso = (int) datum["Meso"];
 
-            this.Items.MaxSlots[ItemConstants.ItemType.Equipment] = (byte) datum["EquipmentSlots"];
-            this.Items.MaxSlots[ItemConstants.ItemType.Usable] = (byte) datum["UsableSlots"];
-            this.Items.MaxSlots[ItemConstants.ItemType.Setup] = (byte) datum["SetupSlots"];
-            this.Items.MaxSlots[ItemConstants.ItemType.Etcetera] = (byte) datum["EtceteraSlots"];
-            this.Items.MaxSlots[ItemConstants.ItemType.Cash] = (byte) datum["CashSlots"];
+            this.Items.MaxSlots[ItemType.Equipment] = (byte) datum["EquipmentSlots"];
+            this.Items.MaxSlots[ItemType.Usable] = (byte) datum["UsableSlots"];
+            this.Items.MaxSlots[ItemType.Setup] = (byte) datum["SetupSlots"];
+            this.Items.MaxSlots[ItemType.Etcetera] = (byte) datum["EtceteraSlots"];
+            this.Items.MaxSlots[ItemType.Cash] = (byte) datum["CashSlots"];
 
             this.Items.Load();
             this.Skills.Load();
@@ -704,11 +703,11 @@ namespace Destiny.Maple.Characters
             datum["SpawnPoint"] = this.SpawnPoint;
             datum["Meso"] = this.Meso;
 
-            datum["EquipmentSlots"] = this.Items.MaxSlots[ItemConstants.ItemType.Equipment];
-            datum["UsableSlots"] = this.Items.MaxSlots[ItemConstants.ItemType.Usable];
-            datum["SetupSlots"] = this.Items.MaxSlots[ItemConstants.ItemType.Setup];
-            datum["EtceteraSlots"] = this.Items.MaxSlots[ItemConstants.ItemType.Etcetera];
-            datum["CashSlots"] = this.Items.MaxSlots[ItemConstants.ItemType.Cash];
+            datum["EquipmentSlots"] = this.Items.MaxSlots[ItemType.Equipment];
+            datum["UsableSlots"] = this.Items.MaxSlots[ItemType.Usable];
+            datum["SetupSlots"] = this.Items.MaxSlots[ItemType.Setup];
+            datum["EtceteraSlots"] = this.Items.MaxSlots[ItemType.Etcetera];
+            datum["CashSlots"] = this.Items.MaxSlots[ItemType.Cash];
 
             if (this.Assigned)
             {
@@ -980,7 +979,7 @@ namespace Destiny.Maple.Characters
             }
         }
 
-        public void Attack(Packet iPacket, CharacterConstants.AttackType type)
+        public void Attack(Packet iPacket, AttackType type)
         {
             Attack attack = new Attack(iPacket, type);
 
@@ -1000,7 +999,7 @@ namespace Destiny.Maple.Characters
             // TODO: further adjustments
             switch (type)
             {
-                case CharacterConstants.AttackType.Melee:
+                case AttackType.Melee:
                     using (Packet oPacket = new Packet(ServerOperationCode.CloseRangeAttack))
                     {
                         oPacket
@@ -1039,7 +1038,7 @@ namespace Destiny.Maple.Characters
 
                     break;
 
-                case CharacterConstants.AttackType.Magic:
+                case AttackType.Magic:
                     using (Packet oPacket = new Packet(ServerOperationCode.MagicAttack))
                     {
                         oPacket
@@ -1078,7 +1077,7 @@ namespace Destiny.Maple.Characters
 
                     break;
 
-                case CharacterConstants.AttackType.Range:
+                case AttackType.Range:
                     using (Packet oPacket = new Packet(ServerOperationCode.RangedAttack))
                     {
                         oPacket
@@ -1117,7 +1116,7 @@ namespace Destiny.Maple.Characters
 
                     break;
 
-                case CharacterConstants.AttackType.Summon:
+                case AttackType.Summon:
                     /*using (Packet oPacket = new Packet(ServerOperationCode.RangedAttack))
                     {
                         oPacket
@@ -1390,7 +1389,7 @@ namespace Destiny.Maple.Characters
             }
 
             iPacket.ReadInt(); // NOTE: Ticks.
-            CharacterConstants.StatisticType type = (CharacterConstants.StatisticType) iPacket.ReadInt();
+            StatisticType type = (StatisticType) iPacket.ReadInt();
 
             CharacterStats.DistributeAP(this, type);
             this.AbilityPoints--;
@@ -1405,7 +1404,7 @@ namespace Destiny.Maple.Characters
 
             for (int i = 0; i < count; i++)
             {
-                CharacterConstants.StatisticType type = (CharacterConstants.StatisticType) iPacket.ReadInt();
+                StatisticType type = (StatisticType) iPacket.ReadInt();
                 int amount = iPacket.ReadInt();
 
                 if (amount > this.AbilityPoints || amount < 0)
@@ -1788,11 +1787,11 @@ namespace Destiny.Maple.Characters
                 return;
             }
 
-            CharacterConstants.AdminCommandType type = (CharacterConstants.AdminCommandType) iPacket.ReadByte();
+            AdminCommandType type = (AdminCommandType) iPacket.ReadByte();
 
             switch (type)
             {
-                case CharacterConstants.AdminCommandType.Hide:
+                case AdminCommandType.Hide:
                 {
                     bool hide = iPacket.ReadBool();
 
@@ -1807,7 +1806,7 @@ namespace Destiny.Maple.Characters
                 }
                     break;
 
-                case CharacterConstants.AdminCommandType.Send:
+                case AdminCommandType.Send:
                 {
                     string name = iPacket.ReadString();
                     int destinationID = iPacket.ReadInt();
@@ -1832,7 +1831,7 @@ namespace Destiny.Maple.Characters
                 }
                     break;
 
-                case CharacterConstants.AdminCommandType.Summon:
+                case AdminCommandType.Summon:
                 {
                     int mobID = iPacket.ReadInt();
                     int count = iPacket.ReadInt();
@@ -1851,7 +1850,7 @@ namespace Destiny.Maple.Characters
                 }
                     break;
 
-                case CharacterConstants.AdminCommandType.CreateItem:
+                case AdminCommandType.CreateItem:
                 {
                     int itemID = iPacket.ReadInt();
 
@@ -1859,13 +1858,13 @@ namespace Destiny.Maple.Characters
                 }
                     break;
 
-                case CharacterConstants.AdminCommandType.DestroyFirstITem:
+                case AdminCommandType.DestroyFirstITem:
                 {
                     // TODO: What does this do?
                 }
                     break;
 
-                case CharacterConstants.AdminCommandType.GiveExperience:
+                case AdminCommandType.GiveExperience:
                 {
                     int amount = iPacket.ReadInt();
 
@@ -1873,7 +1872,7 @@ namespace Destiny.Maple.Characters
                 }
                     break;
 
-                case CharacterConstants.AdminCommandType.Ban:
+                case AdminCommandType.Ban:
                 {
                     string name = iPacket.ReadString();
 
@@ -1897,31 +1896,31 @@ namespace Destiny.Maple.Characters
                 }
                     break;
 
-                case CharacterConstants.AdminCommandType.Block:
+                case AdminCommandType.Block:
                 {
                     // TODO: Ban.
                 }
                     break;
 
-                case CharacterConstants.AdminCommandType.ShowMessageMap:
+                case AdminCommandType.ShowMessageMap:
                 {
                     // TODO: What does this do?
                 }
                     break;
 
-                case CharacterConstants.AdminCommandType.Snow:
+                case AdminCommandType.Snow:
                 {
                     // TODO: We have yet to implement map weather.
                 }
                     break;
 
-                case CharacterConstants.AdminCommandType.VarSetGet:
+                case AdminCommandType.VarSetGet:
                 {
                     // TODO: This seems useless. Should we implement this?
                 }
                     break;
 
-                case CharacterConstants.AdminCommandType.Warn:
+                case AdminCommandType.Warn:
                 {
                     string name = iPacket.ReadString();
                     string text = iPacket.ReadString();
@@ -1986,21 +1985,21 @@ namespace Destiny.Maple.Characters
 
         public void Report(Packet iPacket)
         {
-            CharacterConstants.ReportType type = (CharacterConstants.ReportType) iPacket.ReadByte();
+            ReportType type = (ReportType) iPacket.ReadByte();
             string victimName = iPacket.ReadString();
             iPacket.ReadByte(); // NOTE: Unknown.
             string description = iPacket.ReadString();
 
-            CharacterConstants.ReportResult result;
+            ReportResult result;
 
             switch (type)
             {
-                case CharacterConstants.ReportType.IllegalProgramUsage:
+                case ReportType.IllegalProgramUsage:
                 {
                 }
                     break;
 
-                case CharacterConstants.ReportType.ConversationClaim:
+                case ReportType.ConversationClaim:
                 {
                     string chatLog = iPacket.ReadString();
                 }
@@ -2029,11 +2028,11 @@ namespace Destiny.Maple.Characters
                 {
                     result = ReportResult.UnableToLocate;
                 }*/
-                result = CharacterConstants.ReportResult.Success;
+                result = ReportResult.Success;
             }
             else
             {
-                result = CharacterConstants.ReportResult.Max10TimesADay;
+                result = ReportResult.Max10TimesADay;
             }
 
             using (Packet oPacket = new Packet(ServerOperationCode.SueCharacterResult))
@@ -2168,7 +2167,7 @@ namespace Destiny.Maple.Characters
 
                 oPacket.WriteByte(byte.MaxValue);
 
-                Item cashWeapon = this.Items[ItemConstants.EquipmentSlot.CashWeapon];
+                Item cashWeapon = this.Items[EquipmentSlot.CashWeapon];
 
                 oPacket.WriteInt(cashWeapon != null ? cashWeapon.MapleID : 0);
 
@@ -2330,7 +2329,7 @@ namespace Destiny.Maple.Characters
                 .WriteBytes(this.AppearanceToByteArray())
                 .WriteInt(this.Items.Available(5110000))
                 .WriteInt() // NOTE: Item effect.
-                .WriteInt((int) (Item.GetType(this.Chair) == ItemConstants.ItemType.Setup ? this.Chair : 0))
+                .WriteInt((int) (Item.GetType(this.Chair) == ItemType.Setup ? this.Chair : 0))
                 .WriteShort(this.Position.X)
                 .WriteShort(this.Position.Y)
                 .WriteByte(this.Stance)

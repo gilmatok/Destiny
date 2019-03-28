@@ -1,4 +1,4 @@
-﻿using Destiny.Constants;
+﻿using static Destiny.Constants.CharacterConstants;
 using Destiny.Maple.Characters;
 
 namespace Destiny.Maple.Commands.Implementation
@@ -50,39 +50,39 @@ namespace Destiny.Maple.Commands.Implementation
                 }
 
                 string stat = args[0];
-                CharacterConstants.StatisticType type = CharacterConstants.StatisticType.None;
+                StatisticType type = StatisticType.None;
 
                 switch (stat)
                 {
                     case "str":
-                        type = CharacterConstants.StatisticType.Strength;
+                        type = StatisticType.Strength;
                         break;
                     case "dex":
-                        type = CharacterConstants.StatisticType.Dexterity;
+                        type = StatisticType.Dexterity;
                         break;
                     case "int":
-                        type = CharacterConstants.StatisticType.Intelligence;
+                        type = StatisticType.Intelligence;
                         break;
                     case "luck":
-                        type = CharacterConstants.StatisticType.Luck;
+                        type = StatisticType.Luck;
                         break;
                     case "hp":
-                        type = CharacterConstants.StatisticType.Health;
+                        type = StatisticType.Health;
                         break;
                     case "maxhp":
-                        type = CharacterConstants.StatisticType.MaxHealth;
+                        type = StatisticType.MaxHealth;
                         break;
                     case "mp":
-                        type = CharacterConstants.StatisticType.Mana;
+                        type = StatisticType.Mana;
                         break;
                     case "maxmp":
-                        type = CharacterConstants.StatisticType.MaxMana;
+                        type = StatisticType.MaxMana;
                         break;
                     case "ap":
-                        type = CharacterConstants.StatisticType.AbilityPoints;
+                        type = StatisticType.AbilityPoints;
                         break;
                     case "sp":
-                        type = CharacterConstants.StatisticType.SkillPoints;
+                        type = StatisticType.SkillPoints;
                         break;
                 }
 

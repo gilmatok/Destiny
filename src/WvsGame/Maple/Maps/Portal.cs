@@ -1,4 +1,4 @@
-﻿using Destiny.Constants;
+﻿using static Destiny.Constants.CharacterConstants;
 using Destiny.Data;
 using Destiny.Network;
 using Destiny.Maple.Characters;
@@ -63,7 +63,7 @@ namespace Destiny.Maple.Maps
 
         public void PlaySoundEffect(Character character)
         {
-            CharacterBuffs.ShowLocalUserEffect(character, CharacterConstants.UserEffect.PlayPortalSE);
+            CharacterBuffs.ShowLocalUserEffect(character, UserEffect.PlayPortalSE);
         }
 
         public void ShowBalloonMessage(Character character, string text, short width, short height)
@@ -85,7 +85,7 @@ namespace Destiny.Maple.Maps
             using (Packet oPacket = new Packet(ServerOperationCode.Effect))
             {
                 oPacket
-                    .WriteByte((byte)CharacterConstants.UserEffect.AvatarOriented)
+                    .WriteByte((byte)UserEffect.AvatarOriented)
                     .WriteString(dataPath)
                     .WriteInt(1);
 

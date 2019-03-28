@@ -1,10 +1,10 @@
 ﻿using Destiny.Data;
 using Destiny.Maple;
 using Destiny.Security;
-using Destiny.Constants;
 using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
+using static Destiny.Constants.CharacterConstants;
 
 namespace Destiny.Network
 {
@@ -148,7 +148,7 @@ namespace Destiny.Network
                         this.Account.Salt = HashGenerator.GenerateMD5();
                         this.Account.Password = SHACryptograph.Encrypt(SHAMode.SHA512, password + this.Account.Salt);
                         this.Account.EULA = false;
-                        this.Account.Gender = CharacterConstants.Gender.Unset;
+                        this.Account.Gender = Gender.Unset;
                         this.Account.Pin = string.Empty;
                         this.Account.Pic = string.Empty;
                         this.Account.IsBanned = false;
@@ -227,7 +227,7 @@ namespace Destiny.Network
 
         private void SetGender(Packet iPacket)
         {
-            if (this.Account.Gender != CharacterConstants.Gender.Unset)
+            if (this.Account.Gender != Gender.Unset)
             {
                 return;
             }
@@ -236,7 +236,7 @@ namespace Destiny.Network
 
             if (valid)
             {
-                CharacterConstants.Gender gender = (CharacterConstants.Gender)iPacket.ReadByte();
+                Gender gender = (Gender)iPacket.ReadByte();
 
                 this.Account.Gender = gender;
 

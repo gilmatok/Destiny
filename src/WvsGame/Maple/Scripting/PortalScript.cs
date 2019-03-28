@@ -1,7 +1,7 @@
 ﻿using Destiny.Maple.Characters;
 using Destiny.Maple.Maps;
 using System;
-using Destiny.Constants;
+using static Destiny.Constants.CharacterConstants;
 
 namespace Destiny.Maple.Scripting
 {
@@ -19,7 +19,7 @@ namespace Destiny.Maple.Scripting
 
         private void PlayPortalSoundEffect()
         {
-            CharacterBuffs.ShowLocalUserEffect(mCharacter, CharacterConstants.UserEffect.PlayPortalSE);
+            CharacterBuffs.ShowLocalUserEffect(mCharacter, UserEffect.PlayPortalSE);
         }
     }
 }

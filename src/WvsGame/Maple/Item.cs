@@ -1,20 +1,21 @@
-﻿using Destiny.Network;
-using Destiny.Data;
+﻿using Destiny.Data;
+using Destiny.IO;
 using Destiny.Maple.Characters;
 using Destiny.Maple.Data;
 using Destiny.Maple.Maps;
+using Destiny.Network;
 using System;
 using System.Collections.Generic;
-using Destiny.Constants;
-using Destiny.IO;
+using static Destiny.Constants.CharacterConstants;
+using static Destiny.Constants.ItemConstants;
 
 namespace Destiny.Maple
 {
     public class Item : Drop // TODO: too big and fugly; redo
     {
-        public static ItemConstants.ItemType GetType(int mapleID)
+        public static ItemType GetType(int mapleID)
         {
-            return (ItemConstants.ItemType)(mapleID / 1000000);
+            return (ItemType)(mapleID / 1000000);
         }
 
         public CharacterItems Parent { get; set; }
@@ -67,7 +68,7 @@ namespace Destiny.Maple
         public short RequiredIntelligence { get; private set; }
         public short RequiredLuck { get; private set; }
         public short RequiredFame { get; private set; }
-        public CharacterConstants.Job RequiredJob { get; private set; }
+        public Job RequiredJob { get; private set; }
 
         // Consume data properties are prefixed with 'C'.
         public int CItemId { get; private set; }
@@ -93,7 +94,7 @@ namespace Destiny.Maple
 
         public List<Tuple<int, short>> Summons { get; private set; }
 
-        public ItemConstants.ItemType Type
+        public ItemType Type
         {
             get
             {
@@ -101,62 +102,62 @@ namespace Destiny.Maple
             }
         }
 
-        public ItemConstants.WeaponType WeaponType
+        public WeaponType WeaponType
         {
             get
             {
                 switch (this.MapleID / 10000 % 100)
                 {
                     case 30:
-                        return ItemConstants.WeaponType.Sword1H;
+                        return WeaponType.Sword1H;
 
                     case 31:
-                        return ItemConstants.WeaponType.Axe1H;
+                        return WeaponType.Axe1H;
 
                     case 32:
-                        return ItemConstants.WeaponType.Blunt1H;
+                        return WeaponType.Blunt1H;
 
                     case 33:
-                        return ItemConstants.WeaponType.Dagger;
+                        return WeaponType.Dagger;
 
                     case 37:
-                        return ItemConstants.WeaponType.Wand;
+                        return WeaponType.Wand;
 
                     case 38:
-                        return ItemConstants.WeaponType.Staff;
+                        return WeaponType.Staff;
 
                     case 40:
-                        return ItemConstants.WeaponType.Sword2H;
+                        return WeaponType.Sword2H;
 
                     case 41:
-                        return ItemConstants.WeaponType.Axe2H;
+                        return WeaponType.Axe2H;
 
                     case 42:
-                        return ItemConstants.WeaponType.Blunt2H;
+                        return WeaponType.Blunt2H;
 
                     case 43:
-                        return ItemConstants.WeaponType.Spear;
+                        return WeaponType.Spear;
 
                     case 44:
-                        return ItemConstants.WeaponType.PoleArm;
+                        return WeaponType.PoleArm;
 
                     case 45:
-                        return ItemConstants.WeaponType.Bow;
+                        return WeaponType.Bow;
 
                     case 46:
-                        return ItemConstants.WeaponType.Crossbow;
+                        return WeaponType.Crossbow;
 
                     case 47:
-                        return ItemConstants.WeaponType.Claw;
+                        return WeaponType.Claw;
 
                     case 48:
-                        return ItemConstants.WeaponType.Knuckle;
+                        return WeaponType.Knuckle;
 
                     case 49:
-                        return ItemConstants.WeaponType.Gun;
+                        return WeaponType.Gun;
 
                     default:
-                        return ItemConstants.WeaponType.NotAWeapon;
+                        return WeaponType.NotAWeapon;
                 }
             }
         }
@@ -229,11 +230,11 @@ namespace Destiny.Maple
             {
                 byte flags = 0;
 
-                if (this.IsSealed) flags |= (byte)ItemConstants.ItemFlags.Sealed;
-                if (this.PreventsSlipping) flags |= (byte)ItemConstants.ItemFlags.AddPreventSlipping;
-                if (this.PreventsColdness) flags |= (byte)ItemConstants.ItemFlags.AddPreventColdness;
-                if (this.IsScissored) flags |= (byte)ItemConstants.ItemFlags.Scissored;
-                if (this.IsTradeBlocked) flags |= (byte)ItemConstants.ItemFlags.Untradeable;
+                if (this.IsSealed) flags |= (byte)ItemFlags.Sealed;
+                if (this.PreventsSlipping) flags |= (byte)ItemFlags.AddPreventSlipping;
+                if (this.PreventsColdness) flags |= (byte)ItemFlags.AddPreventColdness;
+                if (this.IsScissored) flags |= (byte)ItemFlags.Scissored;
+                if (this.IsTradeBlocked) flags |= (byte)ItemFlags.Untradeable;
 
                 return flags;
             }
@@ -323,7 +324,7 @@ namespace Destiny.Maple
         {
             get
             {
-                return this.WeaponType != ItemConstants.WeaponType.NotAWeapon;
+                return this.WeaponType != WeaponType.NotAWeapon;
             }
         }
 
@@ -357,16 +358,16 @@ namespace Destiny.Maple
             {
                 switch (this.WeaponType)
                 {
-                    case ItemConstants.WeaponType.Sword2H:
-                    case ItemConstants.WeaponType.Axe2H:
-                    case ItemConstants.WeaponType.Blunt2H:
-                    case ItemConstants.WeaponType.Spear:
-                    case ItemConstants.WeaponType.PoleArm:
-                    case ItemConstants.WeaponType.Bow:
-                    case ItemConstants.WeaponType.Crossbow:
-                    case ItemConstants.WeaponType.Claw:
-                    case ItemConstants.WeaponType.Knuckle:
-                    case ItemConstants.WeaponType.Gun:
+                    case WeaponType.Sword2H:
+                    case WeaponType.Axe2H:
+                    case WeaponType.Blunt2H:
+                    case WeaponType.Spear:
+                    case WeaponType.PoleArm:
+                    case WeaponType.Bow:
+                    case WeaponType.Crossbow:
+                    case WeaponType.Claw:
+                    case WeaponType.Knuckle:
+                    case WeaponType.Gun:
                         return true;
 
                     default:
@@ -423,7 +424,7 @@ namespace Destiny.Maple
         {
             this.MapleID = mapleID;
             this.MaxPerStack = this.CachedReference.MaxPerStack;
-            this.Quantity = (this.Type == ItemConstants.ItemType.Equipment) ? (short)1 : quantity;
+            this.Quantity = (this.Type == ItemType.Equipment) ? (short)1 : quantity;
             if (equipped) this.Slot = (short)this.GetEquippedSlot();
 
             if (!expiration.HasValue)
@@ -441,7 +442,7 @@ namespace Destiny.Maple
             this.RequiredLevel = this.CachedReference.RequiredLevel;
             this.Meso = this.CachedReference.Meso;
 
-            if (this.Type == ItemConstants.ItemType.Equipment)
+            if (this.Type == ItemType.Equipment)
             {
                 this.PreventsSlipping = this.CachedReference.PreventsSlipping;
                 this.PreventsColdness = this.CachedReference.PreventsColdness;
@@ -527,7 +528,7 @@ namespace Destiny.Maple
                 this.RequiredLevel = this.CachedReference.RequiredLevel;
                 this.Meso = this.CachedReference.Meso;
 
-                if (this.Type == ItemConstants.ItemType.Equipment)
+                if (this.Type == ItemType.Equipment)
                 {
                     this.AttackSpeed = this.CachedReference.AttackSpeed;
                     this.RecoveryRate = this.CachedReference.RecoveryRate;
@@ -708,7 +709,7 @@ namespace Destiny.Maple
                 oPacket
                     .WriteBool(true)
                     .WriteByte(1)
-                    .WriteByte((byte)ItemConstants.InventoryOperationType.ModifyQuantity)
+                    .WriteByte((byte)InventoryOperationType.ModifyQuantity)
                     .WriteByte((byte)this.Type)
                     .WriteShort(this.Slot)
                     .WriteShort(this.Quantity);
@@ -719,7 +720,7 @@ namespace Destiny.Maple
 
         public void Equip()
         {
-            if (this.Type != ItemConstants.ItemType.Equipment)
+            if (this.Type != ItemType.Equipment)
             {
                 throw new InvalidOperationException("Can only equip equipment items.");
             }
@@ -734,12 +735,12 @@ namespace Destiny.Maple
             }
 
             short sourceSlot = this.Slot;
-            ItemConstants.EquipmentSlot destinationSlot = this.GetEquippedSlot();
+            EquipmentSlot destinationSlot = this.GetEquippedSlot();
 
-            Item top = this.Parent[ItemConstants.EquipmentSlot.Top];
-            Item bottom = this.Parent[ItemConstants.EquipmentSlot.Bottom];
-            Item weapon = this.Parent[ItemConstants.EquipmentSlot.Weapon];
-            Item shield = this.Parent[ItemConstants.EquipmentSlot.Shield];
+            Item top = this.Parent[EquipmentSlot.Top];
+            Item bottom = this.Parent[EquipmentSlot.Bottom];
+            Item weapon = this.Parent[EquipmentSlot.Weapon];
+            Item shield = this.Parent[EquipmentSlot.Shield];
 
             Item destination = this.Parent[destinationSlot];
 
@@ -755,7 +756,7 @@ namespace Destiny.Maple
                 oPacket
                     .WriteBool(true)
                     .WriteByte(1)
-                    .WriteByte((byte)ItemConstants.InventoryOperationType.ModifySlot)
+                    .WriteByte((byte)InventoryOperationType.ModifySlot)
                     .WriteByte((byte)this.Type)
                     .WriteShort(sourceSlot)
                     .WriteShort((short)destinationSlot)
@@ -766,7 +767,7 @@ namespace Destiny.Maple
 
             switch (destinationSlot)
             {
-                case ItemConstants.EquipmentSlot.Bottom:
+                case EquipmentSlot.Bottom:
                     {
                         if (top != null && top.IsOverall)
                         {
@@ -775,7 +776,7 @@ namespace Destiny.Maple
                     }
                     break;
 
-                case ItemConstants.EquipmentSlot.Top:
+                case EquipmentSlot.Top:
                     {
                         if (this.IsOverall && bottom != null)
                         {
@@ -784,7 +785,7 @@ namespace Destiny.Maple
                     }
                     break;
 
-                case ItemConstants.EquipmentSlot.Shield:
+                case EquipmentSlot.Shield:
                     {
                         if (weapon != null && weapon.IsTwoHanded)
                         {
@@ -793,7 +794,7 @@ namespace Destiny.Maple
                     }
                     break;
 
-                case ItemConstants.EquipmentSlot.Weapon:
+                case EquipmentSlot.Weapon:
                     {
                         if (this.IsTwoHanded && shield != null)
                         {
@@ -808,7 +809,7 @@ namespace Destiny.Maple
 
         public void Unequip(short destinationSlot = 0)
         {
-            if (this.Type != ItemConstants.ItemType.Equipment)
+            if (this.Type != ItemType.Equipment)
             {
                 throw new InvalidOperationException("Cna only unequip equipment items.");
             }
@@ -817,7 +818,7 @@ namespace Destiny.Maple
 
             if (destinationSlot == 0)
             {
-                destinationSlot = this.Parent.GetNextFreeSlot(ItemConstants.ItemType.Equipment);
+                destinationSlot = this.Parent.GetNextFreeSlot(ItemType.Equipment);
             }
 
             this.Slot = destinationSlot;
@@ -827,7 +828,7 @@ namespace Destiny.Maple
                 oPacket
                     .WriteBool(true)
                     .WriteByte(1)
-                    .WriteByte((byte)ItemConstants.InventoryOperationType.ModifySlot)
+                    .WriteByte((byte)InventoryOperationType.ModifySlot)
                     .WriteByte((byte)this.Type)
                     .WriteShort(sourceSlot)
                     .WriteShort(destinationSlot)
@@ -863,7 +864,7 @@ namespace Destiny.Maple
                     oPacket
                         .WriteBool(true)
                         .WriteByte(1)
-                        .WriteByte((byte)ItemConstants.InventoryOperationType.RemoveItem)
+                        .WriteByte((byte)InventoryOperationType.RemoveItem)
                         .WriteByte((byte)this.Type)
                         .WriteShort(this.Slot);
 
@@ -891,7 +892,7 @@ namespace Destiny.Maple
                     oPacket
                         .WriteBool(true)
                         .WriteByte(1)
-                        .WriteByte((byte)ItemConstants.InventoryOperationType.ModifyQuantity)
+                        .WriteByte((byte)InventoryOperationType.ModifyQuantity)
                         .WriteByte((byte)this.Type)
                         .WriteShort(this.Slot)
                         .WriteShort(this.Quantity);
@@ -916,7 +917,7 @@ namespace Destiny.Maple
             Item destination = this.Parent[this.Type, destinationSlot];
 
             if (destination != null &&
-                this.Type != ItemConstants.ItemType.Equipment &&
+                this.Type != ItemType.Equipment &&
                 this.MapleID == destination.MapleID &&
                 !this.IsRechargeable &&
                 destination.Quantity < destination.MaxPerStack)
@@ -930,11 +931,11 @@ namespace Destiny.Maple
                         oPacket
                             .WriteBool(true)
                             .WriteByte(2)
-                            .WriteByte((byte)ItemConstants.InventoryOperationType.ModifyQuantity)
+                            .WriteByte((byte)InventoryOperationType.ModifyQuantity)
                             .WriteByte((byte)this.Type)
                             .WriteShort(sourceSlot)
                             .WriteShort(this.Quantity)
-                            .WriteByte((byte)ItemConstants.InventoryOperationType.ModifyQuantity)
+                            .WriteByte((byte)InventoryOperationType.ModifyQuantity)
                             .WriteByte((byte)destination.Type)
                             .WriteShort(destinationSlot)
                             .WriteShort(destination.Quantity);
@@ -951,10 +952,10 @@ namespace Destiny.Maple
                         oPacket
                             .WriteBool(true)
                             .WriteByte(2)
-                            .WriteByte((byte)ItemConstants.InventoryOperationType.RemoveItem)
+                            .WriteByte((byte)InventoryOperationType.RemoveItem)
                             .WriteByte((byte)this.Type)
                             .WriteShort(sourceSlot)
-                            .WriteByte((byte)ItemConstants.InventoryOperationType.ModifyQuantity)
+                            .WriteByte((byte)InventoryOperationType.ModifyQuantity)
                             .WriteByte((byte)destination.Type)
                             .WriteShort(destinationSlot)
                             .WriteShort(destination.Quantity);
@@ -977,7 +978,7 @@ namespace Destiny.Maple
                     oPacket
                         .WriteBool(true)
                         .WriteByte(1)
-                        .WriteByte((byte)ItemConstants.InventoryOperationType.ModifySlot)
+                        .WriteByte((byte)InventoryOperationType.ModifySlot)
                         .WriteByte((byte)this.Type)
                         .WriteShort(sourceSlot)
                         .WriteShort(destinationSlot);
@@ -1004,7 +1005,7 @@ namespace Destiny.Maple
                         slot -= 100;
                     }
 
-                    if (this.Type == ItemConstants.ItemType.Equipment)
+                    if (this.Type == ItemType.Equipment)
                     {
                         oPacket.WriteShort(slot);
                     }
@@ -1015,7 +1016,7 @@ namespace Destiny.Maple
                 }
 
                 oPacket
-                    .WriteByte((byte)(this.PetID != null ? 3 : this.Type == ItemConstants.ItemType.Equipment ? 1 : 2))
+                    .WriteByte((byte)(this.PetID != null ? 3 : this.Type == ItemType.Equipment ? 1 : 2))
                     .WriteInt(this.MapleID)
                     .WriteBool(this.IsCash);
 
@@ -1030,7 +1031,7 @@ namespace Destiny.Maple
                 {
 
                 }
-                else if (this.Type == ItemConstants.ItemType.Equipment)
+                else if (this.Type == ItemType.Equipment)
                 {
                     oPacket
                         .WriteByte(this.UpgradesAvailable)
@@ -1086,7 +1087,7 @@ namespace Destiny.Maple
             }
         }
 
-        private ItemConstants.EquipmentSlot GetEquippedSlot() // TODO: Fugly heuristics, remake into better method
+        private EquipmentSlot GetEquippedSlot() // TODO: Fugly heuristics, remake into better method
         {
             short slot = 0;
 
@@ -1152,7 +1153,7 @@ namespace Destiny.Maple
                 slot -= 100;
             }
 
-            return (ItemConstants.EquipmentSlot)slot;
+            return (EquipmentSlot)slot;
         }
 
         public override Packet GetShowGainPacket()
