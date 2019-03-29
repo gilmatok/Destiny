@@ -1,4 +1,6 @@
-﻿using MoonSharp.Interpreter;
+﻿using Destiny.IO;
+using MoonSharp.Interpreter;
+using System.IO;
 using System.Threading;
 
 namespace Destiny.Scripting
@@ -11,21 +13,28 @@ namespace Destiny.Scripting
 
         protected LuaScriptable(string path, bool useThread = false)
         {
-            mPath = path;
+            mPath = Path.GetFullPath(path);
             mScript = new Script();
             mUseThread = useThread;
         }
 
         public void Execute()
         {
-            if (mUseThread)
-            {
-                new Thread(new ThreadStart(() => mScript.DoFile(mPath))).Start();
-            }
-            else
-            {
-                mScript.DoFile(mPath);
-            }
+			if (!File.Exists(mPath))
+			{
+				var dirInfo = new DirectoryInfo(mPath);
+				Log.Warn("Unimplemented Script: {0}", Path.Combine(dirInfo.Parent.Parent.Name, dirInfo.Parent.Name, dirInfo.Name)); // Looks like this: scripts/npc/1234567.lua
+				return;
+			}
+
+			if (mUseThread)
+			{
+				new Thread(new ThreadStart(() => mScript.DoFile(mPath))).Start();
+			}
+			else
+			{
+				mScript.DoFile(mPath);
+			}
         }
 
         protected void Expose(string key, object value)

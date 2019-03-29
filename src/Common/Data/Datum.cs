@@ -11,8 +11,18 @@ namespace Destiny.Data
         private string Table { get; set; }
         private List<Datum> Values { get; set; }
         private string ConnectionString { get; set; }
+		public int Count
+		{
+			get { return this.Values.Count; }
+		}
 
-        public Datums(string table)
+		public Datum this[int index]
+		{
+			get { return Values[index]; }
+		}
+
+
+		public Datums(string table)
         {
             this.Table = table;
             this.ConnectionString = Database.ConnectionString;

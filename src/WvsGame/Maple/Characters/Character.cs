@@ -495,9 +495,9 @@ namespace Destiny.Maple.Characters
                 {
                     try
                     {
-                        if (value.Scripts.ContainsKey(this))
+                        if (lastNpc.Scripts.ContainsKey(this))
                         {
-                            value.Scripts.Remove(this);
+							lastNpc.Scripts.Remove(this);
                         }
                     }
                     catch (ArgumentNullException)

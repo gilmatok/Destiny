@@ -5,6 +5,7 @@ using Destiny.Maple.Shops;
 using System.Collections.Generic;
 using Destiny.Maple.Scripting;
 using System;
+using System.Data;
 
 namespace Destiny.Maple.Life
 {
@@ -14,7 +15,19 @@ namespace Destiny.Maple.Life
             : base(datum)
         {
             this.Scripts = new Dictionary<Character, NpcScript>();
-        }
+
+			// Base class loads the id from map_life datum, but we need to get storage cost and flags from npc_data
+			try
+			{
+				Datum extraData = new Datum("npc_data", Database.SchemaMCDB).Populate("npcid = {0}", this.MapleID);
+				this.StorageCost = (int)extraData["storage_cost"];
+				// TODO: Flags
+			}
+			catch(RowNotInTableException)
+			{
+				this.StorageCost = 0;
+			}
+		}
 
         public Character Controller { get; set; }
 

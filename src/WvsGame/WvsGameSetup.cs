@@ -233,7 +233,7 @@ namespace Destiny
         private static void PopulateGameDatabase()
         {
             Database.ExecuteScript(databaseHost, databaseUsername, databasePassword, @"
-							CREATE DATABASE IF NOT EXISTS `{0}` DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
+                            CREATE DATABASE IF NOT EXISTS `{0}` DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
                             USE `{0}`;
                           
                             DROP TABLE IF EXISTS `buffs`;
@@ -256,10 +256,10 @@ namespace Destiny
                               `Level` tinyint(3) UNSIGNED NOT NULL DEFAULT '1',
                               `Experience` int(11) NOT NULL DEFAULT '0',
                               `Job` smallint(6) NOT NULL DEFAULT '0',
-                              `Strength` smallint(6) NOT NULL,
-                              `Dexterity` smallint(6) NOT NULL,
-                              `Luck` smallint(6) NOT NULL,
-                              `Intelligence` smallint(6) NOT NULL,
+                              `Strength` smallint(6) NOT NULL DEFAULT '12',
+                              `Dexterity` smallint(6) NOT NULL DEFAULT '5',
+                              `Luck` smallint(6) NOT NULL DEFAULT '4',
+                              `Intelligence` smallint(6) NOT NULL DEFAULT '4',
                               `Health` smallint(6) NOT NULL DEFAULT '50',
                               `MaxHealth` smallint(6) NOT NULL DEFAULT '50',
                               `Mana` smallint(6) NOT NULL DEFAULT '5',
@@ -392,6 +392,7 @@ namespace Destiny
                             DROP TABLE IF EXISTS `storages`;
                             CREATE TABLE `storages` (
                               `AccountID` int(11) NOT NULL,
+                              `WorldID` int(11) NOT NULL,
                               `Slots` tinyint(3) UNSIGNED NOT NULL DEFAULT '4',
                               `Meso` int(11) NOT NULL DEFAULT '0'
                             ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -407,9 +408,10 @@ namespace Destiny
                             DROP TABLE IF EXISTS `variables`;
                             CREATE TABLE `variables` (
                               `CharacterID` int(11) NOT NULL,
-                              `Key` varchar(13) NOT NULL DEFAULT '0',
-                              `Value` varchar(13) NOT NULL DEFAULT '0'
-                            ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+                              `Key` varchar(255) NOT NULL,
+                              `Value` varchar(255) NOT NULL
+                            ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 
                             ALTER TABLE `buffs`
                               ADD PRIMARY KEY (`ID`),
@@ -452,8 +454,9 @@ namespace Destiny
                               ADD KEY `character_id` (`CharacterID`) USING BTREE;
 
                             ALTER TABLE `storages`
-                              ADD PRIMARY KEY (`AccountID`) USING BTREE,
-                              ADD KEY `account_id` (`AccountID`) USING BTREE;
+                              ADD PRIMARY KEY (`AccountID`,`WorldID`),
+                              ADD KEY `account_id` (`AccountID`) USING BTREE,
+                              ADD KEY `AccountID` (`AccountID`,`WorldID`);
 
                             ALTER TABLE `trocks`
                               ADD PRIMARY KEY (`ID`),
@@ -461,6 +464,7 @@ namespace Destiny
 
                             ALTER TABLE `variables`
                               ADD PRIMARY KEY (`CharacterID`,`Key`);
+
 
                             ALTER TABLE `buffs`
                               MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
@@ -485,9 +489,11 @@ namespace Destiny
                               ADD CONSTRAINT `buffs_ibfk_1` FOREIGN KEY (`CharacterID`) REFERENCES `characters` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
 
                             ALTER TABLE `characters`
+                              ADD CONSTRAINT `characters_ibfk_1` FOREIGN KEY (`AccountID`) REFERENCES `login`.`accounts` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE,
                               ADD CONSTRAINT `characters_ibfk_2` FOREIGN KEY (`GuildID`) REFERENCES `guilds` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
 
                             ALTER TABLE `items`
+                              ADD CONSTRAINT `items_ibfk_1` FOREIGN KEY (`AccountID`) REFERENCES `login`.`accounts` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE,
                               ADD CONSTRAINT `items_ibfk_2` FOREIGN KEY (`CharacterID`) REFERENCES `characters` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE,
                               ADD CONSTRAINT `items_ibfk_3` FOREIGN KEY (`PetID`) REFERENCES `pets` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
 
@@ -505,6 +511,9 @@ namespace Destiny
 
                             ALTER TABLE `skills`
                               ADD CONSTRAINT `skills_ibfk_1` FOREIGN KEY (`CharacterID`) REFERENCES `characters` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+                            ALTER TABLE `storages`
+                              ADD CONSTRAINT `storages_ibfk_1` FOREIGN KEY (`AccountID`) REFERENCES `login`.`accounts` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
 
                             ALTER TABLE `trocks`
                               ADD CONSTRAINT `trocks_ibfk_1` FOREIGN KEY (`CharacterID`) REFERENCES `characters` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;

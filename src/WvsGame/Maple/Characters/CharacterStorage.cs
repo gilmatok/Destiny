@@ -3,6 +3,7 @@ using Destiny.Data;
 using Destiny.Maple.Life;
 using System.Collections.Generic;
 using static Destiny.Constants.ItemConstants;
+using System.Linq;
 
 namespace Destiny.Maple.Characters
 {
@@ -11,6 +12,7 @@ namespace Destiny.Maple.Characters
         public Character Parent { get; private set; }
 
         public Npc Npc { get; private set; }
+		public byte WorldID { get; private set; }
         public byte Slots { get; private set; }
         public int Meso { get; private set; }
 
@@ -29,42 +31,47 @@ namespace Destiny.Maple.Characters
             this.Parent = parent;
         }
 
-        public void Load()
-        {
-            Datum datum = new Datum("storages");
+		public void Load()
+		{
+			Datum datum = new Datum("storages");
 
-            try
-            {
-                datum.Populate("AccountID = {0}", this.Parent.AccountID);
-            }
-            catch
-            {
-                datum["AccountID"] = this.Parent.AccountID;
-                datum["Slots"] = (byte)4;
-                datum["Meso"] = 0;
+			try
+			{
+				datum.Populate("AccountID = {0} AND WorldID = {1}", this.Parent.AccountID, this.Parent.WorldID);
+			}
+			catch
+			{
+				datum["AccountID"] = this.Parent.AccountID;
+				datum["WorldID"] = this.Parent.WorldID;
+				datum["Slots"] = (byte)4;
+				datum["Meso"] = 0;
 
-                datum.Insert();
-            }
+				datum.Insert();
+			}
 
-            this.Slots = (byte)datum["Slots"];
-            this.Meso = (int)datum["Meso"];
+			this.Slots = (byte)datum["Slots"];
+			this.Meso = (int)datum["Meso"];
 
-            this.Items = new List<Item>();
-
-            foreach (Datum itemDatum in new Datums("items").Populate("AccountID = {0} AND IsStored = True", this.Parent.AccountID))
-            {
-                this.Items.Add(new Item(itemDatum));
-            }
+			this.Items = new List<Item>();
+			
+			Datums charDatums = new Datums("characters").Populate("AccountID = {0} AND WorldID = {1}", this.Parent.AccountID, this.Parent.WorldID);
+			foreach (int charId in (charDatums.Count == 0) ? new[] { this.Parent.ID } : charDatums.Select((cd) => (int)cd["ID"]))
+			{
+				foreach (Datum itemDatum in new Datums("items").Populate("CharacterID = {0} AND IsStored = True", charId))
+				{
+					this.Items.Add(new Item(itemDatum));
+				}
+			}
         }
 
         public void Save()
         {
             Datum datum = new Datum("storages");
-
-            datum["Slots"] = this.Slots;
+			
+			datum["Slots"] = this.Slots;
             datum["Meso"] = this.Meso;
 
-            datum.Update("AccountID = {0}", this.Parent.AccountID);
+            datum.Update("AccountID = {0} AND WorldID = {1}", this.Parent.AccountID, this.Parent.WorldID);
 
             foreach (Item item in this.Items)
             {
@@ -232,11 +239,22 @@ namespace Destiny.Maple.Characters
 
                         if (meso > 0) // NOTE: Withdraw meso.
                         {
-                            // TODO: Meso checks.
+							if (this.Meso < meso)
+								return;
+
+							if (meso + this.Parent.Meso > int.MaxValue)
+							{
+								this.Parent.Notify("Your character cannot hold that many mesos.", NoticeType.Popup); // TOOD: Is there a packet for this?
+								return;
+							}
                         }
                         else // NOTE: Deposit meso.
                         {
-                            // TODO: Meso checks.
+                            if (this.Parent.Meso < meso)
+							{
+								this.Parent.Notify("You don't have enough mesos.", NoticeType.Popup); // TOOD: Is there a packet for this?
+								return;
+							}
                         }
 
                         this.Meso -= meso;

@@ -34,6 +34,8 @@ namespace Destiny.Maple.Scripting
             this.Expose("sendBackOk", new Func<int>(this.SendBackOk));
             this.Expose("askYesNo", new Func<int>(this.AskYesNo));
             this.Expose("askAcceptDecline", new Func<int>(this.AskAcceptDecline));
+
+			this.Expose("openStorage", new Action(this.OpenStorage));
         }
 
         public void SetResult(int value)
@@ -146,5 +148,12 @@ namespace Destiny.Maple.Scripting
         {
 
         }
+
+		private void OpenStorage()
+		{
+			mText = string.Empty;
+
+			mCharacter.Storage.Show(mNpc);
+		}
     }
 }
