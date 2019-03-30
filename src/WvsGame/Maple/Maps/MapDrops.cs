@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Destiny.IO;
 using Destiny.Maple.Characters;
 using Destiny.Network;
@@ -43,32 +44,34 @@ namespace Destiny.Maple.Maps
 
         protected override void RemoveItem(int index)
         {
-            Drop item = base.Items[index];
+			try
+			{
+				Drop item = base.Items[index];
 
-            if (item.Expiry != null)
-            {
-                item.Expiry.Dispose();
-            }
+				if (item.Expiry != null)
+				{
+					item.Expiry.Dispose();
+				}
 
-            using (Packet oPacket = item.GetDestroyPacket())
-            {
-                this.Map.Broadcast(oPacket);
-            }
-
-            if (base.Items.Count > index)
-            {
-                try
-                {
-                    base.RemoveItem(index);
-                }
-                catch (Exception e)
-                {
-                    Log.SkipLine();
-                    Log.Inform("MapDrops-RemoveItem: exception occurred: {0}", e);
-                    Log.SkipLine();
-                }
-            }
-
-        }
+				using (Packet oPacket = item.GetDestroyPacket())
+				{
+					this.Map.Broadcast(oPacket);
+				}
+				
+				base.RemoveItem(index);
+			}
+			catch (ArgumentOutOfRangeException)
+			{
+				Log.SkipLine();
+				Tracer.TraceErrorMessage("Failed to remove item!\nIndex outside of range.");
+				Log.SkipLine();
+			}
+			catch (Exception e)
+			{
+				Log.SkipLine();
+				Log.Error("MapDrops-RemoveItem: exception occurred: {0}", e);
+				Log.SkipLine();
+			}
+		}
     }
 }

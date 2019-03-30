@@ -33,15 +33,15 @@ namespace Destiny.Maple.Maps
 
         protected override void InsertItem(int index, T item)
         {
-            item.Map = this.Map;
+			try
+			{
+				item.Map = this.Map;
 
-            if (!(item is Character)  && !(item is Portal))
-            {
-                item.ObjectID = this.Map.AssignObjectID();
-            }
-
-            try
-            {
+				if (!(item is Character)  && !(item is Portal))
+				{
+					item.ObjectID = this.Map.AssignObjectID();
+				}
+				
                 base.InsertItem(index, item);
             }
             catch(Exception e)
@@ -53,56 +53,25 @@ namespace Destiny.Maple.Maps
             }     
         }
 
-        protected override void RemoveItem(int index) 
+        protected override void RemoveItem(int index)
         {
-            if (index >= 0 && index < int.MaxValue)
-            {
-                if (base.Items.Count < index)
+			try
+			{
+                T item = base.Items[index];
+                item.Map = null;
+
+                if (!(item is Character) && !(item is Portal))
                 {
-                    Log.SkipLine();
-                    Tracer.TraceErrorMessage("Failed to remove item, there is less items in base then index points to!");
-                    Log.SkipLine();
-                    //Log.Inform("ERROR: MapObjects-RemoveItem() failed to remove item! Index: {0} \n Theres less items then index points to: {1}", index, base.Items.Count);
+                    item.ObjectID = -1;
                 }
 
-                else if (base.Items.Count >= index)
-                {
-                    T item = base.Items[index];
-                    item.Map = null;
-
-                    if (!(item is Character) && !(item is Portal))
-                    {
-                        item.ObjectID = -1;
-                    }
-
-                    try
-                    {
-                        base.RemoveItem(index);
-                    }
-                    catch (Exception e)
-                    {
-                        Log.SkipLine();
-                        Tracer.TraceErrorMessage("Failed to remove item! \n Exception occurred.");
-                        Log.SkipLine();
-                        //Log.Inform("ERROR: MapObjects-RemoveItem() failed to remove item! ItemIndex: {0} \n Exception occurred: {1}", index, e);
-                    }
-                }
-
-                else
-                {
-                    Log.SkipLine();
-                    Tracer.TraceErrorMessage("Failed to remove item!.");
-                    Log.SkipLine();
-                    //Log.Inform("ERROR: MapObjects-RemoveItem() failed to remove item! ItemIndex: {0}, Items.Count: {1}", index, Items.Count);
-                }             
+                base.RemoveItem(index);  
             }
-
-            else
+			catch (ArgumentOutOfRangeException)
             {
                 Log.SkipLine();
-                Tracer.TraceErrorMessage("Failed item index out of bounds!!.");
+                Tracer.TraceErrorMessage("Failed to remove item! \n Index outside of range.");
                 Log.SkipLine();
-                //Log.Error("ERROR: MapObjects-RemoveItem() index out of bounds! ItemIndex: {0}", index);
             }
         }
     }

@@ -491,7 +491,7 @@ namespace Destiny.Maple.Characters
             get { return lastNpc; }
             set
             {
-                if (value == null)
+                if (value == null && lastNpc != null)
                 {
                     try
                     {

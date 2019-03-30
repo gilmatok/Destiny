@@ -16,8 +16,3 @@ Destiny is a C# based open-source server emulation software for 2D MMORPG game M
 5. **Run Destiny**: Execute the servers in order: WvsCenter -> WvsLogin -> WvsGame(s).
 
 Each server will guide you through the process of configuring it automatically.
-
-**Warning: Two auto-setup options currently do not function as intended.**
-- If you login for first time with auto-register on, you will have to log in 2 times consecutively. On the fist time you will not be logged in, but the account will be created. Therefore, upon second attempt you will be logged in.
-
-- The number of channels selected on login server setup is not yet implemented. So even if you select 16 channels there will only be 1.

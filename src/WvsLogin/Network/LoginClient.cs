@@ -159,7 +159,7 @@ namespace Destiny.Network
 
                         this.Account.Save();
 
-                        this.SendLoginResult(LoginResult.Valid);
+                        this.SendLoginResult(LoginResult.EULA);
                     }
                     else
                     {
