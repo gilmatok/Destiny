@@ -401,7 +401,7 @@ namespace Destiny.Maple.Characters
 
                 if (true) // NOTE: A server setting for multi-leveling.
                 {
-                    while (experience >= ExperienceTables.CharacterLevelExp[this.Level])
+                    while (experience >= ExperienceTables.CharacterLevelExp[this.Level] && this.Level < MAX_LEVEL)
                     {
                         experience -= ExperienceTables.CharacterLevelExp[this.Level];
 
@@ -409,7 +409,7 @@ namespace Destiny.Maple.Characters
                     }
                 }
 
-                /*
+				/*
                 else
                 {
                     if (experience >= ExperienceTables.CharacterLevel[this.Level])
@@ -426,7 +426,13 @@ namespace Destiny.Maple.Characters
                 }
                 */
 
-                if (this.IsInitialized && delta != 0)
+
+				if (this.Level == MAX_LEVEL)
+				{
+					experience = 0;
+				}
+
+				if (this.IsInitialized && delta != 0)
                 {
                     CharacterStats.Update(this, StatisticType.Experience);
                 }

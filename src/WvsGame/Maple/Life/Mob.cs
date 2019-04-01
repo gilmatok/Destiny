@@ -312,7 +312,16 @@ namespace Destiny.Maple.Life
                     .WriteByte(skillID)
                     .WriteByte(skillLevel);
 
-                this.Controller.Client.Send(oPacket);
+				// If the controller disconnected at just the wrong time, find a new controller
+				if (this.Controller != null && this.Controller.Client != null && this.Controller.Client.IsAlive)
+				{
+					this.Controller.Client.Send(oPacket);
+				}
+				else
+				{
+					this.Controller = null;
+					AssignController();
+				}
             }
 
             using (Packet oPacket = new Packet(ServerOperationCode.MobMove))

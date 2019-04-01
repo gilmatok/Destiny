@@ -37,17 +37,25 @@ namespace Destiny.Maple.Characters
 
         public void Load()
         {
-            // TODO: Use JOIN with the pets table.
-            foreach (Datum datum in new Datums("items").Populate("CharacterID = {0} AND IsStored = 0", this.Parent.ID))
+			string fields = "i.*, p.Name AS PetName, p.Level AS PetLevel, p.Closeness AS PetCloseness, p.Fullness AS PetFullness";
+            foreach (Datum datum in new Datums("items i").LeftJoin("pets AS p", "p.ID = i.PetID").PopulateWith(fields, "i.CharacterID = {0} AND i.IsStored = 0", this.Parent.ID))
             {
                 Item item = new Item(datum);
 
                 this.Add(item);
 
-                if (item.PetID != null)
-                {
-                    //this.Parent.Pets.Add(new Pet(item));
-                }
+				if (item.PetID != null)
+				{
+					var petData = new Dictionary<string, object>();
+					foreach(var column in Meta.Tables["pets"].Keys)
+					{
+						// NOTE: Assumes the query has EVERY column and each one is aliased with "Pet" + the actual column name
+						petData.Add(column, datum.Dictionary["Pet" + column]);
+					}
+					Datum petDatum = new Datum("pets", petData);
+
+					// this.Parent.Pets.Add(new Pet(petDatum));
+				}
             }
         }
 

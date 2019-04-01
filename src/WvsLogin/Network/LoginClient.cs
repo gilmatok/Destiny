@@ -122,23 +122,6 @@ namespace Destiny.Network
                 try
                 {
                     this.Account.Load(username);
-
-                    if (SHACryptograph.Encrypt(SHAMode.SHA512, password + this.Account.Salt) != this.Account.Password)
-                    {
-                        this.SendLoginResult(LoginResult.InvalidPassword);
-                    }                  
-                    else if (this.Account.IsBanned)
-                    {
-                        this.SendLoginResult(LoginResult.Banned);
-                    }
-                    else if (!this.Account.EULA)
-                    {
-                        this.SendLoginResult(LoginResult.EULA);
-                    }
-                    else // TODO: Add more scenarios (require master IP, check banned IP, check logged in).
-                    {
-                        this.SendLoginResult(LoginResult.Valid);
-                    }
                 }
                 catch (NoAccountException)
                 {
@@ -158,18 +141,38 @@ namespace Destiny.Network
                         this.Account.MaxCharacters = WvsLogin.MaxCharacters;
 
                         this.Account.Save();
-
-                        this.SendLoginResult(LoginResult.EULA);
-                    }
+					}
                     else
                     {
                         this.SendLoginResult(LoginResult.InvalidUsername);
 
                         this.LastUsername = username;
                         this.LastPassword = password;
+						return;
                     }
                 }
-            }
+
+				// Do not store password in memory any longer than necessary
+				this.LastUsername = null;
+				this.LastPassword = null;
+
+				if (SHACryptograph.Encrypt(SHAMode.SHA512, password + this.Account.Salt) != this.Account.Password)
+				{
+					this.SendLoginResult(LoginResult.InvalidPassword);
+				}
+				else if (this.Account.IsBanned)
+				{
+					this.SendLoginResult(LoginResult.Banned);
+				}
+				else if (!this.Account.EULA)
+				{
+					this.SendLoginResult(LoginResult.EULA);
+				}
+				else // TODO: Add more scenarios (require master IP, check banned IP, check logged in).
+				{
+					this.SendLoginResult(LoginResult.Valid);
+				}
+			}
         }
 
         private void SendLoginResult(LoginResult result)

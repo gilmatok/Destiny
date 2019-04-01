@@ -67,13 +67,19 @@ namespace Destiny.Data
 
             foreach (string field in tokens)
             {
-                final += "`" + field + "`";
-                processed++;
+				if (field.ToUpperInvariant().Trim().Equals("AS"))
+				{
+					final += " AS ";
+					continue;
+				}
 
-                if (processed < tokens.Length)
-                {
-                    final += ", ";
-                }
+				if (processed > 0 && !final.EndsWith(" AS "))
+				{
+					final += ", ";
+				}
+
+                final += "`" + field.Replace(".", "`.`") + "`";
+                processed++;
             }
 
             return final;

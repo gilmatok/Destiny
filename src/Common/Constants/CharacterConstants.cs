@@ -24,6 +24,8 @@ namespace Destiny.Constants
 				.Concat(FourthJobLevelExp).ToArray();
 		}
 
+		public const int MAX_LEVEL = 200;
+
 		#region Character
 		public enum Gender : byte
 		{

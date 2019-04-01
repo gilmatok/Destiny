@@ -3,14 +3,18 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.Text;
 
 namespace Destiny.Data
 {
     public sealed class Datums : IEnumerable<Datum>
     {
         private string Table { get; set; }
+		private string TableAlias { get; set; }
         private List<Datum> Values { get; set; }
         private string ConnectionString { get; set; }
+		private List<string> JoinConditions { get; set; }
+		private List<MySqlParameter> JoinParameters { get; set; }
 		public int Count
 		{
 			get { return this.Values.Count; }
@@ -22,21 +26,21 @@ namespace Destiny.Data
 		}
 
 
-		public Datums(string table)
-        {
-            this.Table = table;
-            this.ConnectionString = Database.ConnectionString;
-        }
+		public Datums(string table) : this(table, Database.Schema) {}
 
         public Datums(string table, string schema)
         {
-            this.Table = table;
-            this.ConnectionString = string.Format("server={0}; database={1}; uid={2}; password={3}; convertzerodatetime=yes;",
+			var separated = SeparateTableAndAlias(table);
+			this.Table = separated.Item1;
+			this.TableAlias = separated.Item2;
+			this.ConnectionString = string.Format("server={0}; database={1}; uid={2}; password={3}; convertzerodatetime=yes;",
                 Database.Host,
                 schema,
                 Database.Username,
                 Database.Password);
-        }
+			this.JoinConditions = new List<string>();
+			this.JoinParameters = new List<MySqlParameter>();
+		}
 
         private void PopulateInternal(string fields, string constraints, params object[] args)
         {
@@ -47,10 +51,16 @@ namespace Destiny.Data
                 connection.Open();
                 using (MySqlCommand command = Database.GetCommand(connection, constraints, args))
                 {
-                    string whereClause = constraints != null ? " WHERE " + command.CommandText : string.Empty;
-                    command.CommandText = string.Format("SELECT {0} FROM `{1}`{2}", fields == null ? "*" : Database.CorrectFields(fields), this.Table, whereClause);
+					string tableAndAlias = string.Format("`{0}`{1}", this.Table, !string.IsNullOrWhiteSpace(this.TableAlias) ? string.Format(" AS `{0}`", this.TableAlias) : "");
+					string joinClause = string.Join("", this.JoinConditions);
+					foreach (var param in this.JoinParameters)
+					{
+						command.Parameters.Add(param);
+					}
+					string whereClause = constraints != null ? " WHERE " + command.CommandText : string.Empty;
+					command.CommandText = string.Format("SELECT {0} FROM {1}{2}{3}", fields == null ? "*" : Database.CorrectFields(fields), tableAndAlias, joinClause, whereClause);
 
-                    using (MySqlDataReader reader = command.ExecuteReader())
+					using (MySqlDataReader reader = command.ExecuteReader())
                     {
                         while (reader.Read())
                         {
@@ -68,7 +78,57 @@ namespace Destiny.Data
             }
         }
 
-        public Datums Populate()
+		private Tuple<string, string> SeparateTableAndAlias(string tableAndAlias)
+		{
+			// In case table is aliased, split it so that both the table and alias have separate quotes
+			int spacePos = tableAndAlias.IndexOf(" ", StringComparison.InvariantCultureIgnoreCase);
+			string tableName = spacePos > 0 ? tableAndAlias.Substring(0, spacePos) : tableAndAlias;
+			string tableAlias = spacePos > 0 ? tableAndAlias.Substring(spacePos + 1) : "";
+			tableAlias = tableAlias.StartsWith("AS ", StringComparison.InvariantCultureIgnoreCase) ? tableAlias.Remove(0, 3) : tableAlias;
+
+			return new Tuple<string, string>(tableName, tableAlias);
+		}
+
+		private Datums JoinInternal(string table, string condition, string joinType = null, params object[] args)
+		{
+			StringBuilder outputBuilder = new StringBuilder();
+
+			if (!string.IsNullOrWhiteSpace(joinType))
+			{
+				outputBuilder.Append(string.Format(" {0}", joinType.ToUpper()));
+			}
+
+			var tableAndAlias = SeparateTableAndAlias(table);
+			string safeTableAndAlias = string.Format("`{0}`{1}", tableAndAlias.Item1, !string.IsNullOrWhiteSpace(tableAndAlias.Item2) ? string.Format(" AS `{0}`", tableAndAlias.Item2) : "");
+			outputBuilder.Append(string.Format(" JOIN {0}", safeTableAndAlias));
+
+			if (!String.IsNullOrWhiteSpace(condition))
+			{
+				outputBuilder.Append(string.Format(" ON {0}", Database.ParameterizeCommandText("join" + this.JoinConditions.Count + "_", condition, args)));
+				this.JoinParameters.AddRange(Database.ConstraintsToParameters("join" + this.JoinConditions.Count + "_", condition, args));
+			}
+
+			this.JoinConditions.Add(outputBuilder.ToString());
+
+			return this;
+		}
+
+		public Datums Join(string table, string condition, params object[] args)
+		{
+			return this.JoinInternal(table, condition, null, args);
+		}
+
+		public Datums LeftJoin(string table, string condition, params object[] args)
+		{
+			return this.JoinInternal(table, condition, "LEFT", args);
+		}
+
+		public Datums FullJoin(string table, string condition, params object[] args)
+		{
+			return this.JoinInternal(table, condition, "FULL", args);
+		}
+
+		public Datums Populate()
         {
             this.PopulateInternal(null, null, null);
 
@@ -113,8 +173,11 @@ namespace Destiny.Data
     public sealed class Datum
     {
         public string Table { get; private set; }
+		public string TableAlias { get; private set; }
         public Dictionary<string, Object> Dictionary { get; set; }
         private string ConnectionString { get; set; }
+		private List<string> JoinConditions { get; set; }
+		private List<MySqlParameter> JoinParameters { get; set; }
 
         public object this[string name]
         {
@@ -149,41 +212,26 @@ namespace Destiny.Data
             }
         }
 
-        public Datum(string table)
-        {
-            this.Table = table;
-            this.Dictionary = new Dictionary<string, object>();
-            this.ConnectionString = Database.ConnectionString;
-        }
+        public Datum(string table) : this(table, Database.Schema, new Dictionary<string, object>()) {}
 
-        public Datum(string table, string schema)
-        {
-            this.Table = table;
-            this.Dictionary = new Dictionary<string, object>();
-            this.ConnectionString = string.Format("server={0}; database={1}; uid={2}; password={3}; convertzerodatetime=yes;",
-                Database.Host,
-                schema,
-                Database.Username,
-                Database.Password);
-        }
+        public Datum(string table, string schema) : this(table, schema, new Dictionary<string, object>()) {}
 
-        public Datum(string table, Dictionary<string, object> dictionary)
-        {
-            this.Table = table;
-            this.Dictionary = dictionary;
-            this.ConnectionString = Database.ConnectionString;
-        }
+        public Datum(string table, Dictionary<string, object> dictionary) : this(table, Database.Schema, dictionary) {}
 
         public Datum(string table, string schema, Dictionary<string, object> dictionary)
         {
-            this.Table = table;
-            this.Dictionary = dictionary;
+			var separated = SeparateTableAndAlias(table);
+			this.Table = separated.Item1;
+			this.TableAlias = separated.Item2;
+			this.Dictionary = dictionary;
             this.ConnectionString = string.Format("server={0}; database={1}; uid={2}; password={3}; convertzerodatetime=yes;",
                 Database.Host,
                 schema,
                 Database.Username,
                 Database.Password);
-        }
+			this.JoinConditions = new List<string>();
+			this.JoinParameters = new List<MySqlParameter>();
+		}
 
         public Datum Populate(string constraints, params object[] args)
         {
@@ -194,12 +242,19 @@ namespace Destiny.Data
 
         public Datum PopulateWith(string fields, string constraints, params object[] args)
         {
-            using (MySqlConnection connection = new MySqlConnection(this.ConnectionString))
+			using (MySqlConnection connection = new MySqlConnection(this.ConnectionString))
             {
                 connection.Open();
                 using (MySqlCommand command = Database.GetCommand(connection, constraints, args))
                 {
-                    command.CommandText = string.Format("SELECT {0} FROM `{1}` WHERE ", Database.CorrectFields(fields), this.Table) + command.CommandText;
+					string tableAndAlias = string.Format("`{0}`{1}", this.Table, !string.IsNullOrWhiteSpace(this.TableAlias) ? string.Format(" AS `{0}`", this.TableAlias) : "");
+					string joinClause = string.Join("", this.JoinConditions);
+					foreach (var param in this.JoinParameters)
+					{
+						command.Parameters.Add(param);
+					}
+					string whereClause = constraints != null ? " WHERE " + command.CommandText : string.Empty;
+					command.CommandText = string.Format("SELECT {0} FROM {1}{2}{3}", fields == null ? "*" : Database.CorrectFields(fields), tableAndAlias, joinClause, whereClause);
 
                     using (MySqlDataReader reader = command.ExecuteReader())
                     {
@@ -229,7 +284,57 @@ namespace Destiny.Data
             return this;
         }
 
-        public void Insert()
+		private Tuple<string, string> SeparateTableAndAlias(string tableAndAlias)
+		{
+			// In case table is aliased, split it so that both the table and alias have separate quotes
+			int spacePos = tableAndAlias.IndexOf(" ", StringComparison.InvariantCultureIgnoreCase);
+			string tableName = spacePos > 0 ? tableAndAlias.Substring(0, spacePos) : tableAndAlias;
+			string tableAlias = spacePos > 0 ? tableAndAlias.Substring(spacePos + 1) : "";
+			tableAlias = tableAlias.StartsWith("AS ", StringComparison.InvariantCultureIgnoreCase) ? tableAlias.Remove(0, 3) : tableAlias;
+
+			return new Tuple<string, string>(tableName, tableAlias);
+		}
+
+		private Datum JoinInternal(string table, string condition, string joinType = null, params object[] args)
+		{
+			StringBuilder outputBuilder = new StringBuilder();
+
+			if (!string.IsNullOrWhiteSpace(joinType))
+			{
+				outputBuilder.Append(string.Format(" {0}", joinType.ToUpper()));
+			}
+
+			var tableAndAlias = SeparateTableAndAlias(table);
+			string safeTableAndAlias = string.Format("`{0}`{1}", tableAndAlias.Item1, !string.IsNullOrWhiteSpace(tableAndAlias.Item2) ? string.Format(" AS `{0}`", tableAndAlias.Item2) : "");
+			outputBuilder.Append(string.Format(" JOIN {0}", safeTableAndAlias));
+
+			if (!String.IsNullOrWhiteSpace(condition))
+			{
+				outputBuilder.Append(string.Format(" ON {0}", Database.ParameterizeCommandText("join" + this.JoinConditions.Count + "_", condition, args)));
+				this.JoinParameters.AddRange(Database.ConstraintsToParameters("join" + this.JoinConditions.Count + "_", condition, args));
+			}
+
+			this.JoinConditions.Add(outputBuilder.ToString());
+
+			return this;
+		}
+
+		public Datum Join(string table, string condition, params object[] args)
+		{
+			return this.JoinInternal(table, condition, null, args);
+		}
+
+		public Datum LeftJoin(string table, string condition, params object[] args)
+		{
+			return this.JoinInternal(table, condition, "LEFT", args);
+		}
+
+		public Datum FullJoin(string table, string condition, params object[] args)
+		{
+			return this.JoinInternal(table, condition, "FULL", args);
+		}
+
+		public void Insert()
         {
             string fields = "( ";
 
